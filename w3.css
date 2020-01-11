@@ -23,7 +23,7 @@ legend{color:inherit;display:table;max-width:100%;padding:0;white-space:normal}t
 [type=search]::-webkit-search-decoration{-webkit-appearance:none}
 ::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}
 /* End extract */
-*{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}
+*:not(input){-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}
 select{cursor:pointer}
 .outline-red{outline-color:#f44336}
 .outline-blue{outline-color:#2196F3}
