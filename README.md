@@ -6,11 +6,11 @@ An FRC scouting web app
 - w3.css - mininal and responsive css framework
 - Dark-only theme with red/blue color variants
 - Simple error checking for scouting criteria
+- Templates - fully customizable with in-app creator (documentation coming soon)
 - Uses `localStorage` to store entries
-- Download saved entries as `surveys.txt`
+- Download saved entries as `(Template Name) Surveys.txt`, separated with `;`
 
 ### Planned Features
-- Templates - fully customizable with in-app creator
 - Google Drive integration
 - Exporting methods - `csv`, `json`, etc
 
