@@ -1,7 +1,7 @@
 // Template loader/setter/creator
 let gameMetrics = [];
 let defaults = [
-  // { name: 'FRC 2020 (2471)', values: [] }, TO BE COMPLETEd
+  // { name: 'FRC 2020 (2471)', values: [] }, TO BE COMPLETED
   { name: 'BunnyBots 2019 (2471)', selected: true, values: [
     { name: 'Tub Supported', type: 'toggle' },
     { name: 'Spoiled', type: 'toggle' },
@@ -109,7 +109,7 @@ function changeText(i) {
 }
 function crement(i, way) {
   let metric = gameMetrics[i];
-  if (way == 'inc' && metric.value < metric.max) metric.value++;
+  if (way == 'inc' && metric.value < (metric.max ? metrix.max : Infinity)) metric.value++;
   else if (way == 'dec' && metric.value > 0) metric.value--;
   metric.element.children('.inc').html(metric.value);
 }
@@ -141,7 +141,7 @@ function loadTemplate(t) {
       newMetric.appendChild(document.createTextNode(metric.name));
       let input = document.createElement('input');
       input.classList.add('w3-input', 'w3-black');
-      input.placeholder = metric.tip;
+      input.placeholder = metric.tip ? metric.tip : '';
       input.onchange = () => {changeText(i)};
       newMetric.appendChild(input);
       metricObj.value = '';
