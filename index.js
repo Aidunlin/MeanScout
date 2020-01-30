@@ -27,6 +27,7 @@ function setLoc(l) {
     if (metric.type == 'toggle' && metric.value) metric.element.addClass(`w3-${theme}`);
   });
   $('.data-btn, #opt-temp-set').addClass(`w3-hover-${theme} w3-text-${theme} w3-border-${theme}`);
+  console.log(`Set location ${loc} and theme ${theme}`);
 }
 if (localStorage.getItem('location')) {
   setLoc(localStorage.getItem('location'));
@@ -55,6 +56,7 @@ function setSize(s) {
     $('.btn-spacer').height(35);
   }
   $('body').addClass(`w3-${s}`);
+  console.log(`Set size ${size}`);
 }
 if (localStorage.getItem('size')) {
   setSize(localStorage.getItem('size'));
@@ -83,15 +85,9 @@ function save() {
     return;
   }
   let values = `${$('#team').val()};${$('#match').val()};${absent ? '1' : '0'};`;
-  let emptyReq = false;
   $.each(gameMetrics, (_i, metric) => {
-    if (metric.required && !metric.value) {
-      alert(`Please enter a value for ${metric.name}!`);
-      emptyReq = true;
-    }
     values += metric.value + ';';
   });
-  if (emptyReq) return;
   if (!confirm('Confirm save?')) return;
   let prev = localStorage.getItem('surveys');
   localStorage.setItem('surveys', `${prev || ''}${values}\n`);
@@ -117,13 +113,12 @@ function save() {
       metric.element.children('select').val(0);
     }
   });
+  console.log('Save successful');
 }
 
 // Download and clear saved surveys from localstorage
 function download(ask=true) {
-  if (ask) {
-    if (!confirm('Confirm download?')) return;
-  }
+  if (ask) if (!confirm('Confirm download?')) return;
   let a = document.createElement('a');
   a.href = `data:text/plain;charset=utf-8,${encodeURIComponent(localStorage.getItem('surveys'))}`;
   a.download = `${selTemp} Surveys.txt`;
@@ -131,4 +126,5 @@ function download(ask=true) {
   a.click();
   document.body.removeChild(a);
   localStorage.setItem('surveys', '');
+  console.log(`Downloaded ${selTemp} Surveys.txt`);
 }

@@ -8,11 +8,11 @@
   "theme_color": "#000000",
   "background_color": "#000000",
   "icons": [{
-    "src": "./robot192.png",
+    "src": "./logo192.png",
     "type": "image/png",
     "sizes": "192x192"
   }, {
-    "src": "./robot512.png",
+    "src": "./logo512.png",
     "type": "image/png",
     "sizes": "512x512"
   }]

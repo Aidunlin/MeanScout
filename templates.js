@@ -1,34 +1,52 @@
-// Template loader/setter/creator
-let gameMetrics = [];
-let defaults = [
-  // { name: 'FRC 2020 (2471)', values: [] }, TO BE COMPLETED
-  { name: 'BunnyBots 2019 (2471)', selected: true, values: [
-    { name: 'Tub Supported', type: 'toggle' },
-    { name: 'Spoiled', type: 'toggle' },
-    { name: 'Bunnies', type: 'number', max: 6 },
-    { name: 'Tubs', type: 'number', max: 8 },
-    { name: 'Cubes', type: 'number', max: 120 },
-    { name: 'Penalty', type: 'select', values: [ 'None', 'Yellow', 'Red' ]},
-    { name: 'Drive', type: 'select', values: [ 'Terrible', 'Bad', 'Good', 'Great', 'Excellent' ]},
-    { name: 'Defense', type: 'select', values: [ 'Terrible', 'Bad', 'Good', 'Great', 'Excellent' ]},
-    { name: 'Comment', type: 'text', tip: 'Useful info', required: true },
-    { name: 'Breakdown', type: 'text', tip: 'Reason if broke down' }
-  ]}
-];
+let defaultTemplate = { name: 'FRC 2020 (2471)', values: [
+  { name: 'Passed Line', type: 'toggle' },
+  { name: 'AUTO Bottom Port', type: 'number' },
+  { name: 'TELE Bottom Port', type: 'number' },
+  { name: 'AUTO Outer Port', type: 'number', newline: true },
+  { name: 'TELE Outer Port', type: 'number' },
+  { name: 'AUTO Inner Port', type: 'number', newline: true },
+  { name: 'TELE Inner Port', type: 'number' },
+  { name: 'Rotation Control', type: 'toggle' },
+  { name: 'Position Control', type: 'toggle' },
+  { name: 'Endgame', type: 'select', values: ['None', 'Park', 'Hang'] },
+  { name: 'Primary Role', type: 'select', values: ['None', 'Role 1', 'Role 2'] },
+  { name: 'Secondary Role', type: 'select', values: ['None', 'Role 1', 'Role 2'] },
+  { name: 'Penalty Card', type: 'select', values: ['None', 'Yellow', 'Red'] },
+  { name: 'Disabled', type: 'toggle' },
+  { name: 'Disqualified', type: 'toggle' },
+  { name: 'Drive Rating', type: 'select', values: ['Bad', 'Ok', 'Great'] },
+  { name: 'Co-op Rating', type: 'select', values: ['Bad', 'Ok', 'Great'] },
+  { name: 'Defense Rating', type: 'select', values: ['Bad', 'Ok', 'Great'] },
+  { name: 'Comment(s)', type: 'text' },
+  { name: 'Breakdown', type: 'text' }
+]};
 let templates = [];
+let gameMetrics = [];
+let selTemp;
+
 if (localStorage.getItem('templates')) {
   templates = JSON.parse(localStorage.getItem('templates'));
-} else {
-  templates = defaults;
 }
+
+$('#opt-temp').append(new Option(defaultTemplate.name, defaultTemplate.name));
+let isCustomSel = false;
 $.each(templates, (i, template) => {
-  $('#opt-temp').append(new Option(template.name, template.name));
+  $('#opt-temp').prepend(new Option(template.name, template.name));
   if (template.selected) {
+    selTemp = template.name;
+    isCustomSel = true;
     loadTemplate(template.values);
-    $('#opt-temp').val(template.name);
+    $('#opt-temp').val(selTemp);
     $('#opt-temp-text').val(JSON.stringify(template));
   }
 });
+
+if (!isCustomSel) {
+  selTemp = defaultTemplate.name;
+  loadTemplate(defaultTemplate.values);
+  $('#opt-temp').val(selTemp);
+  $('#opt-temp-text').val(JSON.stringify(defaultTemplate));
+}
 localStorage.setItem('templates', JSON.stringify(templates));
 
 function setTemplate() {
@@ -36,39 +54,44 @@ function setTemplate() {
     if (confirm('There are saved surveys from another template. Download them to switch templates?')) download(false);
     else return;
   }
+  let isCustomSel = false;
   $.each(templates, (i, template) => {
     template.selected = false;
     if ($('#opt-temp').val() == template.name) {
+      selTemp = template.name;
+      isCustomSel = true;
       template.selected = true;
       loadTemplate(template.values);
       setLoc(loc);
+      $('#opt-temp-text').val(JSON.stringify(template));
     }
   });
+  if (!isCustomSel) {
+    selTemp = defaultTemplate.name;
+    loadTemplate(defaultTemplate.values);
+    $('#opt-temp').val(selTemp);
+    $('#opt-temp-text').val(JSON.stringify(defaultTemplate));
+    setLoc(loc);
+  }
   localStorage.setItem('templates', JSON.stringify(templates));
 }
 
 $('#opt-temp').change(() => {
   setTemplate();
-  $('#opt-temp-text').val(JSON.stringify(templates.filter(t => {if (t.selected) return t})[0]));
 });
 $('#opt-temp-add').click(() => {
   if ($('#opt-temp-text').val()) {
-    let newTemplate = JSON.parse($('#opt-temp-text').val());
-    if (newTemplate instanceof Array) newTemplate = newTemplate[0];
+    let newTemp = JSON.parse($('#opt-temp-text').val());
+    if (newTemp instanceof Array) newTemp = newTemp[0];
     let isDup = false;
     $.each(templates, (_i, template) => {
-      if (newTemplate.name == template.name && JSON.stringify(newTemplate.values) == JSON.stringify(template.values)) {
-        isDup = true;
-      }
+      if (newTemp.name == template.name && JSON.stringify(newTemp.values) == JSON.stringify(template.values)) isDup = true;
     });
-    if (isDup) {
-      alert('This template already exists!');
-      return;
-    }
-    newTemplate.selected = true;
+    if (isDup) { alert('This template already exists!'); return; }
+    newTemp.selected = true;
     let error = false;
-    if (newTemplate.name && newTemplate.values) {
-      $.each(newTemplate.values, (_i, value) => {
+    if (newTemp.name && newTemp.values) {
+      $.each(newTemp.values, (_i, value) => {
         if (!value.name) error = true;
         else if (value.type == 'number') error = value.max < 1;
         else if (value.type == 'select') error = !value.values;
@@ -79,17 +102,16 @@ $('#opt-temp-add').click(() => {
       alert('Invalid JSON/template! Please try again.');
       return;
     }
-    templates.unshift(newTemplate);
-    $('#opt-temp').prepend(new Option(newTemplate.name, newTemplate.name));
-    $('#opt-temp').val(newTemplate.name);
+    templates.unshift(newTemp);
+    $('#opt-temp').prepend(new Option(newTemp.name, newTemp.name));
+    $('#opt-temp').val(newTemp.name);
     setTemplate();
   }
 });
 $('#opt-temp-reset').click(() => {
   if (confirm('This will remove all custom templates created. Are you sure?')) {
     if (confirm('No, seriously, you will not be able to undo this action. Are you sure?')) {
-      if (['debug', 'I understand that all templates will be removed and it is my fault if I do this on accident'].includes(
-        prompt('Type "I understand that all templates will be removed and it is my fault if I do this on accident" to reset templates'))) {
+      if (['debug', 'I am completely sure'].includes(prompt('Type "I am completely sure" to reset templates'))) {
         localStorage.removeItem('templates');
         location.reload();
       }
@@ -184,8 +206,8 @@ function loadTemplate(t) {
       newMetric.appendChild(select);
       metricObj.value = 0;
     }
-    
-    if (prevType == metric.type) {
+
+    if (prevType == metric.type && !metric.newline) {
       prevDiv.appendChild(newMetric);
     } else {
       newDiv.appendChild(newMetric);
@@ -194,7 +216,6 @@ function loadTemplate(t) {
     }
     metricObj.element = $(newMetric);
     metricObj.type = metric.type;
-    metricObj.required = metric.required;
     prevType = metric.type;
     gameMetrics.push(metricObj);
   });
