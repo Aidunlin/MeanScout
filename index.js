@@ -1,7 +1,7 @@
 // Register service worker
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js');
+    navigator.serviceWorker.register('./sw.js').then(() => console.log('Service worker registered'));
   });
 }
 
@@ -34,35 +34,6 @@ if (localStorage.getItem('location')) {
   $('#opt-location').val(loc);
 } else setLoc('None');
 $('#opt-location').change(() => setLoc($('#opt-location option:checked').val()));
-
-// Size setter
-let size = 'medium';
-function setSize(s) {
-  $('body').removeClass(`w3-${size}`);
-  $('nav').removeClass('w3-hide');
-  size = s;
-  localStorage.setItem('size', s);
-  if (size == 'medium') {
-    $('#title-img').height(22);
-    $('main').css('margin-top', 54);
-    $('.btn-spacer').height(21);
-  } else if (size == 'large') {
-    $('#title-img').height(27);
-    $('main').css('margin-top', 60);
-    $('.btn-spacer').height(26);
-  } else if (size == 'xlarge') {
-    $('#title-img').height(36);
-    $('main').css('margin-top', 68);
-    $('.btn-spacer').height(35);
-  }
-  $('body').addClass(`w3-${s}`);
-  console.log(`Set size ${size}`);
-}
-if (localStorage.getItem('size')) {
-  setSize(localStorage.getItem('size'));
-  $('#opt-size').val(size);
-} else setSize('medium');
-$('#opt-size').change(() => setSize($('#opt-size').val()));
 
 // Match/Absent stuff
 let matchCount = 1;
