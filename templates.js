@@ -1,3 +1,4 @@
+// 2471's current default template
 let defaultTemplate = { name: 'FRC 2020 (2471)', values: [
   { name: 'Passed Line', type: 'toggle' },
   { name: 'AUTO Bottom Port', type: 'number' },
@@ -28,6 +29,7 @@ if (localStorage.getItem('templates')) {
   templates = JSON.parse(localStorage.getItem('templates'));
 }
 
+// Populate template picker with template options, select previously selected template
 $('#opt-temp').append(new Option(defaultTemplate.name, defaultTemplate.name));
 let isCustomSel = false;
 $.each(templates, (i, template) => {
@@ -40,7 +42,6 @@ $.each(templates, (i, template) => {
     $('#opt-temp-text').val(JSON.stringify(template));
   }
 });
-
 if (!isCustomSel) {
   selTemp = defaultTemplate.name;
   loadTemplate(defaultTemplate.values);
@@ -49,6 +50,7 @@ if (!isCustomSel) {
 }
 localStorage.setItem('templates', JSON.stringify(templates));
 
+// Change to new template
 function setTemplate() {
   if (localStorage.getItem('surveys')) {
     if (confirm('There are saved surveys from another template. Download them to switch templates?')) download(false);
@@ -75,10 +77,11 @@ function setTemplate() {
   }
   localStorage.setItem('templates', JSON.stringify(templates));
 }
-
 $('#opt-temp').change(() => {
   setTemplate();
 });
+
+// Create and select new template from JSON text
 $('#opt-temp-add').click(() => {
   if ($('#opt-temp-text').val()) {
     let newTemp = JSON.parse($('#opt-temp-text').val());
@@ -108,6 +111,8 @@ $('#opt-temp-add').click(() => {
     setTemplate();
   }
 });
+
+// ;D
 $('#opt-temp-reset').click(() => {
   if (confirm('This will remove all custom templates created. Are you sure?')) {
     if (confirm('No, seriously, you will not be able to undo this action. Are you sure?')) {
@@ -121,26 +126,22 @@ $('#opt-temp-reset').click(() => {
 
 // Managing scouting metric value changes
 function toggle(i) {
-  let metric = gameMetrics[i];
-  metric.element.toggleClass(`w3-${theme}`);
-  metric.value = !metric.value;
+  gameMetrics[i].element.toggleClass(`w3-${theme}`);
+  gameMetrics[i].value = !gameMetrics[i].value;
 }
 function changeText(i) {
-  let metric = gameMetrics[i];
-  metric.value = metric.element.children('input').val();
+  gameMetrics[i].value = gameMetrics[i].element.children('input').val().replace(';', ' ');
 }
 function crement(i, way) {
-  let metric = gameMetrics[i];
-  if (way == 'inc' && metric.value < (metric.max ? metrix.max : Infinity)) metric.value++;
-  else if (way == 'dec' && metric.value > 0) metric.value--;
-  metric.element.children('.inc').html(metric.value);
+  if (way == 'inc' && gameMetrics[i].value < (gameMetrics[i].max || Infinity)) gameMetrics[i].value++;
+  else if (way == 'dec' && gameMetrics[i].value > 0) gameMetrics[i].value--;
+  gameMetrics[i].element.children('.inc').html(gameMetrics[i].value);
 }
 function changeSelect(i) {
-  let metric = gameMetrics[i];
-  metric.value = metric.element.children('select').val();
+  gameMetrics[i].value = gameMetrics[i].element.children('select').val();
 }
 
-// Load scouting metrics from template
+// Create scouting metrics (UI and state variables) from template
 function loadTemplate(t) {
   $('#game-data').empty();
   gameMetrics = [];
