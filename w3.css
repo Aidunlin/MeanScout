@@ -28,7 +28,7 @@ select{cursor:pointer}
 .outline-red{outline-color:#f44336}
 .outline-blue{outline-color:#2196F3}
 .outline-white{outline-color:#ffffff}
-@media(max-width:320px){#title-img{display:none}}
+@media(max-width:390px){#title-img{display:none}}
 /* w3.css (with a few changed values) */
 html,body{font-family:Verdana,sans-serif;font-size:15px;line-height:1.5}html{overflow-x:hidden}
 h1{font-size:36px}h2{font-size:30px}h3{font-size:24px}h4{font-size:20px}h5{font-size:18px}h6{font-size:16px}.w3-serif{font-family:serif}
