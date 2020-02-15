@@ -2,10 +2,10 @@
 let defaultTemplate = { name: 'FRC 2020 (2471)', values: [
   { name: 'Passed Line', type: 'toggle' },
   { name: 'AUTO Bottom Port', type: 'number' },
+  { name: 'AUTO Outer Port', type: 'number' },
+  { name: 'AUTO Inner Port', type: 'number' },
   { name: 'TELE Bottom Port', type: 'number' },
-  { name: 'AUTO Outer Port', type: 'number', newline: true },
   { name: 'TELE Outer Port', type: 'number' },
-  { name: 'AUTO Inner Port', type: 'number', newline: true },
   { name: 'TELE Inner Port', type: 'number' },
   { name: 'Rotation Control', type: 'toggle' },
   { name: 'Position Control', type: 'toggle' },

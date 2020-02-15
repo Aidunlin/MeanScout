@@ -12,20 +12,20 @@
     <link rel="stylesheet" href="./w3.css">
     <script src="./jquery-3.4.1.min.js"></script>
   </head>
-  <body class="w3-black">
-    <nav class="w3-bar w3-border-bottom">
-      <img class="w3-bar-item" id="title-img" src="./logo192.png" alt="" style="height:39px;padding-right:0">
+  <body class="w3-black" onclick="$('#options').addClass('w3-hide')">
+    <nav class="w3-bar w3-large">
+      <img class="w3-bar-item" id="title-img" src="./logo192.png" alt="" style="height:43px;padding-right:0">
       <span class="w3-bar-item title">MeanScout</span>
       <div class="w3-right">
         <span class="w3-bar-item" id="location" style="padding-right:0"></span>
-        <button class="w3-bar-item w3-button w3-ripple" onclick="$('#options-modal').show()">&#9776;</button>
+        <button class="w3-bar-item w3-button w3-ripple" onclick="event.stopPropagation();$('#options').toggleClass('w3-hide')">&#9776;</button>
       </div>
     </nav>
-    <div class="w3-modal" id="options-modal" onclick="$('#options-modal').hide()">
-      <div class="w3-modal-content w3-black w3-border" onclick="event.stopPropagation()">
-        <div class="w3-bar w3-border-bottom w3-margin-bottom">
-          <span class="w3-bar-item title">Options</span>
-          <button class="w3-bar-item w3-button w3-ripple w3-right" onclick="$('#options-modal').hide()">&times;</button>
+    <main class="w3-content">
+      <div class="w3-border w3-hide" id="options" onclick="event.stopPropagation()">
+        <div class="w3-bar w3-large">
+          <span class="w3-bar-item">Options</span>
+          <button class="w3-bar-item w3-button w3-right w3-ripple" onclick="$('#options').toggleClass('w3-hide')">&times;</button>
         </div>
         <div class="w3-container">
           <label class="w3-block">Location
@@ -51,25 +51,21 @@
           <button class="data-btn w3-button w3-border w3-ripple w3-margin-bottom" onclick="download()">Download Entries</button>
         </div>
       </div>
-    </div>
-    <main style="padding-left:12px">
-      <div class="w3-auto">
-        <div class="w3-row-padding w3-margin-top">
-          <label class="w3-third w3-margin-bottom">Team
-            <input class="w3-input w3-black" maxlength="5" placeholder="####" id="team" autofocus>
-          </label>
-          <label class="w3-third w3-margin-bottom">Match
-            <input class="w3-input w3-black" type="number" placeholder="##" id="match" value="1">
-          </label>
-          <div class="w3-third w3-margin-bottom">
-            <div class="btn-spacer w3-hide-small" style="height:21px"></div>
-            <button class="w3-button w3-border w3-ripple w3-block" id="absent">Absent</button>
-          </div>
+      <div class="w3-row-padding w3-margin-top">
+        <label class="w3-third w3-margin-bottom">Team
+          <input class="w3-input w3-black" maxlength="5" placeholder="####" id="team" autofocus>
+        </label>
+        <label class="w3-third w3-margin-bottom">Match
+          <input class="w3-input w3-black" type="number" placeholder="##" id="match" value="1">
+        </label>
+        <div class="w3-third w3-margin-bottom">
+          <div class="btn-spacer w3-hide-small" style="height:21px"></div>
+          <button class="w3-button w3-border w3-ripple w3-block" id="absent">Absent</button>
         </div>
-        <div id="game-data"></div>
-        <div class="w3-container w3-margin-bottom">
-          <button class="data-btn w3-button w3-border w3-ripple w3-block" onclick="save()">Save</button>
-        </div>
+      </div>
+      <div id="game-data"></div>
+      <div class="w3-container w3-margin-bottom">
+        <button class="data-btn w3-button w3-border w3-ripple w3-block" onclick="save()">Save</button>
       </div>
     </main>
     <script src="./templates.js"></script>
