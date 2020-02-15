@@ -12,20 +12,20 @@
     <link rel="stylesheet" href="./w3.css">
     <script src="./jquery-3.4.1.min.js"></script>
   </head>
-  <body class="w3-black" onclick="$('#options').addClass('w3-hide')">
-    <nav class="w3-bar w3-large">
-      <img class="w3-bar-item" id="title-img" src="./logo192.png" alt="" style="height:43px;padding-right:0">
+  <body class="w3-black w3-large" onclick="$('#options').addClass('w3-hide')">
+    <nav class="w3-bar w3-xlarge">
+      <img class="w3-bar-item" id="title-img" src="./logo192.png" alt="" style="height:52px;padding-right:0">
       <span class="w3-bar-item title">MeanScout</span>
       <div class="w3-right">
         <span class="w3-bar-item" id="location" style="padding-right:0"></span>
-        <button class="w3-bar-item w3-button w3-ripple" onclick="event.stopPropagation();$('#options').toggleClass('w3-hide')">&#9776;</button>
+        <button class="w3-bar-item w3-button w3-ripple" onclick="event.stopPropagation();$('#options').toggleClass('w3-hide')">=</button>
       </div>
     </nav>
     <main class="w3-content">
       <div class="w3-border w3-hide" id="options" onclick="event.stopPropagation()">
-        <div class="w3-bar w3-large">
+        <div class="w3-bar w3-large w3-margin-bottom">
           <span class="w3-bar-item">Options</span>
-          <button class="w3-bar-item w3-button w3-right w3-ripple" onclick="$('#options').toggleClass('w3-hide')">&times;</button>
+          <button class="w3-bar-item w3-button w3-right w3-ripple" onclick="$('#options').toggleClass('w3-hide')">x</button>
         </div>
         <div class="w3-container">
           <label class="w3-block">Location
