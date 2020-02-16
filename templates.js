@@ -82,7 +82,13 @@ $('#opt-temp').change(() => {
 });
 
 $('#opt-temp-copy').click(() => {
-  prompt('Copy the JSON below', JSON.stringify(currentTemp));
+  let tempInput = $('<input>');
+  $('body').append(tempInput);
+  tempInput.attr('value', JSON.stringify(currentTemp));
+  tempInput.select();
+  document.execCommand('copy');
+  $('body').remove(tempInput);
+  alert(`Copied ${currentTemp.name}`);
 });
 
 // Create and select new template from JSON text
