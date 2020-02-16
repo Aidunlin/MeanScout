@@ -22,8 +22,8 @@
       </div>
     </div>
     <div class="w3-border w3-round w3-hide" id="options">
-      <div class="w3-panel">
-        <label>Location
+      <div class="w3-container w3-margin-top">
+        <label class="w3-show-inline-block w3-mobile w3-margin-right w3-margin-bottom">Location
           <select class="w3-select w3-round w3-black" id="opt-location">
             <option class="w3-text-white" value="None">None</option>
             <option class="w3-text-red" value="Red Near">Red Near</option>
@@ -34,20 +34,19 @@
             <option class="w3-text-blue" value="Blue Far">Blue Far</option>
           </select>
         </label>
-      </div>
-      <div class="w3-panel">
-        <label>Template
+        <label class="w3-show-inline-block w3-mobile w3-margin-right w3-margin-bottom">Template
           <select class="w3-select w3-round w3-black" id="opt-temp"></select>
         </label>
-      </div>
-      <div class="w3-panel">
-        <label>Template JSON <span class="w3-hide-small">(edit to make new)</span>
-          <input class="w3-input w3-round w3-black" placeholder="Copy/paste JSON here" id="opt-temp-text">
-        </label>
-      </div>
-      <div class="w3-container">
-        <button class="data-btn" id="opt-temp-add">Add Template</button><!--
-        --><button class="data-btn" id="opt-temp-reset">Reset Templates</button>
+        <br>
+        <div class="w3-show-inline-block w3-mobile w3-margin-bottom">
+          <button class="data-btn" id="opt-temp-copy">Copy Template</button>
+        </div>
+        <div class="w3-show-inline-block w3-mobile w3-margin-bottom">
+          <button class="data-btn" id="opt-temp-add">New Template</button>
+        </div>
+        <div class="w3-show-inline-block w3-mobile w3-margin-bottom">
+          <button class="data-btn" id="opt-temp-reset">Reset Templates</button>
+        </div>
       </div>
     </div>
     <div class="w3-container w3-margin-top">
@@ -63,8 +62,8 @@
     </div>
     <div id="game-data"></div>
     <div class="w3-container">
-      <button class="data-btn" onclick="save()">Save</button><!--
-      --><button class="data-btn" onclick="download()">Download</button>
+      <button class="data-btn w3-margin-bottom" onclick="save()">Save</button><!--
+      --><button class="data-btn w3-margin-bottom" onclick="download()">Download</button>
     </div>
     <script src="./templates.js"></script>
     <script src="./index.js"></script>

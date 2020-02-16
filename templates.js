@@ -23,7 +23,7 @@ let defaultTemplate = { name: 'FRC 2020 (2471)', values: [
 ]};
 let templates = [];
 let gameMetrics = [];
-let selTemp;
+let currentTemp;
 
 if (localStorage.getItem('templates')) {
   templates = JSON.parse(localStorage.getItem('templates'));
@@ -35,20 +35,18 @@ let isCustomSel = false;
 $.each(templates, (i, template) => {
   $('#opt-temp').prepend(new Option(template.name, template.name));
   if (template.selected) {
-    selTemp = template.name;
+    currentTemp = template;
     isCustomSel = true;
     loadTemplate(template.values);
-    $('#opt-temp').val(selTemp);
-    $('#nav-temp').html(selTemp);
-    $('#opt-temp-text').val(JSON.stringify(template));
+    $('#opt-temp').val(currentTemp.name);
+    $('#nav-temp').html(currentTemp.name);
   }
 });
 if (!isCustomSel) {
-  selTemp = defaultTemplate.name;
+  currentTemp = defaultTemplate;
   loadTemplate(defaultTemplate.values);
-  $('#opt-temp').val(selTemp);
-  $('#nav-temp').html(selTemp);
-  $('#opt-temp-text').val(JSON.stringify(defaultTemplate));
+  $('#opt-temp').val(currentTemp.name);
+  $('#nav-temp').html(currentTemp.name);
 }
 localStorage.setItem('templates', JSON.stringify(templates));
 
@@ -62,21 +60,19 @@ function setTemplate() {
   $.each(templates, (i, template) => {
     template.selected = false;
     if ($('#opt-temp').val() == template.name) {
-      selTemp = template.name;
+      currentTemp = template;
       isCustomSel = true;
       template.selected = true;
       loadTemplate(template.values);
       setLoc(loc);
-      $('#nav-temp').html(selTemp);
-      $('#opt-temp-text').val(JSON.stringify(template));
+      $('#nav-temp').html(currentTemp.name);
     }
   });
   if (!isCustomSel) {
-    selTemp = defaultTemplate.name;
+    currentTemp = defaultTemplate;
     loadTemplate(defaultTemplate.values);
-    $('#opt-temp').val(selTemp);
-    $('#nav-temp').html(selTemp);
-    $('#opt-temp-text').val(JSON.stringify(defaultTemplate));
+    $('#opt-temp').val(currentTemp.name);
+    $('#nav-temp').html(currentTemp.name);
     setLoc(loc);
   }
   localStorage.setItem('templates', JSON.stringify(templates));
@@ -85,16 +81,16 @@ $('#opt-temp').change(() => {
   setTemplate();
 });
 
+$('#opt-temp-copy').click(() => {
+  prompt('Copy the JSON below', JSON.stringify(currentTemp));
+});
+
 // Create and select new template from JSON text
 $('#opt-temp-add').click(() => {
-  if ($('#opt-temp-text').val()) {
-    let newTemp = JSON.parse($('#opt-temp-text').val());
+  let newTempPrompt = prompt('Type/paste new template:');
+  if (newTempPrompt) {
+    let newTemp = JSON.parse(newTempPrompt);
     if (newTemp instanceof Array) newTemp = newTemp[0];
-    let isDup = false;
-    $.each(templates, (_i, template) => {
-      if (newTemp.name == template.name && JSON.stringify(newTemp.values) == JSON.stringify(template.values)) isDup = true;
-    });
-    if (isDup) { alert('This template already exists!'); return; }
     newTemp.selected = true;
     let error = false;
     if (newTemp.name && newTemp.values) {
@@ -122,6 +118,7 @@ $('#opt-temp-reset').click(() => {
     if (confirm('No, seriously, you will not be able to undo this action. Are you sure?')) {
       if (['debug', 'I am completely sure'].includes(prompt('Type "I am completely sure" to reset templates'))) {
         localStorage.removeItem('templates');
+        skipWarning = null;
         location.reload();
       }
     }

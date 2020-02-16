@@ -5,7 +5,7 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-$('.data-btn').addClass('w3-button w3-border-bottom w3-round w3-ripple w3-mobile w3-margin-right w3-margin-bottom');
+$('.data-btn').addClass('w3-button w3-border-bottom w3-round w3-ripple w3-mobile w3-margin-right');
 
 // Location/theme setter
 let theme = 'white';
@@ -51,6 +51,9 @@ $('#opt-toggle').click(() => {
   $('#options').toggleClass('w3-hide');
   $('#opt-toggle').toggleClass('w3-border-bottom');
 });
+
+let skipWarning = true;
+window.onbeforeunload = () => {return skipWarning};
 
 // Save data to localstorage and reset data
 function save() {
