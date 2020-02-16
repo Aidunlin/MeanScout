@@ -1,24 +1,24 @@
 // 2471's current default template
 let defaultTemplate = { name: 'FRC 2020 (2471)', values: [
   { name: 'Passed Line', type: 'toggle' },
-  { name: 'AUTO Bottom Port', type: 'number' },
-  { name: 'AUTO Outer Port', type: 'number' },
-  { name: 'AUTO Inner Port', type: 'number' },
-  { name: 'TELE Bottom Port', type: 'number' },
-  { name: 'TELE Outer Port', type: 'number' },
-  { name: 'TELE Inner Port', type: 'number' },
-  { name: 'Rotation Control', type: 'toggle' },
+  { name: 'AUTO Bottom', type: 'number', newline: true },
+  { name: 'AUTO Outer', type: 'number' },
+  { name: 'AUTO Inner', type: 'number' },
+  { name: 'TELE Bottom', type: 'number', newline: true },
+  { name: 'TELE Outer', type: 'number' },
+  { name: 'TELE Inner', type: 'number' },
+  { name: 'Rotation Control', type: 'toggle', newline: true },
   { name: 'Position Control', type: 'toggle' },
-  { name: 'Endgame', type: 'select', values: ['None', 'Park', 'Hang'] },
+  { name: 'Endgame', type: 'select', values: ['None', 'Park', 'Hang'], newline: true },
+  { name: 'Penalty Card', type: 'select', values: ['None', 'Yellow', 'Red'] },
   { name: 'Primary Role', type: 'select', values: ['None', 'Role 1', 'Role 2'] },
   { name: 'Secondary Role', type: 'select', values: ['None', 'Role 1', 'Role 2'] },
-  { name: 'Penalty Card', type: 'select', values: ['None', 'Yellow', 'Red'] },
-  { name: 'Disabled', type: 'toggle' },
+  { name: 'Disabled', type: 'toggle', newline: true },
   { name: 'Disqualified', type: 'toggle' },
-  { name: 'Drive Rating', type: 'select', values: ['Bad', 'Ok', 'Great'] },
+  { name: 'Drive Rating', type: 'select', values: ['Bad', 'Ok', 'Great'], newline: true },
   { name: 'Co-op Rating', type: 'select', values: ['Bad', 'Ok', 'Great'] },
   { name: 'Defense Rating', type: 'select', values: ['Bad', 'Ok', 'Great'] },
-  { name: 'Comment(s)', type: 'text' },
+  { name: 'Comment(s)', type: 'text', newline: true },
   { name: 'Breakdown', type: 'text' }
 ]};
 let templates = [];
@@ -39,6 +39,7 @@ $.each(templates, (i, template) => {
     isCustomSel = true;
     loadTemplate(template.values);
     $('#opt-temp').val(selTemp);
+    $('#nav-temp').html(selTemp);
     $('#opt-temp-text').val(JSON.stringify(template));
   }
 });
@@ -46,6 +47,7 @@ if (!isCustomSel) {
   selTemp = defaultTemplate.name;
   loadTemplate(defaultTemplate.values);
   $('#opt-temp').val(selTemp);
+  $('#nav-temp').html(selTemp);
   $('#opt-temp-text').val(JSON.stringify(defaultTemplate));
 }
 localStorage.setItem('templates', JSON.stringify(templates));
@@ -65,6 +67,7 @@ function setTemplate() {
       template.selected = true;
       loadTemplate(template.values);
       setLoc(loc);
+      $('#nav-temp').html(selTemp);
       $('#opt-temp-text').val(JSON.stringify(template));
     }
   });
@@ -72,6 +75,7 @@ function setTemplate() {
     selTemp = defaultTemplate.name;
     loadTemplate(defaultTemplate.values);
     $('#opt-temp').val(selTemp);
+    $('#nav-temp').html(selTemp);
     $('#opt-temp-text').val(JSON.stringify(defaultTemplate));
     setLoc(loc);
   }
@@ -126,14 +130,14 @@ $('#opt-temp-reset').click(() => {
 
 // Managing scouting metric value changes
 function toggle(i) {
-  gameMetrics[i].element.toggleClass(`w3-${theme}`);
+  gameMetrics[i].element.children('button').toggleClass(`w3-${theme}`);
   gameMetrics[i].value = !gameMetrics[i].value;
 }
 function changeText(i) {
   gameMetrics[i].value = gameMetrics[i].element.children('input').val().replace(';', ' ');
 }
 function crement(i, way) {
-  if (way == 'inc' && gameMetrics[i].value < (gameMetrics[i].max || Infinity)) gameMetrics[i].value++;
+  if (way == 'inc' && gameMetrics[i].value < gameMetrics[i].max) gameMetrics[i].value++;
   else if (way == 'dec' && gameMetrics[i].value > 0) gameMetrics[i].value--;
   gameMetrics[i].element.children('.inc').html(gameMetrics[i].value);
 }
@@ -145,79 +149,83 @@ function changeSelect(i) {
 function loadTemplate(t) {
   $('#game-data').empty();
   gameMetrics = [];
-  let prevType, prevDiv, newMetric, newDiv, metricObj;
+  let metricObj, newMetric, prevDiv, newDiv;
+  prevDiv = $('<div></div>');
+  prevDiv.addClass('w3-container');
   $.each(t, (i, metric) => {
     metricObj = { name: metric.name };
-    newDiv = document.createElement('div');
     if (metric.type == 'toggle') {
-      newDiv.classList.add('w3-container');
-      newMetric = document.createElement('button');
-      newMetric.classList.add('w3-button', 'w3-border', 'w3-ripple', 'w3-margin-right', 'w3-margin-bottom');
-      newMetric.appendChild(document.createTextNode(metric.name));
-      newMetric.onclick = () => {toggle(i)};
+      newMetric = $('<div></div>');
+      
+      let button = $('<button></button>');
+      button.addClass('w3-button w3-mobile w3-border-bottom w3-round w3-ripple');
+      button.append(metric.name);
+      button.click(() => toggle(i));
+      newMetric.append(button);
       metricObj.value = false;
     
     } else if (metric.type == 'text') {
-      newDiv.classList.add('w3-row-padding');
-      newMetric = document.createElement('label');
-      newMetric.classList.add('w3-half', 'w3-margin-bottom');
-      newMetric.appendChild(document.createTextNode(metric.name));
-      let input = document.createElement('input');
-      input.classList.add('w3-input', 'w3-black');
-      input.placeholder = metric.tip ? metric.tip : '';
-      input.onchange = () => {changeText(i)};
-      newMetric.appendChild(input);
+      newMetric = $('<label></label>');
+      newMetric.append(metric.name, '<br>');
+
+      let input = $('<input>')
+      input.addClass('w3-input w3-round w3-black');
+      input.attr('placeholder', metric.tip ? metric.tip : metric.name);
+      input.on('input', () => changeText(i));
+      newMetric.append(input);
       metricObj.value = '';
     
     } else if (metric.type == 'number') {
-      newDiv.classList.add('w3-container');
-      newMetric = document.createElement('div');
-      newMetric.classList.add('w3-show-inline-block', 'w3-margin-right', 'w3-margin-bottom');
-      newMetric.appendChild(document.createTextNode(metric.name));
-      newMetric.appendChild(document.createElement('br'));
-      let incBtn = document.createElement('button');
-      incBtn.classList.add('inc', 'w3-button', 'w3-border', 'w3-ripple');
-      incBtn.style.width = '6.5ch';
-      incBtn.onclick = () => {crement(i, 'inc')};
-      incBtn.appendChild(document.createTextNode('0'));
-      let decBtn = document.createElement('button');
-      decBtn.classList.add('dec', 'w3-button', 'w3-border', 'w3-ripple');
-      decBtn.onclick = () => {crement(i, 'dec')};
-      decBtn.appendChild(document.createTextNode('-'));
-      newMetric.appendChild(incBtn);
-      newMetric.appendChild(document.createTextNode(' '));
-      newMetric.appendChild(decBtn);
-      metricObj.max = metric.max;
+      newMetric = $('<div></div>');
+      newMetric.append(metric.name, '<br>');
+      
+      let incBtn = $('<button></button>');
+      incBtn.addClass('inc w3-button w3-border-bottom w3-round w3-ripple');
+      incBtn.css('width', '6.5ch');
+      incBtn.click(() => crement(i, 'inc'));
+      incBtn.append('0');
+      let decBtn = $('<button></button>');
+      decBtn.addClass('dec w3-button w3-border-bottom w3-round w3-ripple');
+      decBtn.click(() => crement(i, 'dec'));
+      decBtn.append('-');
+      
+      newMetric.append(incBtn, ' ', decBtn);
+      metricObj.max = metric.max || 100;
       metricObj.value = 0;
     
     } else if (metric.type == 'select') {
-      newDiv.classList.add('w3-row-padding');
-      newMetric = document.createElement('label');
-      newMetric.classList.add('w3-third', 'w3-margin-bottom');
-      newMetric.appendChild(document.createTextNode(metric.name));
-      let select = document.createElement('select');
-      select.classList.add('w3-select', 'w3-black');
-      select.onchange = () => {changeSelect(index)};
+      newMetric = $('<label></label>');
+      newMetric.append(metric.name, '<br>');
+      
+      let select = $('<select></select>');
+      select.addClass('w3-select w3-round w3-black');
+      select.css('width', '100%');
+      select.css('min-width', 'fit-content');
+      select.on('change', () => changeSelect(i));
       $.each(metric.values, (index, selValue) => {
-        let newSel = document.createElement('option');
-        newSel.value = index;
-        newSel.appendChild(document.createTextNode(selValue));
-        select.appendChild(newSel);
+        let newSel = $('<option></option>');
+        newSel.attr('value', index);
+        newSel.html(selValue);
+        select.append(newSel);
       });
-      newMetric.appendChild(select);
+      newMetric.append(select);
       metricObj.value = 0;
     }
+    newMetric.addClass('w3-show-inline-block w3-mobile w3-margin-right w3-margin-bottom');
 
-    if (prevType == metric.type && !metric.newline) {
-      prevDiv.appendChild(newMetric);
-    } else {
-      newDiv.appendChild(newMetric);
-      document.getElementById('game-data').appendChild(newDiv);
+    if (metric.newline) {
+      newDiv = $('<div></div>');
+      newDiv.addClass('w3-container');
+      newDiv.append(newMetric);
+      $('#game-data').append(prevDiv);
       prevDiv = newDiv;
+    } else {
+      prevDiv.append(newMetric);
     }
-    metricObj.element = $(newMetric);
+
+    metricObj.element = newMetric;
     metricObj.type = metric.type;
-    prevType = metric.type;
     gameMetrics.push(metricObj);
   });
+  $('#game-data').append(prevDiv);
 }

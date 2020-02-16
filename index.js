@@ -5,12 +5,14 @@ if ('serviceWorker' in navigator) {
   });
 }
 
+$('.data-btn').addClass('w3-button w3-border-bottom w3-round w3-ripple w3-mobile w3-margin-right w3-margin-bottom');
+
 // Location/theme setter
 let theme = 'white';
 let loc = 'None';
 function setLoc(l) {
   $('input, textarea, button, select').removeClass(`outline-${theme}`);
-  $('input, textarea, select, .title, #location').removeClass(`w3-text-${theme}`);
+  $('input, .inc, textarea, select, #title, #location').removeClass(`w3-text-${theme}`);
   $('.data-btn, #opt-temp-set').removeClass(`w3-hover-${theme} w3-text-${theme} w3-border-${theme}`);
   $.each(gameMetrics, (_i, metric) => {
     if (metric.type == 'toggle') metric.element.removeClass(`w3-${theme}`);
@@ -22,7 +24,7 @@ function setLoc(l) {
   localStorage.setItem('location', l);
   $('#location').html(l);
   $('input, textarea, button, select').addClass(`outline-${theme}`);
-  $('input, textarea, select, .title, #location').addClass(`w3-text-${theme}`);
+  $('input, .inc, textarea, select, #title, #location').addClass(`w3-text-${theme}`);
   $.each(gameMetrics, (_i, metric) => {
     if (metric.type == 'toggle' && metric.value) metric.element.addClass(`w3-${theme}`);
   });
@@ -43,6 +45,12 @@ $('#absent').click(() => {
   $('#absent').toggleClass(`w3-${theme}`);
   absent = !absent;
 })
+
+// Options toggle
+$('#opt-toggle').click(() => {
+  $('#options').toggleClass('w3-hide');
+  $('#opt-toggle').toggleClass('w3-border-bottom');
+});
 
 // Save data to localstorage and reset data
 function save() {
