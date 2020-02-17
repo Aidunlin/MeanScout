@@ -1,7 +1,7 @@
 // Register service worker
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').then(() => console.log('Service worker registered'));
+    navigator.serviceWorker.register('./sw.js');
   });
 }
 
@@ -29,7 +29,6 @@ function setLoc(l) {
     if (metric.type == 'toggle' && metric.value) metric.element.addClass(`w3-${theme}`);
   });
   $('.data-btn, #opt-temp-set').addClass(`w3-hover-${theme} w3-text-${theme} w3-border-${theme}`);
-  console.log(`Set location ${loc} and theme ${theme}`);
 }
 if (localStorage.getItem('location')) {
   setLoc(localStorage.getItem('location'));
@@ -66,7 +65,7 @@ function save() {
     $('#match').focus();
     return;
   }
-  let values = `${$('#team').val()};${$('#match').val()};${absent ? '1' : '0'};`;
+  let values = `${$('#team').val()};${$('#match').val()};${absent};`;
   $.each(gameMetrics, (_i, metric) => {
     values += metric.value + ';';
   });
@@ -95,7 +94,6 @@ function save() {
       metric.element.children('select').val(0);
     }
   });
-  console.log('Save successful');
 }
 
 // Download and clear saved surveys from localstorage
@@ -103,10 +101,9 @@ function download(ask=true) {
   if (ask) if (!confirm('Confirm download?')) return;
   let a = document.createElement('a');
   a.href = `data:text/plain;charset=utf-8,${encodeURIComponent(localStorage.getItem('surveys'))}`;
-  a.download = `${selTemp} Surveys.txt`;
+  a.download = `${currentTemp.name} Surveys.txt`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
   localStorage.setItem('surveys', '');
-  console.log(`Downloaded ${selTemp} Surveys.txt`);
 }
