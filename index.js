@@ -5,42 +5,48 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-$('.data-btn').addClass('w3-button w3-border-bottom w3-round w3-ripple w3-mobile w3-margin-right');
-
-// Location/theme setter
+$('.data-btn').addClass('w3-button w3-border-bottom w3-round w3-ripple w3-mobile');
 let theme = 'white';
 let loc = 'None';
-function setLoc(l) {
-  $('input, textarea, button, select').removeClass(`outline-${theme}`);
-  $('input, .inc, textarea, select, #title, #location').removeClass(`w3-text-${theme}`);
-  $('.data-btn, #opt-temp-set').removeClass(`w3-hover-${theme} w3-text-${theme} w3-border-${theme}`);
+let matchCount = 1;
+let absent = false;
+let skipWarning = false;
+
+/**
+ * Sets location and changes theme colors
+ * @param {string} newLoc Name of location
+ */
+function setLoc(newLoc) {
+  $('input, button, select').removeClass(`outline-${theme}`);
+  $('input, .inc, select, #title, #nav-loc').removeClass(`w3-text-${theme}`);
+  $('.data-btn').removeClass(`w3-text-${theme} w3-border-${theme}`);
+  $('#absent').removeClass(`w3-${theme}`);
   $.each(gameMetrics, (_i, metric) => {
-    if (metric.type == 'toggle') metric.element.removeClass(`w3-${theme}`);
+    if (metric.type == 'toggle') metric.element.children('button').removeClass(`w3-${theme}`);
   });
-  if (l.includes('Red')) theme = 'red';
-  else if (l.includes('Blue')) theme = 'blue';
+  if (newLoc.includes('Red')) theme = 'red';
+  else if (newLoc.includes('Blue')) theme = 'blue';
   else theme = 'white';
-  loc = l;
-  localStorage.setItem('location', l);
-  $('#location').html(l);
-  $('input, textarea, button, select').addClass(`outline-${theme}`);
-  $('input, .inc, textarea, select, #title, #location').addClass(`w3-text-${theme}`);
+  loc = newLoc;
+  localStorage.setItem('location', newLoc);
+  $('#nav-loc').html(newLoc);
+  $('input, button, select').addClass(`outline-${theme}`);
+  $('input, .inc, select, #title, #nav-loc').addClass(`w3-text-${theme}`);
+  $('.data-btn').addClass(`w3-text-${theme} w3-border-${theme}`);
+  if (absent) $('#absent').addClass(`w3-${theme}`);
   $.each(gameMetrics, (_i, metric) => {
-    if (metric.type == 'toggle' && metric.value) metric.element.addClass(`w3-${theme}`);
+    if (metric.type == 'toggle' && metric.value) metric.element.children('button').addClass(`w3-${theme}`);
   });
-  $('.data-btn, #opt-temp-set').addClass(`w3-hover-${theme} w3-text-${theme} w3-border-${theme}`);
 }
 if (localStorage.getItem('location')) {
   setLoc(localStorage.getItem('location'));
-  $('#opt-location').val(loc);
+  $('#opt-loc').val(loc);
 } else setLoc('None');
-$('#opt-location').change(() => setLoc($('#opt-location option:checked').val()));
+$('#opt-loc').change(() => setLoc($('#opt-loc').val()));
 
-// Match/Absent stuff
-let matchCount = 1;
-let absent = false;
+// Absent stuff
 $('#absent').click(() => {
-  $('#game-data').toggle();
+  $('#metrics').toggle();
   $('#absent').toggleClass(`w3-${theme}`);
   absent = !absent;
 })
@@ -51,10 +57,9 @@ $('#opt-toggle').click(() => {
   $('#opt-toggle').toggleClass('w3-border-bottom');
 });
 
-let skipWarning = true;
 window.onbeforeunload = () => {return skipWarning};
 
-// Save data to localstorage and reset data
+/** Saves current survey to localstorage and reset metrics */
 function save() {
   if (!/\d{1,4}[a-z]?/.test($('#team').val())) {
     alert('Please enter a proper team value!');
@@ -76,13 +81,13 @@ function save() {
   $('#team').val('').focus();
   matchCount = parseInt($('#match').val()) + 1;
   $('#match').val(matchCount);
-  $('#game-data').show();
+  $('#metrics').show();
   $('#absent').removeClass(`w3-${theme}`);
   absent = false;
   $.each(gameMetrics, (_i, metric) => {
     if (metric.type == 'toggle') {
       metric.value = false;
-      metric.element.removeClass(`w3-${theme}`);
+      metric.element.children('button').removeClass(`w3-${theme}`);
     } else if (metric.type == 'text') {
       metric.value = '';
       metric.element.children('input').val('');
@@ -96,7 +101,10 @@ function save() {
   });
 }
 
-// Download and clear saved surveys from localstorage
+/**
+ * Downloads and clears saved surveys from localStorage
+ * @param {boolean} ask If true, confirm download with user
+ */
 function download(ask=true) {
   if (ask) if (!confirm('Confirm download?')) return;
   let a = document.createElement('a');
