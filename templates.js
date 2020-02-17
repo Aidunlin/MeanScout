@@ -1,25 +1,25 @@
 // 2471's current default template
 let defaultTemplate = { name: 'FRC 2020 (2471)', metrics: [
-  { name: 'Passed Line', type: 'toggle', newline: 'Auto' },
-  { name: 'Bottom Port', type: 'number', newline: true },
-  { name: 'Outer Port', type: 'number' },
-  { name: 'Inner Port', type: 'number' },
-  { name: 'Bottom Port', type: 'number', newline: 'Tele-Op' },
-  { name: 'Outer Port', type: 'number' },
-  { name: 'Inner Port', type: 'number' },
-  { name: 'Rotation Control', type: 'toggle', newline: true },
-  { name: 'Position Control', type: 'toggle' },
-  { name: 'Endgame', type: 'select', values: ['None', 'Park', 'Hang'], newline: true },
-  { name: 'Penalty Card', type: 'select', values: ['None', 'Yellow', 'Red'], newline: 'Post-Game' },
-  { name: 'Primary Role', type: 'select', values: ['None', 'Role 1', 'Role 2'] },
-  { name: 'Secondary Role', type: 'select', values: ['None', 'Role 1', 'Role 2'] },
-  { name: 'Disabled', type: 'toggle', newline: true },
-  { name: 'Disqualified', type: 'toggle' },
-  { name: 'Drive Rating', type: 'select', values: ['Bad', 'Ok', 'Great'], newline: true },
-  { name: 'Co-op Rating', type: 'select', values: ['Bad', 'Ok', 'Great'] },
-  { name: 'Defense Rating', type: 'select', values: ['Bad', 'Ok', 'Great'] },
-  { name: 'Comment(s)', type: 'text', newline: true },
-  { name: 'Breakdown', type: 'text' }
+  { name: 'Passed Line',      type: 'toggle', newline: 'Auto'                                            },
+  { name: 'Bottom Port',      type: 'number', newline: true                                              },
+  { name: 'Outer Port',       type: 'number'                                                             },
+  { name: 'Inner Port',       type: 'number'                                                             },
+  { name: 'Bottom Port',      type: 'number', newline: 'Tele-Op'                                         },
+  { name: 'Outer Port',       type: 'number'                                                             },
+  { name: 'Inner Port',       type: 'number'                                                             },
+  { name: 'Rotation Control', type: 'toggle', newline: true                                              },
+  { name: 'Position Control', type: 'toggle'                                                             },
+  { name: 'Endgame',          type: 'select', newline: true,        values: ['None', 'Park', 'Hang']     },
+  { name: 'Penalty Card',     type: 'select', newline: 'Post-Game', values: ['None', 'Yellow', 'Red']    },
+  { name: 'Primary Role',     type: 'select',                       values: ['None', 'Role 1', 'Role 2'] },
+  { name: 'Secondary Role',   type: 'select',                       values: ['None', 'Role 1', 'Role 2'] },
+  { name: 'Disabled',         type: 'toggle', newline: true                                              },
+  { name: 'Disqualified',     type: 'toggle'                                                             },
+  { name: 'Drive Rating',     type: 'select', newline: true,        values: ['Bad', 'Ok', 'Great']       },
+  { name: 'Co-op Rating',     type: 'select',                       values: ['Bad', 'Ok', 'Great']       },
+  { name: 'Defense Rating',   type: 'select',                       values: ['Bad', 'Ok', 'Great']       },
+  { name: 'Comment(s)',       type: 'text',   newline: true                                              },
+  { name: 'Breakdown',        type: 'text'                                                               }
 ]};
 let templates = [];
 let gameMetrics = [];
@@ -100,19 +100,25 @@ $('#opt-temp-add').click(() => {
     let newTemp = JSON.parse(newTempPrompt);
     if (newTemp instanceof Array) newTemp = newTemp[0];
     newTemp.selected = true;
+
     let error = false;
+    $.each(templates, (_i, template) => {
+      if (newTemp.name == template.name) error = "Template has same name";
+    });
+    if (newTemp.name == defaultTemplate.name) error = "Template has same name";
     if (newTemp.name && newTemp.metrics) {
       $.each(newTemp.metrics, (_i, metric) => {
-        if (!metric.name) error = true;
-        else if (metric.type == 'number') error = metric.max < 1;
-        else if (metric.type == 'select') error = !metric.values;
-        else if (metric.type != 'toggle' && metric.type != 'text') error = true;
+        if (!metric.name) error = "Metric has no name";
+        else if (metric.type == 'number' && metric.max < 1) error = "Max is less than one";
+        else if (metric.type == 'select' && !metric.values) error = "Metric has no values";
+        else if (!['number', 'select', 'toggle', 'text'].includes(metric.type)) error = "Unknown metric type";
       });
-    } else error = true;
+    } else error = "Template is invalid";
     if (error) {
-      alert('Invalid JSON/template! Please try again.');
+      alert(`Could not add template! Error: ${error}`);
       return;
     }
+
     templates.unshift(newTemp);
     $('#opt-temp').prepend(new Option(newTemp.name, newTemp.name));
     $('#opt-temp').val(newTemp.name);

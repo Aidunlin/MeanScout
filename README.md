@@ -5,7 +5,6 @@ An FRC scouting web app
 - Progressive Web App - full offline support
 - w3.css - mininal and responsive css framework
 - Dark-only theme with red/blue color variants
-- Simple error checking for scouting criteria
 - Templates - customizable with text-based in-app creator (documentation below)
 - Uses `localStorage` to store entries
 - Download saved entries as `(Template Name) Surveys.txt`
@@ -21,7 +20,8 @@ If you can't find it, you can still use the app as normal.
 
 ## Templates
 Below is an example of a scouting template. To add a template to MeanScout, simply copy and paste its JSON.
-```
+
+```json
 { "name": "FRC 2020 (2471)", "metrics": [
   { "name": "Passed Line", "type": "toggle", "newline": "Auto" },
   { "name": "Bottom Port", "type": "number", "newline": true },
@@ -32,19 +32,20 @@ Below is an example of a scouting template. To add a template to MeanScout, simp
   { "name": "Inner Port", "type": "number" },
   { "name": "Rotation Control", "type": "toggle", "newline": true },
   { "name": "Position Control", "type": "toggle" },
-  { "name": "Endgame", "type": "select", "values": ["None", "Park", "Hang"], "newline": true },
-  { "name": "Penalty Card", "type": "select", "values": ["None", "Yellow", "Red"], "newline": "Post-Game" },
+  { "name": "Endgame", "type": "select", "newline": true, "values": ["None", "Park", "Hang"] },
+  { "name": "Penalty Card", "type": "select", "newline": "Post-Game", "values": ["None", "Yellow", "Red"] },
   { "name": "Primary Role", "type": "select", "values": ["None", "Role 1", "Role 2"] },
   { "name": "Secondary Role", "type": "select", "values": ["None", "Role 1", "Role 2"] },
-  { "name": "Disabled", "type": "toggle", "newline": true },
+  { "name": "Disabled", "type": "toggle", "newline": true},
   { "name": "Disqualified", "type": "toggle" },
-  { "name": "Drive Rating", "type": "select", "values": ["Bad", "Ok", "Great"], "newline": true },
+  { "name": "Drive Rating", "type": "select", "newline": true, "values": ["Bad", "Ok", "Great"] },
   { "name": "Co-op Rating", "type": "select", "values": ["Bad", "Ok", "Great"] },
   { "name": "Defense Rating", "type": "select", "values": ["Bad", "Ok", "Great"] },
-  { "name": "Comment(s)", "type": "text", "newline": true },
+  { "name": "Comment(s)", "type": "text", "newline": true},
   { "name": "Breakdown", "type": "text" }
-}
+]}
 ```
+
 Each template should have a `name` (string) and an array of `metrics` (JSON objects).
 
 Each metric must have a `name` and a `type` (`toggle`, `number`, `select`, or `text`).
