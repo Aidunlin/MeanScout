@@ -1,16 +1,16 @@
 // 2471's current default template
-let defaultTemplate = { name: 'FRC 2020 (2471)', values: [
-  { name: 'Passed Line', type: 'toggle' },
-  { name: 'AUTO Bottom', type: 'number', newline: true },
-  { name: 'AUTO Outer', type: 'number' },
-  { name: 'AUTO Inner', type: 'number' },
-  { name: 'TELE Bottom', type: 'number', newline: true },
-  { name: 'TELE Outer', type: 'number' },
-  { name: 'TELE Inner', type: 'number' },
+let defaultTemplate = { name: 'FRC 2020 (2471)', metrics: [
+  { name: 'Passed Line', type: 'toggle', newline: 'Auto' },
+  { name: 'Bottom Port', type: 'number', newline: true },
+  { name: 'Outer Port', type: 'number' },
+  { name: 'Inner Port', type: 'number' },
+  { name: 'Bottom Port', type: 'number', newline: 'Tele-Op' },
+  { name: 'Outer Port', type: 'number' },
+  { name: 'Inner Port', type: 'number' },
   { name: 'Rotation Control', type: 'toggle', newline: true },
   { name: 'Position Control', type: 'toggle' },
   { name: 'Endgame', type: 'select', values: ['None', 'Park', 'Hang'], newline: true },
-  { name: 'Penalty Card', type: 'select', values: ['None', 'Yellow', 'Red'] },
+  { name: 'Penalty Card', type: 'select', values: ['None', 'Yellow', 'Red'], newline: 'Post-Game' },
   { name: 'Primary Role', type: 'select', values: ['None', 'Role 1', 'Role 2'] },
   { name: 'Secondary Role', type: 'select', values: ['None', 'Role 1', 'Role 2'] },
   { name: 'Disabled', type: 'toggle', newline: true },
@@ -37,14 +37,14 @@ $.each(templates, (i, template) => {
   if (template.selected) {
     currentTemp = template;
     isCustomSel = true;
-    loadTemplate(template.values);
+    loadTemplate(template.metrics);
     $('#opt-temp').val(currentTemp.name);
     $('#nav-temp').html(currentTemp.name);
   }
 });
 if (!isCustomSel) {
   currentTemp = defaultTemplate;
-  loadTemplate(defaultTemplate.values);
+  loadTemplate(defaultTemplate.metrics);
   $('#opt-temp').val(currentTemp.name);
   $('#nav-temp').html(currentTemp.name);
 }
@@ -63,14 +63,14 @@ function setTemplate() {
       currentTemp = template;
       isCustomSel = true;
       template.selected = true;
-      loadTemplate(template.values);
+      loadTemplate(template.metrics);
       setLoc(loc);
       $('#nav-temp').html(currentTemp.name);
     }
   });
   if (!isCustomSel) {
     currentTemp = defaultTemplate;
-    loadTemplate(defaultTemplate.values);
+    loadTemplate(defaultTemplate.metrics);
     $('#opt-temp').val(currentTemp.name);
     $('#nav-temp').html(currentTemp.name);
     setLoc(loc);
@@ -99,12 +99,12 @@ $('#opt-temp-add').click(() => {
     if (newTemp instanceof Array) newTemp = newTemp[0];
     newTemp.selected = true;
     let error = false;
-    if (newTemp.name && newTemp.values) {
-      $.each(newTemp.values, (_i, value) => {
-        if (!value.name) error = true;
-        else if (value.type == 'number') error = value.max < 1;
-        else if (value.type == 'select') error = !value.values;
-        else if (value.type != 'toggle' && value.type != 'text') error = true;
+    if (newTemp.name && newTemp.metrics) {
+      $.each(newTemp.metrics, (_i, metric) => {
+        if (!metric.name) error = true;
+        else if (metric.type == 'number') error = metric.max < 1;
+        else if (metric.type == 'select') error = !metric.values;
+        else if (metric.type != 'toggle' && metric.type != 'text') error = true;
       });
     } else error = true;
     if (error) {
@@ -214,11 +214,12 @@ function loadTemplate(t) {
       newMetric.append(select);
       metricObj.value = 0;
     }
-    newMetric.addClass('w3-show-inline-block w3-mobile w3-margin-right w3-margin-bottom');
+    newMetric.addClass('w3-show-inline-block w3-mobile w3-margin-left w3-margin-bottom');
 
     if (metric.newline) {
       newDiv = $('<div></div>');
       newDiv.addClass('w3-container');
+      if (metric.newline !== true) newDiv.append(metric.newline, '<br>');
       newDiv.append(newMetric);
       $('#game-data').append(prevDiv);
       prevDiv = newDiv;
