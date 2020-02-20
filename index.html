@@ -23,74 +23,65 @@
       @media(max-width:310px){#title-img{display:none}}
     </style>
   </head>
-  <body class="w3-content w3-black w3-large">
-    <nav class="w3-bar">
-      <img class="w3-bar-item" id="title-img" src="./logo192.png" alt=""> 
-      <div class="w3-bar-item" id="title">MeanScout</div>
-      <button class="w3-bar-item w3-button w3-ripple w3-border-bottom w3-round w3-right" id="opt-toggle">
-        <span class="w3-hide-small w3-margin-right" id="nav-temp"></span>
+  <body class="content black large">
+    <nav class="bar">
+      <img class="bar-item" id="title-img" src="./logo192.png" alt=""> 
+      <div class="bar-item" id="title">MeanScout</div>
+      <button class="bar-item button ripple border-bottom round right" id="opt-toggle">
+        <span class="hide-small margin-right" id="nav-temp"></span>
         <span id="nav-loc"></span>
       </div>
     </nav>
-    <div class="w3-border w3-margin-left w3-margin-right w3-round w3-hide" id="options">
-      <div class="w3-container w3-margin-top">
-        <label class="w3-show-inline-block w3-mobile w3-margin-right w3-margin-bottom">Location
-          <select class="w3-select w3-round w3-black" id="opt-loc">
-            <option class="w3-text-white">None</option>
-            <option class="w3-text-red">Red Near</option>
-            <option class="w3-text-red">Red Mid</option>
-            <option class="w3-text-red">Red Far</option>
-            <option class="w3-text-blue">Blue Near</option>
-            <option class="w3-text-blue">Blue Mid</option>
-            <option class="w3-text-blue">Blue Far</option>
+    <div class="border margin-left margin-right round hide" id="options">
+      <div class="container margin-top">
+        <label class="show-inline-block mobile margin-right margin-bottom">Location
+          <select class="select round black" id="opt-loc">
+            <option class="text-white">None</option>
+            <option class="text-red">Red Near</option>
+            <option class="text-red">Red Mid</option>
+            <option class="text-red">Red Far</option>
+            <option class="text-blue">Blue Near</option>
+            <option class="text-blue">Blue Mid</option>
+            <option class="text-blue">Blue Far</option>
           </select>
         </label>
         <br>
-        <label class="w3-show-inline-block w3-mobile w3-margin-right w3-margin-bottom">Template
-          <select class="w3-select w3-round w3-black" id="opt-temp"></select>
+        <label class="show-inline-block mobile margin-right margin-bottom">Template
+          <select class="select round black" id="opt-temp"></select>
         </label>
-        <div class="w3-show-inline-block w3-mobile w3-margin-bottom">
+        <div class="show-inline-block mobile margin-bottom">
           <button class="data-btn" id="opt-temp-copy">Copy</button>
         </div>
-        <div class="w3-show-inline-block w3-mobile w3-margin-bottom">
+        <div class="show-inline-block mobile margin-bottom">
           <button class="data-btn" id="opt-temp-add">New</button>
         </div>
-        <div class="w3-show-inline-block w3-mobile w3-margin-bottom">
+        <div class="show-inline-block mobile margin-bottom">
           <button class="data-btn" id="opt-temp-remove">Remove</button>
         </div>
       </div>
     </div>
-    <main class="w3-margin-top">
-      <div class="w3-container">
-        <label class="w3-show-inline-block w3-mobile w3-margin-right w3-margin-bottom" style="width:100px">Team
-          <input class="w3-input w3-round w3-black" maxlength="5" placeholder="####" id="team" autofocus>
+    <main class="margin-top">
+      <div class="container">
+        <label class="show-inline-block mobile margin-right margin-bottom" style="width:100px">Team
+          <input class="input round black" maxlength="5" placeholder="####" id="team" autofocus>
         </label><!--
-        --><label class="w3-show-inline-block w3-mobile w3-margin-right w3-margin-bottom" style="width:80px">Match
-          <input class="w3-input w3-round w3-black" type="number" placeholder="##" id="match" value="1">
+        --><label class="show-inline-block mobile margin-right margin-bottom" style="width:80px">Match
+          <input class="input round black" type="number" placeholder="##" id="match" value="1">
         </label><!--
-        --><div class="w3-show-inline-block w3-mobile w3-margin-right w3-margin-bottom">
-          <button class="w3-button w3-border-bottom w3-round w3-ripple w3-block" id="absent">Absent</button>
+        --><div class="show-inline-block mobile margin-right margin-bottom">
+          <button class="button border-bottom round ripple block" id="absent">Absent</button>
         </div>
       </div>
-      <div class="w3-margin-right" id="metrics"></div>
-      <div class="w3-container">
-        <div class="w3-show-inline-block w3-mobile w3-margin-bottom">
+      <div class="margin-right" id="metrics"></div>
+      <div class="container">
+        <div class="show-inline-block mobile margin-bottom">
           <button class="data-btn" onclick="save()">Save</button>
         </div>
-        <div class="w3-show-inline-block w3-mobile w3-margin-bottom">
+        <div class="show-inline-block mobile margin-bottom">
           <button class="data-btn" onclick="download()">Download</button>
         </div>
       </div>
     </main>
-    <footer class="w3-container w3-small w3-text-gray">
-      <p>
-        Created by <a href="https://aidunlin.codes/" target="_blank" rel="noreferrer">Aidunlin</a>
-        (<a href="https://team2471.org/" target="_blank" rel="noreferrer">Team 2471</a>).
-        <br class="w3-hide-medium w3-hide-large">
-        Powered by <a href="https://www.w3schools.com/w3css/" target="_blank" rel="noreferrer">w3.css</a>
-        and <a href="https://jquery.com/" target="_blank" rel="noreferrer">jQuery</a>.
-      </p>
-    </footer>
     <script src="./templates.js"></script>
     <script src="./index.js"></script>
   </body>

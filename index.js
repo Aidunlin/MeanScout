@@ -5,7 +5,7 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-$('.data-btn').addClass('w3-button w3-border-bottom w3-round w3-ripple w3-mobile');
+$('.data-btn').addClass('button border-bottom round ripple mobile');
 let theme = 'white';
 let loc = 'None';
 let matchCount = 1;
@@ -18,11 +18,11 @@ let skipWarning = false;
  */
 function setLoc(newLoc) {
   $('input, button, select').removeClass(`outline-${theme}`);
-  $('input, .inc, select, #title, #nav-loc').removeClass(`w3-text-${theme}`);
-  $('.data-btn').removeClass(`w3-text-${theme} w3-border-${theme}`);
-  $('#absent').removeClass(`w3-${theme}`);
+  $('input, .inc, select, #title, #nav-loc').removeClass(`text-${theme}`);
+  $('.data-btn').removeClass(`text-${theme} border-${theme}`);
+  $('#absent').removeClass(theme);
   $.each(gameMetrics, (_i, metric) => {
-    if (metric.type == 'toggle') metric.element.children('button').removeClass(`w3-${theme}`);
+    if (metric.type == 'toggle') metric.element.children('button').removeClass(theme);
   });
   if (newLoc.includes('Red')) theme = 'red';
   else if (newLoc.includes('Blue')) theme = 'blue';
@@ -31,11 +31,11 @@ function setLoc(newLoc) {
   localStorage.setItem('location', newLoc);
   $('#nav-loc').html(newLoc);
   $('input, button, select').addClass(`outline-${theme}`);
-  $('input, .inc, select, #title, #nav-loc').addClass(`w3-text-${theme}`);
-  $('.data-btn').addClass(`w3-text-${theme} w3-border-${theme}`);
-  if (absent) $('#absent').addClass(`w3-${theme}`);
+  $('input, .inc, select, #title, #nav-loc').addClass(`text-${theme}`);
+  $('.data-btn').addClass(`text-${theme} border-${theme}`);
+  if (absent) $('#absent').addClass(theme);
   $.each(gameMetrics, (_i, metric) => {
-    if (metric.type == 'toggle' && metric.value) metric.element.children('button').addClass(`w3-${theme}`);
+    if (metric.type == 'toggle' && metric.value) metric.element.children('button').addClass(theme);
   });
 }
 if (localStorage.getItem('location')) {
@@ -47,14 +47,14 @@ $('#opt-loc').change(() => setLoc($('#opt-loc').val()));
 // Absent stuff
 $('#absent').click(() => {
   $('#metrics').toggle();
-  $('#absent').toggleClass(`w3-${theme}`);
+  $('#absent').toggleClass(theme);
   absent = !absent;
 })
 
 // Options toggle
 $('#opt-toggle').click(() => {
-  $('#options').toggleClass('w3-hide');
-  $('#opt-toggle').toggleClass('w3-border-bottom');
+  $('#options').toggleClass('hide');
+  $('#opt-toggle').toggleClass('border-bottom');
 });
 
 window.onbeforeunload = () => {return skipWarning};
@@ -82,12 +82,12 @@ function save() {
   matchCount = parseInt($('#match').val()) + 1;
   $('#match').val(matchCount);
   $('#metrics').show();
-  $('#absent').removeClass(`w3-${theme}`);
+  $('#absent').removeClass(theme);
   absent = false;
   $.each(gameMetrics, (_i, metric) => {
     if (metric.type == 'toggle') {
       metric.value = false;
-      metric.element.children('button').removeClass(`w3-${theme}`);
+      metric.element.children('button').removeClass(theme);
     } else if (metric.type == 'text') {
       metric.value = '';
       metric.element.children('input').val('');

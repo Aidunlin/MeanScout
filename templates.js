@@ -146,7 +146,7 @@ $('#opt-temp-remove').click(() => {
  * @param {number} i Index of metric
  */
 function toggle(i) {
-  gameMetrics[i].element.children('button').toggleClass(`w3-${theme}`);
+  gameMetrics[i].element.children('button').toggleClass(theme);
   gameMetrics[i].value = !gameMetrics[i].value;
 }
 
@@ -186,14 +186,14 @@ function loadTemplate(t) {
   gameMetrics = [];
   let metricObj, newMetric, prevDiv, newDiv;
   prevDiv = $('<div></div>');
-  prevDiv.addClass('w3-container');
+  prevDiv.addClass('container');
   $.each(t, (i, metric) => {
     metricObj = { name: metric.name };
     if (metric.type == 'toggle') {
       newMetric = $('<div></div>');
       
       let button = $('<button></button>');
-      button.addClass('w3-button w3-mobile w3-border-bottom w3-round w3-ripple');
+      button.addClass('button mobile border-bottom round ripple');
       button.append(metric.name);
       button.click(() => toggle(i));
       newMetric.append(button);
@@ -204,7 +204,7 @@ function loadTemplate(t) {
       newMetric.append(metric.name, '<br>');
 
       let input = $('<input>')
-      input.addClass('w3-input w3-round w3-black');
+      input.addClass('input round black');
       input.attr('placeholder', metric.tip ? metric.tip : metric.name);
       input.on('input', () => changeText(i));
       newMetric.append(input);
@@ -215,12 +215,12 @@ function loadTemplate(t) {
       newMetric.append(metric.name, '<br>');
       
       let incBtn = $('<button></button>');
-      incBtn.addClass('inc w3-button w3-border-bottom w3-round w3-ripple');
+      incBtn.addClass('inc button border-bottom round ripple');
       incBtn.css('width', '6.5ch');
       incBtn.click(() => crement(i, 'inc'));
       incBtn.append('0');
       let decBtn = $('<button></button>');
-      decBtn.addClass('dec w3-button w3-border-bottom w3-round w3-ripple');
+      decBtn.addClass('dec button border-bottom round ripple');
       decBtn.click(() => crement(i, 'dec'));
       decBtn.append('-');
       
@@ -233,7 +233,7 @@ function loadTemplate(t) {
       newMetric.append(metric.name, '<br>');
       
       let select = $('<select></select>');
-      select.addClass('w3-select w3-round w3-black');
+      select.addClass('select round black');
       select.css('width', '100%');
       select.css('min-width', 'fit-content');
       select.on('change', () => changeSelect(i));
@@ -246,11 +246,11 @@ function loadTemplate(t) {
       newMetric.append(select);
       metricObj.value = 0;
     }
-    newMetric.addClass('w3-show-inline-block w3-mobile w3-margin-left w3-margin-bottom');
+    newMetric.addClass('show-inline-block mobile margin-left margin-bottom');
 
     if (metric.newline) {
       newDiv = $('<div></div>');
-      newDiv.addClass('w3-container');
+      newDiv.addClass('container');
       if (metric.newline !== true) newDiv.append(metric.newline, '<br>');
       newDiv.append(newMetric);
       $('#metrics').append(prevDiv);
