@@ -11,14 +11,16 @@
     <link rel="icon" href="./logo192.png">
     <link rel="stylesheet" href="./w3.css">
     <script src="./jquery-3.4.1.min.js"></script>
+    <script src="https://kit.fontawesome.com/705ef2435f.js" crossorigin="anonymous"></script>
     <style>
       body{max-width:700px!important}
       body::-webkit-scrollbar{width:0}
       *:not(input){-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}
-      select{cursor:pointer;-webkit-appearance:none;padding-left:8px!important}
+      select{cursor:pointer;-webkit-appearance:none;padding-left:8px!important;padding-right:8px!important}
       .outline-red{outline-color:#f44336}
       .outline-blue{outline-color:#2196F3}
       .outline-white{outline-color:#ffffff}
+      .star{padding:8px!important;outline:none!important}
       #title-img{height:43px;padding-right:0}
       @media(max-width:310px){#title-img{display:none}}
     </style>
@@ -27,7 +29,7 @@
     <nav class="bar">
       <img class="bar-item" id="title-img" src="./logo192.png" alt=""> 
       <div class="bar-item" id="title">MeanScout</div>
-      <button class="bar-item button ripple border-bottom round right" id="opt-toggle">
+      <button class="bar-item button ripple round right" id="opt-toggle">
         <span class="hide-small margin-right" id="nav-temp"></span>
         <span id="nav-loc"></span>
       </div>
@@ -50,13 +52,13 @@
           <select class="select round black" id="opt-temp"></select>
         </label>
         <div class="show-inline-block mobile margin-bottom">
-          <button class="data-btn" id="opt-temp-copy">Copy</button>
+          <button class="data-btn" id="opt-temp-copy"><i class="fa fa-copy"></i> Copy</button>
         </div>
         <div class="show-inline-block mobile margin-bottom">
-          <button class="data-btn" id="opt-temp-add">New</button>
+          <button class="data-btn" id="opt-temp-add"><i class="fa fa-plus"></i> New</button>
         </div>
         <div class="show-inline-block mobile margin-bottom">
-          <button class="data-btn" id="opt-temp-remove">Remove</button>
+          <button class="data-btn" id="opt-temp-remove"><i class="fa fa-trash"></i> Remove</button>
         </div>
       </div>
     </div>
@@ -75,10 +77,10 @@
       <div class="margin-right" id="metrics"></div>
       <div class="container">
         <div class="show-inline-block mobile margin-bottom">
-          <button class="data-btn" onclick="save()">Save</button>
+          <button class="data-btn" onclick="save()"><i class="fa fa-save"></i> Save</button>
         </div>
         <div class="show-inline-block mobile margin-bottom">
-          <button class="data-btn" onclick="download()">Download</button>
+          <button class="data-btn" onclick="download()"><i class="fa fa-download"></i> Download</button>
         </div>
       </div>
     </main>

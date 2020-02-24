@@ -1,25 +1,10 @@
-// 2471's current default template
-let defaultTemplate = { name: 'FRC 2020 (2471)', metrics: [
-  { name: 'Passed Line',      type: 'toggle', newline: 'Auto'                                            },
-  { name: 'Bottom Port',      type: 'number', newline: true                                              },
-  { name: 'Outer Port',       type: 'number'                                                             },
-  { name: 'Inner Port',       type: 'number'                                                             },
-  { name: 'Bottom Port',      type: 'number', newline: 'Tele-Op'                                         },
-  { name: 'Outer Port',       type: 'number'                                                             },
-  { name: 'Inner Port',       type: 'number'                                                             },
-  { name: 'Rotation Control', type: 'toggle', newline: true                                              },
-  { name: 'Position Control', type: 'toggle'                                                             },
-  { name: 'Endgame',          type: 'select', newline: true,        values: ['None', 'Park', 'Hang']     },
-  { name: 'Penalty Card',     type: 'select', newline: 'Post-Game', values: ['None', 'Yellow', 'Red']    },
-  { name: 'Primary Role',     type: 'select',                       values: ['None', 'Role 1', 'Role 2'] },
-  { name: 'Secondary Role',   type: 'select',                       values: ['None', 'Role 1', 'Role 2'] },
-  { name: 'Disabled',         type: 'toggle', newline: true                                              },
-  { name: 'Disqualified',     type: 'toggle'                                                             },
-  { name: 'Drive Rating',     type: 'select', newline: true,        values: ['Bad', 'Ok', 'Great']       },
-  { name: 'Co-op Rating',     type: 'select',                       values: ['Bad', 'Ok', 'Great']       },
-  { name: 'Defense Rating',   type: 'select',                       values: ['Bad', 'Ok', 'Great']       },
-  { name: 'Comment(s)',       type: 'text',   newline: true                                              },
-  { name: 'Breakdown',        type: 'text'                                                               }
+// Default/example template
+let exampleTemp = { name: 'Example Template', metrics: [
+  { name: 'Toggle Metric', type: 'toggle', newline: 'Group' },
+  { name: 'Number Metric', type: 'number', max: '10' },
+  { name: 'Select Metric', type: 'select', values: ['Value 1', 'Value 2', 'Value 3'] },
+  { name: 'Text Metric', type: 'text', tip: 'Custom tip' },
+  { name: 'Rating Metric', type: 'rating' },
 ]};
 let templates = [];
 let gameMetrics = [];
@@ -31,7 +16,7 @@ if (localStorage.getItem('templates')) {
 }
 
 // Populate template picker with template options, select previously selected template
-$('#opt-temp').append(new Option(defaultTemplate.name, defaultTemplate.name));
+$('#opt-temp').append(new Option(exampleTemp.name, exampleTemp.name));
 $.each(templates, (i, template) => {
   $('#opt-temp').prepend(new Option(template.name, template.name));
   if (template.selected) {
@@ -43,8 +28,8 @@ $.each(templates, (i, template) => {
   }
 });
 if (!isCustomTemp) {
-  currentTemp = defaultTemplate;
-  loadTemplate(defaultTemplate.metrics);
+  currentTemp = exampleTemp;
+  loadTemplate(exampleTemp.metrics);
   $('#opt-temp').val(currentTemp.name);
   $('#nav-temp').html(currentTemp.name);
 }
@@ -69,8 +54,8 @@ function setTemplate() {
     }
   });
   if (!isCustomTemp) {
-    currentTemp = defaultTemplate;
-    loadTemplate(defaultTemplate.metrics);
+    currentTemp = exampleTemp;
+    loadTemplate(exampleTemp.metrics);
     $('#opt-temp').val(currentTemp.name);
     $('#nav-temp').html(currentTemp.name);
     setLoc(loc);
@@ -105,13 +90,13 @@ $('#opt-temp-add').click(() => {
     $.each(templates, (_i, template) => {
       if (newTemp.name == template.name) error = "Template has same name";
     });
-    if (newTemp.name == defaultTemplate.name) error = "Template has same name";
+    if (newTemp.name == exampleTemp.name) error = "Template has same name";
     if (newTemp.name && newTemp.metrics) {
       $.each(newTemp.metrics, (_i, metric) => {
         if (!metric.name) error = "Metric has no name";
         else if (metric.type == 'number' && metric.max < 1) error = "Max is less than one";
         else if (metric.type == 'select' && !metric.values) error = "Metric has no values";
-        else if (!['number', 'select', 'toggle', 'text'].includes(metric.type)) error = "Unknown metric type";
+        else if (!['number', 'select', 'toggle', 'text', 'rating'].includes(metric.type)) error = "Unknown metric type";
       });
     } else error = "Template is invalid";
     if (error) {
@@ -127,7 +112,7 @@ $('#opt-temp-add').click(() => {
 });
 
 $('#opt-temp-remove').click(() => {
-  if (!isCustomTemp) { alert('The default template cannot be removed.'); return; }
+  if (!isCustomTemp) { alert('The example template cannot be removed.'); return; }
   if (prompt(`Are you sure? Type '${currentTemp.name}' to remove the template`)) {
     $.each(templates, (i, template) => {
       if (template.name == currentTemp.name) {
@@ -174,7 +159,25 @@ function crement(i, way) {
  * @param {number} i Index of metric
  */
 function changeSelect(i) {
-  gameMetrics[i].value = gameMetrics[i].element.children('select').val();
+  gameMetrics[i].value = gameMetrics[i].element.find('option:checked').html();
+}
+
+/**
+ * Update a rating metric
+ * @param {number} i Index of metric
+ * @param {number} val Index of selected star
+ */
+function changeRating(i, val) {
+  gameMetrics[i].element.find('.star').html('<i class="far fa-star fa-2x"></i>');
+  if (val == 0 && gameMetrics[i].value == 1) {
+    gameMetrics[i].value = 0;
+    return;
+  } else {
+    gameMetrics[i].value = val + 1;
+    for (let count = 0; count <= val + 2; count++) {
+      gameMetrics[i].element.find(`.star:nth-child(${count})`).html('<i class="fas fa-star fa-2x"></i>');
+    }
+  }
 }
 
 /**
@@ -244,6 +247,19 @@ function loadTemplate(t) {
         select.append(newSel);
       });
       newMetric.append(select);
+      metricObj.value = metric.values[0];
+
+    } else if (metric.type == 'rating') {
+      newMetric = $('<div></div>');
+      newMetric.append(metric.name, '<br>');
+
+      for (let count = 0; count < 5; count++) {
+        let star = $('<button></button>');
+        star.addClass('star button ripple medium');
+        star.append('<i class="far fa-star fa-2x"></i>');
+        star.click(() => changeRating(i, count));
+        newMetric.append(star);
+      }
       metricObj.value = 0;
     }
     newMetric.addClass('show-inline-block mobile margin-left margin-bottom');

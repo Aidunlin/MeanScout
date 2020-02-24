@@ -18,7 +18,7 @@ let skipWarning = false;
  */
 function setLoc(newLoc) {
   $('input, button, select').removeClass(`outline-${theme}`);
-  $('input, .inc, select, #title, #nav-loc').removeClass(`text-${theme}`);
+  $('input, .inc, select, #title, #nav-loc, .star').removeClass(`text-${theme}`);
   $('.data-btn').removeClass(`text-${theme} border-${theme}`);
   $('#absent').removeClass(theme);
   $.each(gameMetrics, (_i, metric) => {
@@ -31,7 +31,7 @@ function setLoc(newLoc) {
   localStorage.setItem('location', newLoc);
   $('#nav-loc').html(newLoc);
   $('input, button, select').addClass(`outline-${theme}`);
-  $('input, .inc, select, #title, #nav-loc').addClass(`text-${theme}`);
+  $('input, .inc, select, #title, #nav-loc, .star').addClass(`text-${theme}`);
   $('.data-btn').addClass(`text-${theme} border-${theme}`);
   if (absent) $('#absent').addClass(theme);
   $.each(gameMetrics, (_i, metric) => {
@@ -54,7 +54,6 @@ $('#absent').click(() => {
 // Options toggle
 $('#opt-toggle').click(() => {
   $('#options').toggleClass('hide');
-  $('#opt-toggle').toggleClass('border-bottom');
 });
 
 window.onbeforeunload = () => {return skipWarning};
@@ -97,6 +96,9 @@ function save() {
     } else if (metric.type == 'select') {
       metric.value = 0;
       metric.element.children('select').val(0);
+    } else if (metric.type == 'rating') {
+      metric.value = 0;
+      metric.element.find('.star').html('<i class="far fa-star fa-2x"></i>');
     }
   });
 }
