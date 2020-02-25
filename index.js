@@ -87,7 +87,7 @@ function save() {
   $.each(gameMetrics, (_i, metric) => {
     if (metric.type == 'toggle') {
       metric.value = false;
-      metric.element.children('button').removeClass(theme);
+      metric.element.find('i').removeClass('fas').addClass('far');
     } else if (metric.type == 'text') {
       metric.value = '';
       metric.element.children('input').val('');
@@ -99,7 +99,7 @@ function save() {
       metric.element.children('select').val(0);
     } else if (metric.type == 'rating') {
       metric.value = 0;
-      metric.element.children('.star').html('<i class="far fa-star fa-2x"></i>');
+      metric.element.find('.star').html('<i class="far fa-star"></i>');
     }
   });
 }

@@ -197,8 +197,8 @@ function loadTemplate(t) {
       
       let button = $('<button></button>');
       button.addClass('button mobile border-bottom round ripple');
-      button.append('<i class="far fa-check-square margin-right"></i>')
-      button.append(metric.name);
+      button.append('<i class="far fa-check-square"></i>')
+      button.append(` ${metric.name}`);
       button.click(() => toggle(i));
       newMetric.append(button);
       metricObj.value = false;
@@ -226,7 +226,7 @@ function loadTemplate(t) {
       let decBtn = $('<button></button>');
       decBtn.addClass('dec button border-bottom round ripple');
       decBtn.click(() => crement(i, 'dec'));
-      decBtn.append('-');
+      decBtn.append('−');
       
       newMetric.append(incBtn, ' ', decBtn);
       metricObj.max = metric.max || 100;
