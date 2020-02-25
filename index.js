@@ -18,11 +18,11 @@ let skipWarning = false;
  */
 function setLoc(newLoc) {
   $('input, button, select').removeClass(`outline-${theme}`);
-  $('input, .inc, select, #title, #nav-loc, .star').removeClass(`text-${theme}`);
+  $('input, .inc, select, #title, #nav-loc, .star, .fa-check-square').removeClass(`text-${theme}`);
   $('.data-btn').removeClass(`text-${theme} border-${theme}`);
-  $('#absent').removeClass(theme);
+  $('#absent i').removeClass('far fas');
   $.each(gameMetrics, (_i, metric) => {
-    if (metric.type == 'toggle') metric.element.children('button').removeClass(theme);
+    metric.element.children('i').removeClass('far fas');
   });
   if (newLoc.includes('Red')) theme = 'red';
   else if (newLoc.includes('Blue')) theme = 'blue';
@@ -31,11 +31,11 @@ function setLoc(newLoc) {
   localStorage.setItem('location', newLoc);
   $('#nav-loc').html(newLoc);
   $('input, button, select').addClass(`outline-${theme}`);
-  $('input, .inc, select, #title, #nav-loc, .star').addClass(`text-${theme}`);
+  $('input, .inc, select, #title, #nav-loc, .star, .fa-check-square').addClass(`text-${theme}`);
   $('.data-btn').addClass(`text-${theme} border-${theme}`);
-  if (absent) $('#absent').addClass(theme);
+  $('#absent i').addClass(absent ? 'fas' : 'far');
   $.each(gameMetrics, (_i, metric) => {
-    if (metric.type == 'toggle' && metric.value) metric.element.children('button').addClass(theme);
+    if (metric.type == 'toggle') metric.element.children('i').addClass(metric.value ? 'fas' : 'far');
   });
 }
 if (localStorage.getItem('location')) {
@@ -47,7 +47,7 @@ $('#opt-loc').change(() => setLoc($('#opt-loc').val()));
 // Absent stuff
 $('#absent').click(() => {
   $('#metrics').toggle();
-  $('#absent').toggleClass(theme);
+  $('#absent i').toggleClass('far fas');
   absent = !absent;
 })
 
@@ -71,7 +71,8 @@ function save() {
   }
   let values = `${$('#team').val()};${$('#match').val()};${absent};`;
   $.each(gameMetrics, (_i, metric) => {
-    values += metric.value + ';';
+    if (metric.type == 'text') values += metric.value.replace(';', ' ') + ';';
+    else values += metric.value + ';';
   });
   if (!confirm('Confirm save?')) return;
   let prev = localStorage.getItem('surveys');
@@ -98,7 +99,7 @@ function save() {
       metric.element.children('select').val(0);
     } else if (metric.type == 'rating') {
       metric.value = 0;
-      metric.element.find('.star').html('<i class="far fa-star fa-2x"></i>');
+      metric.element.children('.star').html('<i class="far fa-star fa-2x"></i>');
     }
   });
 }

@@ -29,7 +29,7 @@ h1{font-size:36px}h2{font-size:30px}h3{font-size:24px}h4{font-size:20px}h5{font-
 h1,h2,h3,h4,h5,h6{font-family:"Segoe UI",Arial,sans-serif;font-weight:400;margin:10px 0}.wide{letter-spacing:4px}
 hr{border:0;border-top:1px solid #eee;margin:20px 0}
 .image{max-width:100%;height:auto}img{vertical-align:middle}a{color:inherit}
-.btn,.button{border:none;display:inline-block;padding:8px 16px;vertical-align:middle;overflow:hidden;text-decoration:none;color:inherit;background-color:inherit;text-align:center;cursor:pointer;white-space:nowrap}
+.btn,.button{border:none;display:inline-block;padding:8px 16px;overflow:hidden;text-decoration:none;color:inherit;background-color:inherit;text-align:center;cursor:pointer;white-space:nowrap}
 .btn:hover{box-shadow:0 8px 16px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19)}
 .btn,.button{-webkit-touch-callout:none;-webkit-user-select:none;-khtml-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}   
 .disabled,.btn:disabled,.button:disabled{cursor:not-allowed;opacity:0.3}.disabled *,:disabled *{pointer-events:none}
@@ -39,7 +39,7 @@ hr{border:0;border-top:1px solid #eee;margin:20px 0}
 .tooltip,.display-container{position:relative}.tooltip .text{display:none}.tooltip:hover .text{display:inline-block}
 .ripple:active{opacity:0.5}.ripple{transition:opacity 0s}
 .input{padding:8px;display:block;border:none;border-bottom:1px solid #ccc;width:100%}
-.select{padding:9px 0;width:100%;border:none;border-bottom:1px solid #ccc}
+.select{padding:8px 0;width:100%;border:none;border-bottom:1px solid #ccc}
 .check,.radio{width:24px;height:24px;position:relative;top:6px}
 .sidebar{height:100%;width:200px;background-color:#fff;position:fixed!important;z-index:1;overflow:auto}
 .bar-block .dropdown-hover,.bar-block .dropdown-click{width:100%}

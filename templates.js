@@ -131,7 +131,7 @@ $('#opt-temp-remove').click(() => {
  * @param {number} i Index of metric
  */
 function toggle(i) {
-  gameMetrics[i].element.children('button').toggleClass(theme);
+  gameMetrics[i].element.find('i').toggleClass('far fas');
   gameMetrics[i].value = !gameMetrics[i].value;
 }
 
@@ -159,7 +159,7 @@ function crement(i, way) {
  * @param {number} i Index of metric
  */
 function changeSelect(i) {
-  gameMetrics[i].value = gameMetrics[i].element.find('option:checked').html();
+  gameMetrics[i].value = gameMetrics[i].element.children('option:checked').html();
 }
 
 /**
@@ -168,14 +168,14 @@ function changeSelect(i) {
  * @param {number} val Index of selected star
  */
 function changeRating(i, val) {
-  gameMetrics[i].element.find('.star').html('<i class="far fa-star fa-2x"></i>');
+  gameMetrics[i].element.find('.star').html('<i class="far fa-star"></i>');
   if (val == 0 && gameMetrics[i].value == 1) {
     gameMetrics[i].value = 0;
     return;
   } else {
     gameMetrics[i].value = val + 1;
-    for (let count = 0; count <= val + 2; count++) {
-      gameMetrics[i].element.find(`.star:nth-child(${count})`).html('<i class="fas fa-star fa-2x"></i>');
+    for (let count = 0; count <= val + 1; count++) {
+      gameMetrics[i].element.find(`div>.star:nth-child(${count})`).html('<i class="fas fa-star"></i>');
     }
   }
 }
@@ -197,6 +197,7 @@ function loadTemplate(t) {
       
       let button = $('<button></button>');
       button.addClass('button mobile border-bottom round ripple');
+      button.append('<i class="far fa-check-square margin-right"></i>')
       button.append(metric.name);
       button.click(() => toggle(i));
       newMetric.append(button);
@@ -237,8 +238,6 @@ function loadTemplate(t) {
       
       let select = $('<select></select>');
       select.addClass('select round black');
-      select.css('width', '100%');
-      select.css('min-width', 'fit-content');
       select.on('change', () => changeSelect(i));
       $.each(metric.values, (index, selValue) => {
         let newSel = $('<option></option>');
@@ -252,14 +251,18 @@ function loadTemplate(t) {
     } else if (metric.type == 'rating') {
       newMetric = $('<div></div>');
       newMetric.append(metric.name, '<br>');
-
+      
+      let ratingBar = $('<div></div>');
+      ratingBar.addClass('round border-bottom');
+      ratingBar.css('width', 'fit-content');
       for (let count = 0; count < 5; count++) {
         let star = $('<button></button>');
-        star.addClass('star button ripple medium');
-        star.append('<i class="far fa-star fa-2x"></i>');
+        star.addClass('star button ripple');
+        star.append('<i class="far fa-star"></i>');
         star.click(() => changeRating(i, count));
-        newMetric.append(star);
+        ratingBar.append(star);
       }
+      newMetric.append(ratingBar);
       metricObj.value = 0;
     }
     newMetric.addClass('show-inline-block mobile margin-left margin-bottom');
