@@ -35,12 +35,9 @@ if (!isCustomTemp) {
 }
 localStorage.setItem('templates', JSON.stringify(templates));
 
-/** Change to selected template */
+// Change to selected template
 function setTemplate() {
-  if (localStorage.getItem('surveys')) {
-    if (confirm('There are saved surveys from another template. Download them to switch templates?')) download(false);
-    else return;
-  }
+  if (localStorage.getItem('surveys')) download(false);
   isCustomTemp = false;
   $.each(templates, (i, template) => {
     template.selected = false;
@@ -96,7 +93,7 @@ $('#opt-temp-add').click(() => {
         if (!metric.name) error = "Metric has no name";
         else if (metric.type == 'number' && metric.max < 1) error = "Max is less than one";
         else if (metric.type == 'select' && !metric.values) error = "Metric has no values";
-        else if (!['number', 'select', 'toggle', 'text', 'rating'].includes(metric.type)) error = "Unknown metric type";
+        else if (!['toggle', 'number', 'select', 'text', 'rating'].includes(metric.type)) error = "Unknown metric type";
       });
     } else error = "Template is invalid";
     if (error) {
@@ -126,47 +123,22 @@ $('#opt-temp-remove').click(() => {
   }
 });
 
-/**
- * Toggle a button metric
- * @param {number} i Index of metric
- */
+// Handles metric UI/value changes
 function toggle(i) {
-  gameMetrics[i].element.find('i').toggleClass('far fas');
+  gameMetrics[i].element.find('i').toggleClass('far fa-square fas fa-check-square');
   gameMetrics[i].value = !gameMetrics[i].value;
 }
-
-/**
- * Update a text metric
- * @param {number} i Index of metric
- */
-function changeText(i) {
-  gameMetrics[i].value = gameMetrics[i].element.children('input').val().replace(';', ' ');
-}
-
-/**
- * Increment or decrement a number metric
- * @param {number} i Index of metric
- * @param {string} way Either 'inc' or 'dec'
- */
 function crement(i, way) {
   if (way == 'inc' && gameMetrics[i].value < gameMetrics[i].max) gameMetrics[i].value++;
   else if (way == 'dec' && gameMetrics[i].value > 0) gameMetrics[i].value--;
   gameMetrics[i].element.children('.inc').html(gameMetrics[i].value);
 }
-
-/**
- * Update a select metric
- * @param {number} i Index of metric
- */
 function changeSelect(i) {
-  gameMetrics[i].value = gameMetrics[i].element.children('option:checked').html();
+  gameMetrics[i].value = gameMetrics[i].element.find('option:checked').html();
 }
-
-/**
- * Update a rating metric
- * @param {number} i Index of metric
- * @param {number} val Index of selected star
- */
+function changeText(i) {
+  gameMetrics[i].value = gameMetrics[i].element.children('input').val().replace(';', ' ');
+}
 function changeRating(i, val) {
   gameMetrics[i].element.find('.star').html('<i class="far fa-star"></i>');
   if (val == 0 && gameMetrics[i].value == 1) {
@@ -180,10 +152,7 @@ function changeRating(i, val) {
   }
 }
 
-/**
- * Create scouting metrics (UI and state variables) from template
- * @param {Object[]} t An array of metrics
- */
+// Create scouting metrics (UI and state variables) from template
 function loadTemplate(t) {
   $('#metrics').empty();
   gameMetrics = [];
@@ -197,22 +166,10 @@ function loadTemplate(t) {
       
       let button = $('<button></button>');
       button.addClass('button mobile border-bottom round ripple');
-      button.append('<i class="far fa-check-square"></i>')
-      button.append(` ${metric.name}`);
+      button.append('<i class="far fa-square"></i>', ` ${metric.name}`);
       button.click(() => toggle(i));
       newMetric.append(button);
       metricObj.value = false;
-    
-    } else if (metric.type == 'text') {
-      newMetric = $('<label></label>');
-      newMetric.append(metric.name, '<br>');
-
-      let input = $('<input>')
-      input.addClass('input round black');
-      input.attr('placeholder', metric.tip ? metric.tip : metric.name);
-      input.on('input', () => changeText(i));
-      newMetric.append(input);
-      metricObj.value = '';
     
     } else if (metric.type == 'number') {
       newMetric = $('<div></div>');
@@ -248,6 +205,17 @@ function loadTemplate(t) {
       newMetric.append(select);
       metricObj.value = metric.values[0];
 
+    } else if (metric.type == 'text') {
+      newMetric = $('<label></label>');
+      newMetric.append(metric.name, '<br>');
+
+      let input = $('<input>')
+      input.addClass('input round black');
+      input.attr('placeholder', metric.tip ? metric.tip : metric.name);
+      input.on('input', () => changeText(i));
+      newMetric.append(input);
+      metricObj.value = '';
+    
     } else if (metric.type == 'rating') {
       newMetric = $('<div></div>');
       newMetric.append(metric.name, '<br>');
