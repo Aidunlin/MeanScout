@@ -78,9 +78,7 @@ function save() {
   $('#team').val('').focus();
   matchCount = parseInt($('#match').val()) + 1;
   $('#match').val(matchCount);
-  $('#metrics').show();
-  $('#absent').removeClass(theme);
-  absent = false;
+  if (absent) $('#absent').click();
   $.each(gameMetrics, (_i, metric) => {
     if (metric.type == 'toggle') {
       metric.element.find('i').removeClass('fas fa-check-square').addClass('far fa-square');
