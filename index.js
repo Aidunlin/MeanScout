@@ -41,6 +41,17 @@ if (localStorage.getItem('location')) {
 } else setLoc('None');
 $('#opt-loc').change(() => setLoc($('#opt-loc').val()));
 
+// Team, match value restrictions
+$('#team, #match').keypress(e => {
+  if (e.which != 8 && e.which != 0 && e.which < 48 || e.which > 57) e.preventDefault();
+});
+$('#team').on('input', () => {
+  if ($('#team').val().length > 4) $('#team').val($('#team').val().substring(0, 4));
+});
+$('#match').on('input', () => {
+  if ($('#match').val().length > 3) $('#match').val($('#match').val().substring(0, 3));
+});
+
 // Absent toggle
 $('#absent').click(() => {
   $('#metrics').toggle();
@@ -51,13 +62,14 @@ $('#absent').click(() => {
 // Options toggle
 $('#opt-toggle').click(() => {
   $('#options').toggleClass('hide');
+  $('#opt-toggle i').toggleClass('fa-caret-down fa-caret-up');
 });
 
 window.onbeforeunload = () => {return skipWarning};
 
 // Saves current survey to localstorage and reset metrics
 function save() {
-  if (!/\d{1,4}[a-z]?/.test($('#team').val())) {
+  if (!/\d{1,4}/.test($('#team').val())) {
     alert('Please enter a proper team value!');
     $('#team').focus();
     return;
@@ -66,7 +78,7 @@ function save() {
     $('#match').focus();
     return;
   }
-  let values = `${$('#team').val()};${$('#match').val()};${absent};`;
+  let values = `${$('#team').val() + $('#suffix').val()};${$('#match').val()};${absent};`;
   $.each(gameMetrics, (_i, metric) => {
     if (metric.type == 'text') values += metric.value.replace(';', ' ') + ';';
     else values += metric.value + ';';
@@ -76,6 +88,7 @@ function save() {
   localStorage.setItem('surveys', `${prev || ''}${values}\n`);
   
   $('#team').val('').focus();
+  $('#suffix').val('');
   matchCount = parseInt($('#match').val()) + 1;
   $('#match').val(matchCount);
   if (absent) $('#absent').click();

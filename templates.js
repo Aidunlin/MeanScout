@@ -1,7 +1,7 @@
 // Default/example template
 let exampleTemp = { name: 'Example Template', metrics: [
   { name: 'Toggle Metric', type: 'toggle', newline: 'Group' },
-  { name: 'Number Metric', type: 'number', max: '10' },
+  { name: 'Number Metric', type: 'number', max: 10 },
   { name: 'Select Metric', type: 'select', values: ['Value 1', 'Value 2', 'Value 3'] },
   { name: 'Text Metric', type: 'text', tip: 'Custom tip' },
   { name: 'Rating Metric', type: 'rating' },
@@ -84,10 +84,7 @@ $('#opt-temp-add').click(() => {
     newTemp.selected = true;
 
     let error = false;
-    $.each(templates, (_i, template) => {
-      if (newTemp.name == template.name) error = "Template has same name";
-    });
-    if (newTemp.name == exampleTemp.name) error = "Template has same name";
+    if (newTemp.name == exampleTemp.name) error = "Template has same name as example";
     if (newTemp.name && newTemp.metrics) {
       $.each(newTemp.metrics, (_i, metric) => {
         if (!metric.name) error = "Metric has no name";
@@ -100,6 +97,24 @@ $('#opt-temp-add').click(() => {
       alert(`Could not add template! Error: ${error}`);
       return;
     }
+    
+    $.each(templates, (_i, template) => {
+      if (newTemp.name == template.name) {
+        if (confirm(`${newTemp.name} already exists. Replace current template?`)) {
+          $.each(templates, (i, template) => {
+            if (template.name == currentTemp.name) {
+              templates.splice(i, 1);
+              return false;
+            }
+          });
+          $('#opt-temp option:checked').remove();
+          setTemplate();
+          localStorage.setItem('templates', JSON.stringify(templates));
+        } else {
+          return false;
+        }
+      };
+    });
 
     templates.unshift(newTemp);
     $('#opt-temp').prepend(new Option(newTemp.name, newTemp.name));
@@ -175,17 +190,17 @@ function loadTemplate(t) {
       newMetric = $('<div></div>');
       newMetric.append(metric.name, '<br>');
       
-      let incBtn = $('<button></button>');
-      incBtn.addClass('inc button border-bottom round ripple');
-      incBtn.css('width', '6.5ch');
-      incBtn.click(() => crement(i, 'inc'));
-      incBtn.append('0');
       let decBtn = $('<button></button>');
       decBtn.addClass('dec button border-bottom round ripple');
       decBtn.click(() => crement(i, 'dec'));
       decBtn.append('−');
+      let incBtn = $('<button></button>');
+      incBtn.addClass('inc button border-bottom round ripple');
+      incBtn.css('width', '80px');
+      incBtn.click(() => crement(i, 'inc'));
+      incBtn.append('0');
       
-      newMetric.append(incBtn, ' ', decBtn);
+      newMetric.append(decBtn, ' ', incBtn);
       metricObj.max = metric.max || 100;
       metricObj.value = 0;
     
@@ -208,8 +223,8 @@ function loadTemplate(t) {
     } else if (metric.type == 'text') {
       newMetric = $('<label></label>');
       newMetric.append(metric.name, '<br>');
-
-      let input = $('<input>')
+      if (metric.length == 'long') newMetric.css('width', '100%');
+      let input = $('<input>');
       input.addClass('input round black');
       input.attr('placeholder', metric.tip ? metric.tip : metric.name);
       input.on('input', () => changeText(i));
@@ -233,7 +248,7 @@ function loadTemplate(t) {
       newMetric.append(ratingBar);
       metricObj.value = 0;
     }
-    newMetric.addClass('show-inline-block mobile margin-left margin-bottom');
+    newMetric.addClass('show-inline-block margin-left margin-bottom');
 
     if (metric.newline) {
       newDiv = $('<div></div>');

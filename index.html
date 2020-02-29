@@ -4,7 +4,7 @@
     <title>MeanScout</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
-    <meta name="description" content="An FRC scouting web app">
+    <meta name="description" content="A responsive, flexible, and powerful FRC scouting web app.">
     <meta name="theme-color" content="#000000">
     <link rel="apple-touch-icon" href="./logo192.png">
     <link rel="icon" href="./logo192.png">
@@ -30,7 +30,7 @@
       <img class="bar-item" id="title-img" src="./logo192.png" alt=""> 
       <div class="bar-item" id="title">MeanScout</div>
       <button class="bar-item button ripple round right" id="opt-toggle">
-        <span class="hide-small margin-right" id="nav-temp"></span><span id="nav-loc"></span>
+        <span class="hide-small margin-right" id="nav-temp"></span><span id="nav-loc"></span><i class="fa fa-caret-down margin-left"></i>
       </div>
     </nav>
     <div class="container border round hide" id="options">
@@ -52,25 +52,28 @@
       <label class="show-inline-block mobile margin-right margin-bottom">Template
         <select class="select round black" id="opt-temp"></select>
       </label>
-      <div class="show-inline-block mobile margin-bottom">
+      <div class="show-inline-block margin-bottom">
         <button class="data-btn" id="opt-temp-copy"><i class="fa fa-copy"></i> Copy</button>
       </div>
-      <div class="show-inline-block mobile margin-bottom">
+      <div class="show-inline-block margin-bottom">
         <button class="data-btn" id="opt-temp-add"><i class="fa fa-plus"></i> New</button>
       </div>
-      <div class="show-inline-block mobile margin-bottom">
+      <div class="show-inline-block margin-bottom">
         <button class="data-btn" id="opt-temp-remove"><i class="fa fa-trash"></i> Remove</button>
       </div>
     </div>
     <main class="margin-top">
       <div class="container">
-        <label class="show-inline-block mobile margin-right margin-bottom" style="width:100px">Team
-          <input class="input round black" maxlength="5" placeholder="####" id="team" autofocus>
+        <label class="show-inline-block margin-right margin-bottom" style="width:100px">Team
+          <input class="input round black" type="number" placeholder="####" id="team" autofocus>
         </label><!--
-        --><label class="show-inline-block mobile margin-right margin-bottom" style="width:80px">Match
+        --><label class="show-inline-block margin-right margin-bottom" style="width:55px">Suffix
+          <input class="input round black" maxlength="1" placeholder="" id="suffix" value="">
+        </label><!--
+        --><label class="show-inline-block margin-right margin-bottom" style="width:80px">Match
           <input class="input round black" type="number" placeholder="##" id="match" value="1">
         </label><!--
-        --><div class="show-inline-block mobile margin-right margin-bottom">
+        --><div class="show-inline-block margin-right margin-bottom">
           <button class="button border-bottom round ripple block" id="absent"><i class="far fa-square"></i> Absent</button>
         </div>
       </div>
