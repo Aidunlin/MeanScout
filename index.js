@@ -73,6 +73,12 @@ function save() {
     alert('Please enter a proper team value!');
     $('#team').focus();
     return;
+  } else if (currentTemp.teams) {
+    if (!currentTemp.teams.includes(parseInt($('#team').val()))) {
+      alert('Unaccepted team value!');
+      $('#team').focus();
+      return;
+    }
   } else if (!/\d{1,3}/.test($('#match').val()) || $('#match').val().length > 3) {
     alert('Please enter a proper match value!');
     $('#match').focus();

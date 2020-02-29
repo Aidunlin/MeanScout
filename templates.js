@@ -5,6 +5,11 @@ let exampleTemp = { name: 'Example Template', metrics: [
   { name: 'Select Metric', type: 'select', values: ['Value 1', 'Value 2', 'Value 3'] },
   { name: 'Text Metric', type: 'text', tip: 'Custom tip' },
   { name: 'Rating Metric', type: 'rating' },
+], teams: [
+  360,753,847,1425,1432,1510,1540,1571,2411,
+  2471,2521,2550,2811,2898,2915,2990,3024,3223,
+  3636,3674,3711,3812,4127,4488,5085,5295,5450,
+  5468,5803,5977,6343,6465,6696,6831,6845,7448
 ]};
 let templates = [];
 let gameMetrics = [];
@@ -98,28 +103,25 @@ $('#opt-temp-add').click(() => {
       return;
     }
     
+    let skip = false;
     $.each(templates, (_i, template) => {
       if (newTemp.name == template.name) {
         if (confirm(`${newTemp.name} already exists. Replace current template?`)) {
           $.each(templates, (i, template) => {
-            if (template.name == currentTemp.name) {
-              templates.splice(i, 1);
-              return false;
-            }
+            if (template.name == currentTemp.name) { templates.splice(i, 1); return false; }
           });
           $('#opt-temp option:checked').remove();
           setTemplate();
           localStorage.setItem('templates', JSON.stringify(templates));
-        } else {
-          return false;
-        }
+        } else { skip = true; return false; }
       };
     });
-
-    templates.unshift(newTemp);
-    $('#opt-temp').prepend(new Option(newTemp.name, newTemp.name));
-    $('#opt-temp').val(newTemp.name);
-    setTemplate();
+    if (!skip) {
+      templates.unshift(newTemp);
+      $('#opt-temp').prepend(new Option(newTemp.name, newTemp.name));
+      $('#opt-temp').val(newTemp.name);
+      setTemplate();
+    }
   }
 });
 
@@ -200,7 +202,7 @@ function loadTemplate(t) {
       incBtn.click(() => crement(i, 'inc'));
       incBtn.append('0');
       
-      newMetric.append(decBtn, ' ', incBtn);
+      newMetric.append(incBtn, ' ', decBtn);
       metricObj.max = metric.max || 100;
       metricObj.value = 0;
     

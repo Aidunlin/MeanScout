@@ -47,10 +47,15 @@ To add a template to MeanScout, simply copy and paste its JSON. MeanScout comes 
   { "name": "Select Metric", "type": "select", "values": ["Value 1", "Value 2", "Value 3"] },
   { "name": "Text Metric", "type": "text", "tip": "Custom tip" },
   { "name": "Rating Metric", "type": "rating" },
+], "teams": [
+  360,753,847,1425,1432,1510,1540,1571,2411,
+  2471,2521,2550,2811,2898,2915,2990,3024,3223,
+  3636,3674,3711,3812,4127,4488,5085,5295,5450,
+  5468,5803,5977,6343,6465,6696,6831,6845,7448
 ]}
 ```
 
-Each template should have a `name` (string) and an array of `metrics` (JSON objects).
+Each template should have a `name` and an array of `metrics`. Optionally, a whitelist of `teams` can be included to restrict what team numbers can be entered.
 
 Each metric must have a `name` and a `type` (`toggle`, `number`, `select`, `text`, or `rating`). Use short/concise names for metrics.
 
