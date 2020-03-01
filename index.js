@@ -45,11 +45,16 @@ $('#opt-loc').change(() => setLoc($('#opt-loc').val()));
 $('#team, #match').keypress(e => {
   if (e.which != 8 && e.which != 0 && e.which < 48 || e.which > 57) e.preventDefault();
 });
+$('#suffix').keypress(e => {
+  if (!'abcdefghijklmnopqrstuvwxyz'.includes(e.key.toLowerCase())) e.preventDefault();
+  else $('#suffix').val('');
+});
 $('#team').on('input', () => {
   if ($('#team').val().length > 4) $('#team').val($('#team').val().substring(0, 4));
 });
 $('#suffix').on('input', () => {
   $('#suffix').val($('#suffix').val().toUpperCase());
+  if ($('#suffix').val().length > 1) $('#suffix').val($('#suffix').val().substring(0, 1));
 });
 $('#match').on('input', () => {
   if ($('#match').val().length > 3) $('#match').val($('#match').val().substring(0, 3));

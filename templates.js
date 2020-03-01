@@ -1,5 +1,5 @@
 // Default/example template
-let exampleTemp = { name: 'Example Template', metrics: [
+let exampleTemp = { name: 'Example', metrics: [
   { name: 'Toggle Metric', type: 'toggle', newline: 'Group' },
   { name: 'Number Metric', type: 'number', max: 10 },
   { name: 'Select Metric', type: 'select', values: ['Value 1', 'Value 2', 'Value 3'] },
@@ -194,7 +194,7 @@ function loadTemplate(t) {
       
       let incBtn = $('<button></button>');
       incBtn.addClass('inc button border-bottom round ripple');
-      incBtn.css('width', '75px');
+      incBtn.css('width', '80px');
       incBtn.click(() => crement(i, 'inc'));
       incBtn.append('0');
       let decBtn = $('<button></button>');

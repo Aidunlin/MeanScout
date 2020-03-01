@@ -13,7 +13,6 @@
     <script src="./jquery-3.4.1.min.js"></script>
     <script src="https://kit.fontawesome.com/705ef2435f.js" crossorigin="anonymous"></script>
     <style>
-      body{max-width:750px!important}
       *:not(input){-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}
       select{cursor:pointer;-webkit-appearance:none;padding-left:8px!important;padding-right:8px!important}
       #options{padding-top:12px;margin:0 4px!important}
@@ -21,16 +20,17 @@
       .outline-blue{outline-color:#2196F3!important}
       .outline-white{outline-color:#ffffff!important}
       .star{padding:8px!important}
-      #title-img{height:43px;padding-right:0}
-      @media(max-width:310px){#title-img{display:none}}
+      #title-img{height:52px;padding-right:0}
+      @media(max-width:400px){#title-img{display:none}}
+      @media(max-width:600px){#nav-temp{display:none}}
     </style>
   </head>
-  <body class="content black large">
+  <body class="content black xlarge">
     <nav class="bar">
       <img class="bar-item" id="title-img" src="./logo192.png" alt=""> 
       <div class="bar-item" id="title">MeanScout</div>
       <button class="bar-item button ripple round right" id="opt-toggle">
-        <span class="hide-small margin-right" id="nav-temp"></span><span id="nav-loc"></span><i class="fa fa-caret-down margin-left"></i>
+        <span class="margin-right" id="nav-temp"></span><span id="nav-loc"></span><i class="fa fa-caret-down margin-left"></i>
       </div>
     </nav>
     <div class="container border round hide" id="options">
@@ -46,7 +46,7 @@
         </select>
       </label>
       <div class="show-inline-block mobile margin-bottom">
-        <button class="data-btn" onclick="download()"><i class="fa fa-download"></i> Download Surveys</button>
+        <button class="data-btn" onclick="download()"><i class="fa fa-download"></i> Download</button>
       </div>
       <br>
       <label class="show-inline-block mobile margin-right margin-bottom">Template
@@ -64,11 +64,11 @@
     </div>
     <main class="margin-top">
       <div class="container">
-        <label class="show-inline-block margin-right margin-bottom" style="width:100px">Team
+        <label class="show-inline-block margin-right margin-bottom" style="width:110px">Team
           <input class="input round black" type="number" placeholder="####" id="team" autofocus>
         </label><!--
-        --><label class="show-inline-block margin-right margin-bottom" style="width:55px">Suffix
-          <input class="input round black" maxlength="1" id="suffix">
+        --><label class="show-inline-block margin-right margin-bottom" style="width:70px">Suffix
+          <input class="input round black" id="suffix">
         </label><!--
         --><label class="show-inline-block margin-right margin-bottom" style="width:80px">Match
           <input class="input round black" type="number" placeholder="##" id="match" value="1">
