@@ -9,13 +9,13 @@ A responsive, flexible, and powerful FRC scouting web app.
 - Dark-only theme with red/blue color variants
 - Templates - customizable metrics (documentation below)
 - Different metric types: toggles, numbers, selectors, text, ratings
+- Team whitelist customization - make sure entered team is correct
 - Uses `localStorage` to store entries
 - Download saved entries as `(Template Name) Surveys.txt`
 - Metrics separated with semicolons and surveys separated with newlines
 
 ### Planned Features
 
-- Team whitelist customization - make sure team is correct
 - Google Drive integration
 - Exporting methods - `csv`, `json`, etc
 
@@ -40,6 +40,7 @@ It can be annoying to reprogram the scouting app every year to change scouting m
 The only metrics that can't be changed are team (and team suffix), match, and absent, as it is generally assumed that these will stay consistent with all future FRC games.
 
 To add a template to MeanScout, simply copy and paste its JSON. MeanScout comes with an example template to get you started. Here is its JSON:
+
 ```json
 { "name": "Example Template", "metrics": [
   { "name": "Toggle Metric", "type": "toggle", "newline": "Group" },

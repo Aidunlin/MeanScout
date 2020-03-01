@@ -192,15 +192,15 @@ function loadTemplate(t) {
       newMetric = $('<div></div>');
       newMetric.append(metric.name, '<br>');
       
+      let incBtn = $('<button></button>');
+      incBtn.addClass('inc button border-bottom round ripple');
+      incBtn.css('width', '75px');
+      incBtn.click(() => crement(i, 'inc'));
+      incBtn.append('0');
       let decBtn = $('<button></button>');
       decBtn.addClass('dec button border-bottom round ripple');
       decBtn.click(() => crement(i, 'dec'));
       decBtn.append('−');
-      let incBtn = $('<button></button>');
-      incBtn.addClass('inc button border-bottom round ripple');
-      incBtn.css('width', '80px');
-      incBtn.click(() => crement(i, 'inc'));
-      incBtn.append('0');
       
       newMetric.append(incBtn, ' ', decBtn);
       metricObj.max = metric.max || 100;

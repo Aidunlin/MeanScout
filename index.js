@@ -48,6 +48,9 @@ $('#team, #match').keypress(e => {
 $('#team').on('input', () => {
   if ($('#team').val().length > 4) $('#team').val($('#team').val().substring(0, 4));
 });
+$('#suffix').on('input', () => {
+  $('#suffix').val($('#suffix').val().toUpperCase());
+});
 $('#match').on('input', () => {
   if ($('#match').val().length > 3) $('#match').val($('#match').val().substring(0, 3));
 });
