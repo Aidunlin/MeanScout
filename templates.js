@@ -175,7 +175,7 @@ function loadTemplate(t) {
   gameMetrics = [];
   let metricObj, newMetric, prevDiv, newDiv;
   prevDiv = $('<div></div>');
-  prevDiv.addClass('container');
+  prevDiv.addClass('margin-left');
   $.each(t, (i, metric) => {
     metricObj = { name: metric.name };
     if (metric.type == 'toggle') {
@@ -194,7 +194,7 @@ function loadTemplate(t) {
       
       let incBtn = $('<button></button>');
       incBtn.addClass('inc button border-bottom round ripple');
-      incBtn.css('width', '80px');
+      incBtn.css('width', '75px');
       incBtn.click(() => crement(i, 'inc'));
       incBtn.append('0');
       let decBtn = $('<button></button>');
@@ -254,7 +254,7 @@ function loadTemplate(t) {
 
     if (metric.newline) {
       newDiv = $('<div></div>');
-      newDiv.addClass('container');
+      newDiv.addClass('margin-left');
       if (metric.newline !== true) newDiv.append(metric.newline, '<br>');
       newDiv.append(newMetric);
       $('#metrics').append(prevDiv);
