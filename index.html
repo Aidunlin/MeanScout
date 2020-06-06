@@ -10,33 +10,32 @@
     <link rel="icon" href="./logo192.png">
     <link rel="manifest" href="./manifest.json">
     <link rel="stylesheet" href="./w3.css">
-    <script src="./jquery-3.4.1.min.js"></script>
+    <script src="/jquery-3.5.1.js"></script>
     <script src="https://kit.fontawesome.com/705ef2435f.js" crossorigin="anonymous"></script>
     <style>
+      *{outline:none}
       *:not(input){-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}
       select{cursor:pointer;-webkit-appearance:none;padding-left:8px!important;padding-right:8px!important}
-      #options{padding-top:12px;margin:0 4px!important}
-      .outline-red{outline-color:#f44336!important}
-      .outline-blue{outline-color:#2196F3!important}
-      .outline-white{outline-color:#ffffff!important}
+      #options{padding-top:12px;margin:0!important}
       .star{padding:8px!important}
       #title-img{height:52px;padding-right:0}
-      @media(max-width:400px){#title-img{display:none}}
+      @media(max-width:430px){#title-img{display:none}}
       @media(max-width:600px){#nav-temp{display:none}}
-      @media(max-width:350px){#title{display:none}}
+      @media(max-width:380px){#nav-loc{display:none}}
     </style>
   </head>
   <body class="content black xlarge">
     <nav class="bar">
       <img class="bar-item" id="title-img" src="./logo192.png" alt=""> 
       <div class="bar-item" id="title">MeanScout</div>
-      <button class="bar-item button ripple round right" id="opt-toggle">
-        <span class="margin-right" id="nav-temp"></span><span id="nav-loc"></span><i class="fa fa-caret-down margin-left"></i>
+      <div class="right">
+        <div class="bar-item"><span class="margin-right" id="nav-temp"></span><span id="nav-loc"></span></div>
+        <button class="bar-item button ripple" id="opt-toggle"><i class="fa fa-cog"></i></button>
       </div>
     </nav>
-    <div class="container border round hide" id="options">
+    <div class="container border hide" id="options">
       <label class="show-inline-block mobile margin-right margin-bottom">Location
-        <select class="select round black" id="opt-loc">
+        <select class="select black" id="opt-loc">
           <option class="text-white">None</option>
           <option class="text-red">Red Near</option>
           <option class="text-red">Red Mid</option>
@@ -46,12 +45,12 @@
           <option class="text-blue">Blue Far</option>
         </select>
       </label>
-      <div class="show-inline-block mobile margin-bottom">
-        <button class="data-btn" onclick="download()"><i class="fa fa-download"></i> Download</button>
+      <div class="show-inline-block mobile margin-bottom margin-right">
+        <button class="data-btn" onclick="download()"><i class="fa fa-download"></i> Download Surveys</button>
       </div>
       <br>
       <label class="show-inline-block mobile margin-right margin-bottom">Template
-        <select class="select round black" id="opt-temp"></select>
+        <select class="select black" id="opt-temp"></select>
       </label>
       <div class="show-inline-block margin-bottom">
         <button class="data-btn" id="opt-temp-copy"><i class="fa fa-copy"></i> Copy</button>
@@ -66,16 +65,16 @@
     <main class="margin-top">
       <div class="container">
         <label class="show-inline-block margin-right margin-bottom" style="width:110px">Team
-          <input class="input round black" type="number" placeholder="####" id="team" autofocus>
-        </label><!--
-        --><label class="show-inline-block margin-right margin-bottom" style="width:70px">Suffix
-          <input class="input round black" id="suffix">
-        </label><!--
-        --><label class="show-inline-block margin-right margin-bottom" style="width:80px">Match
-          <input class="input round black" type="number" placeholder="##" id="match" value="1">
-        </label><!--
-        --><div class="show-inline-block margin-right margin-bottom">
-          <button class="button border-bottom round ripple block" id="absent"><i class="far fa-square"></i> Absent</button>
+          <input class="input black" type="number" placeholder="####" id="team" autofocus>
+        </label>
+        <label class="show-inline-block margin-right margin-bottom" style="width:70px">Suffix
+          <input class="input black" id="suffix">
+        </label>
+        <label class="show-inline-block margin-right margin-bottom" style="width:80px">Match
+          <input class="input black" type="number" placeholder="##" id="match" value="1">
+        </label>
+        <div class="show-inline-block margin-right margin-bottom">
+          <button class="button border-bottom ripple block" id="absent"><i class="far fa-square"></i> Absent</button>
         </div>
       </div>
       <div class="margin-right" id="metrics"></div>

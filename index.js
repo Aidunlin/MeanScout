@@ -5,18 +5,16 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-$('.data-btn').addClass('button border-bottom round ripple mobile');
+$('.data-btn').addClass('button border-bottom ripple mobile');
 let theme = 'white';
 let loc = 'None';
 let matchCount = 1;
 let absent = false;
-let skipWarning = false;
 
 // Sets location and changes theme colors
 function setLoc(newLoc) {
-  $('input, button, select').removeClass(`outline-${theme}`);
   $('input, .inc, select, #title, #nav-loc, .star, i').removeClass(`text-${theme}`);
-  $('.data-btn').removeClass(`text-${theme} border-${theme}`);
+  $('.data-btn').removeClass(`text-${theme}`);
   $('#absent i').removeClass('far fa-square fas fa-check-square');
   $.each(gameMetrics, (_i, metric) => {
     metric.element.children('i').removeClass('far fa-square fas fa-check-square');
@@ -27,9 +25,8 @@ function setLoc(newLoc) {
   loc = newLoc;
   localStorage.setItem('location', newLoc);
   $('#nav-loc').html(newLoc);
-  $('input, button, select').addClass(`outline-${theme}`);
   $('input, .inc, select, #title, #nav-loc, .star, i').addClass(`text-${theme}`);
-  $('.data-btn').addClass(`text-${theme} border-${theme}`);
+  $('.data-btn').addClass(`text-${theme}`);
   $('#absent i').addClass(absent ? 'fas fa-check-square' : 'far fa-square');
   $.each(gameMetrics, (_i, metric) => {
     if (metric.type == 'toggle') metric.element.children('i').addClass(metric.value ? 'fas fa-check-square' : 'far fa-square');
@@ -70,10 +67,9 @@ $('#absent').click(() => {
 // Options toggle
 $('#opt-toggle').click(() => {
   $('#options').toggleClass('hide');
-  $('#opt-toggle i').toggleClass('fa-caret-down fa-caret-up');
 });
 
-window.onbeforeunload = () => {return skipWarning};
+window.onbeforeunload = () => {return true};
 
 // Saves current survey to localstorage and reset metrics
 function save() {

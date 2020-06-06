@@ -182,7 +182,7 @@ function loadTemplate(t) {
       newMetric = $('<div></div>');
       
       let button = $('<button></button>');
-      button.addClass('button mobile border-bottom round ripple');
+      button.addClass('button mobile border-bottom ripple');
       button.append('<i class="far fa-square"></i>', ` ${metric.name}`);
       button.click(() => toggle(i));
       newMetric.append(button);
@@ -193,12 +193,12 @@ function loadTemplate(t) {
       newMetric.append(metric.name, '<br>');
       
       let incBtn = $('<button></button>');
-      incBtn.addClass('inc button border-bottom round ripple');
+      incBtn.addClass('inc button border-bottom ripple');
       incBtn.css('width', '75px');
       incBtn.click(() => crement(i, 'inc'));
       incBtn.append('0');
       let decBtn = $('<button></button>');
-      decBtn.addClass('dec button border-bottom round ripple');
+      decBtn.addClass('dec button border-bottom ripple');
       decBtn.click(() => crement(i, 'dec'));
       decBtn.append('−');
       
@@ -211,7 +211,7 @@ function loadTemplate(t) {
       newMetric.append(metric.name, '<br>');
       
       let select = $('<select></select>');
-      select.addClass('select round black');
+      select.addClass('select black');
       select.on('change', () => changeSelect(i));
       $.each(metric.values, (index, selValue) => {
         let newSel = $('<option></option>');
@@ -227,7 +227,7 @@ function loadTemplate(t) {
       newMetric.append(metric.name, '<br>');
       if (metric.length == 'long') newMetric.css('width', '100%');
       let input = $('<input>');
-      input.addClass('input round black');
+      input.addClass('input black');
       input.attr('placeholder', metric.tip ? metric.tip : metric.name);
       input.on('input', () => changeText(i));
       newMetric.append(input);
@@ -238,7 +238,7 @@ function loadTemplate(t) {
       newMetric.append(metric.name, '<br>');
       
       let ratingBar = $('<div></div>');
-      ratingBar.addClass('round border-bottom');
+      ratingBar.addClass('border-bottom');
       ratingBar.css('width', 'fit-content');
       for (let count = 0; count < 5; count++) {
         let star = $('<button></button>');
