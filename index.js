@@ -1,3 +1,5 @@
+// window.onbeforeunload = () => {return true};
+
 // Register service worker
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
@@ -59,7 +61,7 @@ $('#match').on('input', () => {
 
 // Absent toggle
 $('#absent').click(() => {
-  $('#metrics').toggle();
+  $('#metrics').toggleClass('hide');
   $('#absent i').toggleClass('far fa-square fas fa-check-square');
   absent = !absent;
 })
@@ -68,8 +70,6 @@ $('#absent').click(() => {
 $('#opt-toggle').click(() => {
   $('#options').toggleClass('hide');
 });
-
-window.onbeforeunload = () => {return true};
 
 // Saves current survey to localstorage and reset metrics
 function save() {

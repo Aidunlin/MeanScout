@@ -3,7 +3,7 @@ let exampleTemp = { name: 'Example', metrics: [
   { name: 'Toggle Metric', type: 'toggle', newline: 'Group' },
   { name: 'Number Metric', type: 'number', max: 10 },
   { name: 'Select Metric', type: 'select', values: ['Value 1', 'Value 2', 'Value 3'] },
-  { name: 'Text Metric', type: 'text', tip: 'Custom tip' },
+  { name: 'Text Metric',   type: 'text',   tip: 'Custom tip' },
   { name: 'Rating Metric', type: 'rating' },
 ], teams: [
   360,753,847,1425,1432,1510,1540,1571,2411,
