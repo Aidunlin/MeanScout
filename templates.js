@@ -38,6 +38,11 @@ if (!isCustomTemp) {
   $('#opt-temp').val(currentTemp.name);
   $('#nav-temp').html(currentTemp.name);
 }
+if (currentTemp.teams) {
+  $.each(currentTemp.teams, (i, team) => {
+    $('#teams').append(`<option value="${team}">`);
+  });
+}
 localStorage.setItem('templates', JSON.stringify(templates));
 
 // Change to selected template
@@ -61,6 +66,11 @@ function setTemplate() {
     $('#opt-temp').val(currentTemp.name);
     $('#nav-temp').html(currentTemp.name);
     setLoc(loc);
+  }
+  if (currentTemp.teams) {
+    $.each(currentTemp.teams, (i, team) => {
+      $('#teams').append(`<option value="${team}">`);
+    });
   }
   localStorage.setItem('templates', JSON.stringify(templates));
 }

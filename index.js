@@ -1,4 +1,4 @@
-// window.onbeforeunload = () => {return true};
+window.onbeforeunload = () => {return true};
 
 // Register service worker
 if ('serviceWorker' in navigator) {

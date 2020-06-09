@@ -16,9 +16,12 @@
       *{border-radius:0}
       *:not(input){-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}
       select{cursor:pointer;-webkit-appearance:none;padding-left:8px!important;padding-right:8px!important}
+      input::-webkit-outer-spin-button,input::-webkit-inner-spin-button,
+      input::-webkit-calendar-picker-indicator{display:none}
+      input[type=number]{-moz-appearance:textfield}
       #options{padding-top:12px;margin:0!important}
       .star{padding:8px!important}
-      #title-img{height:52px;padding-right:0}
+      #title-img,#nav-details{height:52px;padding-right:0}
       @media(max-width:430px){#title-img{display:none}}
       @media(max-width:600px){#nav-temp{display:none}}
       @media(max-width:380px){#nav-loc{display:none}}
@@ -29,7 +32,9 @@
       <img class="bar-item" id="title-img" src="./logo192.png" alt=""> 
       <div class="bar-item" id="title">MeanScout</div>
       <div class="right">
-        <div class="bar-item"><span class="margin-right" id="nav-temp"></span><span id="nav-loc"></span></div>
+        <div class="bar-item" id="nav-details">
+          <span class="margin-right" id="nav-temp"></span><span id="nav-loc"></span>
+        </div>
         <button class="bar-item button ripple" id="opt-toggle"><i class="fa fa-cog"></i></button>
       </div>
     </nav>
@@ -65,7 +70,8 @@
     <main class="margin-top">
       <div class="container">
         <label class="show-inline-block margin-right margin-bottom" style="width:110px">Team
-          <input class="input black" type="number" placeholder="####" id="team" autofocus>
+          <input class="input black" type="number" list="teams" placeholder="####" id="team" autofocus>
+          <datalist id="teams"></datalist>
         </label>
         <label class="show-inline-block margin-right margin-bottom" style="width:70px">Suffix
           <input class="input black" id="suffix">
