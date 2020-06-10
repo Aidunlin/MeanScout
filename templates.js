@@ -178,10 +178,12 @@ function toggle(i) {
   gameMetrics[i].value = !gameMetrics[i].value
 }
 function crement(i, way) {
-  if (way == 'inc') {
-    gameMetrics[i].value = Math.min(gameMetrics[i].value + 1, gameMetrics[i].max)
-  } else if (way == 'dec') {
-    gameMetrics[i].value = Math.max(gameMetrics[i].value - 1, 0)
+  switch (way) {
+    case 'inc':
+      gameMetrics[i].value = Math.min(gameMetrics[i].value + 1, gameMetrics[i].max)
+      break
+    case 'dec':
+      gameMetrics[i].value = Math.max(gameMetrics[i].value - 1, 0)
   }
   gameMetrics[i].element.children('.inc').html(gameMetrics[i].value)
 }
@@ -213,87 +215,88 @@ function loadTemplate(t) {
   prevDiv.addClass('margin-left')
   $.each(t, (i, metric) => {
     metricObj = { name: metric.name }
-    if (metric.type == 'toggle') {
-      newMetric = $('<div></div>')
-
-      let button = $('<button></button>')
-      button.addClass('button mobile border-bottom ripple')
-      button.append('<i class="far fa-square"></i>', ` ${metric.name}`)
-      button.click(() => toggle(i))
-      newMetric.append(button)
-      metricObj.value = false
-
-    } else if (metric.type == 'number') {
-      newMetric = $('<div></div>')
-      newMetric.append(metric.name, '<br>')
-
-      let incBtn = $('<button></button>')
-      incBtn.addClass('inc button border-bottom ripple')
-      incBtn.css('width', '75px')
-      incBtn.click(() => crement(i, 'inc'))
-      incBtn.append('0')
-      let decBtn = $('<button></button>')
-      decBtn.addClass('dec button border-bottom ripple')
-      decBtn.click(() => crement(i, 'dec'))
-      decBtn.append('−')
-
-      newMetric.append(incBtn, ' ', decBtn)
-      metricObj.max = metric.max || 100
-      metricObj.value = 0
-
-    } else if (metric.type == 'select') {
-      newMetric = $('<label></label>')
-      newMetric.append(metric.name, '<br>')
-
-      let select = $('<select></select>')
-      select.addClass('select black')
-      select.on('change', () => changeSelect(i))
-      $.each(metric.values, (index, selValue) => {
-        let newSel = $('<option></option>')
-        newSel.attr('value', index)
-        newSel.html(selValue)
-        select.append(newSel)
-      })
-      newMetric.append(select)
-      metricObj.value = metric.values[0]
-
-    } else if (metric.type == 'text') {
-      newMetric = $('<label></label>')
-      newMetric.append(metric.name, '<br>')
-      if (metric.length == 'long') {
-        newMetric.css('width', '100%')
-        newMetric.css('paddingRight', '16px')
-      }
-      let input = $('<input>')
-      input.addClass('input black')
-      input.attr('placeholder', metric.tip || metric.name)
-      input.on('input', () => changeText(i))
-      newMetric.append(input)
-      metricObj.value = ''
-
-    } else if (metric.type == 'rating') {
-      newMetric = $('<div></div>')
-      newMetric.append(metric.name, '<br>')
-
-      let ratingBar = $('<div></div>')
-      ratingBar.addClass('border-bottom')
-      ratingBar.css('width', 'fit-content')
-      for (let count = 0; count < 5; count++) {
-        let star = $('<button></button>')
-        star.addClass('star button ripple')
-        star.append('<i class="far fa-star"></i>')
-        star.click(() => changeRating(i, count))
-        ratingBar.append(star)
-      }
-      newMetric.append(ratingBar)
-      metricObj.value = 0
+    switch (metric.type) {
+      case 'toggle':
+        newMetric = $('<div></div>')
+        let button = $('<button></button>')
+        button.addClass('button mobile border-bottom ripple')
+        button.append('<i class="far fa-square"></i>', ` ${metric.name}`)
+        button.click(() => toggle(i))
+        newMetric.append(button)
+        metricObj.value = false
+        break
+      
+      case 'number':
+        newMetric = $('<div></div>')
+        newMetric.append(metric.name, '<br>')
+        let incBtn = $('<button></button>')
+        incBtn.addClass('inc button border-bottom ripple')
+        incBtn.css('width', '75px')
+        incBtn.click(() => crement(i, 'inc'))
+        incBtn.append('0')
+        let decBtn = $('<button></button>')
+        decBtn.addClass('dec button border-bottom ripple')
+        decBtn.click(() => crement(i, 'dec'))
+        decBtn.append('−')
+        newMetric.append(incBtn, ' ', decBtn)
+        metricObj.max = metric.max || 100
+        metricObj.value = 0
+        break
+      
+      case 'select':
+        newMetric = $('<label></label>')
+        newMetric.append(metric.name, '<br>')
+        let select = $('<select></select>')
+        select.addClass('select black')
+        select.on('change', () => changeSelect(i))
+        $.each(metric.values, (index, selValue) => {
+          let newSel = $('<option></option>')
+          newSel.attr('value', index)
+          newSel.html(selValue)
+          select.append(newSel)
+        })
+        newMetric.append(select)
+        metricObj.value = metric.values[0]
+        break
+      
+      case 'text':
+        newMetric = $('<label></label>')
+        newMetric.append(metric.name, '<br>')
+        if (metric.length == 'long') {
+          newMetric.css('width', '100%')
+          newMetric.css('paddingRight', '16px')
+        }
+        let input = $('<input>')
+        input.addClass('input black')
+        input.attr('placeholder', metric.tip || metric.name)
+        input.on('input', () => changeText(i))
+        newMetric.append(input)
+        metricObj.value = ''
+        break
+      
+      case 'rating':
+        newMetric = $('<div></div>')
+        newMetric.append(metric.name, '<br>')
+  
+        let ratingBar = $('<div></div>')
+        ratingBar.addClass('border-bottom')
+        ratingBar.css('width', 'fit-content')
+        for (let count = 0; count < 5; count++) {
+          let star = $('<button></button>')
+          star.addClass('star button ripple')
+          star.append('<i class="far fa-star"></i>')
+          star.click(() => changeRating(i, count))
+          ratingBar.append(star)
+        }
+        newMetric.append(ratingBar)
+        metricObj.value = 0
     }
     newMetric.addClass('show-inline-block margin-left margin-bottom')
 
     if (metric.newline) {
       newDiv = $('<div></div>')
       newDiv.addClass('margin-left')
-      if (metric.newline !== true) {
+      if (typeof metric.newline == "string") {
         newDiv.append(metric.newline, '<br>')
       }
       newDiv.append(newMetric)

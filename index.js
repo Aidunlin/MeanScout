@@ -1,4 +1,7 @@
-window.onbeforeunload = () => { return true }
+// Check if user wants to reload/close
+window.onbeforeunload = () => {
+  return true
+}
 
 // Register service worker
 if ('serviceWorker' in navigator) {
@@ -128,21 +131,26 @@ function save() {
     $('#absent').click()
   }
   $.each(gameMetrics, (_i, metric) => {
-    if (metric.type == 'toggle') {
-      metric.element.find('i').removeClass('fas fa-check-square').addClass('far fa-square')
-      metric.value = false
-    } else if (metric.type == 'text') {
-      metric.element.children('input').val('')
-      metric.value = ''
-    } else if (metric.type == 'number') {
-      metric.element.children('.inc').html('0')
-      metric.value = 0
-    } else if (metric.type == 'select') {
-      metric.element.children('select').val(0)
-      metric.value = metric.element.find('select option:checked').html()
-    } else if (metric.type == 'rating') {
-      metric.element.find('.star').html('<i class="far fa-star"></i>')
-      metric.value = 0
+    switch (metric.type) {
+      case 'toggle':
+        metric.element.find('i').removeClass('fas fa-check-square').addClass('far fa-square')
+        metric.value = false
+        break
+      case 'text':
+        metric.element.children('input').val('')
+        metric.value = ''
+        break
+      case 'number':
+        metric.element.children('.inc').html('0')
+        metric.value = 0
+        break
+      case 'select':
+        metric.element.children('select').val(0)
+        metric.value = metric.element.find('select option:checked').html()
+        break
+      case 'rating':
+        metric.element.find('.star').html('<i class="far fa-star"></i>')
+        metric.value = 0
     }
   })
 }
