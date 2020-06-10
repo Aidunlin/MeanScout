@@ -1,0 +1,59 @@
+* {
+  border-radius: 0;
+}
+
+:not(input) {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+select {
+  cursor: pointer;
+  -webkit-appearance: none;
+  padding: 8px !important;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button,
+input::-webkit-calendar-picker-indicator {
+  display: none;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+#options {
+  padding-top: 12px;
+  margin: 0 !important;
+}
+
+.star {
+  padding: 8px !important;
+}
+
+#title-img,
+#nav-details {
+  height: 52px;
+  padding-right: 0;
+}
+
+@media (max-width: 430px) {
+  #title-img {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  #nav-temp {
+    display: none;
+  }
+}
+
+@media (max-width: 380px) {
+  #nav-loc {
+    display: none;
+  }
+}

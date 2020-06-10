@@ -1,96 +1,105 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <title>MeanScout</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
-    <meta name="description" content="A responsive, flexible, and powerful FRC scouting web app.">
-    <meta name="theme-color" content="#000000">
-    <link rel="apple-touch-icon" href="./logo192.png">
-    <link rel="icon" href="./logo192.png">
-    <link rel="manifest" href="./manifest.json">
-    <link rel="stylesheet" href="./w3.css">
-    <script src="./jquery-3.5.1.slim.min.js"></script>
-    <script src="https://kit.fontawesome.com/705ef2435f.js" crossorigin="anonymous"></script>
-    <style>
-      *{border-radius:0}
-      *:not(input){-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}
-      select{cursor:pointer;-webkit-appearance:none;padding-left:8px!important;padding-right:8px!important}
-      input::-webkit-outer-spin-button,input::-webkit-inner-spin-button,
-      input::-webkit-calendar-picker-indicator{display:none}
-      input[type=number]{-moz-appearance:textfield}
-      #options{padding-top:12px;margin:0!important}
-      .star{padding:8px!important}
-      #title-img,#nav-details{height:52px;padding-right:0}
-      @media(max-width:430px){#title-img{display:none}}
-      @media(max-width:600px){#nav-temp{display:none}}
-      @media(max-width:380px){#nav-loc{display:none}}
-    </style>
-  </head>
-  <body class="content black xlarge">
-    <nav class="bar">
-      <img class="bar-item" id="title-img" src="./logo192.png" alt=""> 
-      <div class="bar-item" id="title">MeanScout</div>
-      <div class="right">
-        <div class="bar-item" id="nav-details">
-          <span class="margin-right" id="nav-temp"></span><span id="nav-loc"></span>
-        </div>
-        <button class="bar-item button ripple" id="opt-toggle"><i class="fa fa-cog"></i></button>
+
+<head>
+  <title>MeanScout</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+  <meta name="description" content="A responsive, flexible, and powerful FRC scouting web app.">
+  <meta name="theme-color" content="#000000">
+  <link rel="apple-touch-icon" href="./logo192.png">
+  <link rel="icon" href="./logo192.png">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="stylesheet" href="./w3.css">
+  <link rel="stylesheet" href="./index.css">
+  <script src="./jquery-3.5.1.slim.min.js"></script>
+  <script src="https://kit.fontawesome.com/705ef2435f.js" crossorigin="anonymous"></script>
+</head>
+
+<body class="content black xlarge">
+  <nav class="bar">
+    <img class="bar-item" id="title-img" src="./logo192.png" alt="">
+    <div class="bar-item" id="title">MeanScout</div>
+    <div class="right">
+      <div class="bar-item" id="nav-details">
+        <span class="margin-right" id="nav-temp"></span><span id="nav-loc"></span>
       </div>
-    </nav>
-    <div class="container border hide" id="options">
-      <label class="show-inline-block mobile margin-right margin-bottom">Location
-        <select class="select black" id="opt-loc">
-          <option class="text-white">None</option>
-          <option class="text-red">Red Near</option>
-          <option class="text-red">Red Mid</option>
-          <option class="text-red">Red Far</option>
-          <option class="text-blue">Blue Near</option>
-          <option class="text-blue">Blue Mid</option>
-          <option class="text-blue">Blue Far</option>
-        </select>
+      <button class="bar-item button ripple" id="opt-toggle">
+        <i class="fa fa-cog"></i>
+      </button>
+    </div>
+  </nav>
+  
+  <div class="container border hide" id="options">
+    <label class="show-inline-block mobile margin-right margin-bottom">Location
+      <select class="select black" id="opt-loc">
+        <option class="text-white">None</option>
+        <option class="text-red">Red Near</option>
+        <option class="text-red">Red Mid</option>
+        <option class="text-red">Red Far</option>
+        <option class="text-blue">Blue Near</option>
+        <option class="text-blue">Blue Mid</option>
+        <option class="text-blue">Blue Far</option>
+      </select>
+    </label>
+    <div class="show-inline-block mobile margin-bottom margin-right">
+      <button class="data-btn" onclick="download()">
+        <i class="fa fa-download"></i> Download Surveys
+      </button>
+    </div>
+    <br>
+    <label class="show-inline-block mobile margin-right margin-bottom">Template
+      <select class="select black" id="opt-temp">
+        <option value="Example">Example</option>
+      </select>
+    </label>
+    <div class="show-inline-block margin-bottom">
+      <button class="data-btn" id="opt-temp-copy">
+        <i class="fa fa-copy"></i> Copy
+      </button>
+    </div>
+    <div class="show-inline-block margin-bottom">
+      <button class="data-btn" id="opt-temp-add">
+        <i class="fa fa-plus"></i> New
+      </button>
+    </div>
+    <div class="show-inline-block margin-bottom">
+      <button class="data-btn" id="opt-temp-remove">
+        <i class="fa fa-trash"></i> Remove
+      </button>
+    </div>
+  </div>
+  
+  <main class="margin-top">
+    <div class="container">
+      <label class="show-inline-block margin-right margin-bottom" style="width:110px">Team
+        <input class="input black" type="number" list="teams" placeholder="####" id="team" autofocus>
+        <datalist id="teams"></datalist>
       </label>
-      <div class="show-inline-block mobile margin-bottom margin-right">
-        <button class="data-btn" onclick="download()"><i class="fa fa-download"></i> Download Surveys</button>
-      </div>
-      <br>
-      <label class="show-inline-block mobile margin-right margin-bottom">Template
-        <select class="select black" id="opt-temp"></select>
+      <label class="show-inline-block margin-right margin-bottom" style="width:70px">Suffix
+        <input class="input black" id="suffix">
       </label>
-      <div class="show-inline-block margin-bottom">
-        <button class="data-btn" id="opt-temp-copy"><i class="fa fa-copy"></i> Copy</button>
-      </div>
-      <div class="show-inline-block margin-bottom">
-        <button class="data-btn" id="opt-temp-add"><i class="fa fa-plus"></i> New</button>
-      </div>
-      <div class="show-inline-block margin-bottom">
-        <button class="data-btn" id="opt-temp-remove"><i class="fa fa-trash"></i> Remove</button>
+      <label class="show-inline-block margin-right margin-bottom" style="width:80px">Match
+        <input class="input black" type="number" placeholder="##" id="match" value="1">
+      </label>
+      <div class="show-inline-block margin-right margin-bottom">
+        <button class="button border-bottom ripple block" id="absent">
+          <i class="far fa-square"></i> Absent
+        </button>
       </div>
     </div>
-    <main class="margin-top">
-      <div class="container">
-        <label class="show-inline-block margin-right margin-bottom" style="width:110px">Team
-          <input class="input black" type="number" list="teams" placeholder="####" id="team" autofocus>
-          <datalist id="teams"></datalist>
-        </label>
-        <label class="show-inline-block margin-right margin-bottom" style="width:70px">Suffix
-          <input class="input black" id="suffix">
-        </label>
-        <label class="show-inline-block margin-right margin-bottom" style="width:80px">Match
-          <input class="input black" type="number" placeholder="##" id="match" value="1">
-        </label>
-        <div class="show-inline-block margin-right margin-bottom">
-          <button class="button border-bottom ripple block" id="absent"><i class="far fa-square"></i> Absent</button>
-        </div>
+    <div class="margin-right" id="metrics"></div>
+    <div class="container">
+      <div class="show-inline-block mobile margin-bottom">
+        <button class="data-btn" onclick="save()">
+          <i class="fa fa-save"></i> Save
+        </button>
       </div>
-      <div class="margin-right" id="metrics"></div>
-      <div class="container">
-        <div class="show-inline-block mobile margin-bottom">
-          <button class="data-btn" onclick="save()"><i class="fa fa-save"></i> Save</button>
-        </div>
-      </div>
-    </main>
-    <script src="./templates.js"></script>
-    <script src="./index.js"></script>
-  </body>
+    </div>
+  </main>
+  
+  <script src="./templates.js"></script>
+  <script src="./index.js"></script>
+</body>
+
 </html>

@@ -11,8 +11,12 @@ A responsive, flexible, and powerful FRC scouting web app.
 - Different metric types: toggles, numbers, selectors, text, ratings
 - Team whitelist customization - make sure entered team is correct
 - Uses `localStorage` to store entries
-- Download saved entries as `(Template Name) Surveys.txt`
-- Metrics separated with semicolons and surveys separated with newlines
+- Download saved entries as `(Template Name) Surveys.csv`
+
+### Planned Features
+
+- In-app GUI-based template editor
+- More exporting methods (e.g. json)
 
 ## Installing MeanScout
 
@@ -51,7 +55,7 @@ To add a template to MeanScout, simply copy and paste its JSON. MeanScout comes 
 ]}
 ```
 
-Each template should have a `name` and an array of `metrics`. Optionally, a whitelist of `teams` can be included to restrict what team numbers can be entered. This does not apply to team suffixes.
+Each template should have a `name` and an array of `metrics`. Optionally, a whitelist of `teams` can be included to restrict what team numbers can be entered. Keep team suffixes out of the whitelist.
 
 Each metric must have a `name` and a `type` (`toggle`, `number`, `select`, `text`, or `rating`). Use short/concise names for metrics.
 
@@ -60,7 +64,7 @@ The `newline` value moves the metric in question to a new line, as every metric 
 - A `toggle ` metric will have a toggleable button. Value is a boolean.
 - A `number` metric will have an incremental and decremental button. Including a `max` value will change the maximum value for the metric in question (default 100). Value is a number.
 - A `select` metric will have a dropdown selector. There must be an array of string `values` to create options for the selector. Value is a string (selected option).
-- A `text` metric will have a text input. Including a string `tip` value will change the placeholder (within the input element). Including a string `length` set to `long` will produce a full-width input on desktop. Value is a string.
-- A `rating` metric will have a star rating bar. Value is a number (0-5). You can reset the rating bar (to 0) by tapping the first star twice.
+- A `text` metric will have a text input. Including a string `tip` value will change the placeholder (within the input element). Including `length` set to `long` will produce a full-width input. Value is a string.
+- A `rating` metric will have a star rating bar. Value is a number (0-5). You can reset the rating bar to 0 by tapping the first star twice.
 
 When saving/downloading, every metric's value will be concatenated together in the same order the metrics were created (with team/match/absent concatenated before).
