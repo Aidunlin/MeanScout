@@ -17,19 +17,21 @@
 </head>
 
 <body class="content black xlarge">
+  <!-- Navbar -->
   <nav class="bar">
     <img class="bar-item" id="title-img" src="./logo192.png" alt="">
-    <div class="bar-item" id="title">MeanScout</div>
+    <div class="bar-item" id="title"><b>MeanScout</b></div>
     <div class="right">
       <div class="bar-item" id="nav-details">
         <span class="margin-right" id="nav-temp"></span><span id="nav-loc"></span>
       </div>
       <button class="bar-item button ripple" id="opt-toggle">
-        <i class="fa fa-cog"></i>
+        <i class="fa fa-bars"></i>
       </button>
     </div>
   </nav>
   
+  <!-- Options panel -->
   <div class="container border hide" id="options">
     <label class="show-inline-block mobile margin-right margin-bottom">Location
       <select class="select black" id="opt-loc">
@@ -68,8 +70,13 @@
         <i class="fa fa-trash"></i> Remove
       </button>
     </div>
+    <br>
+    <div class="small">
+      <p>&copy; 2020 Aidan Linerud | <a href="https://github.com/Aidunlin/MeanScout/blob/master/README.md" target="_blank">README</a></p>
+    </div>
   </div>
   
+  <!-- Main body -->
   <main class="margin-top">
     <div class="container">
       <label class="show-inline-block margin-right margin-bottom" style="width:110px">Team
@@ -88,7 +95,10 @@
         </button>
       </div>
     </div>
+    
+    <!-- Custom metrics wrapper -->
     <div class="margin-right" id="metrics"></div>
+
     <div class="container">
       <div class="show-inline-block mobile margin-bottom">
         <button class="data-btn" onclick="save()">

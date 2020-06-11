@@ -40,20 +40,14 @@ input[type="number"] {
   padding-right: 0;
 }
 
-@media (max-width: 430px) {
-  #title-img {
-    display: none;
-  }
-}
-
 @media (max-width: 600px) {
   #nav-temp {
     display: none;
   }
 }
 
-@media (max-width: 380px) {
-  #nav-loc {
+@media (max-width: 430px) {
+  #title {
     display: none;
   }
 }
