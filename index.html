@@ -12,9 +12,9 @@
   <link rel="manifest" href="./manifest.json">
   <link rel="stylesheet" href="./index.css">
   <script src="./jquery-3.5.1.slim.min.js"></script>
-  <script src="./regular.min.js"></script>
-  <script src="./solid.min.js"></script>
-  <script src="./fontawesome.min.js"></script>
+  <script defer src="./regular.min.js"></script>
+  <script defer src="./solid.min.js"></script>
+  <script defer src="./fontawesome.min.js"></script>
 </head>
 
 <body class="content black xlarge">
@@ -33,7 +33,7 @@
   </nav>
   
   <!-- Options panel -->
-  <div class="container border hide" id="options">
+  <div class="container border round hide" id="options">
     <label class="show-inline-block mobile margin-right margin-bottom">Location
       <select class="select black" id="options-location">
         <option class="text-white">None</option>
@@ -55,10 +55,10 @@
       </select>
     </label>
     <div class="show-inline-block margin-bottom">
-      <button class="data-button" id="options-template-copy">Copy</button>
+      <button class="data-button" id="options-template-new">New</button>
     </div>
     <div class="show-inline-block margin-bottom">
-      <button class="data-button" id="options-template-new">New</button>
+      <button class="data-button" id="options-template-copy">Copy</button>
     </div>
     <div class="show-inline-block margin-bottom">
       <button class="data-button" id="options-template-remove">Remove</button>

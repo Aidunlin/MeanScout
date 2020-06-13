@@ -73,23 +73,11 @@ function setTemplate() {
       $('#teams').append(`<option value="${team}">`)
     })
   }
-  setLocation(loc)
+  setLocation(currentLocation)
   localStorage.setItem('templates', JSON.stringify(templates))
 }
 $('#options-template').change(() => {
   setTemplate()
-})
-
-$('#options-template-copy').click(() => {
-  let input = $('<input>')
-  let templateToCopy = currentTemplate
-  delete templateToCopy['selected']
-  $('body').append(input)
-  input.attr('value', JSON.stringify(templateToCopy))
-  input.select()
-  document.execCommand('copy')
-  $(input).remove()
-  alert(`Copied ${currentTemplate.name}`)
 })
 
 // Create and select new template from JSON text
@@ -154,6 +142,18 @@ $('#options-template-new').click(() => {
   }
 })
 
+$('#options-template-copy').click(() => {
+  let input = $('<input>')
+  let templateToCopy = currentTemplate
+  delete templateToCopy['selected']
+  $('body').append(input)
+  input.attr('value', JSON.stringify(templateToCopy))
+  input.select()
+  document.execCommand('copy')
+  $(input).remove()
+  alert(`Copied ${currentTemplate.name}`)
+})
+
 $('#options-template-remove').click(() => {
   if (!isCustom) {
     alert('The example template cannot be removed.')
@@ -203,6 +203,7 @@ function change(i, type, data = 0) {
         }
       }
   }
+  setLocation(scoutLocation)
 }
 
 // Create scouting metrics (UI and state variables) from template

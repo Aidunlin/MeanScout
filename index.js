@@ -20,7 +20,7 @@ let isAbsent = false
 
 // Sets location and changes theme colors
 function setLocation(newLocation) {
-  $('input, .inc, select, #title, #nav-location, .star, i').removeClass(`text-${theme}`)
+  $('input, .inc, select, #title, #nav-location, .star, i, svg').removeClass(`text-${theme}`)
   $('.data-button').removeClass(`text-${theme}`)
   $('#absent i').removeClass('far fa-square fas fa-check-square')
   $.each(gameMetrics, (_i, metric) => {
@@ -36,7 +36,7 @@ function setLocation(newLocation) {
   scoutLocation = newLocation
   localStorage.setItem('location', newLocation)
   $('#nav-location').html(newLocation)
-  $('input, .inc, select, #title, #nav-location, .star, i').addClass(`text-${theme}`)
+  $('input, .inc, select, #title, #nav-location, .star, i, svg').addClass(`text-${theme}`)
   $('.data-button').addClass(`text-${theme}`)
   $('#absent i').addClass(isAbsent ? 'fas fa-check-square' : 'far fa-square')
   $.each(gameMetrics, (_i, metric) => {
@@ -87,7 +87,7 @@ $('#metric-match').on('input', () => {
 $('#metric-absent').click(() => {
   $('#metrics').toggleClass('hide')
   $('#metric-absent').empty()
-  $('#metric-absent').append(`<i class='${isAbsent ? 'far fa-square' : 'fas fa-check-square'}'></i> Absent`)
+  $('#metric-absent').append(`<i class='${isAbsent ? 'far fa-square' : 'fas fa-check-square'} text-${theme}'></i> Absent`)
   isAbsent = !isAbsent
 })
 

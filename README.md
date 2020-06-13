@@ -5,7 +5,7 @@ A responsive, flexible, and powerful FRC scouting web app.
 ## Features
 
 - Progressive Web App - full offline support
-- w3.css - mininal and responsive css framework
+- w3.css - minimal and responsive css framework
 - Dark-only theme with red/blue color variants
 - Templates - customizable metrics (documentation below)
 - Different metric types: toggles, numbers, selectors, text, ratings
