@@ -1,5 +1,5 @@
 // Default/example template
-let exampleTemp = {
+let exampleTemplate = {
   name: 'Example',
   metrics: [
     { name: 'Toggle Metric', type: 'toggle', newline: 'Group' },
@@ -17,8 +17,8 @@ let exampleTemp = {
 }
 let templates = []
 let gameMetrics = []
-let currentTemp
-let isCustomTemp = false
+let currentTemplate
+let isCustom = false
 
 if (localStorage.getItem('templates')) {
   templates = JSON.parse(localStorage.getItem('templates'))
@@ -26,23 +26,23 @@ if (localStorage.getItem('templates')) {
 
 // Populate template picker with template options, select previously selected template
 $.each(templates, (i, template) => {
-  $('#opt-temp').prepend(new Option(template.name, template.name))
+  $('#options-template').prepend(new Option(template.name, template.name))
   if (template.selected) {
-    currentTemp = template
-    isCustomTemp = true
+    currentTemplate = template
+    isCustom = true
     loadTemplate(template.metrics)
-    $('#opt-temp').val(currentTemp.name)
-    $('#nav-temp').html(currentTemp.name)
+    $('#options-template').val(currentTemplate.name)
+    $('#nav-template').html(currentTemplate.name)
   }
 })
-if (!isCustomTemp) {
-  currentTemp = exampleTemp
-  loadTemplate(exampleTemp.metrics)
-  $('#opt-temp').val(currentTemp.name)
-  $('#nav-temp').html(currentTemp.name)
+if (!isCustom) {
+  currentTemplate = exampleTemplate
+  loadTemplate(exampleTemplate.metrics)
+  $('#options-template').val(currentTemplate.name)
+  $('#nav-template').html(currentTemplate.name)
 }
-if (currentTemp.teams) {
-  $.each(currentTemp.teams, (i, team) => {
+if (currentTemplate.teams) {
+  $.each(currentTemplate.teams, (i, team) => {
     $('#teams').append(`<option value="${team}">`)
   })
 }
@@ -51,63 +51,63 @@ localStorage.setItem('templates', JSON.stringify(templates))
 // Change to selected template
 function setTemplate() {
   if (localStorage.getItem('surveys')) download(false)
-  isCustomTemp = false
+  isCustom = false
   $.each(templates, (i, template) => {
     template.selected = false
-    if ($('#opt-temp').val() == template.name) {
-      currentTemp = template
-      isCustomTemp = true
+    if ($('#options-template').val() == template.name) {
+      currentTemplate = template
+      isCustom = true
       template.selected = true
       loadTemplate(template.metrics)
-      $('#nav-temp').html(currentTemp.name)
+      $('#nav-template').html(currentTemplate.name)
     }
   })
-  if (!isCustomTemp) {
-    currentTemp = exampleTemp
-    loadTemplate(exampleTemp.metrics)
-    $('#opt-temp').val(currentTemp.name)
-    $('#nav-temp').html(currentTemp.name)
+  if (!isCustom) {
+    currentTemplate = exampleTemplate
+    loadTemplate(exampleTemplate.metrics)
+    $('#options-template').val(currentTemplate.name)
+    $('#nav-template').html(currentTemplate.name)
   }
-  if (currentTemp.teams) {
-    $.each(currentTemp.teams, (i, team) => {
+  if (currentTemplate.teams) {
+    $.each(currentTemplate.teams, (i, team) => {
       $('#teams').append(`<option value="${team}">`)
     })
   }
-  setLoc(loc)
+  setLocation(loc)
   localStorage.setItem('templates', JSON.stringify(templates))
 }
-$('#opt-temp').change(() => {
+$('#options-template').change(() => {
   setTemplate()
 })
 
-$('#opt-temp-copy').click(() => {
+$('#options-template-copy').click(() => {
   let input = $('<input>')
-  let tempToCopy = currentTemp
-  delete tempToCopy['selected']
+  let templateToCopy = currentTemplate
+  delete templateToCopy['selected']
   $('body').append(input)
-  input.attr('value', JSON.stringify(tempToCopy))
+  input.attr('value', JSON.stringify(templateToCopy))
   input.select()
   document.execCommand('copy')
   $(input).remove()
-  alert(`Copied ${currentTemp.name}`)
+  alert(`Copied ${currentTemplate.name}`)
 })
 
 // Create and select new template from JSON text
-$('#opt-temp-add').click(() => {
-  let newTempPrompt = prompt('Type/paste new template:')
-  if (newTempPrompt) {
-    let newTemp = JSON.parse(newTempPrompt)
-    if (newTemp instanceof Array) {
-      newTemp = newTemp[0]
+$('#options-template-new').click(() => {
+  let newPrompt = prompt('Type/paste new template:')
+  if (newPrompt) {
+    let newTemplate = JSON.parse(newPrompt)
+    if (newTemplate instanceof Array) {
+      newTemplate = newTemplate[0]
     }
-    newTemp.selected = true
+    newTemplate.selected = true
 
     let error = false
-    if (newTemp.name == exampleTemp.name) {
+    if (newTemplate.name == exampleTemplate.name) {
       error = "Template has same name as example"
     }
-    if (newTemp.name && newTemp.metrics) {
-      $.each(newTemp.metrics, (_i, metric) => {
+    if (newTemplate.name && newTemplate.metrics) {
+      $.each(newTemplate.metrics, (_i, metric) => {
         if (!metric.name) {
           error = "Metric has no name"
         } else if (metric.type == 'number' && metric.max < 1) {
@@ -128,15 +128,15 @@ $('#opt-temp-add').click(() => {
 
     let skip = false
     $.each(templates, (_i, template) => {
-      if (newTemp.name == template.name) {
-        if (confirm(`${newTemp.name} already exists. Replace current template?`)) {
+      if (newTemplate.name == template.name) {
+        if (confirm(`${newTemplate.name} already exists. Replace current template?`)) {
           $.each(templates, (i, template) => {
-            if (template.name == currentTemp.name) {
+            if (template.name == currentTemplate.name) {
               templates.splice(i, 1)
               return false
             }
           })
-          $('#opt-temp option:checked').remove()
+          $('#options-template option:checked').remove()
           setTemplate()
           localStorage.setItem('templates', JSON.stringify(templates))
         } else {
@@ -146,63 +146,62 @@ $('#opt-temp-add').click(() => {
       }
     })
     if (!skip) {
-      templates.unshift(newTemp)
-      $('#opt-temp').prepend(new Option(newTemp.name, newTemp.name))
-      $('#opt-temp').val(newTemp.name)
+      templates.unshift(newTemplate)
+      $('#options-template').prepend(new Option(newTemplate.name, newTemplate.name))
+      $('#options-template').val(newTemplate.name)
       setTemplate()
     }
   }
 })
 
-$('#opt-temp-remove').click(() => {
-  if (!isCustomTemp) {
+$('#options-template-remove').click(() => {
+  if (!isCustom) {
     alert('The example template cannot be removed.')
     return
   }
-  if (prompt(`Are you sure? Type '${currentTemp.name}' to remove the template`)) {
+  if (prompt(`Are you sure? Type '${currentTemplate.name}' to remove the template`)) {
     $.each(templates, (i, template) => {
-      if (template.name == currentTemp.name) {
+      if (template.name == currentTemplate.name) {
         templates.splice(i, 1)
         return false
       }
     })
-    $('#opt-temp option:checked').remove()
+    $('#options-template option:checked').remove()
     setTemplate()
     localStorage.setItem('templates', JSON.stringify(templates))
   }
 })
 
 // Handles metric UI/value changes
-function toggle(i) {
-  gameMetrics[i].element.find('i').toggleClass('far fa-square fas fa-check-square')
-  gameMetrics[i].value = !gameMetrics[i].value
-}
-function crement(i, way) {
-  switch (way) {
-    case 'inc':
-      gameMetrics[i].value = Math.min(gameMetrics[i].value + 1, gameMetrics[i].max)
+function change(i, type, data = 0) {
+  switch (type) {
+    case 'toggle':
+      gameMetrics[i].element.find('button').empty()
+      gameMetrics[i].element.find('button').append(
+        `<i class='${gameMetrics[i].value ? 'far fa-square' : 'fas fa-check-square'}'></i> ${gameMetrics[i].name}`)
+      gameMetrics[i].value = !gameMetrics[i].value
       break
-    case 'dec':
-      gameMetrics[i].value = Math.max(gameMetrics[i].value - 1, 0)
-  }
-  gameMetrics[i].element.children('.inc').html(gameMetrics[i].value)
-}
-function changeSelect(i) {
-  gameMetrics[i].value = gameMetrics[i].element.find('option:checked').html()
-}
-function changeText(i) {
-  gameMetrics[i].value = gameMetrics[i].element.children('input').val().replace(';', ' ')
-}
-function changeRating(i, val) {
-  gameMetrics[i].element.find('.star').html('<i class="far fa-star"></i>')
-  if (val == 0 && gameMetrics[i].value == 1) {
-    gameMetrics[i].value = 0
-    return
-  } else {
-    gameMetrics[i].value = val + 1
-    for (let count = 0; count <= val + 1; count++) {
-      gameMetrics[i].element.find(`div>.star:nth-child(${count})`).html('<i class="fas fa-star"></i>')
-    }
+    case 'number':
+      gameMetrics[i].value = Math.max(Math.min(gameMetrics[i].value += data, gameMetrics[i].max), 0)
+      gameMetrics[i].element.children('.inc').html(gameMetrics[i].value)
+      break
+    case 'select':
+      gameMetrics[i].value = gameMetrics[i].element.find('option:checked').html()
+      break
+    case 'text':
+      gameMetrics[i].value = gameMetrics[i].element.children('input').val().replace(';', ' ')
+      break
+    case 'rating':
+      gameMetrics[i].element.find('.star').html('<i class="far fa-star"></i>')
+      if (data == 0 && gameMetrics[i].value == 1) {
+        gameMetrics[i].value = 0
+        return
+      } else {
+        gameMetrics[i].value = data + 1
+        for (let count = 0; count <= data + 1; count++) {
+          gameMetrics[i].element.find(`div>.star:nth-child(${count})`).html('<i class="fas fa-star"></i>')
+        }
+      }
   }
 }
 
@@ -210,58 +209,58 @@ function changeRating(i, val) {
 function loadTemplate(t) {
   $('#metrics').empty()
   gameMetrics = []
-  let metricObj, newMetric, prevDiv, newDiv
+  let metricObject, newMetric, prevDiv, newDiv
   prevDiv = $('<div></div>')
   prevDiv.addClass('margin-left')
   $.each(t, (i, metric) => {
-    metricObj = { name: metric.name }
+    metricObject = { name: metric.name }
     switch (metric.type) {
       case 'toggle':
         newMetric = $('<div></div>')
         let button = $('<button></button>')
         button.addClass('button mobile border-bottom ripple')
-        button.append('<i class="far fa-square"></i>', ` ${metric.name}`)
-        button.click(() => toggle(i))
+        button.append(`<i class="far fa-square"></i> ${metric.name}`)
+        button.click(() => change(i, metric.type))
         newMetric.append(button)
-        metricObj.value = false
+        metricObject.value = false
         break
       
       case 'number':
         newMetric = $('<div></div>')
-        newMetric.append(metric.name, '<br>')
-        let incBtn = $('<button></button>')
-        incBtn.addClass('inc button border-bottom ripple')
-        incBtn.css('width', '75px')
-        incBtn.click(() => crement(i, 'inc'))
-        incBtn.append('0')
-        let decBtn = $('<button></button>')
-        decBtn.addClass('dec button border-bottom ripple')
-        decBtn.click(() => crement(i, 'dec'))
-        decBtn.append('−')
-        newMetric.append(incBtn, ' ', decBtn)
-        metricObj.max = metric.max || 100
-        metricObj.value = 0
+        newMetric.append(`${metric.name} <br>`)
+        let incButton = $('<button></button>')
+        incButton.addClass('inc button border-bottom ripple')
+        incButton.css('width', '75px')
+        incButton.click(() => change(i, metric.type, 1))
+        incButton.append('0')
+        let decButton = $('<button></button>')
+        decButton.addClass('dec button border-bottom ripple')
+        decButton.click(() => change(i, metric.type, -1))
+        decButton.append('−')
+        newMetric.append(incButton, ' ', decButton)
+        metricObject.max = metric.max || 100
+        metricObject.value = 0
         break
       
       case 'select':
         newMetric = $('<label></label>')
-        newMetric.append(metric.name, '<br>')
+        newMetric.append(`${metric.name} <br>`)
         let select = $('<select></select>')
         select.addClass('select black')
-        select.on('change', () => changeSelect(i))
+        select.on('change', () => change(i, metric.type))
         $.each(metric.values, (index, selValue) => {
-          let newSel = $('<option></option>')
-          newSel.attr('value', index)
-          newSel.html(selValue)
-          select.append(newSel)
+          let option = $('<option></option>')
+          option.attr('value', index)
+          option.html(selValue)
+          select.append(option)
         })
         newMetric.append(select)
-        metricObj.value = metric.values[0]
+        metricObject.value = metric.values[0]
         break
       
       case 'text':
         newMetric = $('<label></label>')
-        newMetric.append(metric.name, '<br>')
+        newMetric.append(`${metric.name} <br>`)
         if (metric.length == 'long') {
           newMetric.css('width', '100%')
           newMetric.css('paddingRight', '16px')
@@ -269,14 +268,14 @@ function loadTemplate(t) {
         let input = $('<input>')
         input.addClass('input black')
         input.attr('placeholder', metric.tip || metric.name)
-        input.on('input', () => changeText(i))
+        input.on('input', () => change(i, metric.type))
         newMetric.append(input)
-        metricObj.value = ''
+        metricObject.value = ''
         break
       
       case 'rating':
         newMetric = $('<div></div>')
-        newMetric.append(metric.name, '<br>')
+        newMetric.append(`${metric.name} <br>`)
   
         let ratingBar = $('<div></div>')
         ratingBar.addClass('border-bottom')
@@ -285,11 +284,11 @@ function loadTemplate(t) {
           let star = $('<button></button>')
           star.addClass('star button ripple')
           star.append('<i class="far fa-star"></i>')
-          star.click(() => changeRating(i, count))
+          star.click(() => change(i, metric.type, count))
           ratingBar.append(star)
         }
         newMetric.append(ratingBar)
-        metricObj.value = 0
+        metricObject.value = 0
     }
     newMetric.addClass('show-inline-block margin-left margin-bottom')
 
@@ -297,7 +296,7 @@ function loadTemplate(t) {
       newDiv = $('<div></div>')
       newDiv.addClass('margin-left')
       if (typeof metric.newline == "string") {
-        newDiv.append(metric.newline, '<br>')
+        newDiv.append(`${metric.newline} <br>`)
       }
       newDiv.append(newMetric)
       $('#metrics').append(prevDiv)
@@ -306,9 +305,9 @@ function loadTemplate(t) {
       prevDiv.append(newMetric)
     }
 
-    metricObj.element = newMetric
-    metricObj.type = metric.type
-    gameMetrics.push(metricObj)
+    metricObject.element = newMetric
+    metricObject.type = metric.type
+    gameMetrics.push(metricObject)
   })
   $('#metrics').append(prevDiv)
 }

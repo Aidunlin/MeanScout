@@ -10,23 +10,24 @@
   <link rel="apple-touch-icon" href="./logo192.png">
   <link rel="icon" href="./logo192.png">
   <link rel="manifest" href="./manifest.json">
-  <link rel="stylesheet" href="./w3.css">
   <link rel="stylesheet" href="./index.css">
   <script src="./jquery-3.5.1.slim.min.js"></script>
-  <script src="https://kit.fontawesome.com/705ef2435f.js" crossorigin="anonymous"></script>
+  <script src="./regular.min.js"></script>
+  <script src="./solid.min.js"></script>
+  <script src="./fontawesome.min.js"></script>
 </head>
 
 <body class="content black xlarge">
   <!-- Navbar -->
   <nav class="bar">
-    <img class="bar-item" id="title-img" src="./logo192.png" alt="">
+    <img class="bar-item" id="logo" src="./logo192.png" alt="">
     <div class="bar-item" id="title"><b>MeanScout</b></div>
     <div class="right">
       <div class="bar-item" id="nav-details">
-        <span class="margin-right" id="nav-temp"></span><span id="nav-loc"></span>
+        <span class="margin-right" id="nav-template"></span><span id="nav-location"></span>
       </div>
-      <button class="bar-item button ripple" id="opt-toggle">
-        <i class="fa fa-bars"></i>
+      <button class="bar-item button ripple" id="options-toggle">
+        <i class="fas fa-bars"></i>
       </button>
     </div>
   </nav>
@@ -34,7 +35,7 @@
   <!-- Options panel -->
   <div class="container border hide" id="options">
     <label class="show-inline-block mobile margin-right margin-bottom">Location
-      <select class="select black" id="opt-loc">
+      <select class="select black" id="options-location">
         <option class="text-white">None</option>
         <option class="text-red">Red Near</option>
         <option class="text-red">Red Mid</option>
@@ -45,30 +46,22 @@
       </select>
     </label>
     <div class="show-inline-block mobile margin-bottom margin-right">
-      <button class="data-btn" onclick="download()">
-        <i class="fa fa-download"></i> Download Surveys
-      </button>
+      <button class="data-button" onclick="download()">Download Surveys</button>
     </div>
     <br>
     <label class="show-inline-block mobile margin-right margin-bottom">Template
-      <select class="select black" id="opt-temp">
+      <select class="select black" id="options-template">
         <option value="Example">Example</option>
       </select>
     </label>
     <div class="show-inline-block margin-bottom">
-      <button class="data-btn" id="opt-temp-copy">
-        <i class="fa fa-copy"></i> Copy
-      </button>
+      <button class="data-button" id="options-template-copy">Copy</button>
     </div>
     <div class="show-inline-block margin-bottom">
-      <button class="data-btn" id="opt-temp-add">
-        <i class="fa fa-plus"></i> New
-      </button>
+      <button class="data-button" id="options-template-new">New</button>
     </div>
     <div class="show-inline-block margin-bottom">
-      <button class="data-btn" id="opt-temp-remove">
-        <i class="fa fa-trash"></i> Remove
-      </button>
+      <button class="data-button" id="options-template-remove">Remove</button>
     </div>
     <br>
     <div class="small">
@@ -80,17 +73,17 @@
   <main class="margin-top">
     <div class="container">
       <label class="show-inline-block margin-right margin-bottom" style="width:110px">Team
-        <input class="input black" type="number" list="teams" placeholder="####" id="team" autofocus>
+        <input class="input black" type="number" list="teams" placeholder="####" id="metric-team" autofocus>
         <datalist id="teams"></datalist>
       </label>
       <label class="show-inline-block margin-right margin-bottom" style="width:70px">Suffix
-        <input class="input black" id="suffix">
+        <input class="input black" id="metric-suffix">
       </label>
       <label class="show-inline-block margin-right margin-bottom" style="width:80px">Match
-        <input class="input black" type="number" placeholder="##" id="match" value="1">
+        <input class="input black" type="number" placeholder="##" id="metric-match" value="1">
       </label>
       <div class="show-inline-block margin-right margin-bottom">
-        <button class="button border-bottom ripple block" id="absent">
+        <button class="button border-bottom ripple block" id="metric-absent">
           <i class="far fa-square"></i> Absent
         </button>
       </div>
@@ -101,9 +94,7 @@
 
     <div class="container">
       <div class="show-inline-block mobile margin-bottom">
-        <button class="data-btn" onclick="save()">
-          <i class="fa fa-save"></i> Save
-        </button>
+        <button class="data-button" onclick="saveSurvey()">Save</button>
       </div>
     </div>
   </main>
