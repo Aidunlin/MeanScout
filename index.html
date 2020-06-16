@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="hide">
   <head>
     <title>MeanScout</title>
     <meta charset="utf-8" />
@@ -15,6 +15,7 @@
     <link rel="apple-touch-icon" href="./logo.png" />
     <link rel="icon" href="./logo.png" />
     <link rel="manifest" href="./manifest.json" />
+    <link rel="stylesheet" href="./normalize.css" />
     <link rel="stylesheet" href="./index.css" />
     <script src="./jquery.min.js"></script>
     <script defer src="./regular.min.js"></script>
@@ -22,7 +23,7 @@
     <script defer src="./fa.min.js"></script>
   </head>
 
-  <body class="content black xlarge">
+  <body class="content black large">
     <!-- Navbar -->
     <nav class="bar">
       <img class="bar-item" id="logo" src="./logo.png" alt="" />
@@ -39,8 +40,8 @@
     </nav>
 
     <!-- Options panel -->
-    <div class="container border round hide" id="options">
-      <label class="show-inline-block mobile margin-right margin-bottom"
+    <div class="container border hide" id="options">
+      <label class="option mobile"
         >Location
         <select class="select black" id="options-location">
           <option class="text-white">None</option>
@@ -58,7 +59,7 @@
         </button>
       </div>
       <br />
-      <label class="show-inline-block mobile margin-right margin-bottom"
+      <label class="option mobile"
         >Template
         <select class="select black" id="options-template">
           <option value="Example">Example</option>
@@ -89,12 +90,10 @@
     <!-- Main body -->
     <main class="margin-top">
       <div class="container">
-        <label
-          class="show-inline-block margin-right margin-bottom"
-          style="width: 110px;"
+        <label class="metric" style="width: 110px;"
           >Team
           <input
-            class="input black"
+            class="black"
             type="number"
             list="teams"
             placeholder="####"
@@ -103,25 +102,21 @@
           />
           <datalist id="teams"></datalist>
         </label>
-        <label
-          class="show-inline-block margin-right margin-bottom"
-          style="width: 70px;"
+        <label class="metric" style="width: 70px;"
           >Suffix
-          <input class="input black" id="metric-suffix" />
+          <input class="black" id="metric-suffix" />
         </label>
-        <label
-          class="show-inline-block margin-right margin-bottom"
-          style="width: 80px;"
+        <label class="metric" style="width: 80px;"
           >Match
           <input
-            class="input black"
+            class="black"
             type="number"
             placeholder="##"
             id="metric-match"
             value="1"
           />
         </label>
-        <div class="show-inline-block margin-right margin-bottom">
+        <div class="metric">
           <button class="button border-bottom ripple block" id="metric-absent">
             <i class="far fa-square"></i> Absent
           </button>

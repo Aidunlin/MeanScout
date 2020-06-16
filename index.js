@@ -13,6 +13,7 @@ if ("serviceWorker" in navigator) {
 }
 
 $(".data-button").addClass("button border-bottom ripple mobile");
+$(".metric, .option").addClass("show-inline-block margin-right margin-bottom");
 let theme = "white";
 let scoutLocation = "None";
 let matchCount = 1;
@@ -60,6 +61,9 @@ $("#options-location").val(scoutLocation);
 $("#options-location").change(() => {
   setLocation($("#options-location").val());
 });
+
+// Show everything after code above finishes
+$("html").removeClass("hide");
 
 // Team, match value restrictions
 $("#metric-team, #metric-match").keypress((event) => {

@@ -19,10 +19,10 @@ A responsive, flexible, and powerful FRC scouting web app.
 
 ## Libraries/Frameworks
 
-- [w3.css](https://www.w3schools.com/w3css/) - CSS framework
-- [jQuery](https://jquery.com/) - JS library
-- [FontAwesome](https://fontawesome.com/) - icon library
-- [Workbox](https://developers.google.com/web/tools/workbox) - JS service worker library
+- CSS based on [w3.css](https://www.w3schools.com/w3css/)
+- [jQuery](https://jquery.com/)
+- [FontAwesome](https://fontawesome.com/)
+- [Workbox](https://developers.google.com/web/tools/workbox)
 
 ## Installing MeanScout
 
@@ -47,22 +47,29 @@ The only metrics that can't be changed are team (and team suffix), match, and ab
 To add a template to MeanScout, simply copy and paste its JSON. MeanScout comes with an example template to get you started. Here is its JSON:
 
 ```json
-{ "name": "Example Template", "metrics": [
-  { "name": "Toggle Metric", "type": "toggle", "newline": "Group" },
-  { "name": "Number Metric", "type": "number", "max": 10 },
-  { "name": "Select Metric", "type": "select", "values": ["Value 1", "Value 2", "Value 3"] },
-  { "name": "Text Metric",   "type": "text",   "tip": "Custom tip" },
-  { "name": "Rating Metric", "type": "rating" },
-]}
+{
+  "name": "Example Template",
+  "metrics": [
+    { "name": "Toggle Metric", "type": "toggle", "newline": "Group" },
+    { "name": "Number Metric", "type": "number", "max": 10 },
+    {
+      "name": "Select Metric",
+      "type": "select",
+      "values": ["Value 1", "Value 2", "Value 3"]
+    },
+    { "name": "Text Metric", "type": "text", "tip": "Custom tip" },
+    { "name": "Rating Metric", "type": "rating" }
+  ]
+}
 ```
 
-Each template should have a `name` and an array of `metrics`. Optionally, a whitelist of `teams` can be included to restrict what team numbers can be entered. Keep team suffixes out of the whitelist.
+Each template should have a `name` and an array of `metrics`. Optionally, a whitelist of `teams` can be included to restrict what team numbers can be entered. Keep team suffixes out of the whitelist so all team values are numbers.
 
 Each metric must have a `name` and a `type` (`toggle`, `number`, `select`, `text`, or `rating`). Use short/concise names for metrics.
 
 The `newline` value moves the metric in question to a new line, as every metric will be placed next to the last metric. Setting `newline` with a string will add a group label above the metric, and all metrics after will appear to be 'grouped' together (until the next metric with a `newline` string).
 
-- A `toggle ` metric will have a toggleable button. Value is a boolean.
+- A `toggle` metric will have a toggleable button. Value is a boolean.
 - A `number` metric will have an incremental and decremental button. Including a `max` value will change the maximum value for the metric in question (default 100). Value is a number.
 - A `select` metric will have a dropdown selector. There must be an array of string `values` to create options for the selector. Value is a string (selected option).
 - A `text` metric will have a text input. Including a string `tip` value will change the placeholder (within the input element). Including `length` set to `long` will produce a full-width input. Value is a string.
