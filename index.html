@@ -1,106 +1,144 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
+  <head>
+    <title>MeanScout</title>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,user-scalable=no"
+    />
+    <meta
+      name="description"
+      content="A responsive, flexible, and powerful FRC scouting web app."
+    />
+    <meta name="theme-color" content="#000000" />
+    <link rel="apple-touch-icon" href="./logo.png" />
+    <link rel="icon" href="./logo.png" />
+    <link rel="manifest" href="./manifest.json" />
+    <link rel="stylesheet" href="./index.css" />
+    <script src="./jquery.min.js"></script>
+    <script defer src="./regular.min.js"></script>
+    <script defer src="./solid.min.js"></script>
+    <script defer src="./fa.min.js"></script>
+  </head>
 
-<head>
-  <title>MeanScout</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
-  <meta name="description" content="A responsive, flexible, and powerful FRC scouting web app.">
-  <meta name="theme-color" content="#000000">
-  <link rel="apple-touch-icon" href="./logo192.png">
-  <link rel="icon" href="./logo192.png">
-  <link rel="manifest" href="./manifest.json">
-  <link rel="stylesheet" href="./index.css">
-  <script src="./jquery-3.5.1.slim.min.js"></script>
-  <script defer src="./regular.min.js"></script>
-  <script defer src="./solid.min.js"></script>
-  <script defer src="./fontawesome.min.js"></script>
-</head>
-
-<body class="content black xlarge">
-  <!-- Navbar -->
-  <nav class="bar">
-    <img class="bar-item" id="logo" src="./logo192.png" alt="">
-    <div class="bar-item" id="title"><b>MeanScout</b></div>
-    <div class="right">
-      <div class="bar-item" id="nav-details">
-        <span class="margin-right" id="nav-template"></span><span id="nav-location"></span>
-      </div>
-      <button class="bar-item button ripple" id="options-toggle">
-        <i class="fas fa-bars"></i>
-      </button>
-    </div>
-  </nav>
-  
-  <!-- Options panel -->
-  <div class="container border round hide" id="options">
-    <label class="show-inline-block mobile margin-right margin-bottom">Location
-      <select class="select black" id="options-location">
-        <option class="text-white">None</option>
-        <option class="text-red">Red Near</option>
-        <option class="text-red">Red Mid</option>
-        <option class="text-red">Red Far</option>
-        <option class="text-blue">Blue Near</option>
-        <option class="text-blue">Blue Mid</option>
-        <option class="text-blue">Blue Far</option>
-      </select>
-    </label>
-    <div class="show-inline-block mobile margin-bottom margin-right">
-      <button class="data-button" onclick="download()">Download Surveys</button>
-    </div>
-    <br>
-    <label class="show-inline-block mobile margin-right margin-bottom">Template
-      <select class="select black" id="options-template">
-        <option value="Example">Example</option>
-      </select>
-    </label>
-    <div class="show-inline-block margin-bottom">
-      <button class="data-button" id="options-template-new">New</button>
-    </div>
-    <div class="show-inline-block margin-bottom">
-      <button class="data-button" id="options-template-copy">Copy</button>
-    </div>
-    <div class="show-inline-block margin-bottom">
-      <button class="data-button" id="options-template-remove">Remove</button>
-    </div>
-    <br>
-    <div class="small">
-      <p>&copy; 2020 Aidan Linerud | <a href="https://github.com/Aidunlin/MeanScout/blob/master/README.md" target="_blank">README</a></p>
-    </div>
-  </div>
-  
-  <!-- Main body -->
-  <main class="margin-top">
-    <div class="container">
-      <label class="show-inline-block margin-right margin-bottom" style="width:110px">Team
-        <input class="input black" type="number" list="teams" placeholder="####" id="metric-team" autofocus>
-        <datalist id="teams"></datalist>
-      </label>
-      <label class="show-inline-block margin-right margin-bottom" style="width:70px">Suffix
-        <input class="input black" id="metric-suffix">
-      </label>
-      <label class="show-inline-block margin-right margin-bottom" style="width:80px">Match
-        <input class="input black" type="number" placeholder="##" id="metric-match" value="1">
-      </label>
-      <div class="show-inline-block margin-right margin-bottom">
-        <button class="button border-bottom ripple block" id="metric-absent">
-          <i class="far fa-square"></i> Absent
+  <body class="content black xlarge">
+    <!-- Navbar -->
+    <nav class="bar">
+      <img class="bar-item" id="logo" src="./logo.png" alt="" />
+      <div class="bar-item" id="title"><b>MeanScout</b></div>
+      <div class="right">
+        <div class="bar-item" id="nav-details">
+          <span class="margin-right" id="nav-template"></span
+          ><span id="nav-location"></span>
+        </div>
+        <button class="bar-item button ripple" id="options-toggle">
+          <i class="fas fa-bars"></i>
         </button>
       </div>
-    </div>
-    
-    <!-- Custom metrics wrapper -->
-    <div class="margin-right" id="metrics"></div>
+    </nav>
 
-    <div class="container">
-      <div class="show-inline-block mobile margin-bottom">
-        <button class="data-button" onclick="saveSurvey()">Save</button>
+    <!-- Options panel -->
+    <div class="container border round hide" id="options">
+      <label class="show-inline-block mobile margin-right margin-bottom"
+        >Location
+        <select class="select black" id="options-location">
+          <option class="text-white">None</option>
+          <option class="text-red">Red Near</option>
+          <option class="text-red">Red Mid</option>
+          <option class="text-red">Red Far</option>
+          <option class="text-blue">Blue Near</option>
+          <option class="text-blue">Blue Mid</option>
+          <option class="text-blue">Blue Far</option>
+        </select>
+      </label>
+      <div class="show-inline-block mobile margin-bottom margin-right">
+        <button class="data-button" onclick="download()">
+          Download Surveys
+        </button>
+      </div>
+      <br />
+      <label class="show-inline-block mobile margin-right margin-bottom"
+        >Template
+        <select class="select black" id="options-template">
+          <option value="Example">Example</option>
+        </select>
+      </label>
+      <div class="show-inline-block margin-bottom">
+        <button class="data-button" id="options-template-new">New</button>
+      </div>
+      <div class="show-inline-block margin-bottom">
+        <button class="data-button" id="options-template-copy">Copy</button>
+      </div>
+      <div class="show-inline-block margin-bottom">
+        <button class="data-button" id="options-template-remove">Remove</button>
+      </div>
+      <br />
+      <div class="small">
+        <p>
+          &copy; 2020 Aidan Linerud |
+          <a
+            href="https://github.com/Aidunlin/MeanScout/blob/master/README.md"
+            target="_blank"
+            >README</a
+          >
+        </p>
       </div>
     </div>
-  </main>
-  
-  <script src="./templates.js"></script>
-  <script src="./index.js"></script>
-</body>
 
+    <!-- Main body -->
+    <main class="margin-top">
+      <div class="container">
+        <label
+          class="show-inline-block margin-right margin-bottom"
+          style="width: 110px;"
+          >Team
+          <input
+            class="input black"
+            type="number"
+            list="teams"
+            placeholder="####"
+            id="metric-team"
+            autofocus
+          />
+          <datalist id="teams"></datalist>
+        </label>
+        <label
+          class="show-inline-block margin-right margin-bottom"
+          style="width: 70px;"
+          >Suffix
+          <input class="input black" id="metric-suffix" />
+        </label>
+        <label
+          class="show-inline-block margin-right margin-bottom"
+          style="width: 80px;"
+          >Match
+          <input
+            class="input black"
+            type="number"
+            placeholder="##"
+            id="metric-match"
+            value="1"
+          />
+        </label>
+        <div class="show-inline-block margin-right margin-bottom">
+          <button class="button border-bottom ripple block" id="metric-absent">
+            <i class="far fa-square"></i> Absent
+          </button>
+        </div>
+      </div>
+
+      <!-- Custom metrics wrapper -->
+      <div class="margin-right" id="metrics"></div>
+
+      <div class="container">
+        <div class="show-inline-block mobile margin-bottom">
+          <button class="data-button" onclick="saveSurvey()">Save</button>
+        </div>
+      </div>
+    </main>
+
+    <script src="./templates.js"></script>
+    <script src="./index.js"></script>
+  </body>
 </html>

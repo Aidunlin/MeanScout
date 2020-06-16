@@ -4,8 +4,7 @@ A responsive, flexible, and powerful FRC scouting web app.
 
 ## Features
 
-- Progressive Web App - full offline support
-- w3.css - minimal and responsive css framework
+- Progressive web app - full offline support
 - Dark-only theme with red/blue color variants
 - Templates - customizable metrics (documentation below)
 - Different metric types: toggles, numbers, selectors, text, ratings
@@ -17,6 +16,13 @@ A responsive, flexible, and powerful FRC scouting web app.
 
 - In-app GUI-based template editor
 - More exporting methods (e.g. json)
+
+## Libraries/Frameworks
+
+- [w3.css](https://www.w3schools.com/w3css/) - CSS framework
+- [jQuery](https://jquery.com/) - JS library
+- [FontAwesome](https://fontawesome.com/) - icon library
+- [Workbox](https://developers.google.com/web/tools/workbox) - JS service worker library
 
 ## Installing MeanScout
 
@@ -47,11 +53,6 @@ To add a template to MeanScout, simply copy and paste its JSON. MeanScout comes 
   { "name": "Select Metric", "type": "select", "values": ["Value 1", "Value 2", "Value 3"] },
   { "name": "Text Metric",   "type": "text",   "tip": "Custom tip" },
   { "name": "Rating Metric", "type": "rating" },
-], "teams": [
-  360,753,847,1425,1432,1510,1540,1571,2411,
-  2471,2521,2550,2811,2898,2915,2990,3024,3223,
-  3636,3674,3711,3812,4127,4488,5085,5295,5450,
-  5468,5803,5977,6343,6465,6696,6831,6845,7448
 ]}
 ```
 
@@ -67,4 +68,4 @@ The `newline` value moves the metric in question to a new line, as every metric 
 - A `text` metric will have a text input. Including a string `tip` value will change the placeholder (within the input element). Including `length` set to `long` will produce a full-width input. Value is a string.
 - A `rating` metric will have a star rating bar. Value is a number (0-5). You can reset the rating bar to 0 by tapping the first star twice.
 
-When saving/downloading, every metric's value will be concatenated together in the same order the metrics were created (with team/match/absent concatenated before).
+When saving/downloading, every metric's value will be placed in the same order the metrics were created (with team/match/absent first).
