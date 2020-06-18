@@ -3,14 +3,8 @@
   <head>
     <title>MeanScout</title>
     <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width,initial-scale=1,user-scalable=no"
-    />
-    <meta
-      name="description"
-      content="A responsive, flexible, and powerful FRC scouting web app."
-    />
+    <meta name="viewport" content="width=device-width,user-scalable=no" />
+    <meta name="description" content="A responsive, flexible, and powerful FRC scouting web app." />
     <meta name="theme-color" content="#000000" />
     <link rel="apple-touch-icon" href="./logo.png" />
     <link rel="icon" href="./logo.png" />
@@ -22,117 +16,68 @@
     <script defer src="./solid.min.js"></script>
     <script defer src="./fa.min.js"></script>
   </head>
-
   <body class="content black large">
-    <!-- Navbar -->
-    <nav class="bar">
-      <img class="bar-item" id="logo" src="./logo.png" alt="" />
+    <div class="bar">
+      <img class="bar-item ripple" id="menu-toggle" src="./logo.png" alt="" />
       <div class="bar-item" id="title"><b>MeanScout</b></div>
       <div class="right">
-        <div class="bar-item" id="nav-details">
-          <span class="margin-right" id="nav-template"></span
-          ><span id="nav-location"></span>
+        <div class="bar-item">
+          <span class="margin-right" id="nav-template"></span><span id="nav-location"></span>
         </div>
-        <button class="bar-item button ripple" id="options-toggle">
-          <i class="fas fa-bars"></i>
-        </button>
-      </div>
-    </nav>
-
-    <!-- Options panel -->
-    <div class="container border hide" id="options">
-      <label class="option mobile"
-        >Location
-        <select class="select black" id="options-location">
-          <option class="text-white">None</option>
-          <option class="text-red">Red Near</option>
-          <option class="text-red">Red Mid</option>
-          <option class="text-red">Red Far</option>
-          <option class="text-blue">Blue Near</option>
-          <option class="text-blue">Blue Mid</option>
-          <option class="text-blue">Blue Far</option>
-        </select>
-      </label>
-      <div class="show-inline-block mobile margin-bottom margin-right">
-        <button class="data-button" onclick="download()">
-          Download Surveys
-        </button>
-      </div>
-      <br />
-      <label class="option mobile"
-        >Template
-        <select class="select black" id="options-template">
-          <option value="Example">Example</option>
-        </select>
-      </label>
-      <div class="show-inline-block margin-bottom">
-        <button class="data-button" id="options-template-new">New</button>
-      </div>
-      <div class="show-inline-block margin-bottom">
-        <button class="data-button" id="options-template-copy">Copy</button>
-      </div>
-      <div class="show-inline-block margin-bottom">
-        <button class="data-button" id="options-template-remove">Remove</button>
-      </div>
-      <br />
-      <div class="small">
-        <p>
-          &copy; 2020 Aidan Linerud |
-          <a
-            href="https://github.com/Aidunlin/MeanScout/blob/master/README.md"
-            target="_blank"
-            >README</a
-          >
-        </p>
       </div>
     </div>
-
-    <!-- Main body -->
-    <main class="margin-top">
-      <div class="container">
-        <label class="metric" style="width: 110px;"
-          >Team
-          <input
-            class="black"
-            type="number"
-            list="teams"
-            placeholder="####"
-            id="metric-team"
-            autofocus
-          />
-          <datalist id="teams"></datalist>
+    <div class="border hide" id="menu">
+      <div class="flex margin-right">
+        <label class="margin-leftbottom mobile">Location
+          <select class="select black" id="menu-location">
+            <option class="text-white">None</option>
+            <option class="text-red">Red Near</option>
+            <option class="text-red">Red Mid</option>
+            <option class="text-red">Red Far</option>
+            <option class="text-blue">Blue Near</option>
+            <option class="text-blue">Blue Mid</option>
+            <option class="text-blue">Blue Far</option>
+          </select>
         </label>
-        <label class="metric" style="width: 70px;"
-          >Suffix
-          <input class="black" id="metric-suffix" />
-        </label>
-        <label class="metric" style="width: 80px;"
-          >Match
-          <input
-            class="black"
-            type="number"
-            placeholder="##"
-            id="metric-match"
-            value="1"
-          />
-        </label>
-        <div class="metric">
-          <button class="button border-bottom ripple block" id="metric-absent">
-            <i class="far fa-square"></i> Absent
-          </button>
-        </div>
+        <button class="margin-leftbottom ripple" onclick="download()">
+          <i class="fas fa-download"></i> Download Surveys
+        </button>
       </div>
-
-      <!-- Custom metrics wrapper -->
-      <div class="margin-right" id="metrics"></div>
-
-      <div class="container">
-        <div class="show-inline-block mobile margin-bottom">
-          <button class="data-button" onclick="saveSurvey()">Save</button>
-        </div>
+      <div class="flex margin-right">
+        <label class="margin-leftbottom mobile">Template
+          <select class="select black" id="menu-template">
+            <option value="Example">Example</option>
+          </select>
+        </label>
+        <button class="margin-leftbottom ripple" id="menu-template-new">
+            <i class="fas fa-plus"></i> New
+        </button>
+        <button class="margin-leftbottom ripple" id="menu-template-copy">
+            <i class="fas fa-copy"></i> Copy
+        </button>
+        <button class="margin-leftbottom ripple" id="menu-template-remove">
+            <i class="fas fa-trash-alt"></i> Remove
+        </button>
       </div>
-    </main>
-
+      <p class="margin small">&copy; 2020 Aidan Linerud</a></p>
+    </div>
+    <div class="flex margin-top margin-right">
+      <label class="margin-leftbottom">Team
+        <input class="black" id="metric-team" type="number" list="teams" placeholder="####" autofocus />
+        <datalist id="teams"></datalist>
+      </label>
+      <label class="margin-leftbottom">Suffix
+        <input class="black" id="metric-suffix" />
+      </label>
+      <label class="margin-leftbottom">Match
+        <input class="black" id="metric-match" type="number" placeholder="##" value="1" />
+      </label>
+      <button class="margin-leftbottom ripple" id="metric-absent">
+        <i class="far fa-square"></i> Absent
+      </button>
+    </div>
+    <div class="margin-right" id="metrics"></div>
+    <button class="margin-leftbottom margin-right ripple" onclick="saveSurvey()"><i class="fas fa-save"></i> Save</button>
     <script src="./templates.js"></script>
     <script src="./index.js"></script>
   </body>

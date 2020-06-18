@@ -1,19 +1,12 @@
 // Check if user wants to reload/close
 window.onbeforeunload = () => {
-  if (window.location.hostname.includes("aidunlin.codes")) {
-    return true;
-  }
+  if (window.location.hostname.includes("aidunlin.codes")) return true;
 };
 
 // Register service worker
-if ("serviceWorker" in navigator) {
-  window.onload = () => {
-    navigator.serviceWorker.register("./sw.js");
-  };
-}
+if ("serviceWorker" in navigator) window.onload = () => navigator.serviceWorker.register("./sw.js");
+else alert("Your browser doesn't support offline web apps, so you won't be able to scout offline.");
 
-$(".data-button").addClass("button border-bottom ripple mobile");
-$(".metric, .option").addClass("show-inline-block margin-right margin-bottom");
 let theme = "white";
 let scoutLocation = "None";
 let matchCount = 1;
@@ -21,56 +14,27 @@ let isAbsent = false;
 
 // Sets location and changes theme colors
 function setLocation(newLocation) {
-  $("input, .inc, select, #title, #nav-location, .star, i, svg").removeClass(
-    `text-${theme}`
-  );
-  $(".data-button").removeClass(`text-${theme}`);
-  $("#absent i").removeClass("far fa-square fas fa-check-square");
-  $.each(gameMetrics, (_i, metric) => {
-    metric.element
-      .children("i")
-      .removeClass("far fa-square fas fa-check-square");
-  });
-  if (newLocation.includes("Red")) {
-    theme = "red";
-  } else if (newLocation.includes("Blue")) {
-    theme = "blue";
-  } else {
-    theme = "white";
-  }
-  scoutLocation = newLocation;
+  let newTheme;
+  if (newLocation.includes("Red")) newTheme = "red";
+  else if (newLocation.includes("Blue")) newTheme = "blue";
+  else newTheme = "white";
+  $("#title, #nav-location, input, select, i, svg, .inc, .star").removeClass(`text-${theme}`).addClass(`text-${newTheme}`);
+  $("button:not(#metrics button, #metric-absent)").removeClass(`text-${theme}`).addClass(`text-${newTheme}`);
   localStorage.setItem("location", newLocation);
   $("#nav-location").html(newLocation);
-  $("input, .inc, select, #title, #nav-location, .star, i, svg").addClass(
-    `text-${theme}`
-  );
-  $(".data-button").addClass(`text-${theme}`);
-  $("#absent i").addClass(isAbsent ? "fas fa-check-square" : "far fa-square");
-  $.each(gameMetrics, (_i, metric) => {
-    if (metric.type == "toggle") {
-      metric.element
-        .children("i")
-        .addClass(metric.value ? "fas fa-check-square" : "far fa-square");
-    }
-  });
+  theme = newTheme;
+  scoutLocation = newLocation;
 }
 
 setLocation(localStorage.getItem("location") || "None");
-$("#options-location").val(scoutLocation);
-
-$("#options-location").change(() => {
-  setLocation($("#options-location").val());
-});
+$("#menu-location").val(scoutLocation).change(() => setLocation($("#menu-location").val()));
 
 // Show everything after code above finishes
 $("html").removeClass("hide");
 
 // Team, match value restrictions
 $("#metric-team, #metric-match").keypress((event) => {
-  if (
-    (event.which != 8 && event.which != 0 && event.which < 48) ||
-    event.which > 57
-  ) {
+  if ((event.which != 8 && event.which != 0 && event.which < 48) || event.which > 57) {
     event.preventDefault();
   }
 });
@@ -102,17 +66,13 @@ $("#metric-match").on("input", () => {
 $("#metric-absent").click(() => {
   $("#metrics").toggleClass("hide");
   $("#metric-absent").empty();
-  $("#metric-absent").append(
-    `<i class='${
-      isAbsent ? "far fa-square" : "fas fa-check-square"
-    } text-${theme}'></i> Absent`
-  );
+  $("#metric-absent").append(`<i class='${isAbsent ? "far fa-square" : "fas fa-check-square"} text-${theme}'></i> Absent`);
   isAbsent = !isAbsent;
 });
 
-// Options toggle
-$("#options-toggle").click(() => {
-  $("#options").toggleClass("hide");
+// menu toggle
+$("#menu-toggle").click(() => {
+  $("#menu").toggleClass("hide");
 });
 
 // Saves current survey to localstorage and reset metrics
@@ -129,10 +89,7 @@ function saveSurvey() {
       return;
     }
   }
-  if (
-    !/\d{1,3}/.test($("#metric-match").val()) ||
-    $("#metric-match").val().length > 3
-  ) {
+  if (!/\d{1,3}/.test($("#metric-match").val()) || $("#metric-match").val().length > 3) {
     alert("Please enter a proper match value!");
     $("#metric-match").focus();
     return;
@@ -140,11 +97,7 @@ function saveSurvey() {
   let values = `${$("#metric-team").val() + ($("#suffix").val() || "")}`;
   values += `,${$("#metric-match").val()},${isAbsent}`;
   $.each(gameMetrics, (_i, metric) => {
-    values += `,${
-      metric.type == "text"
-        ? `"${metric.value.replace('"', "'")}"`
-        : metric.value
-    }`;
+    values += `,${metric.type == "text" ? `"${metric.value.replace('"', "'")}"` : metric.value}`;
   });
 
   if (!confirm("Confirm save?")) {
@@ -164,13 +117,8 @@ function saveSurvey() {
     switch (metric.type) {
       case "toggle":
         metric.element.find("button").empty();
-        metric.element
-          .find("button")
-          .append(`<i class='far fa-square'></i> ${metric.name}`);
-        metric.element
-          .find("i")
-          .removeClass("fas fa-check-square")
-          .addClass("far fa-square");
+        metric.element.find("button").append(`<i class='far fa-square'></i> ${metric.name}`);
+        metric.element.find("i").addClass(`text-${theme}`);
         metric.value = false;
         break;
       case "text":
@@ -200,9 +148,7 @@ function download(askUser = true) {
     }
   }
   let a = document.createElement("a");
-  a.href = `data:text/plain;charset=utf-8,${encodeURIComponent(
-    localStorage.getItem("surveys")
-  )}`;
+  a.href = `data:text/plain;charset=utf-8,${encodeURIComponent(localStorage.getItem("surveys"))}`;
   a.download = `${currentTemplate.name} Surveys.csv`;
   document.body.appendChild(a);
   a.click();

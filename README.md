@@ -31,12 +31,14 @@ If you can't find it, you can still use the app as normal.
 
 ## Options
 
-Clicking the gear icon next to the template name and location will reveal useful options for MeanScout. (Make sure to tell your scouts they probably shouldn't mess with these).
+Clicking the MeanScout logo will reveal useful options for MeanScout. (Make sure to tell your scouts they probably shouldn't mess with these).
 
-- The location setting is useful for reminding scouts which robot they will focus on. It will also change some UI elements to the location's alliance color.
-- Click Download Surveys to download currently saved surveys. This will also clear the surveys from the app's `localStorage`.
-- The template selector changes templates. When you change templates, It will detect any saved surveys from the previous template and download them automatically.
-- The next three buttons relate to templates: copy the JSON text of the current template, type/paste new templates in (templates with same name can be replaced), and remove custom templates.
+- Set which robot location will be scouted, only used to remind scouts which robot they are scouting.
+- Download surveys and clear the in-app survey storage (prevents duplicate surveys if you download more than once).
+- Change templates and download any saved surveys from the previous template.
+- Add a new template (templates with same name can be replaced).
+- Copy the JSON text of the current template.
+- Remove the current template (the example can't be removed).
 
 ## Templates
 
@@ -50,14 +52,10 @@ To add a template to MeanScout, simply copy and paste its JSON. MeanScout comes 
 {
   "name": "Example Template",
   "metrics": [
-    { "name": "Toggle Metric", "type": "toggle", "newline": "Group" },
+    { "name": "Toggle Metric", "type": "toggle", "group": "Group" },
     { "name": "Number Metric", "type": "number", "max": 10 },
-    {
-      "name": "Select Metric",
-      "type": "select",
-      "values": ["Value 1", "Value 2", "Value 3"]
-    },
-    { "name": "Text Metric", "type": "text", "tip": "Custom tip" },
+    { "name": "Select Metric", "type": "select", "values": ["Value 1", "Value 2", "Value 3"] },
+    { "name": "Text Metric",   "type": "text",   "tip": "Custom tip" },
     { "name": "Rating Metric", "type": "rating" }
   ]
 }
@@ -67,7 +65,7 @@ Each template should have a `name` and an array of `metrics`. Optionally, a whit
 
 Each metric must have a `name` and a `type` (`toggle`, `number`, `select`, `text`, or `rating`). Use short/concise names for metrics.
 
-The `newline` value moves the metric in question to a new line, as every metric will be placed next to the last metric. Setting `newline` with a string will add a group label above the metric, and all metrics after will appear to be 'grouped' together (until the next metric with a `newline` string).
+Setting `group` to a truthy value moves the metric in question to a new line, as every metric will be placed next to the last metric. Setting `group` with a string will add a group label before the current metric, and all metrics after will appear to be 'grouped' together (until the next metric with a `group` string).
 
 - A `toggle` metric will have a toggleable button. Value is a boolean.
 - A `number` metric will have an incremental and decremental button. Including a `max` value will change the maximum value for the metric in question (default 100). Value is a number.

@@ -1,27 +1,31 @@
 /* Based off of w3.css - https://www.w3schools.com/w3css/ */
-*,*:before,*:after{box-sizing:inherit;border-radius:0;user-select:none;line-height:1.5!important}
+*,*:before,*:after{box-sizing:inherit;border-radius:0;line-height:1.5!important}
+*:not(input){-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;}
 html,body{overflow-x:hidden;box-sizing:border-box;font-family:Verdana,sans-serif;font-size:15px;color:#fff;background-color:#000}
 img{vertical-align:middle}a{color:inherit}
+button{border:none;display:inline-block;padding:8px 12px;overflow:hidden;text-decoration:none;color:inherit;background-color:inherit;text-align:center;cursor:pointer;white-space:nowrap}
+button{-webkit-touch-callout:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;border-bottom:1px solid #ccc}
 input,select{padding:8px;display:block;border:none;border-bottom:1px solid #ccc;width:100%;appearance:textfield;-webkit-appearance:none;background-color:#000}
+select{cursor:pointer}
 ::-webkit-outer-spin-button,::-webkit-inner-spin-button,::-webkit-calendar-picker-indicator{display:none}
-.btn,.button{border:none;display:inline-block;padding:8px 12px;overflow:hidden;text-decoration:none;color:inherit;background-color:inherit;text-align:center;cursor:pointer;white-space:nowrap}
-.btn:hover{box-shadow:0 8px 16px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19)}
-.btn,.button{-webkit-touch-callout:none;-webkit-user-select:none;-khtml-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}
 .ripple{transition:opacity 0s}.ripple:active{opacity:0.5}
 .bar{width:100%;overflow:hidden}.bar .bar-item{padding:8px 16px;float:left;width:auto;border:none;display:block;outline:0}.bar .button{white-space:normal}
 .block{display:block;width:100%}
-.container{padding:0.01em 16px}.container:after,.container:before,.bar:before,.bar:after{content:"";display:table;clear:both}
 .content{max-width:980px;margin-left:auto;margin-right:auto}
 .hide{display:none!important}.show{display:block!important}.show-inline-block{display:inline-block!important}
 .small{font-size:12px!important}.large{font-size:24px!important}
 .margin{margin:16px!important}.margin-top{margin-top:16px!important}.margin-bottom{margin-bottom:16px!important}.margin-left{margin-left:16px!important}.margin-right{margin-right:16px!important}
+.margin-leftbottom{margin-left:16px!important;margin-bottom:16px!important}
 .left{float:left!important}.right{float:right!important}
-.blue{color:#fff!important;background-color:#2196F3!important}.red{color:#fff!important;background-color:#f44336!important}.white{color:#000!important;background-color:#fff!important}
-.text-blue{color:#2196F3!important}.text-red{color:#f44336!important}.text-white{color:#fff!important}
-.border{border:1px solid #ccc!important}.border-bottom{border-bottom:1px solid #ccc!important}.border-blue{border-color:#2196F3!important}.border-red{border-color:#f44336!important}.border-white{border-color:#ccc!important}
+.white{color:#000!important;background-color:#fff!important}.red{color:#fff!important;background-color:#f44336!important}.blue{color:#fff!important;background-color:#2196F3!important}
+.text-white{color:#fff!important}.text-red{color:#f44336!important}.text-blue{color:#2196F3!important}
+.border{border:1px solid #ccc!important}.border-bottom{border-bottom:1px solid #ccc!important}
+.border-white{border-color:#ccc!important}.border-red{border-color:#f44336!important}.border-blue{border-color:#2196F3!important}
+.flex{display:flex;flex-wrap:wrap;align-items:flex-end}
 .star{padding:8px!important}
-#options{padding-top:12px;margin:0!important}
-#logo,#nav-details{height:52px;padding-right:0}
+#menu-toggle{height:52px;cursor:pointer}
+#title{padding-left:0}
+#menu{padding-top:14px;margin:0!important}
+#metric-team{width:96px}#metric-suffix,#metric-match{width:72px}
 @media(max-width:600px){#nav-template{display:none}}
-@media (max-width:500px){.mobile{display:block;width:100%!important}}
-@media(max-width:430px){#title{display:none}}
+@media(max-width:400px){#title{display:none}.mobile{display:block;width:100%!important}}
