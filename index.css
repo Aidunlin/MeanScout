@@ -23,9 +23,11 @@ select{cursor:pointer}
 .border-white{border-color:#ccc!important}.border-red{border-color:#f44336!important}.border-blue{border-color:#2196F3!important}
 .flex{display:flex;flex-wrap:wrap;align-items:flex-end}
 .star{padding:8px!important}
+.inc{text-align:left}
 #menu-toggle{height:52px;cursor:pointer}
 #title{padding-left:0}
 #menu{padding-top:14px;margin:0!important}
-#metric-team{width:96px}#metric-suffix,#metric-match{width:72px}
+#template{width:fit-content!important}
+#metric-team{width:80px}#metric-suffix,#metric-match{width:72px}
 @media(max-width:600px){#nav-template{display:none}}
 @media(max-width:400px){#title{display:none}.mobile{display:block;width:100%!important}}

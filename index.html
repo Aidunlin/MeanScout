@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="hide">
+<html lang="en">
   <head>
     <title>MeanScout</title>
     <meta charset="utf-8" />
@@ -18,18 +18,14 @@
   </head>
   <body class="content black large">
     <div class="bar">
-      <img class="bar-item ripple" id="menu-toggle" src="./logo.png" alt="" />
+      <img class="bar-item ripple" id="menu-toggle" title="Menu" src="./logo.png" alt="" />
       <div class="bar-item" id="title"><b>MeanScout</b></div>
-      <div class="right">
-        <div class="bar-item">
-          <span class="margin-right" id="nav-template"></span><span id="nav-location"></span>
-        </div>
-      </div>
+      <div class="bar-item right"><span class="margin-right" id="nav-template"></span><span id="nav-location"></span></div>
     </div>
     <div class="border hide" id="menu">
       <div class="flex margin-right">
-        <label class="margin-leftbottom mobile">Location
-          <select class="select black" id="menu-location">
+        <label class="margin-leftbottom">Location
+          <select id="menu-location">
             <option class="text-white">None</option>
             <option class="text-red">Red Near</option>
             <option class="text-red">Red Mid</option>
@@ -39,45 +35,33 @@
             <option class="text-blue">Blue Far</option>
           </select>
         </label>
-        <button class="margin-leftbottom ripple" onclick="download()">
-          <i class="fas fa-download"></i> Download Surveys
-        </button>
-      </div>
-      <div class="flex margin-right">
-        <label class="margin-leftbottom mobile">Template
-          <select class="select black" id="menu-template">
-            <option value="Example">Example</option>
-          </select>
-        </label>
-        <button class="margin-leftbottom ripple" id="menu-template-new">
-            <i class="fas fa-plus"></i> New
-        </button>
-        <button class="margin-leftbottom ripple" id="menu-template-copy">
-            <i class="fas fa-copy"></i> Copy
-        </button>
-        <button class="margin-leftbottom ripple" id="menu-template-remove">
-            <i class="fas fa-trash-alt"></i> Remove
+        <div class="margin-leftbottom">Template
+          <div class="flex">
+            <select id="template"><option value="Example">Example</option></select>
+            <button class="ripple" id="template-new" title="New"><i class="fas fa-plus"></i></button>
+            <button class="ripple" id="template-copy" title="Copy"><i class="fas fa-copy"></i></button>
+            <button class="ripple" id="template-remove" title="Remove"><i class="fas fa-trash"></i></button>
+          </div>
+        </div>
+        <button class="margin-leftbottom ripple" title="Download Surveys" onclick="download()">
+          <i class="fas fa-download"></i> Surveys
         </button>
       </div>
       <p class="margin small">&copy; 2020 Aidan Linerud</a></p>
     </div>
     <div class="flex margin-top margin-right">
       <label class="margin-leftbottom">Team
-        <input class="black" id="metric-team" type="number" list="teams" placeholder="####" autofocus />
+        <input id="metric-team" type="number" list="teams" autofocus />
         <datalist id="teams"></datalist>
       </label>
-      <label class="margin-leftbottom">Suffix
-        <input class="black" id="metric-suffix" />
-      </label>
-      <label class="margin-leftbottom">Match
-        <input class="black" id="metric-match" type="number" placeholder="##" value="1" />
-      </label>
-      <button class="margin-leftbottom ripple" id="metric-absent">
-        <i class="far fa-square"></i> Absent
-      </button>
+      <label class="margin-leftbottom">Suffix <input id="metric-suffix" /></label>
+      <label class="margin-leftbottom">Match <input id="metric-match" type="number" value="1" /></label>
+      <button class="margin-leftbottom ripple" id="metric-absent"><i class="far fa-square"></i> Absent</button>
     </div>
     <div class="margin-right" id="metrics"></div>
-    <button class="margin-leftbottom margin-right ripple" onclick="saveSurvey()"><i class="fas fa-save"></i> Save</button>
+    <button class="margin-leftbottom margin-right ripple" title="Save Survey" onclick="saveSurvey()">
+      <i class="fas fa-save"></i> Save
+    </button>
     <script src="./templates.js"></script>
     <script src="./index.js"></script>
   </body>
