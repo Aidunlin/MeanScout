@@ -44,7 +44,7 @@ Clicking the MeanScout logo will reveal useful options for MeanScout. (Make sure
 
 It can be annoying to reprogram your scouting app every year to change scouting metrics. To make things easier, MeanScout can be customized with flexible scouting templates.
 
-The only metrics that can't be changed are team (and team suffix), match, and absent, as it is generally assumed that these will stay consistent with all future FRC games.
+The only metrics that can't be changed are team, match, and absent, as it is generally assumed that these will stay consistent with all future FRC games.
 
 To add a template to MeanScout, simply copy and paste its JSON. MeanScout comes with an example template to get you started. Here is its JSON:
 
@@ -61,7 +61,7 @@ To add a template to MeanScout, simply copy and paste its JSON. MeanScout comes 
 }
 ```
 
-Each template should have a `name` and an array of `metrics`. Optionally, a whitelist of `teams` can be included to restrict what team numbers can be entered. Keep team suffixes out of the whitelist so all team values are numbers.
+Each template should have a `name` and an array of `metrics`. Optionally, a whitelist of `teams` can be included to help scouts correctly identify teams. 
 
 Each metric must have a `name` and a `type` (`toggle`, `number`, `select`, `text`, or `rating`). Use short/concise names for metrics.
 

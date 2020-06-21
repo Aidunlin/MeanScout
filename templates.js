@@ -67,7 +67,7 @@ $("#template").change(() => {
 
 // Create and select new template from JSON text
 $("#template-new").click(() => {
-  let newPrompt = prompt("Type/paste new template:");
+  let newPrompt = prompt("Paste new template:");
   if (newPrompt) {
     let newTemplate = JSON.parse(newPrompt);
     if (Array.isArray(newTemplate)) newTemplate = newTemplate[0];
@@ -168,7 +168,7 @@ function change(i, type, data = 0) {
         return;
       } else {
         gameMetrics[i].value = data + 1;
-        for (let j = 0; j <= data + 1; j++) gameMetrics[i].element.find(`div>.star:nth-child(${j})`).html(`<i class="${unstarred}"></i>`);
+        for (let j = 0; j <= data + 1; j++) gameMetrics[i].element.find(`div>.star:nth-child(${j})`).html(`<i class="${starred}"></i>`);
       }
   }
   setLocation(scoutLocation);

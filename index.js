@@ -29,19 +29,18 @@ setLocation(localStorage.getItem("location") || "None");
 $("#menu-location").val(scoutLocation).change(() => setLocation($("#menu-location").val()));
 
 // Team, match value restrictions
-$("#metric-team, #metric-match").keypress((event) => {
-  if ((event.which != 8 && event.which != 0 && event.which < 48) || event.which > 57) event.preventDefault();
-});
-$("#metric-suffix").keypress((event) => {
-  if (!"abcdefghijklmnopqrstuvwxyz".includes(event.key.toLowerCase())) event.preventDefault();
-  else $("#metric-suffix").val("");
-});
 $("#metric-team").on("input", () => {
-  if ($("#metric-team").val().length > 4) $("#metric-team").val($("#metric-team").val().substring(0, 4));
-});
-$("#metric-suffix").on("input", () => {
-  $("#metric-suffix").val($("#metric-suffix").val().toUpperCase());
-  if ($("#metric-suffix").val().length > 1) $("#metric-suffix").val($("#metric-suffix").val().substring(0, 1));
+  $("#metric-team").val($("#metric-team").val().toUpperCase());
+  if (!"01234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ".includes($("#metric-team").val().substring($("#metric-team").val().length-1))) {
+    $("#metric-team").val($("#metric-team").val().substring(0, $("#metric-team").val().length - 1));
+  }
+  if ("ABCDEFGHIJKLMNOPQRSTUVWXYZ".includes($("#metric-team").val().substr($("#metric-team").val().length-2, 1))) {
+    $("#metric-team").val($("#metric-team").val().substring(0, $("#metric-team").val().length - 1));
+  }
+  if ($("#metric-team").val().length == 5 && "01234567890".includes($("#metric-team").val().substr(4, 1))) {
+    $("#metric-team").val($("#metric-team").val().substring(0, $("#metric-team").val().length - 1));
+  }
+  if ($("#metric-team").val().length > 5) $("#metric-team").val($("#metric-team").val().substring(0, 5));
 });
 $("#metric-match").on("input", () => {
   if ($("#metric-match").val().length > 3) $("#metric-match").val($("#metric-match").val().substring(0, 3));
@@ -59,7 +58,7 @@ $("#menu-toggle").click(() => $("#menu").toggleClass("hide"));
 
 // Saves current survey to localstorage and reset metrics
 function saveSurvey() {
-  if (!/\d{1,4}/.test($("#metric-team").val())) {
+  if (!/\d{1,4}[A-Z]?/.test($("#metric-team").val())) {
     alert("Please enter a proper team value!");
     $("#metric-team").focus();
     return;
@@ -71,13 +70,12 @@ function saveSurvey() {
       return;
     }
   }
-  if (!/\d{1,3}/.test($("#metric-match").val()) || $("#metric-match").val().length > 3) {
+  if (!/\d{1,3}/.test($("#metric-match").val())) {
     alert("Please enter a proper match value!");
     $("#metric-match").focus();
     return;
   }
-  let values = `${$("#metric-team").val() + ($("#suffix").val() || "")}`;
-  values += `,${$("#metric-match").val()},${isAbsent}`;
+  let values = `${$("#metric-team").val()},${$("#metric-match").val()},${isAbsent}`;
   $.each(gameMetrics, (_i, metric) => {
     values += `,${["text", "select"].includes(metric.type) ? `"${metric.value.replace('"', "'")}"` : metric.value}`;
   });
@@ -86,7 +84,7 @@ function saveSurvey() {
   localStorage.setItem("surveys", `${savedSurveys || ""}${values}\n`);
   $("#metric-team").val("").focus();
   $("#metric-suffix").val("");
-  matchCount = parseInt($("#metric-match").val()) + 1;
+  matchCount = Math.max(parseInt($("#metric-match").val()) + 1, 999);
   $("#metric-match").val(matchCount);
   if (isAbsent) $("#metric-absent").click();
   $.each(gameMetrics, (_i, metric) => {

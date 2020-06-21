@@ -9,7 +9,7 @@ input,select{padding:8px;display:block;border:none;border-bottom:1px solid #ccc;
 select{cursor:pointer}
 ::-webkit-outer-spin-button,::-webkit-inner-spin-button,::-webkit-calendar-picker-indicator{display:none}
 .ripple{transition:opacity 0s}.ripple:active{opacity:0.5}
-.bar{width:100%;overflow:hidden}.bar .bar-item{padding:8px 16px;float:left;width:auto;border:none;display:block;outline:0}.bar .button{white-space:normal}
+.bar{width:100%;overflow:hidden}.bar .bar-item{padding:8px 16px;float:left;width:auto;border:none;display:block;outline:0}
 .block{display:block;width:100%}
 .content{max-width:980px;margin-left:auto;margin-right:auto}
 .hide{display:none!important}.show{display:block!important}.show-inline-block{display:inline-block!important}
@@ -28,6 +28,6 @@ select{cursor:pointer}
 #title{padding-left:0}
 #menu{padding-top:14px;margin:0!important}
 #template{width:fit-content!important}
-#metric-team{width:80px}#metric-suffix,#metric-match{width:72px}
+#metric-team{width:100px}#metric-suffix,#metric-match{width:72px}
 @media(max-width:600px){#nav-template{display:none}}
-@media(max-width:400px){#title{display:none}.mobile{display:block;width:100%!important}}
+@media(max-width:400px){#title{display:none}}
