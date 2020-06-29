@@ -24,7 +24,7 @@ select{cursor:pointer}
 .flex{display:flex;flex-wrap:wrap;align-items:flex-end}
 .star{padding:8px!important}
 .inc{text-align:left}
-#menu-toggle{height:52px;cursor:pointer}
+.bar img{height:52px;padding-left:0!important;padding-right:0!important}
 #title{padding-left:0}
 #menu{padding-top:14px;margin:0!important}
 #template{width:fit-content!important}

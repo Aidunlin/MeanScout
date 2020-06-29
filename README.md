@@ -31,7 +31,7 @@ If you can't find it, you can still use the app as normal.
 
 ## Options
 
-Clicking the MeanScout logo will reveal useful options for MeanScout. (Make sure to tell your scouts they probably shouldn't mess with these).
+Pressing the menu button will reveal useful options for MeanScout (Make sure to tell your scouts they probably shouldn't mess with these).
 
 - Set which robot location will be scouted, only used to remind scouts which robot they are scouting.
 - Download surveys and clear the in-app survey storage (prevents duplicate surveys if you download more than once).
