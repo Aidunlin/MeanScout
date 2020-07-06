@@ -1,16 +1,17 @@
 # MeanScout
 
-A responsive, flexible, and powerful FRC scouting web app.
+A lightweight FRC scouting web app.
 
 ## Features
 
 - Progressive web app - full offline support
-- Dark-only theme with red/blue color variants
+- Dark theme with red/blue color variants
 - Templates - customizable metrics (documentation below)
 - Different metric types: toggles, numbers, selectors, text, ratings
 - Team whitelist customization - make sure entered team is correct
 - Uses `localStorage` to store entries
 - Download saved entries as `(Template Name) Surveys.csv`
+- Approximately 1 MB cache size
 
 ### Planned Features
 
@@ -31,22 +32,24 @@ If you can't find it, you can still use the app as normal.
 
 ## Options
 
-Pressing the menu button will reveal useful options for MeanScout (Make sure to tell your scouts they probably shouldn't mess with these).
+Pressing the menu button (on small devices) will reveal useful options for MeanScout.
+These options are shown automatically on larger devices.
+Make sure to tell your scouts they shouldn't mess with these.
 
-- Set which robot location will be scouted, only used to remind scouts which robot they are scouting.
-- Download surveys and clear the in-app survey storage (prevents duplicate surveys if you download more than once).
-- Change templates and download any saved surveys from the previous template.
-- Add a new template (templates with same name can be replaced).
-- Copy the JSON text of the current template.
-- Remove the current template (the example can't be removed).
+- Set which robot location will be scouted
+- Download (and remove) saved surveys
+- Change templates and download any saved surveys from the previous template
+- Add a new template (templates with same name can be replaced)
+- Copy the JSON text of the current template
+- Remove the current template (the example can't be removed)
 
 ## Templates
 
-It can be annoying to reprogram your scouting app every year to change scouting metrics. To make things easier, MeanScout can be customized with flexible scouting templates.
+It can be annoying to reprogram your scouting app every year to change scouting metrics.
+To make things easier, MeanScout can be customized with flexible scouting templates.
 
-The only metrics that can't be changed are team, match, and absent, as it is generally assumed that these will stay consistent with all future FRC games.
-
-To add a template to MeanScout, simply copy and paste its JSON. MeanScout comes with an example template to get you started. Here is its JSON:
+To add a template to MeanScout, simply copy and paste its JSON.
+MeanScout comes with an example template to get you started. Here is its JSON:
 
 ```json
 {
@@ -61,16 +64,21 @@ To add a template to MeanScout, simply copy and paste its JSON. MeanScout comes 
 }
 ```
 
-Each template should have a `name` and an array of `metrics`. Optionally, a whitelist of `teams` can be included to help scouts correctly identify teams. 
+The only metrics that can't be changed are team, match, and absent.
 
-Each metric must have a `name` and a `type` (`toggle`, `number`, `select`, `text`, or `rating`). Use short/concise names for metrics.
+Each template should have a `name` and an array of `metrics`.
+Optionally, a whitelist of `teams` can be included to help scouts correctly identify teams. 
 
-Setting `group` to a truthy value moves the metric in question to a new line, as every metric will be placed next to the last metric. Setting `group` with a string will add a group label before the current metric, and all metrics after will appear to be 'grouped' together (until the next metric with a `group` string).
+Each metric must have a `name` and a `type` (`toggle`, `number`, `select`, `text`, or `rating`).
+Use short/concise names for metrics.
 
-- A `toggle` metric will have a toggleable button. Value is a boolean.
-- A `number` metric will have an incremental and decremental button. You can set a `max` value, but the maximum will always be 99. Value is a number.
-- A `select` metric will have a dropdown selector. There must be an array of string `values` to create options for the selector. Value is a string (selected option).
-- A `text` metric will have a text input. Setting a `tip` value will add a placeholder within the input field. Setting `length` to `"long"` will produce a full-width input. Value is a string.
-- A `rating` metric will have a star rating bar. Value is a number (0-5). You can reset the rating bar to 0 by tapping the first star twice.
+- `toggle`: a toggleable button. Value is a boolean.
+- `number`: an incremental and decremental button. Value is a number. You can set a `max` value, but the maximum will always be 99.
+- `select`: a dropdown selector. Value is a string (selected option). There must be an array of string `values` to create options for the selector.
+- `text`: a text input. Value is a string. Setting a `tip` value will add a placeholder within the input field. Setting `length` to `"long"` will produce a full-width input.
+- `rating`: a star rating bar. Value is a number (0-5). You can reset the rating bar to 0 by tapping the first star twice.
 
-When saving/downloading, every metric's value will be placed in the same order the metrics were created (with team/match/absent first).
+Setting `group` to a truthy value moves the metric in question to a new line, as every metric will be placed next to the last metric.
+Setting `group` with a string will add a group label before the current metric, and all metrics after will appear to be 'grouped' together (until the next metric with a `group` string).
+
+When downloaded, every metric's value will be placed in the same order the metrics were created (with team/match/absent first).
