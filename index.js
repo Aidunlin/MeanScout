@@ -12,96 +12,49 @@ if ("serviceWorker" in navigator) {
   };
 }
 
-/* Template code */
-
-// Default/example template
-let exampleTemplate = {
-  name: "Example",
-  metrics: [
-    { name: "Toggle", type: "toggle", group: "Group" },
-    { name: "Number", type: "number", max: 10 },
-    {
-      name: "Select",
-      type: "select",
-      values: ["Value 1", "Value 2", "Value 3"],
-    },
-    { name: "Text", type: "text", tip: "Tip" },
-    { name: "Rating", type: "rating" },
-  ],
-};
-let templates = JSON.parse(localStorage.getItem("templates") || null);
-let gameMetrics = [];
-let currentTemplate;
-let isCustom = false;
 const unchecked = "far fa-square";
 const checked = "fas fa-check-square";
 const unstarred = "far fa-star";
 const starred = "fas fa-star";
 
-// Populate template picker with template options, select previously selected template
-$.each(templates, (i, template) => {
-  $("#template").prepend(new Option(template.name, template.name));
-  if (template.selected) {
-    currentTemplate = template;
-    isCustom = true;
-    loadTemplate(template.metrics);
-    $("#template").val(currentTemplate.name);
-  }
-});
-if (!isCustom) {
-  currentTemplate = exampleTemplate;
-  loadTemplate(exampleTemplate.metrics);
-  $("#template").val(currentTemplate.name);
-}
+let gameMetrics = [];
+let exampleTemplate = {
+  metrics: [
+    { name: "Toggle", type: "toggle", group: "Group" },
+    { name: "Number", type: "number", max: 10 },
+    { name: "Select", type: "select", values: ["Value 1", "Value 2", "Value 3"], },
+    { name: "Text", type: "text", tip: "Tip" },
+    { name: "Rating", type: "rating" },
+  ],
+};
+let currentTemplate = JSON.parse(localStorage.getItem("template") || JSON.stringify(exampleTemplate));
+loadTemplate(currentTemplate.metrics);
 if (currentTemplate.teams) {
-  $.each(currentTemplate.teams, (_i, team) => {
+  for (let team of currentTemplate.teams) {
     $("#teams").append(`<option value="${team}">`);
-  });
+  }
 }
 
-// Change to selected template
-function setTemplate() {
-  if (localStorage.getItem("surveys")) {
-    download(false);
-  }
-  isCustom = false;
-  $.each(templates, (_i, template) => {
-    template.selected = false;
-    if ($("#template").val() == template.name) {
-      currentTemplate = template;
-      isCustom = true;
-      template.selected = true;
-      loadTemplate(template.metrics);
-    }
-  });
-  if (!isCustom) {
-    currentTemplate = exampleTemplate;
-    loadTemplate(exampleTemplate.metrics);
-    $("#template").val(currentTemplate.name);
-  }
-  if (currentTemplate.teams) {
-    $.each(currentTemplate.teams, (_i, team) => {
-      $("#teams").append(`<option value="${team}">`);
-    });
-  }
-  setLocation(scoutLocation);
-  localStorage.setItem("templates", JSON.stringify(templates));
+function copyTemplate() {
+  let input = $("<input>");
+  let templateToCopy = currentTemplate;
+  $("body").append(input);
+  input.attr("value", JSON.stringify(templateToCopy));
+  input.select();
+  document.execCommand("copy");
+  $(input).remove();
+  alert(`Copied template`);
 }
 
-// Create and select new template from JSON text
-function newTemplate() {
-  let newPrompt = prompt("Paste new template:");
+function editTemplate() {
+  let newPrompt = prompt("Paste new template (or leave blank to cancel or type 'default' to load default):");
   if (newPrompt) {
-    let newTemplate = JSON.parse(newPrompt);
+    let newTemplate = newPrompt == "default" ? exampleTemplate : JSON.parse(newPrompt);
     if (Array.isArray(newTemplate)) {
       newTemplate = newTemplate[0];
     }
-    newTemplate.selected = true;
     let error = false;
-    if (newTemplate.name == exampleTemplate.name) {
-      error = "Template has same name as example";
-    }
-    if (newTemplate.name && newTemplate.metrics) {
+    if (newTemplate.metrics) {
       $.each(newTemplate.metrics, (i, metric) => {
         if (!metric.name) {
           error = `Metric ${i}: no name`;
@@ -120,61 +73,19 @@ function newTemplate() {
       alert(`Could not add template! ${error}`);
       return;
     }
-    let skip = false;
-    $.each(templates, (_i, template) => {
-      if (newTemplate.name == template.name) {
-        if (confirm(`Replace ${newTemplate.name}?`)) {
-          $.each(templates, (i, template) => {
-            if (template.name == currentTemplate.name) {
-              templates.splice(i, 1);
-              return false;
-            }
-          });
-          $("#template option:checked").remove();
-          setTemplate();
-          localStorage.setItem("templates", JSON.stringify(templates));
-        } else {
-          skip = true;
-          return false;
-        }
-      }
-    });
-    if (!skip) {
-      templates.unshift(newTemplate);
-      $("#template").prepend(new Option(newTemplate.name, newTemplate.name));
-      $("#template").val(newTemplate.name);
-      setTemplate();
+    currentTemplate = JSON.parse(JSON.stringify(newTemplate));
+    localStorage.setItem("template", JSON.stringify(currentTemplate));
+    if (localStorage.getItem("surveys")) {
+      downloadSurveys(false);
     }
-  }
-}
-
-function copyTemplate() {
-  let input = $("<input>");
-  let templateToCopy = currentTemplate;
-  delete templateToCopy["selected"];
-  $("body").append(input);
-  input.attr("value", JSON.stringify(templateToCopy));
-  input.select();
-  document.execCommand("copy");
-  $(input).remove();
-  alert(`Copied ${currentTemplate.name}`);
-}
-
-function removeTemplate() {
-  if (!isCustom) {
-    alert("The example template cannot be removed.");
-    return;
-  }
-  if (prompt(`Type "${currentTemplate.name}" to remove the template`)) {
-    $.each(templates, (i, template) => {
-      if (template.name == currentTemplate.name) {
-        templates.splice(i, 1);
-        return false;
+    loadTemplate(currentTemplate.metrics);
+    setLocation(scoutLocation);
+    $("#teams").empty();
+    if (currentTemplate.teams) {
+      for (let team of currentTemplate.teams) {
+        $("#teams").append(`<option value="${team}">`);
       }
-    });
-    $("#template option:checked").remove();
-    setTemplate();
-    localStorage.setItem("templates", JSON.stringify(templates));
+    }
   }
 }
 
@@ -194,7 +105,7 @@ function change(i, type, data = 0) {
       gameMetrics[i].value = gameMetrics[i].element.find("option:checked").html();
       break;
     case "text":
-      gameMetrics[i].value = gameMetrics[i].element.children("input").val();
+      gameMetrics[i].value = `"${gameMetrics[i].element.children("input").val().replace('"', "'")}"`;
       break;
     case "rating":
       gameMetrics[i].element.find(".star").html(`<i class="${unstarred}"></i>`);
@@ -228,7 +139,7 @@ function loadTemplate(t) {
         metricObject.value = false;
         break;
       case "number":
-        newMetric = $(`<div>${metric.name} <br></div>`);
+        newMetric = $(`<div>${metric.name}<br></div>`);
         let incButton = $("<button class='inc'></button>");
         incButton.click(() => change(i, metric.type, 1)).html("00");
         let decButton = $("<button class='dec'></button>");
@@ -238,19 +149,20 @@ function loadTemplate(t) {
         metricObject.value = 0;
         break;
       case "select":
-        newMetric = $(`<label>${metric.name} <br></label>`);
+        newMetric = $(`<label>${metric.name}</label>`);
         let select = $("<select></select>");
         select.on("change", () => change(i, metric.type));
-        $.each(metric.values, (index, selValue) => {
+        for (let value of metric.values) {
           let option = $("<option></option>");
-          option.html(selValue);
+          option.val(value);
+          option.html(value);
           select.append(option);
-        });
+        }
         newMetric.append(select);
         metricObject.value = metric.values[0];
         break;
       case "text":
-        newMetric = $(`<label>${metric.name} <br></label>`);
+        newMetric = $(`<label>${metric.name}</label>`);
         if (metric.length == "long") {
           newMetric.css("width", "100%");
         }
@@ -263,7 +175,7 @@ function loadTemplate(t) {
         metricObject.value = "";
         break;
       case "rating":
-        newMetric = $(`<div>${metric.name} <br></div>`);
+        newMetric = $(`<div>${metric.name}</div>`);
         let ratingBar = $("<div class='flex'></div>");
         for (let j = 0; j < 5; j++) {
           let star = $(`<button class='star'><i class="${unstarred}"></i></button>`);
@@ -292,8 +204,6 @@ function loadTemplate(t) {
   $("#metrics").append(currentDiv);
 }
 
-/* End template code */
-
 let theme = "red";
 let scoutLocation = "Red Near";
 let matchCount = 1;
@@ -303,7 +213,6 @@ let isAbsent = false;
 function setLocation(newLocation) {
   let newTheme = /Blue/.test(newLocation) ? "blue" : "red";
   $("#title, #nav-location, input, select, i, svg, .inc, .star").removeClass(theme).addClass(newTheme);
-  $("button:not(#metrics button, #metric-absent)").removeClass(theme).addClass(newTheme);
   localStorage.setItem("location", newLocation);
   $("#nav-location").html(newLocation);
   theme = newTheme;
@@ -335,9 +244,9 @@ $("#metric-match").on("input", () => {
   }
 });
 
-$("#menu-toggle").click(() => {
+function toggleMenu() {
   $('#menu').toggleClass('show-flex');
-});
+}
 
 // Absent toggle
 $("#metric-absent").click(() => {
@@ -366,9 +275,9 @@ function saveSurvey() {
     return;
   }
   let values = `${$("#metric-team").val()},${$("#metric-match").val()},${isAbsent}`;
-  $.each(gameMetrics, (_i, metric) => {
-    values += `,${metric.type == "select" ? `"${metric.value.replace('"', "'")}"` : metric.value}`;
-  });
+  for (let metric of gameMetrics) {
+    values += `,${metric.value}`;
+  }
   if (!confirm("Confirm save?")) {
     return;
   }
@@ -376,35 +285,35 @@ function saveSurvey() {
   localStorage.setItem("surveys", `${savedSurveys || ""}${values}\n`);
   $("#metric-team").val("").focus();
   $("#metric-suffix").val("");
-  matchCount = Math.max(parseInt($("#metric-match").val()) + 1, 999);
+  matchCount = Math.min(parseInt($("#metric-match").val()) + 1, 999);
   $("#metric-match").val(matchCount);
   if (isAbsent) {
     $("#metric-absent").click();
   }
-  $.each(gameMetrics, (_i, metric) => {
-    switch (metric.type) {
+  for (let i = 0; i < gameMetrics.length; i++) {
+    switch (gameMetrics[i].type) {
       case "toggle":
-        metric.element.find("button").html(`<i class="${unchecked}"></i> ${metric.name}`);
-        metric.element.find("i").addClass(theme);
-        metric.value = false;
+        gameMetrics[i].value = false;
+        gameMetrics[i].element.find("button").html(`<i class="${unchecked}"></i> ${gameMetrics[i].name}`);
+        gameMetrics[i].element.find("i").addClass(theme);
         break;
       case "text":
-        metric.element.children("input").val("");
-        metric.value = "";
+        gameMetrics[i].value = "";
+        gameMetrics[i].element.children("input").val("");
         break;
       case "number":
-        metric.element.children(".inc").html("00");
-        metric.value = 0;
+        gameMetrics[i].value = 0;
+        gameMetrics[i].element.children(".inc").html("00");
         break;
       case "select":
-        metric.element.children("select").val(0);
-        metric.value = metric.element.find("select option:checked").html();
+        gameMetrics[i].value = gameMetrics[i].element.find("select option").first().val();
+        gameMetrics[i].element.children("select").val(gameMetrics[i].value);
         break;
       case "rating":
-        metric.element.find(".star").html(`<i class="${unstarred}"></i>`);
-        metric.value = 0;
+        gameMetrics[i].value = 0;
+        gameMetrics[i].element.find(".star").html(`<i class="${unstarred}"></i>`);
     }
-  });
+  }
 }
 
 // Downloads (and clears) saved surveys from localStorage
@@ -416,9 +325,9 @@ function downloadSurveys(askUser = true) {
   }
   let a = document.createElement("a");
   a.href = `data:text/plain;charset=utf-8,${encodeURIComponent(localStorage.getItem("surveys"))}`;
-  a.download = `${currentTemplate.name} Surveys.csv`;
+  a.download = "surveys.csv";
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
-  localStorage.setItem("surveys", "");
+  localStorage.removeItem("surveys");
 }

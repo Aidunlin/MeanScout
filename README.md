@@ -6,7 +6,7 @@ A lightweight FRC scouting web app.
 
 - Progressive web app - full offline support
 - Dark theme with red/blue color variants
-- Templates - customizable metrics (documentation below)
+- Customizable metrics (documentation below)
 - Different metric types: toggles, numbers, selectors, text, ratings
 - Team whitelist customization - make sure entered team is correct
 - Uses `localStorage` to store entries
@@ -38,22 +38,19 @@ Make sure to tell your scouts they shouldn't mess with these.
 
 - Set which robot location will be scouted
 - Download (and remove) saved surveys
-- Change templates and download any saved surveys from the previous template
-- Add a new template (templates with same name can be replaced)
-- Copy the JSON text of the current template
-- Remove the current template (the example can't be removed)
+- Copy the JSON of the template
+- Edit the template and download any saved surveys from before
 
-## Templates
+## Customization
 
 It can be annoying to reprogram your scouting app every year to change scouting metrics.
-To make things easier, MeanScout can be customized with flexible scouting templates.
+To make things easier, metrics in MeanScout can be customized with templates.
 
-To add a template to MeanScout, simply copy and paste its JSON.
+To change the metrics present, simply copy and paste JSON-based templates into MeanScout.
 MeanScout comes with an example template to get you started. Here is its JSON:
 
 ```json
 {
-  "name": "Example Template",
   "metrics": [
     { "name": "Toggle", "type": "toggle", "group": "Group" },
     { "name": "Number", "type": "number", "max": 10 },
@@ -66,11 +63,11 @@ MeanScout comes with an example template to get you started. Here is its JSON:
 
 The only metrics that can't be changed are team, match, and absent.
 
-Each template should have a `name` and an array of `metrics`.
-Optionally, a whitelist of `teams` can be included to help scouts correctly identify teams. 
+Each template should have an array of `metrics`.
+Optionally, a whitelist of `teams` can be included to help scouts correctly identify teams.
 
 Each metric must have a `name` and a `type` (`toggle`, `number`, `select`, `text`, or `rating`).
-Use short/concise names for metrics.
+Use short/concise names for metrics to save space.
 
 - `toggle`: a toggleable button. Value is a boolean.
 - `number`: an incremental and decremental button. Value is a number. You can set a `max` value, but the maximum will always be 99.
@@ -78,7 +75,7 @@ Use short/concise names for metrics.
 - `text`: a text input. Value is a string. Setting a `tip` value will add a placeholder within the input field. Setting `length` to `"long"` will produce a full-width input.
 - `rating`: a star rating bar. Value is a number (0-5). You can reset the rating bar to 0 by tapping the first star twice.
 
-Setting `group` to a truthy value moves the metric in question to a new line, as every metric will be placed next to the last metric.
+Setting `group` to a truthy value moves the metric in question to a new line, as every metric will be placed next to the last.
 Setting `group` with a string will add a group label before the current metric, and all metrics after will appear to be 'grouped' together (until the next metric with a `group` string).
 
 When downloaded, every metric's value will be placed in the same order the metrics were created (with team/match/absent first).

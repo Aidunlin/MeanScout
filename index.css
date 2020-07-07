@@ -139,25 +139,31 @@ select {
 }
 #logo {
   height: 29px;
+  margin-right: 8px;
 }
 #menu {
-  border: 1px solid #fff !important;
   display: none;
-  padding-top: 12px;
-  padding-right: 16px;
 }
 #menu > *, #default > * {
   margin-bottom: 16px !important;
   margin-left: 16px !important;
-}
-#template {
-  width: fit-content !important;
 }
 #metric-team {
   width: 100px;
 }
 #metric-match {
   width: 72px;
+}
+@media (min-width: 768px) {
+  #menu-toggle {
+    display: none;
+  }
+  #menu {
+    display: flex !important;
+  }
+  #logo {
+    margin-left: 16px;
+  }
 }
 @media (max-width: 400px) {
   #title {

@@ -1,93 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
-  <title>MeanScout</title>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,user-scalable=no" />
-  <meta name="description" content="A lightweight FRC scouting web app." />
-  <meta name="theme-color" content="#000000" />
-  <link rel="apple-touch-icon" href="./logo.png" />
-  <link rel="icon" href="./logo.png" />
-  <link rel="manifest" href="./manifest.json" />
-  <link rel="stylesheet" href="./normalize.css" />
-  <link rel="stylesheet" href="./index.css" />
-  <script src="./jquery.js"></script>
-  <script defer src="./regular.js"></script>
-  <script defer src="./solid.js"></script>
-  <script defer src="./fa.js"></script>
-
-  <div class="bar">
-    <div class="flex-center">
-      <button id="menu-toggle" title="Menu">
-        <i class="fa fa-bars"></i>
-      </button>
-      <img id="logo" src="./logo.png" alt />
-      <b id="title">MeanScout</b>
-    </div>
-    <div id="nav-location"></div>
-  </div>
-  
-  <div class="flex margin-bottom" id="menu">
-    <label>
-      Location
-      <select id="menu-location">
-        <option class="red">Red Near</option>
-        <option class="red">Red Mid</option>
-        <option class="red">Red Far</option>
-        <option class="blue">Blue Near</option>
-        <option class="blue">Blue Mid</option>
-        <option class="blue">Blue Far</option>
-      </select>
-    </label>
-    <div>
-      Surveys
-      <div class="flex">
-        <button onclick="downloadSurveys()">
-          <i class="fas fa-download"></i>
-          Download
-        </button>
+  <head>
+    <title>MeanScout</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,user-scalable=no">
+    <meta name="description" content="A lightweight FRC scouting web app.">
+    <meta name="theme-color" content="#000000">
+    <link rel="apple-touch-icon" href="./logo.png">
+    <link rel="icon" href="./logo.png">
+    <link rel="manifest" href="./manifest.json">
+    <link rel="stylesheet" href="./normalize.css">
+    <link rel="stylesheet" href="./index.css">
+    <script src="./jquery.js"></script>
+    <script defer src="./regular.js"></script>
+    <script defer src="./solid.js"></script>
+    <script defer src="./fa.js"></script>
+  </head>
+  <body>
+    <div class="bar">
+      <div class="flex-center">
+        <button id="menu-toggle" onclick="toggleMenu()" title="Menu"><i class="fa fa-bars"></i></button>
+        <img id="logo" src="./logo.png" alt>
+        <b id="title">MeanScout</b>
       </div>
+      <div id="nav-location"></div>
     </div>
-    <div>
-      Template
-      <div class="flex">
-        <select id="template" onchange="setTemplate()">
-          <option value="Example">Example</option>
+    <div class="flex margin-right" id="menu">
+      <label>Location
+        <select id="menu-location">
+          <option class="red">Red Near</option>
+          <option class="red">Red Mid</option>
+          <option class="red">Red Far</option>
+          <option class="blue">Blue Near</option>
+          <option class="blue">Blue Mid</option>
+          <option class="blue">Blue Far</option>
         </select>
-        <button onclick="newTemplate()" title="New">
-          <i class="fas fa-plus"></i>
-        </button>
-        <button onclick="copyTemplate()" title="Copy">
-          <i class="fas fa-copy"></i>
-        </button>
-        <button onclick="removeTemplate()" title="Remove">
-          <i class="fas fa-trash"></i>
-        </button>
+      </label>
+      <div>Surveys
+        <div class="flex">
+          <button onclick="downloadSurveys()">
+            <i class="fas fa-download"></i> Download
+          </button>
+        </div>
+      </div>
+      <div>Template
+        <div class="flex">
+          <button onclick="copyTemplate()">
+            <i class="fas fa-copy"></i> Copy
+          </button>
+          <button onclick="editTemplate()">
+            <i class="fas fa-edit"></i> Edit
+          </button>
+        </div>
       </div>
     </div>
-  </div>
-  
-  <div class="flex margin-right" id="default">
-    <label>
-      Team
-      <input id="metric-team" list="teams" autofocus />
+    <div class="flex margin-top margin-right" id="default">
+      <label>Team<input id="metric-team" list="teams" autofocus></label>
       <datalist id="teams"></datalist>
-    </label>
-    <label>
-      Match
-      <input id="metric-match" type="number" value="1" />
-    </label>
-    <button id="metric-absent">
-      <i class="far fa-square"></i>
-      Absent
-    </button>
-  </div>
-  
-  <div class="margin-right" id="metrics"></div>
-  
-  <button class="margin-bottomleft margin-right" onclick="saveSurvey()">
-    <i class="fas fa-save"></i>
-    <b>Save</b>
-  </button>
-  
+      <label>Match<input id="metric-match" type="number" value="1">
+      </label>
+      <button id="metric-absent"><i class="far fa-square"></i> Absent</button>
+    </div>
+    <div class="margin-right" id="metrics"></div>
+    <button class="margin" onclick="saveSurvey()"><i class="fas fa-save"></i> Save</button>
+  </body>
   <script src="./index.js"></script>
 </html>
