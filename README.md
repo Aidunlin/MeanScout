@@ -38,8 +38,7 @@ Make sure to tell your scouts they shouldn't mess with these.
 
 - Set which robot location will be scouted
 - Download (and remove) saved surveys
-- Copy the JSON of the template
-- Edit the template and download any saved surveys from before
+- Edit, copy, and reset the template
 
 ## Customization
 
@@ -76,6 +75,6 @@ Use short/concise names for metrics to save space.
 - `rating`: a star rating bar. Value is a number (0-5). You can reset the rating bar to 0 by tapping the first star twice.
 
 Setting `group` to a truthy value moves the metric in question to a new line, as every metric will be placed next to the last.
-Setting `group` with a string will add a group label before the current metric, and all metrics after will appear to be 'grouped' together (until the next metric with a `group` string).
+Setting `group` with a string will add a group label before the current metric, and metrics after will appear to be 'grouped' together.
 
 When downloaded, every metric's value will be placed in the same order the metrics were created (with team/match/absent first).

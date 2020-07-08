@@ -1,22 +1,13 @@
-// Check if user wants to reload/close
 window.onbeforeunload = () => {
   if (/aidunlin\.codes/.test(window.location.hostname)) {
     return true;
   }
 };
-
-// Register service worker
 if ("serviceWorker" in navigator) {
   window.onload = () => {
     navigator.serviceWorker.register("./sw.js");
   };
 }
-
-const unchecked = "far fa-square";
-const checked = "fas fa-check-square";
-const unstarred = "far fa-star";
-const starred = "fas fa-star";
-
 let gameMetrics = [];
 let exampleTemplate = {
   metrics: [
@@ -34,22 +25,10 @@ if (currentTemplate.teams) {
     $("#teams").append(`<option value="${team}">`);
   }
 }
-
-function copyTemplate() {
-  let input = $("<input>");
-  let templateToCopy = currentTemplate;
-  $("body").append(input);
-  input.attr("value", JSON.stringify(templateToCopy));
-  input.select();
-  document.execCommand("copy");
-  $(input).remove();
-  alert(`Copied template`);
-}
-
 function editTemplate() {
-  let newPrompt = prompt("Paste new template (or leave blank to cancel or type 'default' to load default):");
+  let newPrompt = prompt("Paste new template (leave blank to cancel):");
   if (newPrompt) {
-    let newTemplate = newPrompt == "default" ? exampleTemplate : JSON.parse(newPrompt);
+    let newTemplate = JSON.parse(newPrompt == "default" ? JSON.stringify(exampleTemplate) : newPrompt);
     if (Array.isArray(newTemplate)) {
       newTemplate = newTemplate[0];
     }
@@ -70,35 +49,53 @@ function editTemplate() {
       error = "Template is invalid";
     }
     if (error) {
-      alert(`Could not add template! ${error}`);
+      alert(`Could not set template! ${error}`);
       return;
     }
-    currentTemplate = JSON.parse(JSON.stringify(newTemplate));
-    localStorage.setItem("template", JSON.stringify(currentTemplate));
-    if (localStorage.getItem("surveys")) {
-      downloadSurveys(false);
+    setTemplate(newTemplate);
+  }
+}
+function copyTemplate() {
+  let input = document.createElement("input");
+  input.value = JSON.stringify(currentTemplate);
+  document.getElementsByTagName("body")[0].appendChild(input);
+  input.select();
+  document.execCommand("copy");
+  input.remove();
+  alert("Copied template");
+}
+function setTemplate(newTemplate = undefined) {
+  if (!newTemplate) {
+    if (!confirm("Confirm reset?")) {
+      return;
     }
-    loadTemplate(currentTemplate.metrics);
-    setLocation(scoutLocation);
-    $("#teams").empty();
-    if (currentTemplate.teams) {
-      for (let team of currentTemplate.teams) {
-        $("#teams").append(`<option value="${team}">`);
-      }
+  }
+  currentTemplate = JSON.parse(JSON.stringify(newTemplate || exampleTemplate));
+  if (newTemplate) {
+    localStorage.setItem("template", JSON.stringify(currentTemplate));
+  } else {
+    localStorage.removeItem("template");
+  }
+  if (localStorage.getItem("surveys")) {
+    downloadSurveys(false);
+  }
+  loadTemplate(currentTemplate.metrics);
+  setLocation(scoutLocation);
+  $("#teams").empty();
+  if (currentTemplate.teams) {
+    for (let team of currentTemplate.teams) {
+      $("#teams").append(`<option value="${team}">`);
     }
   }
 }
-
-// Handles metric UI/value changes
 function change(i, type, data = 0) {
   switch (type) {
     case "toggle":
-      gameMetrics[i].element.find("button").html(`<i class="${gameMetrics[i].value ? unchecked : checked}"></i> ${gameMetrics[i].name}`);
+      gameMetrics[i].element.find("button").html(`<i class="fa${gameMetrics[i].value ? "r fa" : "s fa-check"}-square"></i> ${gameMetrics[i].name}`);
       gameMetrics[i].value = !gameMetrics[i].value;
       break;
     case "number":
-      gameMetrics[i].value = Math.min((gameMetrics[i].value += data), gameMetrics[i].max);
-      gameMetrics[i].value = Math.max(gameMetrics[i].value, 0);
+      gameMetrics[i].value = Math.max(Math.min((gameMetrics[i].value += data), gameMetrics[i].max), 0);
       gameMetrics[i].element.children(".inc").html(("0" + gameMetrics[i].value).slice(-2));
       break;
     case "select":
@@ -108,21 +105,18 @@ function change(i, type, data = 0) {
       gameMetrics[i].value = `"${gameMetrics[i].element.children("input").val().replace('"', "'")}"`;
       break;
     case "rating":
-      gameMetrics[i].element.find(".star").html(`<i class="${unstarred}"></i>`);
+      gameMetrics[i].element.find(".star").html("<i class='far fa-star'></i>");
       if (data == 0 && gameMetrics[i].value == 1) {
         gameMetrics[i].value = 0;
-        return;
       } else {
         gameMetrics[i].value = data + 1;
         for (let j = 0; j <= data + 1; j++) {
-          gameMetrics[i].element.find(`div>.star:nth-child(${j})`).html(`<i class="${starred}"></i>`);
+          gameMetrics[i].element.find(`div>.star:nth-child(${j})`).html("<i class='fas fa-star'></i>");
         }
       }
   }
   setLocation(scoutLocation);
 }
-
-// Create scouting metrics (UI and state variables) from template
 function loadTemplate(t) {
   $("#metrics").empty().removeClass("margin-left");
   gameMetrics = [];
@@ -133,7 +127,7 @@ function loadTemplate(t) {
     switch (metric.type) {
       case "toggle":
         newMetric = $("<div></div>");
-        let button = $(`<button><i class="${unchecked}"></i> ${metric.name}</button>`);
+        let button = $(`<button><i class="far fa-square"></i> ${metric.name}</button>`);
         button.click(() => change(i, metric.type));
         newMetric.append(button);
         metricObject.value = false;
@@ -177,8 +171,9 @@ function loadTemplate(t) {
       case "rating":
         newMetric = $(`<div>${metric.name}</div>`);
         let ratingBar = $("<div class='flex'></div>");
+        ratingBar.css("min-width", "215px");
         for (let j = 0; j < 5; j++) {
-          let star = $(`<button class='star'><i class="${unstarred}"></i></button>`);
+          let star = $("<button class='star'><i class='far fa-star'></i></button>");
           star.click(() => change(i, metric.type, j));
           ratingBar.append(star);
         }
@@ -191,10 +186,9 @@ function loadTemplate(t) {
         $("#metrics").append(currentDiv);
       }
       if (typeof metric.group == "string") {
-        $("#metrics").append(metric.group);
-        $("#metrics").addClass("margin-left");
+        $("#metrics").append(metric.group).addClass("margin-left");
       }
-      currentDiv = $(`<div class="flex"></div>`);
+      currentDiv = $("<div class='flex'></div>");
     }
     currentDiv.append(newMetric);
     metricObject.element = newMetric;
@@ -203,13 +197,10 @@ function loadTemplate(t) {
   });
   $("#metrics").append(currentDiv);
 }
-
 let theme = "red";
 let scoutLocation = "Red Near";
 let matchCount = 1;
 let isAbsent = false;
-
-// Sets location and changes theme colors
 function setLocation(newLocation) {
   let newTheme = /Blue/.test(newLocation) ? "blue" : "red";
   $("#title, #nav-location, input, select, i, svg, .inc, .star").removeClass(theme).addClass(newTheme);
@@ -219,43 +210,30 @@ function setLocation(newLocation) {
   scoutLocation = newLocation;
   $("#menu-location").val(scoutLocation);
 }
-
 setLocation(localStorage.getItem("location") || "Red Near");
-$("#menu-location").change(() => {
-  setLocation($("#menu-location").val());
-});
-
-// Team, match value restrictions
-$("#metric-team").on("input", () => {
+function checkTeam() {
   let team = $("#metric-team").val();
   $("#metric-team").val(team.toUpperCase());
-  if (!/\w|\d/.test(team.charAt(team.length - 1))
-    || /[A-Z]/.test(team.charAt(team.length - 2))
-    || (team.length == 5 && /\d/.test(team.charAt(4)))) {
+  if (!/\w|\d/.test(team.charAt(team.length - 1)) || /[A-Z]/.test(team.charAt(team.length - 2)) || (team.length == 5 && /\d/.test(team.charAt(4)))) {
     $("#metric-team").val(team.substring(0, team.length - 1));
   }
   if (team.length > 5) {
     $("#metric-team").val(team.substring(0, 5));
   }
-});
-$("#metric-match").on("input", () => {
+}
+function checkMatch() {
   if ($("#metric-match").val().length > 3) {
     $("#metric-match").val($("#metric-match").val().substring(0, 3));
   }
-});
-
+}
 function toggleMenu() {
   $('#menu').toggleClass('show-flex');
 }
-
-// Absent toggle
-$("#metric-absent").click(() => {
+function toggleAbsent() {
   $("#metrics").toggleClass("hide");
-  $("#metric-absent").html(`<i class="${isAbsent ? unchecked : checked} ${theme}"></i> Absent`);
+  $("#metric-absent").html(`<i class="fa${isAbsent ? "r fa" : "s fa-check"}-square ${theme}"></i> Absent`);
   isAbsent = !isAbsent;
-});
-
-// Saves current survey to localStorage and reset metrics
+}
 function saveSurvey() {
   if (!/\d{1,4}[A-Z]?/.test($("#metric-team").val())) {
     alert("Please enter a proper team value!");
@@ -284,7 +262,6 @@ function saveSurvey() {
   let savedSurveys = localStorage.getItem("surveys");
   localStorage.setItem("surveys", `${savedSurveys || ""}${values}\n`);
   $("#metric-team").val("").focus();
-  $("#metric-suffix").val("");
   matchCount = Math.min(parseInt($("#metric-match").val()) + 1, 999);
   $("#metric-match").val(matchCount);
   if (isAbsent) {
@@ -294,7 +271,7 @@ function saveSurvey() {
     switch (gameMetrics[i].type) {
       case "toggle":
         gameMetrics[i].value = false;
-        gameMetrics[i].element.find("button").html(`<i class="${unchecked}"></i> ${gameMetrics[i].name}`);
+        gameMetrics[i].element.find("button").html(`<i class="far fa-square"></i> ${gameMetrics[i].name}`);
         gameMetrics[i].element.find("i").addClass(theme);
         break;
       case "text":
@@ -311,12 +288,10 @@ function saveSurvey() {
         break;
       case "rating":
         gameMetrics[i].value = 0;
-        gameMetrics[i].element.find(".star").html(`<i class="${unstarred}"></i>`);
+        gameMetrics[i].element.find(".star").html(`<i class="far fa-star"></i>`);
     }
   }
 }
-
-// Downloads (and clears) saved surveys from localStorage
 function downloadSurveys(askUser = true) {
   if (askUser) {
     if (!confirm("Confirm download?")) {
