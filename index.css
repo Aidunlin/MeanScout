@@ -16,10 +16,6 @@ html {
   font-size: 24px;
   overflow-x: hidden;
 }
-body {
-  margin: auto;
-  width: fit-content;
-}
 button {
   background-color: inherit;
   border: none;
@@ -51,6 +47,9 @@ select {
 select {
   cursor: pointer;
   width: fit-content;
+}
+svg {
+  vertical-align: -.125em;
 }
 ::-webkit-outer-spin-button,
 ::-webkit-inner-spin-button,
@@ -157,14 +156,12 @@ select {
   width: 72px;
 }
 @media (min-width: 800px) {
-  #menu-toggle {
+  #menu-toggle,
+  #nav-location {
     display: none;
   }
   #logo {
     margin-left: 16px;
-  }
-  #nav-location {
-    display: none;
   }
   #menu {
     display: flex;

@@ -21,7 +21,6 @@ A lightweight FRC scouting web app.
 ## Libraries/Frameworks
 
 - CSS based on [w3.css](https://www.w3schools.com/w3css/)
-- [jQuery](https://jquery.com/)
 - [FontAwesome](https://fontawesome.com/)
 - [Workbox](https://developers.google.com/web/tools/workbox)
 

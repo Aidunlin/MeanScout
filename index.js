@@ -3,38 +3,52 @@ window.onbeforeunload = () => {
     return true;
   }
 };
+
 if ("serviceWorker" in navigator) {
   window.onload = () => {
     navigator.serviceWorker.register("./sw.js");
   };
 }
+
+let theme = "red";
+let scoutLocation = "Red Near";
+let matchCount = 1;
+let isAbsent = false;
 let gameMetrics = [];
 let exampleTemplate = {
   metrics: [
     { name: "Toggle", type: "toggle", group: "Group" },
     { name: "Number", type: "number", max: 10 },
-    { name: "Select", type: "select", values: ["Value 1", "Value 2", "Value 3"], },
+    { name: "Select", type: "select", values: [
+      "Value 1", "Value 2", "Value 3" ]
+    },
     { name: "Text", type: "text", tip: "Tip" },
-    { name: "Rating", type: "rating" },
-  ],
+    { name: "Rating", type: "rating" }
+  ]
 };
-let currentTemplate = JSON.parse(localStorage.getItem("template") || JSON.stringify(exampleTemplate));
-loadTemplate(currentTemplate.metrics);
-if (currentTemplate.teams) {
-  for (let team of currentTemplate.teams) {
-    $("#teams").append(`<option value="${team}">`);
-  }
+let currentTemplate = JSON.parse(JSON.stringify(exampleTemplate));
+if (localStorage.getItem("template")) {
+  currentTemplate = JSON.parse(localStorage.getItem("template"));
 }
+loadTemplate(currentTemplate);
+if (localStorage.getItem("location")) {
+  setLocation(localStorage.getItem("location"));
+} else {
+  setLocation("Red Near");
+}
+
+// Template button functions
+
 function editTemplate() {
   let newPrompt = prompt("Paste new template (leave blank to cancel):");
   if (newPrompt) {
-    let newTemplate = JSON.parse(newPrompt == "default" ? JSON.stringify(exampleTemplate) : newPrompt);
+    let newTemplate = JSON.parse(newPrompt);
     if (Array.isArray(newTemplate)) {
       newTemplate = newTemplate[0];
     }
     let error = false;
     if (newTemplate.metrics) {
-      $.each(newTemplate.metrics, (i, metric) => {
+      newTemplate.metrics.forEach((metric, i) => {
         if (!metric.name) {
           error = `Metric ${i}: no name`;
         } else if (metric.type == "number" && metric.max < 1) {
@@ -55,6 +69,7 @@ function editTemplate() {
     setTemplate(newTemplate);
   }
 }
+
 function copyTemplate() {
   let input = document.createElement("input");
   input.value = JSON.stringify(currentTemplate);
@@ -64,234 +79,322 @@ function copyTemplate() {
   input.remove();
   alert("Copied template");
 }
+
 function setTemplate(newTemplate = undefined) {
   if (!newTemplate) {
     if (!confirm("Confirm reset?")) {
       return;
     }
   }
-  currentTemplate = JSON.parse(JSON.stringify(newTemplate || exampleTemplate));
   if (newTemplate) {
+    currentTemplate = JSON.parse(JSON.stringify(newTemplate));
     localStorage.setItem("template", JSON.stringify(currentTemplate));
   } else {
+    currentTemplate = JSON.parse(JSON.stringify(exampleTemplate));
     localStorage.removeItem("template");
   }
   if (localStorage.getItem("surveys")) {
     downloadSurveys(false);
   }
-  loadTemplate(currentTemplate.metrics);
-  setLocation(scoutLocation);
-  $("#teams").empty();
-  if (currentTemplate.teams) {
-    for (let team of currentTemplate.teams) {
-      $("#teams").append(`<option value="${team}">`);
-    }
-  }
-}
-function change(i, type, data = 0) {
-  switch (type) {
-    case "toggle":
-      gameMetrics[i].element.find("button").html(`<i class="fa${gameMetrics[i].value ? "r fa" : "s fa-check"}-square"></i> ${gameMetrics[i].name}`);
-      gameMetrics[i].value = !gameMetrics[i].value;
-      break;
-    case "number":
-      gameMetrics[i].value = Math.max(Math.min((gameMetrics[i].value += data), gameMetrics[i].max), 0);
-      gameMetrics[i].element.children(".inc").html(("0" + gameMetrics[i].value).slice(-2));
-      break;
-    case "select":
-      gameMetrics[i].value = gameMetrics[i].element.find("option:checked").html();
-      break;
-    case "text":
-      gameMetrics[i].value = `"${gameMetrics[i].element.children("input").val().replace('"', "'")}"`;
-      break;
-    case "rating":
-      gameMetrics[i].element.find(".star").html("<i class='far fa-star'></i>");
-      if (data == 0 && gameMetrics[i].value == 1) {
-        gameMetrics[i].value = 0;
-      } else {
-        gameMetrics[i].value = data + 1;
-        for (let j = 0; j <= data + 1; j++) {
-          gameMetrics[i].element.find(`div>.star:nth-child(${j})`).html("<i class='fas fa-star'></i>");
-        }
-      }
-  }
+  loadTemplate(currentTemplate);
   setLocation(scoutLocation);
 }
-function loadTemplate(t) {
-  $("#metrics").empty().removeClass("margin-left");
+
+// Template code
+
+function loadTemplate(newTemplate) {
+  document.getElementById("teams").innerHTML = "";
+  if (newTemplate.teams) {
+    newTemplate.teams.forEach(team => {
+      let newOption = document.createElement("option");
+      newOption.value = team;
+      document.getElementById("teams").appendChild(newOption);
+    });
+  }
+  document.getElementById("metrics").innerHTML = "";
+  document.getElementById("metrics").classList.remove("margin-left");
   gameMetrics = [];
   let metricObject, newMetric;
-  let currentDiv = $("<div class='flex'></div>");
-  $.each(t, (i, metric) => {
-    metricObject = { name: metric.name };
+  let currentDiv = document.createElement("div");
+  currentDiv.classList.add("flex");
+  newTemplate.metrics.forEach((metric, i) => {
+    metricObject = {
+      name: metric.name,
+      type: metric.type
+    };
     switch (metric.type) {
       case "toggle":
-        newMetric = $("<div></div>");
-        let button = $(`<button><i class="far fa-square"></i> ${metric.name}</button>`);
-        button.click(() => change(i, metric.type));
-        newMetric.append(button);
+        newMetric = document.createElement("div");
+        let button = document.createElement("button");
+        button.innerHTML = `<i class="far fa-square"></i> ${metric.name}`;
+        button.onclick = () => change(i, metric.type);
+        newMetric.appendChild(button);
         metricObject.value = false;
         break;
       case "number":
-        newMetric = $(`<div>${metric.name}<br></div>`);
-        let incButton = $("<button class='inc'></button>");
-        incButton.click(() => change(i, metric.type, 1)).html("00");
-        let decButton = $("<button class='dec'></button>");
-        decButton.click(() => change(i, metric.type, -1)).html("−");
-        newMetric.append(incButton, decButton);
-        metricObject.max = metric.max ? Math.min(metric.max, 99) : 99;
+        newMetric = document.createElement("div");
+        newMetric.innerHTML = `${metric.name}<br>`;
+        let incButton = document.createElement("button");
+        incButton.classList.add("inc");
+        incButton.innerHTML = "00";
+        incButton.onclick = () => change(i, metric.type, 1);
+        newMetric.appendChild(incButton);
+        let decButton = document.createElement("button");
+        decButton.classList.add("dec");
+        decButton.innerHTML = "−";
+        decButton.onclick = () => change(i, metric.type, -1);
+        newMetric.appendChild(decButton);
         metricObject.value = 0;
+        metricObject.max = metric.max ? Math.min(metric.max, 99) : 99;
         break;
       case "select":
-        newMetric = $(`<label>${metric.name}</label>`);
-        let select = $("<select></select>");
-        select.on("change", () => change(i, metric.type));
+        newMetric = document.createElement("label");
+        newMetric.innerHTML = metric.name;
+        let select = document.createElement("select");
+        select.onchange = () => change(i, metric.type);
         for (let value of metric.values) {
-          let option = $("<option></option>");
-          option.val(value);
-          option.html(value);
-          select.append(option);
+          let option = document.createElement("option");
+          option.value = value;
+          option.innerHTML = value;
+          select.appendChild(option);
         }
-        newMetric.append(select);
+        newMetric.appendChild(select);
         metricObject.value = metric.values[0];
         break;
       case "text":
-        newMetric = $(`<label>${metric.name}</label>`);
+        newMetric = document.createElement("label");
+        newMetric.innerHTML = metric.name;
         if (metric.length == "long") {
-          newMetric.css("width", "100%");
+          newMetric.style.width = "100%";
         }
-        let input = $("<input>");
+        let input = document.createElement("input");
         if (metric.tip) {
-          input.attr("placeholder", metric.tip);
+          input.placeholder = metric.tip;
         }
-        input.on("input", () => change(i, metric.type));
-        newMetric.append(input);
+        input.oninput = () => change(i, metric.type);
+        newMetric.appendChild(input);
         metricObject.value = "";
         break;
       case "rating":
-        newMetric = $(`<div>${metric.name}</div>`);
-        let ratingBar = $("<div class='flex'></div>");
-        ratingBar.css("min-width", "215px");
+        newMetric = document.createElement("div");
+        newMetric.innerHTML = metric.name;
+        let ratingBar = document.createElement("div");
+        ratingBar.classList.add("flex");
         for (let j = 0; j < 5; j++) {
-          let star = $("<button class='star'><i class='far fa-star'></i></button>");
-          star.click(() => change(i, metric.type, j));
-          ratingBar.append(star);
+          let star = document.createElement("button");
+          star.classList.add("star");
+          star.innerHTML = "<i class='far fa-star'></i>";
+          star.onclick = () => change(i, metric.type, j);
+          ratingBar.appendChild(star);
         }
-        newMetric.append(ratingBar);
+        newMetric.appendChild(ratingBar);
         metricObject.value = 0;
     }
-    newMetric.addClass("margin-bottomleft");
+    newMetric.classList.add("margin-bottomleft");
     if (metric.group) {
       if (i > 0) {
-        $("#metrics").append(currentDiv);
+        document.getElementById("metrics").appendChild(currentDiv);
       }
       if (typeof metric.group == "string") {
-        $("#metrics").append(metric.group).addClass("margin-left");
+        document.getElementById("metrics").innerHTML += metric.group;
+        document.getElementById("metrics").classList.add("margin-left");
       }
-      currentDiv = $("<div class='flex'></div>");
+      currentDiv = document.createElement("div");
+      currentDiv.classList.add("flex");
     }
-    currentDiv.append(newMetric);
+    currentDiv.appendChild(newMetric);
     metricObject.element = newMetric;
-    metricObject.type = metric.type;
     gameMetrics.push(metricObject);
   });
-  $("#metrics").append(currentDiv);
+  document.getElementById("metrics").appendChild(currentDiv);
 }
-let theme = "red";
-let scoutLocation = "Red Near";
-let matchCount = 1;
-let isAbsent = false;
+
+function change(i, type, data = 0) {
+  switch (type) {
+    case "toggle":
+      let button = gameMetrics[i].element.getElementsByTagName("button")[0];
+      button.innerHTML = "";
+      let newIcon = document.createElement("i");
+      if (gameMetrics[i].value) {
+        newIcon.classList.add("far", "fa-square");
+      } else {
+        newIcon.classList.add("fas", "fa-check");
+      }
+      button.appendChild(newIcon);
+      button.innerHTML += " " + gameMetrics[i].name;
+      gameMetrics[i].value = !gameMetrics[i].value;
+      break;
+    case "number":
+      gameMetrics[i].value += data;
+      gameMetrics[i].value = Math.max(gameMetrics[i].value, 0);
+      gameMetrics[i].value = Math.min(gameMetrics[i].value, gameMetrics[i].max);
+      let inc = gameMetrics[i].element.getElementsByClassName("inc")[0];
+      inc.innerHTML = ("0" + gameMetrics[i].value).slice(-2);
+      break;
+    case "select":
+      let select = gameMetrics[i].element.getElementsByTagName("select")[0];
+      gameMetrics[i].value = select.value;
+      break;
+    case "text":
+      let text = gameMetrics[i].element.getElementsByTagName("input")[0];
+      gameMetrics[i].value = `"${text.value.replace('"', "'")}"`;
+      break;
+    case "rating":
+      let stars = gameMetrics[i].element.getElementsByClassName("star");
+      [...stars].forEach(star => star.innerHTML = "<i class='far fa-star'></i>");
+      if (data == 0 && gameMetrics[i].value == 1) {
+        gameMetrics[i].value = 0;
+      } else {
+        for (let j = 0; j < data + 1; j++) {
+          stars[j].innerHTML = "<i class='fas fa-star'></i>";
+        }
+        gameMetrics[i].value = data + 1;
+      }
+  }
+  setLocation(scoutLocation);
+}
+
+// Location/theme setter
+
 function setLocation(newLocation) {
-  let newTheme = /Blue/.test(newLocation) ? "blue" : "red";
-  $("#title, #nav-location, input, select, i, svg, .inc, .star").removeClass(theme).addClass(newTheme);
+  let newTheme;
+  if (/Blue/.test(newLocation)) {
+    newTheme = "blue";
+  } else {
+    newTheme = "red";
+  }
+  ["title", "nav-location"].forEach(id => {
+    document.getElementById(id).classList.remove(theme);
+    document.getElementById(id).classList.add(newTheme);
+  });
+  ["input", "select", "i", "svg"].forEach(tag => {
+    [...document.getElementsByTagName(tag)].forEach(element => {
+      element.classList.remove(theme);
+      element.classList.add(newTheme);
+    });
+  });
+  ["inc", "star"].forEach(cls => {
+    [...document.getElementsByClassName(cls)].forEach(element => {
+      element.classList.remove(theme);
+      element.classList.add(newTheme);
+    });
+  });
   localStorage.setItem("location", newLocation);
-  $("#nav-location").html(newLocation);
+  document.getElementById("nav-location").innerHTML = newLocation;
   theme = newTheme;
   scoutLocation = newLocation;
-  $("#menu-location").val(scoutLocation);
+  document.getElementById("menu-location").value = scoutLocation;
 }
-setLocation(localStorage.getItem("location") || "Red Near");
+
+// Team/match input checkers
+
 function checkTeam() {
-  let team = $("#metric-team").val();
-  $("#metric-team").val(team.toUpperCase());
-  if (!/\w|\d/.test(team.charAt(team.length - 1)) || /[A-Z]/.test(team.charAt(team.length - 2)) || (team.length == 5 && /\d/.test(team.charAt(4)))) {
-    $("#metric-team").val(team.substring(0, team.length - 1));
+  let team = document.getElementById("metric-team");
+  team.value = team.value.toUpperCase();
+  if (
+    !/\w|\d/.test(team.value.charAt(team.value.length - 1))
+    || /[A-Z]/.test(team.value.charAt(team.value.length - 2))
+    || (team.value.length == 5 && /\d/.test(team.value.charAt(4)))
+    ) {
+    team.value = team.value.substring(0, team.value.length - 1);
   }
-  if (team.length > 5) {
-    $("#metric-team").val(team.substring(0, 5));
-  }
+  team.value = team.value.substring(0, 5);
 }
+
 function checkMatch() {
-  if ($("#metric-match").val().length > 3) {
-    $("#metric-match").val($("#metric-match").val().substring(0, 3));
-  }
+  let match = document.getElementById("metric-match");
+  match.value = match.value.substring(0, 3);
 }
+
+// Button toggles
+
 function toggleMenu() {
-  $('#menu').toggleClass('show-flex');
+  document.getElementById("menu").classList.toggle("show-flex");
 }
+
 function toggleAbsent() {
-  $("#metrics").toggleClass("hide");
-  $("#metric-absent").html(`<i class="fa${isAbsent ? "r fa" : "s fa-check"}-square ${theme}"></i> Absent`);
+  document.getElementById("metrics").classList.toggle("hide");
+  document.getElementById("metric-absent").innerHTML = "";
+  let newIcon = document.createElement("i");
+  newIcon.classList.add(theme);
+  if (isAbsent) {
+    newIcon.classList.add("far", "fa-square");
+  } else {
+    newIcon.classList.add("fas", "fa-check");
+  }
+  document.getElementById("metric-absent").appendChild(newIcon);
+  document.getElementById("metric-absent").innerHTML += " Absent";
   isAbsent = !isAbsent;
 }
+
+// Survey functions
+
 function saveSurvey() {
-  if (!/\d{1,4}[A-Z]?/.test($("#metric-team").val())) {
+  let team = document.getElementById("metric-team");
+  let match = document.getElementById("metric-match");
+  if (!/\d{1,4}[A-Z]?/.test(team.value)) {
     alert("Please enter a proper team value!");
-    $("#metric-team").focus();
+    team.focus();
     return;
   }
   if (currentTemplate.teams) {
-    if (!currentTemplate.teams.some((t) => t == $("#metric-team").val())) {
+    if (!currentTemplate.teams.some((t) => t == team.value)) {
       alert("Unaccepted team value!");
-      $("#metric-team").focus();
+      team.focus();
       return;
     }
   }
-  if (!/\d{1,3}/.test($("#metric-match").val())) {
+  if (!/\d{1,3}/.test(match.value)) {
     alert("Please enter a proper match value!");
-    $("#metric-match").focus();
+    match.focus();
     return;
-  }
-  let values = `${$("#metric-team").val()},${$("#metric-match").val()},${isAbsent}`;
-  for (let metric of gameMetrics) {
-    values += `,${metric.value}`;
   }
   if (!confirm("Confirm save?")) {
     return;
   }
+  let values = `${team.value},${match.value},${isAbsent}`;
+  gameMetrics.forEach(metric => values += `,${metric.value}`);
   let savedSurveys = localStorage.getItem("surveys");
   localStorage.setItem("surveys", `${savedSurveys || ""}${values}\n`);
-  $("#metric-team").val("").focus();
-  matchCount = Math.min(parseInt($("#metric-match").val()) + 1, 999);
-  $("#metric-match").val(matchCount);
+  team.value = "";
+  team.focus();
+  matchCount = Math.min(parseInt(match.value) + 1, 999);
+  match.value = matchCount;
   if (isAbsent) {
-    $("#metric-absent").click();
+    toggleAbsent();
   }
   for (let i = 0; i < gameMetrics.length; i++) {
     switch (gameMetrics[i].type) {
       case "toggle":
         gameMetrics[i].value = false;
-        gameMetrics[i].element.find("button").html(`<i class="far fa-square"></i> ${gameMetrics[i].name}`);
-        gameMetrics[i].element.find("i").addClass(theme);
+        let button = gameMetrics[i].element.getElementsByTagName("button")[0];
+        button.innerHTML = "";
+        let newIcon = document.createElement("i");
+        newIcon.classList.add("far", "fa-square");
+        button.appendChild(newIcon);
+        button.innerHTML += " " + gameMetrics[i].name;
+        gameMetrics[i].element.getElementsByTagName("i")[0].classList.add(theme);
         break;
       case "text":
         gameMetrics[i].value = "";
-        gameMetrics[i].element.children("input").val("");
+        gameMetrics[i].element.getElementsByTagName("input")[0].value = "";
         break;
       case "number":
         gameMetrics[i].value = 0;
-        gameMetrics[i].element.children(".inc").html("00");
+        gameMetrics[i].element.getElementsByClassName("inc")[0].innerHTML = "00";
         break;
       case "select":
-        gameMetrics[i].value = gameMetrics[i].element.find("select option").first().val();
-        gameMetrics[i].element.children("select").val(gameMetrics[i].value);
+        gameMetrics[i].value = gameMetrics[i].element.getElementsByTagName("option")[0].value;
+        gameMetrics[i].element.getElementsByTagName("select")[0].value = gameMetrics[i].value;
         break;
       case "rating":
         gameMetrics[i].value = 0;
-        gameMetrics[i].element.find(".star").html(`<i class="far fa-star"></i>`);
+        let stars = gameMetrics[i].element.getElementsByClassName("star");
+        [...stars].forEach(star => star.innerHTML = "<i class='far fa-star'></i>");
     }
   }
 }
+
 function downloadSurveys(askUser = true) {
   if (askUser) {
     if (!confirm("Confirm download?")) {
@@ -299,7 +402,8 @@ function downloadSurveys(askUser = true) {
     }
   }
   let a = document.createElement("a");
-  a.href = `data:text/plain;charset=utf-8,${encodeURIComponent(localStorage.getItem("surveys"))}`;
+  a.href = "data:text/plain;charset=utf-8,";
+  a.href += encodeURIComponent(localStorage.getItem("surveys"));
   a.download = "surveys.csv";
   document.body.appendChild(a);
   a.click();
