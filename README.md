@@ -11,7 +11,7 @@ A lightweight FRC scouting web app.
 - Team whitelist customization - make sure entered team is correct
 - Uses `localStorage` to store entries
 - Download saved entries as `(Template Name) Surveys.csv`
-- Approximately 1 MB cache size
+- 130 kB cache size
 
 ### Planned Features
 
