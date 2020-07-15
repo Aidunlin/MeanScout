@@ -49,6 +49,7 @@ select {
   width: fit-content;
 }
 svg {
+  width: 24px;
   vertical-align: -.125em;
 }
 ::-webkit-outer-spin-button,

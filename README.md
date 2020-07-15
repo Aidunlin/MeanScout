@@ -4,6 +4,7 @@ A lightweight FRC scouting web app.
 
 ## Features
 
+- 85 kB cache size
 - Progressive web app - full offline support
 - Dark theme with red/blue color variants
 - Customizable metrics (documentation below)
@@ -11,7 +12,6 @@ A lightweight FRC scouting web app.
 - Team whitelist customization - make sure entered team is correct
 - Uses `localStorage` to store entries
 - Download saved entries as `(Template Name) Surveys.csv`
-- 130 kB cache size
 
 ### Planned Features
 
@@ -20,8 +20,8 @@ A lightweight FRC scouting web app.
 
 ## Libraries/Frameworks
 
-- CSS based on [w3.css](https://www.w3schools.com/w3css/)
-- [FontAwesome](https://fontawesome.com/)
+- [Normalize.css](https://necolas.github.io/normalize.css/) with CSS based on [w3.css](https://www.w3schools.com/w3css/)
+- [FontAwesome Icons](https://fontawesome.com/)
 - [Workbox](https://developers.google.com/web/tools/workbox)
 
 ## Installing MeanScout

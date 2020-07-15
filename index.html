@@ -16,14 +16,11 @@
     <link rel="manifest" href="./manifest.json">
     <link rel="stylesheet" href="./normalize.css">
     <link rel="stylesheet" href="./index.css">
-    <script defer src="./regular.js"></script>
-    <script defer src="./solid.js"></script>
-    <script defer src="./fontawesome.js"></script>
   </head>
   <body>
     <div id="titlebar">
       <button id="menu-toggle" onclick="toggleMenu()" title="Menu">
-        <i class="fas fa-bars"></i>
+        <i class="bars"></i>
       </button>
       <img id="logo" src="./logo.png" alt>
       <b id="title">MeanScout</b>
@@ -45,7 +42,7 @@
         Surveys
         <div class="flex">
           <button onclick="downloadSurveys()">
-            <i class="fas fa-download"></i>
+            <i class="download"></i>
             Download
           </button>
         </div>
@@ -54,13 +51,13 @@
         Template
         <div class="flex">
           <button onclick="editTemplate()" title="Edit">
-            <i class="fas fa-pen"></i>
+            <i class="pen"></i>
           </button>
           <button onclick="copyTemplate()" title="Copy">
-            <i class="fas fa-copy"></i>
+            <i class="copy"></i>
           </button>
           <button onclick="setTemplate()" title="Reset">
-            <i class="fas fa-undo"></i>
+            <i class="undo"></i>
           </button>
         </div>
       </div>
@@ -77,14 +74,14 @@
           <input id="metric-match" oninput="checkMatch()" type="number" value="1">
         </label>
         <button id="metric-absent" onclick="toggleAbsent()">
-          <i class="far fa-square"></i>
+          <i class="square-empty"></i>
           Absent
         </button>
       </div>
       <div id="metrics"></div>
       <div class="flex spaced margin-top">
         <button onclick="saveSurvey()">
-          <i class="fas fa-save"></i>
+          <i class="save"></i>
           Save
         </button>
       </div>
