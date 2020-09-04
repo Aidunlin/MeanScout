@@ -40,6 +40,7 @@ select {
   border: none;
   border-bottom: 1px solid #fff;
   display: block;
+  -moz-appearance: textfield;
   padding: 8px;
   -webkit-appearance: none;
   width: 100%;
@@ -49,7 +50,7 @@ select {
   width: fit-content;
 }
 svg {
-  width: 24px;
+  height: 24px;
   vertical-align: -.125em;
 }
 ::-webkit-outer-spin-button,
@@ -57,6 +58,7 @@ svg {
 ::-webkit-calendar-picker-indicator {
   display: none;
 }
+
 .block {
   display: block;
   width: 100%;
@@ -111,6 +113,11 @@ svg {
 .inc {
   text-align: left;
 }
+.spaced > * {
+  margin-bottom: 16px !important;
+  margin-left: 16px !important;
+}
+
 #titlebar {
   align-items: center;
   display: flex;
@@ -146,16 +153,13 @@ svg {
   display: none;
   margin-right: 16px;
 }
-.spaced > * {
-  margin-bottom: 16px !important;
-  margin-left: 16px !important;
-}
 #metric-team {
   width: 100px;
 }
 #metric-match {
   width: 72px;
 }
+
 @media (min-width: 800px) {
   #menu-toggle,
   #nav-location {

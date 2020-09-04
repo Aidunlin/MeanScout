@@ -1,3 +1,5 @@
+// Setup code
+
 window.onbeforeunload = () => {
   if (/aidunlin\.codes/.test(window.location.hostname)) {
     return true;
@@ -9,8 +11,6 @@ if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("./sw.js");
   };
 }
-
-// Icon code
 
 const icons = {
   "bars":           "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 512'><path fill='currentColor' d='M16 132h416c8.837 0 16-7.163 16-16V76c0-8.837-7.163-16-16-16H16C7.163 60 0 67.163 0 76v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z'></path></svg>",
@@ -29,21 +29,11 @@ const icons = {
 function findIcon(classes) {
   for (const icon in icons) {
     if (classes.contains(icon)) {
-      return icon;
+      return icons[icon];
     }
   }
-  return "question";
+  return icons.question;
 }
-
-function fillIcon(icon) {
-  icon.innerHTML = icons[findIcon(icon.classList)];
-}
-
-function fillIcons() {
-  [...document.getElementsByTagName("i")].forEach(icon => fillIcon(icon));
-}
-
-// Setup code
 
 let theme = "red";
 let scoutLocation = "Red Near";
@@ -82,21 +72,17 @@ function editTemplate() {
     let error = false;
     if (newTemplate.metrics) {
       newTemplate.metrics.forEach((metric, i) => {
-        if (!metric.name) {
-          error = `Metric ${i}: no name`;
-        } else if (metric.type == "number" && metric.max < 1) {
-          error = `Metric ${i}: max is less than one`;
-        } else if (metric.type == "select" && !metric.values) {
-          error = `Metric ${i}: no values`;
-        } else if (!/toggle|number|select|text|rating/.test(metric.type)) {
-          error = `Metric ${i}: unknown type`;
+        if (!metric.name || ((metric.max || 1) < 1)
+        || !Array.isArray(metric.values || [])
+        || !/toggle|number|select|text|rating/.test(metric.type)) {
+          error = "Metric " + (i + 1) + " is invalid";
         }
       });
     } else {
       error = "Template is invalid";
     }
     if (error) {
-      alert(`Could not set template! ${error}`);
+      alert("Could not set template! " + error);
       return;
     }
     setTemplate(newTemplate);
@@ -159,14 +145,14 @@ function loadTemplate(newTemplate) {
       case "toggle":
         newMetric = document.createElement("div");
         let button = document.createElement("button");
-        button.innerHTML = `<i class="square-empty"></i> ${metric.name}`;
+        button.innerHTML = "<i class='square-empty'></i> " + metric.name;
         button.onclick = () => change(i, metric.type);
         newMetric.appendChild(button);
         metricObject.value = false;
         break;
       case "number":
         newMetric = document.createElement("div");
-        newMetric.innerHTML = `${metric.name}<br>`;
+        newMetric.innerHTML = metric.name + "<br>";
         let incButton = document.createElement("button");
         incButton.classList.add("inc");
         incButton.innerHTML = "00";
@@ -178,7 +164,10 @@ function loadTemplate(newTemplate) {
         decButton.onclick = () => change(i, metric.type, -1);
         newMetric.appendChild(decButton);
         metricObject.value = 0;
-        metricObject.max = metric.max ? Math.min(metric.max, 99) : 99;
+        metricObject.max = 99;
+        if (metric.max) {
+          metricObject.max = Math.min(metric.max, 99);
+        }
         break;
       case "select":
         newMetric = document.createElement("label");
@@ -248,14 +237,17 @@ function change(i, type, data = 0) {
       let button = gameMetrics[i].element.getElementsByTagName("button")[0];
       button.innerHTML = "";
       let newIcon = document.createElement("i");
-      newIcon.classList.add(`square-${gameMetrics[i].value ? "empty" : "checked"}`);
+      if (gameMetrics[i].value) {
+        newIcon.classList.add("square-empty");
+      } else {
+        newIcon.classList.add("square-checked");
+      }
       button.appendChild(newIcon);
       button.innerHTML += " " + gameMetrics[i].name;
       gameMetrics[i].value = !gameMetrics[i].value;
       break;
     case "number":
-      gameMetrics[i].value += data;
-      gameMetrics[i].value = Math.max(gameMetrics[i].value, 0);
+      gameMetrics[i].value = Math.max(gameMetrics[i].value + data, 0);
       gameMetrics[i].value = Math.min(gameMetrics[i].value, gameMetrics[i].max);
       let inc = gameMetrics[i].element.getElementsByClassName("inc")[0];
       inc.innerHTML = ("0" + gameMetrics[i].value).slice(-2);
@@ -266,7 +258,7 @@ function change(i, type, data = 0) {
       break;
     case "text":
       let text = gameMetrics[i].element.getElementsByTagName("input")[0];
-      gameMetrics[i].value = `"${text.value.replace('"', "'")}"`;
+      gameMetrics[i].value = '"' + text.value.replace('"', "'") + '"';
       break;
     case "rating":
       let stars = gameMetrics[i].element.getElementsByClassName("star");
@@ -286,7 +278,10 @@ function change(i, type, data = 0) {
 // Location/theme setter
 
 function setLocation(newLocation) {
-  let newTheme = /Blue/.test(newLocation) ? "blue" : "red";
+  let newTheme = "red";
+  if (/Blue/.test(newLocation)) {
+    newTheme = "blue";
+  }
   ["title", "nav-location"].forEach(id => {
     document.getElementById(id).classList.remove(theme);
     document.getElementById(id).classList.add(newTheme);
@@ -308,22 +303,19 @@ function setLocation(newLocation) {
   theme = newTheme;
   scoutLocation = newLocation;
   document.getElementById("menu-location").value = scoutLocation;
-  fillIcons();
+  [...document.getElementsByTagName("i")].forEach(icon => icon.innerHTML = findIcon(icon.classList));
 }
 
 // Team/match input checkers
 
 function checkTeam() {
   let team = document.getElementById("metric-team");
-  team.value = team.value.toUpperCase();
-  if (
-    !/\w|\d/.test(team.value.charAt(team.value.length - 1))
-    || /[A-Z]/.test(team.value.charAt(team.value.length - 2))
-    || (team.value.length == 5 && /\d/.test(team.value.charAt(4)))
-    ) {
+  team.value = team.value.substring(0, 5).toUpperCase();
+  if (!/\w|\d/.test(team.value[team.value.length - 1])
+  || /[A-Z]/.test(team.value[team.value.length - 2])
+  || (/\d/.test(team.value[4]))) {
     team.value = team.value.substring(0, team.value.length - 1);
   }
-  team.value = team.value.substring(0, 5);
 }
 
 function checkMatch() {
@@ -341,8 +333,14 @@ function toggleAbsent() {
   document.getElementById("metrics").classList.toggle("hide");
   document.getElementById("metric-absent").innerHTML = "";
   let newIcon = document.createElement("i");
-  newIcon.classList.add(theme, `square-${isAbsent ? "empty" : "checked"}`);
-  fillIcon(newIcon);
+  newIcon.classList.add(theme);
+  if (isAbsent) {
+    newIcon.classList.add("square-empty");
+    newIcon.innerHTML = icons["square-empty"];
+  } else {
+    newIcon.classList.add("square-checked");
+    newIcon.innerHTML = icons["square-checked"];
+  }
   document.getElementById("metric-absent").appendChild(newIcon);
   document.getElementById("metric-absent").innerHTML += " Absent";
   isAbsent = !isAbsent;
@@ -373,10 +371,13 @@ function saveSurvey() {
   if (!confirm("Confirm save?")) {
     return;
   }
-  let values = `${team.value},${match.value},${isAbsent}`;
-  gameMetrics.forEach(metric => values += `,${metric.value}`);
-  let savedSurveys = localStorage.getItem("surveys");
-  localStorage.setItem("surveys", `${savedSurveys || ""}${values}\n`);
+  let values = team.value + "," + match.value + "," + isAbsent;
+  gameMetrics.forEach(metric => values += "," + metric.value + ",");
+  if (localStorage.getItem("surveys")) {
+    localStorage.setItem("surveys", localStorage.getItem("surveys") + values + "\n");
+  } else {
+    localStorage.setItem("surveys", values + "\n");
+  }
   team.value = "";
   team.focus();
   matchCount = Math.min(parseInt(match.value) + 1, 999);
@@ -423,8 +424,7 @@ function downloadSurveys(askUser = true) {
     }
   }
   let a = document.createElement("a");
-  a.href = "data:text/plain;charset=utf-8,";
-  a.href += encodeURIComponent(localStorage.getItem("surveys"));
+  a.href = "data:text/plain;charset=utf-8," + encodeURIComponent(localStorage.getItem("surveys"));
   a.download = "surveys.csv";
   document.body.appendChild(a);
   a.click();
