@@ -54,11 +54,7 @@ if (localStorage.getItem("template")) {
   currentTemplate = JSON.parse(localStorage.getItem("template"));
 }
 loadTemplate(currentTemplate);
-if (localStorage.getItem("location")) {
-  setLocation(localStorage.getItem("location"));
-} else {
-  setLocation("Red Near");
-}
+setLocation(localStorage.getItem("location") ?? "Red Near");
 
 // Template button functions
 
@@ -66,23 +62,20 @@ function editTemplate() {
   let newPrompt = prompt("Paste new template (leave blank to cancel):");
   if (newPrompt) {
     let newTemplate = JSON.parse(newPrompt);
-    if (Array.isArray(newTemplate)) {
-      newTemplate = newTemplate[0];
-    }
     let error = false;
     if (newTemplate.metrics) {
       newTemplate.metrics.forEach((metric, i) => {
-        if (!metric.name || ((metric.max || 1) < 1)
-        || !Array.isArray(metric.values || [])
+        if (!metric.name || ((metric.max ?? 1) < 1)
+        || !Array.isArray(metric.values ?? [])
         || !/toggle|number|select|text|rating/.test(metric.type)) {
-          error = "Metric " + (i + 1) + " is invalid";
+          error = "Metric is invalid";
         }
       });
     } else {
       error = "Template is invalid";
     }
     if (error) {
-      alert("Could not set template! " + error);
+      alert(`Could not set template! ${error}`);
       return;
     }
     setTemplate(newTemplate);
@@ -92,8 +85,9 @@ function editTemplate() {
 function copyTemplate() {
   let input = document.createElement("input");
   input.value = JSON.stringify(currentTemplate);
-  document.getElementsByTagName("body")[0].appendChild(input);
+  document.body.appendChild(input);
   input.select();
+  input.setSelectionRange(0, 99999);
   document.execCommand("copy");
   input.remove();
   alert("Copied template");
@@ -123,13 +117,11 @@ function setTemplate(newTemplate = undefined) {
 
 function loadTemplate(newTemplate) {
   document.getElementById("teams").innerHTML = "";
-  if (newTemplate.teams) {
-    newTemplate.teams.forEach(team => {
-      let newOption = document.createElement("option");
-      newOption.value = team;
-      document.getElementById("teams").appendChild(newOption);
-    });
-  }
+  newTemplate.teams?.forEach(team => {
+    let newOption = document.createElement("option");
+    newOption.value = team;
+    document.getElementById("teams").appendChild(newOption);
+  });
   document.getElementById("metrics").innerHTML = "";
   document.getElementById("metrics").classList.remove("margin-left");
   gameMetrics = [];
@@ -190,9 +182,7 @@ function loadTemplate(newTemplate) {
           newMetric.style.width = "100%";
         }
         let input = document.createElement("input");
-        if (metric.tip) {
-          input.placeholder = metric.tip;
-        }
+        input.placeholder = metric.tip ?? "";
         input.oninput = () => change(i, metric.type);
         newMetric.appendChild(input);
         metricObject.value = "";
@@ -237,20 +227,16 @@ function change(i, type, data = 0) {
       let button = gameMetrics[i].element.getElementsByTagName("button")[0];
       button.innerHTML = "";
       let newIcon = document.createElement("i");
-      if (gameMetrics[i].value) {
-        newIcon.classList.add("square-empty");
-      } else {
-        newIcon.classList.add("square-checked");
-      }
+      newIcon.classList.add(`square-${gameMetrics[i].value ? "empty" : "checked"}`);
       button.appendChild(newIcon);
-      button.innerHTML += " " + gameMetrics[i].name;
+      button.innerHTML += ` ${gameMetrics[i].name}`;
       gameMetrics[i].value = !gameMetrics[i].value;
       break;
     case "number":
       gameMetrics[i].value = Math.max(gameMetrics[i].value + data, 0);
       gameMetrics[i].value = Math.min(gameMetrics[i].value, gameMetrics[i].max);
       let inc = gameMetrics[i].element.getElementsByClassName("inc")[0];
-      inc.innerHTML = ("0" + gameMetrics[i].value).slice(-2);
+      inc.innerHTML = (`0${gameMetrics[i].value}`).slice(-2);
       break;
     case "select":
       let select = gameMetrics[i].element.getElementsByTagName("select")[0];
@@ -258,7 +244,7 @@ function change(i, type, data = 0) {
       break;
     case "text":
       let text = gameMetrics[i].element.getElementsByTagName("input")[0];
-      gameMetrics[i].value = '"' + text.value.replace('"', "'") + '"';
+      gameMetrics[i].value = `"${text.value.replace('"', "'")}"`;
       break;
     case "rating":
       let stars = gameMetrics[i].element.getElementsByClassName("star");
@@ -371,8 +357,8 @@ function saveSurvey() {
   if (!confirm("Confirm save?")) {
     return;
   }
-  let values = team.value + "," + match.value + "," + isAbsent;
-  gameMetrics.forEach(metric => values += "," + metric.value + ",");
+  let values = `${team.value},${match.value},${isAbsent}`;
+  gameMetrics.forEach(metric => values += `,${metric.value},`);
   if (localStorage.getItem("surveys")) {
     localStorage.setItem("surveys", localStorage.getItem("surveys") + values + "\n");
   } else {
