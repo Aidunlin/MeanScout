@@ -4,48 +4,29 @@ A lightweight FRC scouting web app.
 
 ## Features
 
-- 85 kB cache size
-- Progressive web app - full offline support
-- Dark theme with red/blue color variants
-- Customizable metrics (documentation below)
-- Different metric types: toggles, numbers, selectors, text, ratings
-- Team whitelist customization - make sure entered team is correct
+- Full offline support (progressive web app)
+- Lightweight mobile-first design
+- Red/blue color variants, auto dark/light themes
+- Customizable metrics: toggles, numbers, selectors, textfields, and ratings
+- Optional team whitelisting
 - Uses `localStorage` to store entries
-- Download saved entries as `(Template Name) Surveys.csv`
+- Exports entries as JSON arrays
 
-### Planned Features
-
-- In-app GUI-based template editor
-- More exporting methods (e.g. json)
-
-## Libraries/Frameworks
+## Libraries
 
 - [Normalize.css](https://necolas.github.io/normalize.css/) with CSS based on [w3.css](https://www.w3schools.com/w3css/)
 - [FontAwesome Icons](https://fontawesome.com/)
 - [Workbox](https://developers.google.com/web/tools/workbox)
 
-## Installing MeanScout
+## Location
 
-You should be able to add/install MeanScout as an app from the browser menu.
-If you can't find it, you can still use the app as normal.
-
-## Options
-
-Pressing the menu button (on small devices) will reveal useful options for MeanScout.
-These options are shown automatically on larger devices.
-Make sure to tell your scouts they shouldn't mess with these.
-
-- Set which robot location will be scouted
-- Download (and remove) saved surveys
-- Edit, copy, and reset the template
+The location selector is used to remind your scouts which robot they should scout based on the robot's starting position.
 
 ## Customization
 
-It can be annoying to reprogram your scouting app every year to change scouting metrics.
-To make things easier, metrics in MeanScout can be customized with templates.
+It can be annoying to reprogram your scouting app every year to change scouting metrics. To make things easier, metrics in MeanScout can be customized with templates.
 
-To change the metrics present, simply copy and paste JSON-based templates into MeanScout.
-MeanScout comes with an example template to get you started. Here is its JSON:
+To change the metrics present, simply copy and paste JSON-based templates into MeanScout. MeanScout comes with an example template to get you started. Here is its JSON:
 
 ```json
 {
@@ -61,11 +42,9 @@ MeanScout comes with an example template to get you started. Here is its JSON:
 
 The only metrics that can't be changed are team, match, and absent.
 
-Each template should have an array of `metrics`.
-Optionally, a whitelist of `teams` can be included to help scouts correctly identify teams.
+Each template should have an array of `metrics`. Optionally, a whitelist of `teams` can be included to help scouts correctly identify teams.
 
-Each metric must have a `name` and a `type` (`toggle`, `number`, `select`, `text`, or `rating`).
-Use short/concise names for metrics to save space.
+Each metric must have a `name` and a `type` (`toggle`, `number`, `select`, `text`, or `rating`). Use short/concise names for metrics to save space.
 
 - `toggle`: a toggleable button. Value is a boolean.
 - `number`: an incremental and decremental button. Value is a number. You can set a `max` value, but the maximum will always be 99.
@@ -76,4 +55,23 @@ Use short/concise names for metrics to save space.
 Setting `group` to a truthy value moves the metric in question to a new line, as every metric will be placed next to the last.
 Setting `group` with a string will add a group label before the current metric, and metrics after will appear to be 'grouped' together.
 
-When downloaded, every metric's value will be placed in the same order the metrics were created (with team/match/absent first).
+## Exporting
+
+When saving/downloading, surveys will be stored in a JSON array. Each survey is also an array containing metric objects with names and values. Here is a sample with a single survey:
+
+```json
+[
+  [
+    { "name": "Team", "value": "2471" },
+    { "name": "Match", "value": "1" },
+    { "name": "Absent", "value": false },
+    { "name": "Toggle", "value": false },
+    { "name": "Number", "value": 3 },
+    { "name": "Select", "value": "Value 1" },
+    { "name": "Text", "value": "MeanScout is cool" },
+    { "name": "Rating", "value": 5 }
+    // ... metrics
+  ]
+  // ... surveys
+]
+```

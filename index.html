@@ -30,12 +30,12 @@
       <label>
         Location
         <select id="menu-location" onchange="setLocation(this.value)">
-          <option class="red">Red Near</option>
-          <option class="red">Red Mid</option>
-          <option class="red">Red Far</option>
-          <option class="blue">Blue Near</option>
-          <option class="blue">Blue Mid</option>
-          <option class="blue">Blue Far</option>
+          <option style="color: var(--red)">Red Near</option>
+          <option style="color: var(--red)">Red Mid</option>
+          <option style="color: var(--red)">Red Far</option>
+          <option style="color: var(--blue)">Blue Near</option>
+          <option style="color: var(--blue)">Blue Mid</option>
+          <option style="color: var(--blue)">Blue Far</option>
         </select>
       </label>
       <div>
@@ -50,14 +50,17 @@
       <div>
         Template
         <div class="flex">
-          <button onclick="editTemplate()" title="Edit">
-            <i class="pen"></i>
-          </button>
-          <button onclick="copyTemplate()" title="Copy">
+          <button onclick="copyTemplate()">
             <i class="copy"></i>
+            Copy
           </button>
-          <button onclick="setTemplate()" title="Reset">
+          <button onclick="editTemplate()">
+            <i class="pen"></i>
+            Edit
+          </button>
+          <button onclick="setTemplate()">
             <i class="undo"></i>
+            Reset
           </button>
         </div>
       </div>

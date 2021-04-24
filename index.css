@@ -1,4 +1,22 @@
 /* Based off of w3.css - https://www.w3schools.com/w3css/ */
+
+:root {
+  --red: #f44336;
+  --blue: #2196f3;
+  --theme-color: var(--red);
+  --main-color: #fff;
+  --bg-color: #000;
+}
+#title, #nav-location, input, select, i, svg, .inc {
+  color: var(--theme-color);
+}
+@media (prefers-color-scheme: light) {
+  :root {
+    --main-color: #000;
+    --bg-color: #fff;
+  }
+}
+
 * {
   border-radius: 0;
   box-sizing: inherit;
@@ -9,9 +27,9 @@
   -webkit-user-select: none;
 }
 html {
-  background-color: #000;
+  background-color: var(--bg-color);
   box-sizing: border-box;
-  color: #fff;
+  color: var(--main-color);
   font-family: Verdana, sans-serif;
   font-size: 24px;
   overflow-x: hidden;
@@ -19,7 +37,7 @@ html {
 button {
   background-color: inherit;
   border: none;
-  border-bottom: 1px solid #fff;
+  border-bottom: 1px solid var(--main-color);
   color: inherit;
   cursor: pointer;
   display: inline-block;
@@ -36,9 +54,9 @@ button:active {
 input,
 select {
   appearance: textfield;
-  background-color: #000;
+  background-color: var(--bg-color);
   border: none;
-  border-bottom: 1px solid #fff;
+  border-bottom: 1px solid var(--main-color);
   display: block;
   -moz-appearance: textfield;
   padding: 8px;
@@ -53,6 +71,7 @@ svg {
   height: 24px;
   vertical-align: -.125em;
 }
+::-webkit-scrollbar,
 ::-webkit-outer-spin-button,
 ::-webkit-inner-spin-button,
 ::-webkit-calendar-picker-indicator {
@@ -90,12 +109,6 @@ svg {
 .margin-bottomleft {
   margin-bottom: 16px !important;
   margin-left: 16px !important;
-}
-.red {
-  color: #f44336 !important;
-}
-.blue {
-  color: #2196f3 !important;
 }
 .flex {
   align-items: flex-end;
@@ -171,8 +184,6 @@ svg {
   #menu {
     display: flex;
   }
-}
-@media (max-width: 800px) {
 }
 @media (max-width: 400px) {
   #title {

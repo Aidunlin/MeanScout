@@ -1,7 +1,7 @@
 // Setup code
 
 window.onbeforeunload = () => {
-  if (/aidunlin\.codes/.test(window.location.hostname)) {
+  if (/aidunlin\.com/.test(window.location.hostname)) {
     return true;
   }
 };
@@ -58,6 +58,17 @@ setLocation(localStorage.getItem("location") ?? "Red Near");
 
 // Template button functions
 
+function copyTemplate() {
+  let input = document.createElement("input");
+  input.value = JSON.stringify(currentTemplate);
+  document.body.appendChild(input);
+  input.select();
+  input.setSelectionRange(0, 99999);
+  document.execCommand("copy");
+  input.remove();
+  alert("Copied template");
+}
+
 function editTemplate() {
   let newPrompt = prompt("Paste new template (leave blank to cancel):");
   if (newPrompt) {
@@ -80,17 +91,6 @@ function editTemplate() {
     }
     setTemplate(newTemplate);
   }
-}
-
-function copyTemplate() {
-  let input = document.createElement("input");
-  input.value = JSON.stringify(currentTemplate);
-  document.body.appendChild(input);
-  input.select();
-  input.setSelectionRange(0, 99999);
-  document.execCommand("copy");
-  input.remove();
-  alert("Copied template");
 }
 
 function setTemplate(newTemplate = undefined) {
@@ -268,18 +268,9 @@ function setLocation(newLocation) {
   if (/Blue/.test(newLocation)) {
     newTheme = "blue";
   }
-  ["title", "nav-location"].forEach(id => {
-    document.getElementById(id).classList.remove(theme);
-    document.getElementById(id).classList.add(newTheme);
-  });
-  ["input", "select", "i", "svg"].forEach(tag => {
-    [...document.getElementsByTagName(tag)].forEach(element => {
-      element.classList.remove(theme);
-      element.classList.add(newTheme);
-    });
-  });
-  ["inc", "star"].forEach(cls => {
-    [...document.getElementsByClassName(cls)].forEach(element => {
+  document.documentElement.style.setProperty("--theme-color", "var(--" + newTheme + ")");
+  ["#title", "#nav-location", "input", "select", "i", "svg", ".inc"].forEach(selector => {
+    [...document.querySelectorAll(selector)].forEach(element => {
       element.classList.remove(theme);
       element.classList.add(newTheme);
     });
@@ -289,7 +280,7 @@ function setLocation(newLocation) {
   theme = newTheme;
   scoutLocation = newLocation;
   document.getElementById("menu-location").value = scoutLocation;
-  [...document.getElementsByTagName("i")].forEach(icon => icon.innerHTML = findIcon(icon.classList));
+  [...document.querySelectorAll("i")].forEach(icon => icon.innerHTML = findIcon(icon.classList));
 }
 
 // Team/match input checkers
@@ -357,13 +348,15 @@ function saveSurvey() {
   if (!confirm("Confirm save?")) {
     return;
   }
-  let values = `${team.value},${match.value},${isAbsent}`;
-  gameMetrics.forEach(metric => values += `,${metric.value},`);
-  if (localStorage.getItem("surveys")) {
-    localStorage.setItem("surveys", localStorage.getItem("surveys") + values + "\n");
-  } else {
-    localStorage.setItem("surveys", values + "\n");
-  }
+  let survey = [
+    {name: "Team", value: team.value},
+    {name: "Match", value: match.value},
+    {name: "Absent", value: isAbsent},
+  ];
+  gameMetrics.forEach(metric => survey.push({name: metric.name, value: metric.value}));
+  let surveys = JSON.parse(localStorage.getItem("surveys") ?? "[]");
+  surveys.push(survey);
+  localStorage.setItem("surveys", JSON.stringify(surveys));
   team.value = "";
   team.focus();
   matchCount = Math.min(parseInt(match.value) + 1, 999);
@@ -401,17 +394,18 @@ function saveSurvey() {
         [...stars].forEach(star => star.innerHTML = "<i class='star-empty'></i>");
     }
   }
+  setLocation(scoutLocation);
 }
 
 function downloadSurveys(askUser = true) {
   if (askUser) {
-    if (!confirm("Confirm download?")) {
+    if (!confirm("Confirm download? (Surveys in browser storage will be deleted)")) {
       return;
     }
   }
   let a = document.createElement("a");
   a.href = "data:text/plain;charset=utf-8," + encodeURIComponent(localStorage.getItem("surveys"));
-  a.download = "surveys.csv";
+  a.download = "surveys.json";
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
