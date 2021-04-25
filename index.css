@@ -1,38 +1,30 @@
-/* Based off of w3.css - https://www.w3schools.com/w3css/ */
-
 :root {
   --red: #f44336;
   --blue: #2196f3;
   --theme-color: var(--red);
   --main-color: #fff;
   --bg-color: #000;
+  color-scheme: light dark;
 }
-#title, #nav-location, input, select, i, svg, .inc {
+input, select, i, svg, #title, #nav-location, .inc {
   color: var(--theme-color);
 }
-@media (prefers-color-scheme: light) {
-  :root {
-    --main-color: #000;
-    --bg-color: #fff;
-  }
-}
-
 * {
   border-radius: 0;
-  box-sizing: inherit;
+  box-sizing: border-box;
   line-height: 1.5 !important;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  -webkit-user-select: none;
 }
 html {
   background-color: var(--bg-color);
-  box-sizing: border-box;
   color: var(--main-color);
   font-family: Verdana, sans-serif;
   font-size: 24px;
   overflow-x: hidden;
+  padding: 16px;
+}
+h1 {
+  font-size: 24px;
+  margin: 0;
 }
 button {
   background-color: inherit;
@@ -40,8 +32,6 @@ button {
   border-bottom: 1px solid var(--main-color);
   color: inherit;
   cursor: pointer;
-  display: inline-block;
-  overflow: hidden;
   padding: 8px 12px;
   text-align: center;
   text-decoration: none;
@@ -51,8 +41,7 @@ button {
 button:active {
   opacity: 0.5;
 }
-input,
-select {
+input, select {
   appearance: textfield;
   background-color: var(--bg-color);
   border: none;
@@ -71,79 +60,37 @@ svg {
   height: 24px;
   vertical-align: -.125em;
 }
-::-webkit-scrollbar,
-::-webkit-outer-spin-button,
-::-webkit-inner-spin-button,
-::-webkit-calendar-picker-indicator {
-  display: none;
-}
 
-.block {
-  display: block;
-  width: 100%;
-}
-.hide {
-  display: none !important;
-}
-.show {
-  display: block !important;
-}
-.show-flex {
-  display: flex !important;
-}
-.margin {
-  margin: 16px !important;
-}
-.margin-top {
-  margin-top: 16px !important;
-}
-.margin-bottom {
-  margin-bottom: 16px !important;
-}
-.margin-left {
-  margin-left: 16px !important;
-}
-.margin-right {
-  margin-right: 16px !important;
-}
-.margin-bottomleft {
-  margin-bottom: 16px !important;
-  margin-left: 16px !important;
-}
 .flex {
   align-items: flex-end;
   display: flex;
   flex-wrap: wrap;
 }
-.flex-center {
-  align-items: center;
-  display: flex;
-  flex-wrap: wrap;
+.column {
+  align-items: flex-start;
+  flex-direction: column;
+}
+.spaced > * {
+  margin: 8px;
+}
+.hide {
+  display: none !important;
+}
+.show {
+  display: flex !important;
 }
 .star {
   padding: 8px !important;
 }
+.group {
+  padding-top: 8px;
+}
 .inc {
   text-align: left;
-}
-.spaced > * {
-  margin-bottom: 16px !important;
-  margin-left: 16px !important;
 }
 
 #titlebar {
   align-items: center;
-  display: flex;
-  height: 52px;
-  padding-left: 8px;
-  width: 100%;
-}
-#titlebar button {
-  padding: 0;
-}
-#titlebar > * {
-  margin-left: 8px;
-  margin-right: 8px;
 }
 #titlebar * {
   border: none;
@@ -154,32 +101,31 @@ svg {
   -webkit-user-select: none;
 }
 #logo {
-  height: 29px;
-  margin-left: 8px !important;
-  margin-right: 0 !important;
+  height: 36px;
 }
 #nav-location {
   margin-left: auto;
-  margin-right: 16px;
+}
+#menu-toggle {
+  margin: 0 !important;
 }
 #menu {
   display: none;
-  margin-right: 16px;
 }
-#metric-team {
+#metric-team, #metric-match {
   width: 100px;
 }
-#metric-match {
-  width: 72px;
-}
 
+@media (prefers-color-scheme: light) {
+  :root {
+    --main-color: #000;
+    --bg-color: #fff;
+  }
+}
 @media (min-width: 800px) {
   #menu-toggle,
   #nav-location {
     display: none;
-  }
-  #logo {
-    margin-left: 16px;
   }
   #menu {
     display: flex;

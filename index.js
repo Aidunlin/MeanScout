@@ -45,7 +45,7 @@ let exampleTemplate = {
     { name: "Toggle", type: "toggle", group: "Group" },
     { name: "Number", type: "number", max: 10 },
     { name: "Select", type: "select", values: [ "Value 1", "Value 2", "Value 3" ] },
-    { name: "Text",   type: "text",   tip: "Tip" },
+    { name: "Text", type: "text", tip: "Tip" },
     { name: "Rating", type: "rating" }
   ]
 };
@@ -123,11 +123,11 @@ function loadTemplate(newTemplate) {
     document.getElementById("teams").appendChild(newOption);
   });
   document.getElementById("metrics").innerHTML = "";
-  document.getElementById("metrics").classList.remove("margin-left");
+  document.getElementById("metrics").style.marginLeft = "0";
   gameMetrics = [];
   let metricObject, newMetric;
   let currentDiv = document.createElement("div");
-  currentDiv.classList.add("flex");
+  currentDiv.classList.add("flex", "spaced");
   newTemplate.metrics.forEach((metric, i) => {
     metricObject = {
       name: metric.name,
@@ -202,17 +202,16 @@ function loadTemplate(newTemplate) {
         newMetric.appendChild(ratingBar);
         metricObject.value = 0;
     }
-    newMetric.classList.add("margin-bottomleft");
     if (metric.group) {
       if (i > 0) {
         document.getElementById("metrics").appendChild(currentDiv);
       }
       if (typeof metric.group == "string") {
-        document.getElementById("metrics").innerHTML += metric.group;
-        document.getElementById("metrics").classList.add("margin-left");
+        document.getElementById("metrics").innerHTML += "<span class='group'>" + metric.group + "</span>";
       }
       currentDiv = document.createElement("div");
-      currentDiv.classList.add("flex");
+      currentDiv.classList.add("flex", "spaced");
+      document.getElementById("metrics").style.marginLeft = "8px";
     }
     currentDiv.appendChild(newMetric);
     metricObject.element = newMetric;
@@ -269,12 +268,6 @@ function setLocation(newLocation) {
     newTheme = "blue";
   }
   document.documentElement.style.setProperty("--theme-color", "var(--" + newTheme + ")");
-  ["#title", "#nav-location", "input", "select", "i", "svg", ".inc"].forEach(selector => {
-    [...document.querySelectorAll(selector)].forEach(element => {
-      element.classList.remove(theme);
-      element.classList.add(newTheme);
-    });
-  });
   localStorage.setItem("location", newLocation);
   document.getElementById("nav-location").innerHTML = newLocation;
   theme = newTheme;
@@ -303,7 +296,7 @@ function checkMatch() {
 // Button toggles
 
 function toggleMenu() {
-  document.getElementById("menu").classList.toggle("show-flex");
+  document.getElementById("menu").classList.toggle("show");
 }
 
 function toggleAbsent() {

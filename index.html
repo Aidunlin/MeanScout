@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>MeanScout</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,user-scalable=no">
     <meta name="description" content="A lightweight FRC scouting web app.">
@@ -11,6 +10,7 @@
     <meta property="og:url" content="https://aidunlin.com/MeanScout/">
     <meta property="og:image" content="https://aidunlin.com/MeanScout/logo.png">
     <meta property="og:description" content="A lightweight FRC scouting web app.">
+    <title>MeanScout</title>
     <link rel="apple-touch-icon" href="./logo.png">
     <link rel="icon" href="./logo.png">
     <link rel="manifest" href="./manifest.json">
@@ -18,13 +18,13 @@
     <link rel="stylesheet" href="./index.css">
   </head>
   <body>
-    <div id="titlebar">
-      <button id="menu-toggle" onclick="toggleMenu()" title="Menu">
+    <div class="flex spaced" id="titlebar">
+      <img id="logo" src="./logo.png" alt>
+      <h1 id="title">MeanScout</h1>
+      <div id="nav-location"></div>
+      <button id="menu-toggle" onclick="toggleMenu()">
         <i class="bars"></i>
       </button>
-      <img id="logo" src="./logo.png" alt>
-      <b id="title">MeanScout</b>
-      <div id="nav-location"></div>
     </div>
     <div class="flex spaced" id="menu">
       <label>
@@ -65,7 +65,7 @@
         </div>
       </div>
     </div>
-    <div class="margin-right margin-top">
+    <div class="flex column">
       <div class="flex spaced" id="default">
         <label>
           Team
@@ -74,15 +74,17 @@
         <datalist id="teams"></datalist>
         <label>
           Match
-          <input id="metric-match" oninput="checkMatch()" type="number" value="1">
+          <input id="metric-match" oninput="checkMatch()" type="number" value="1" min="1">
         </label>
-        <button id="metric-absent" onclick="toggleAbsent()">
-          <i class="square-empty"></i>
-          Absent
-        </button>
+        <div>
+          <button id="metric-absent" onclick="toggleAbsent()">
+            <i class="square-empty"></i>
+            Absent
+          </button>
+        </div>
       </div>
-      <div id="metrics"></div>
-      <div class="flex spaced margin-top">
+      <div class="flex column" id="metrics"></div>
+      <div class="flex spaced">
         <button onclick="saveSurvey()">
           <i class="save"></i>
           Save
