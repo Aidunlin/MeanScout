@@ -1,96 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,user-scalable=no">
-    <meta name="description" content="A lightweight FRC scouting web app.">
-    <meta name="theme-color" content="#000000">
-    <meta property="og:title" content="MeanScout">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://aidunlin.com/MeanScout/">
-    <meta property="og:image" content="https://aidunlin.com/MeanScout/logo.png">
-    <meta property="og:description" content="A lightweight FRC scouting web app.">
-    <title>MeanScout</title>
-    <link rel="apple-touch-icon" href="./logo.png">
-    <link rel="icon" href="./logo.png">
-    <link rel="manifest" href="./manifest.json">
-    <link rel="stylesheet" href="./normalize.css">
-    <link rel="stylesheet" href="./index.css">
-  </head>
-  <body>
-    <div class="flex spaced" id="titlebar">
-      <img id="logo" src="./logo.png" alt>
-      <h1 id="title">MeanScout</h1>
-      <div id="nav-location"></div>
-      <button id="menu-toggle" onclick="toggleMenu()">
-        <i class="bars"></i>
-      </button>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,user-scalable=no">
+  <meta name="description" content="A lightweight FRC scouting web app.">
+  <meta property="og:title" content="MeanScout">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://aidunlin.com/MeanScout/">
+  <meta property="og:image" content="https://aidunlin.com/MeanScout/logo.png">
+  <meta property="og:description" content="A lightweight FRC scouting web app.">
+  <title>MeanScout</title>
+  <link rel="apple-touch-icon" href="./logo.png">
+  <link rel="icon" href="./logo.png">
+  <link rel="manifest" href="./app.webmanifest">
+  <link rel="stylesheet" href="./normalize.css">
+  <link rel="stylesheet" href="./index.css">
+</head>
+
+<body>
+  <div class="flex spaced" id="titlebar">
+    <img id="logo" src="./logo.png" alt>
+    <h1 id="title">MeanScout</h1>
+    <div id="nav-location"></div>
+    <button id="menu-toggle" onclick="toggleMenu()">
+      <i class="bars"></i>
+    </button>
+  </div>
+  <div class="flex spaced bordered" id="menu">
+    <div>
+      Location
+      <select id="menu-location" onchange="setLocation(this.value)">
+        <option class="red">Red Near</option>
+        <option class="red">Red Mid</option>
+        <option class="red">Red Far</option>
+        <option class="blue">Blue Near</option>
+        <option class="blue">Blue Mid</option>
+        <option class="blue">Blue Far</option>
+      </select>
     </div>
-    <div class="flex spaced" id="menu">
-      <label>
-        Location
-        <select id="menu-location" onchange="setLocation(this.value)">
-          <option style="color: var(--red)">Red Near</option>
-          <option style="color: var(--red)">Red Mid</option>
-          <option style="color: var(--red)">Red Far</option>
-          <option style="color: var(--blue)">Blue Near</option>
-          <option style="color: var(--blue)">Blue Mid</option>
-          <option style="color: var(--blue)">Blue Far</option>
-        </select>
-      </label>
-      <div>
-        Surveys
-        <div class="flex">
-          <button onclick="downloadSurveys()">
-            <i class="download"></i>
-            Download
-          </button>
-        </div>
-      </div>
-      <div>
-        Template
-        <div class="flex">
-          <button onclick="copyTemplate()">
-            <i class="copy"></i>
-            Copy
-          </button>
-          <button onclick="editTemplate()">
-            <i class="pen"></i>
-            Edit
-          </button>
-          <button onclick="setTemplate()">
-            <i class="undo"></i>
-            Reset
-          </button>
-        </div>
-      </div>
-    </div>
-    <div class="flex column">
-      <div class="flex spaced" id="default">
-        <label>
-          Team
-          <input id="metric-team" oninput="checkTeam()" list="teams" autofocus>
-        </label>
-        <datalist id="teams"></datalist>
-        <label>
-          Match
-          <input id="metric-match" oninput="checkMatch()" type="number" value="1" min="1">
-        </label>
-        <div>
-          <button id="metric-absent" onclick="toggleAbsent()">
-            <i class="square-empty"></i>
-            Absent
-          </button>
-        </div>
-      </div>
-      <div class="flex column" id="metrics"></div>
-      <div class="flex spaced">
-        <button onclick="saveSurvey()">
-          <i class="save"></i>
-          Save
+    <div>
+      Surveys
+      <div class="flex">
+        <button onclick="downloadSurveys()">
+          <i class="download"></i>
+          Download
         </button>
       </div>
     </div>
-    <script src="./index.js"></script>
-  </body>
+    <div>
+      Template
+      <div class="flex">
+        <button onclick="copyTemplate()">
+          <i class="copy"></i>
+        </button>
+        <button onclick="editTemplate()">
+          <i class="pen"></i>
+        </button>
+        <button onclick="setTemplate()">
+          <i class="undo"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="flex column">
+    <div class="flex spaced bordered" id="default">
+      <div>
+        Team
+        <input id="metric-team" oninput="checkTeam()" list="teams" autofocus>
+      </div>
+      <datalist id="teams"></datalist>
+      <div>
+        Match
+        <input id="metric-match" oninput="checkMatch()" type="number" value="1" min="1">
+      </div>
+      <div>
+        <button id="metric-absent" onclick="toggleAbsent()">
+          <i class="square-empty"></i>
+          Absent
+        </button>
+      </div>
+    </div>
+    <div class="flex column" id="metrics"></div>
+  </div>
+  <div class="flex spaced bordered">
+    <div>
+      <button onclick="saveSurvey()">
+        <i class="save"></i>
+        Save
+      </button>
+    </div>
+  </div>
+  <script src="./index.js"></script>
+</body>
+
 </html>

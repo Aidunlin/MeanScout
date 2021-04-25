@@ -1,10 +1,10 @@
 :root {
+  color-scheme: light dark;
   --red: #f44336;
   --blue: #2196f3;
   --theme-color: var(--red);
   --main-color: #fff;
   --bg-color: #000;
-  color-scheme: light dark;
 }
 input, select, i, svg, #title, #nav-location, .inc {
   color: var(--theme-color);
@@ -13,13 +13,15 @@ input, select, i, svg, #title, #nav-location, .inc {
   border-radius: 0;
   box-sizing: border-box;
   line-height: 1.5 !important;
+  outline: none;
 }
 html {
-  background-color: var(--bg-color);
+  background: var(--bg-color);
   color: var(--main-color);
-  font-family: Verdana, sans-serif;
+  font-family: monospace;
   font-size: 24px;
-  overflow-x: hidden;
+  margin: auto;
+  max-width: 720px;
   padding: 16px;
 }
 h1 {
@@ -27,34 +29,28 @@ h1 {
   margin: 0;
 }
 button {
-  background-color: inherit;
+  background: inherit;
   border: none;
-  border-bottom: 1px solid var(--main-color);
   color: inherit;
   cursor: pointer;
   padding: 8px 12px;
   text-align: center;
   text-decoration: none;
-  transition: opacity 0s;
   white-space: nowrap;
 }
 button:active {
-  opacity: 0.5;
+  opacity: 0.4;
 }
 input, select {
-  appearance: textfield;
-  background-color: var(--bg-color);
+  appearance: none;
+  background: var(--bg-color);
   border: none;
-  border-bottom: 1px solid var(--main-color);
   display: block;
-  -moz-appearance: textfield;
   padding: 8px;
-  -webkit-appearance: none;
   width: 100%;
 }
 select {
   cursor: pointer;
-  width: fit-content;
 }
 svg {
   height: 24px;
@@ -70,6 +66,9 @@ svg {
   align-items: flex-start;
   flex-direction: column;
 }
+.bordered > * {
+  border-bottom: 1px solid var(--main-color);
+}
 .spaced > * {
   margin: 8px;
 }
@@ -79,8 +78,14 @@ svg {
 .show {
   display: flex !important;
 }
+.red {
+  color: var(--red);
+}
+.blue {
+  color: var(--blue);
+}
 .star {
-  padding: 8px !important;
+  padding: 8px;
 }
 .group {
   padding-top: 8px;
@@ -89,19 +94,8 @@ svg {
   text-align: left;
 }
 
-#titlebar {
-  align-items: center;
-}
-#titlebar * {
-  border: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  outline: none !important;
-  user-select: none;
-  -webkit-user-select: none;
-}
 #logo {
-  height: 36px;
+  height: 32px;
 }
 #nav-location {
   margin-left: auto;
@@ -120,15 +114,6 @@ svg {
   :root {
     --main-color: #000;
     --bg-color: #fff;
-  }
-}
-@media (min-width: 800px) {
-  #menu-toggle,
-  #nav-location {
-    display: none;
-  }
-  #menu {
-    display: flex;
   }
 }
 @media (max-width: 400px) {
