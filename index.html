@@ -27,39 +27,49 @@
       <i class="bars"></i>
     </button>
   </div>
-  <div class="flex spaced bordered" id="menu">
-    <div>
-      Location
-      <select id="menu-location" onchange="setLocation(this.value)">
-        <option class="red">Red Near</option>
-        <option class="red">Red Mid</option>
-        <option class="red">Red Far</option>
-        <option class="blue">Blue Near</option>
-        <option class="blue">Blue Mid</option>
-        <option class="blue">Blue Far</option>
-      </select>
-    </div>
-    <div>
-      Surveys
-      <div class="flex">
-        <button onclick="downloadSurveys()">
-          <i class="download"></i>
-          Download
-        </button>
+  <div class="flex" id="menu">
+    <span class="group">Options</span>
+    <div class="flex spaced bordered">
+      <div>
+        Location
+        <select id="menu-location" onchange="setLocation(this.value)">
+          <option class="red">Red Near</option>
+          <option class="red">Red Mid</option>
+          <option class="red">Red Far</option>
+          <option class="blue">Blue Near</option>
+          <option class="blue">Blue Mid</option>
+          <option class="blue">Blue Far</option>
+        </select>
       </div>
-    </div>
-    <div>
-      Template
-      <div class="flex">
-        <button onclick="copyTemplate()">
-          <i class="copy"></i>
-        </button>
-        <button onclick="editTemplate()">
-          <i class="pen"></i>
-        </button>
-        <button onclick="setTemplate()">
-          <i class="undo"></i>
-        </button>
+      <div>
+        Surveys
+        <div class="flex">
+          <button onclick="downloadSurveys()">
+            <i class="download"></i>
+            Download
+          </button>
+          <button onclick="eraseSurveys()">
+            <i class="eraser"></i>
+            Erase
+          </button>
+        </div>
+      </div>
+      <div>
+        Template
+        <div class="flex">
+          <button onclick="copyTemplate()">
+            <i class="copy"></i>
+            Copy
+          </button>
+          <button onclick="editTemplate()">
+            <i class="pen"></i>
+            Edit
+          </button>
+          <button onclick="setTemplate()">
+            <i class="undo"></i>
+            Reset
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -83,12 +93,21 @@
     </div>
     <div class="flex column" id="metrics"></div>
   </div>
-  <div class="flex spaced bordered">
-    <div>
-      <button onclick="saveSurvey()">
-        <i class="save"></i>
-        Save
-      </button>
+  <div class="flex column">
+    <span class="group">Survey</span>
+    <div class="flex spaced bordered">
+      <div>
+        <button onclick="saveSurvey()">
+          <i class="save"></i>
+          Save
+        </button>
+      </div>
+      <div>
+        <button onclick="resetSurvey()">
+          <i class="undo"></i>
+          Reset
+        </button>
+      </div>
     </div>
   </div>
   <script src="./index.js"></script>

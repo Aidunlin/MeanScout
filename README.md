@@ -49,7 +49,7 @@ Each metric must have a `name` and a `type` (`toggle`, `number`, `select`, `text
 - `toggle`: a toggleable button. Value is a boolean.
 - `number`: an incremental and decremental button. Value is a number. You can set a `max` value, but the maximum will always be 99.
 - `select`: a dropdown selector. Value is a string (selected option). There must be an array of string `values` to create options for the selector.
-- `text`: a text input. Value is a string. Setting a `tip` value will add a placeholder within the input field. Setting `length` to `"long"` will produce a full-width input.
+- `text`: a text input. Value is a string. Setting a `tip` value will add a placeholder within the input field.
 - `rating`: a star rating bar. Value is a number (0-5). You can reset the rating bar to 0 by tapping the first star twice.
 
 Setting `group` to true (or a string) moves the metric in question to a new line, as every metric will be placed next to the last.

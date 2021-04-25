@@ -6,14 +6,16 @@
   --main-color: #fff;
   --bg-color: #000;
 }
-input, select, i, svg, #title, #nav-location, .inc {
+input, select, i, svg, #title, #nav-location, .number {
   color: var(--theme-color);
+}
+#menu-toggle * {
+  color: var(--main-color);
 }
 * {
   border-radius: 0;
   box-sizing: border-box;
   line-height: 1.5 !important;
-  outline: none;
 }
 html {
   background: var(--bg-color);
@@ -21,10 +23,11 @@ html {
   font-family: monospace;
   font-size: 24px;
   margin: auto;
-  max-width: 720px;
-  padding: 16px;
+  max-width: 600px;
+  padding: 4px;
 }
 h1 {
+  border-bottom: 1px solid var(--main-color);
   font-size: 24px;
   margin: 0;
 }
@@ -38,11 +41,9 @@ button {
   text-decoration: none;
   white-space: nowrap;
 }
-button:active {
-  opacity: 0.4;
-}
 input, select {
   appearance: none;
+  -webkit-appearance: none;
   background: var(--bg-color);
   border: none;
   display: block;
@@ -66,8 +67,8 @@ svg {
   align-items: flex-start;
   flex-direction: column;
 }
-.bordered > * {
-  border-bottom: 1px solid var(--main-color);
+#menu, .bordered input, .bordered select, .bordered button {
+  background: rgba(127, 127, 127, 0.2);
 }
 .spaced > * {
   margin: 8px;
@@ -84,11 +85,17 @@ svg {
 .blue {
   color: var(--blue);
 }
+.number {
+  display: inline-block;
+  min-width: 100%;
+}
 .star {
   padding: 8px;
 }
 .group {
-  padding-top: 8px;
+  border-bottom: 1px solid var(--main-color);
+  margin-top: 8px;
+  margin-left: 8px;
 }
 .inc {
   text-align: left;
@@ -101,13 +108,25 @@ svg {
   margin-left: auto;
 }
 #menu-toggle {
-  margin: 0 !important;
+  margin: 0;
 }
 #menu {
   display: none;
 }
-#metric-team, #metric-match {
+#metric-team {
   width: 100px;
+}
+#metric-match {
+  max-width: fit-content;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type=number] {
+  -moz-appearance: textfield;
 }
 
 @media (prefers-color-scheme: light) {

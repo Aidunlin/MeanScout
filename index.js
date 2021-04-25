@@ -16,6 +16,7 @@ const icons = {
   "bars": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 512'><path fill='currentColor' d='M16 132h416c8.837 0 16-7.163 16-16V76c0-8.837-7.163-16-16-16H16C7.163 60 0 67.163 0 76v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z'></path></svg>",
   "copy": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 512'><path fill='currentColor' d='M320 448v40c0 13.255-10.745 24-24 24H24c-13.255 0-24-10.745-24-24V120c0-13.255 10.745-24 24-24h72v296c0 30.879 25.121 56 56 56h168zm0-344V0H152c-13.255 0-24 10.745-24 24v368c0 13.255 10.745 24 24 24h272c13.255 0 24-10.745 24-24V128H344c-13.2 0-24-10.8-24-24zm120.971-31.029L375.029 7.029A24 24 0 0 0 358.059 0H352v96h96v-6.059a24 24 0 0 0-7.029-16.97z'></path></svg>",
   "download": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path fill='currentColor' d='M216 0h80c13.3 0 24 10.7 24 24v168h87.7c17.8 0 26.7 21.5 14.1 34.1L269.7 378.3c-7.5 7.5-19.8 7.5-27.3 0L90.1 226.1c-12.6-12.6-3.7-34.1 14.1-34.1H192V24c0-13.3 10.7-24 24-24zm296 376v112c0 13.3-10.7 24-24 24H24c-13.3 0-24-10.7-24-24V376c0-13.3 10.7-24 24-24h146.7l49 49c20.1 20.1 52.5 20.1 72.6 0l49-49H488c13.3 0 24 10.7 24 24zm-124 88c0-11-9-20-20-20s-20 9-20 20 9 20 20 20 20-9 20-20zm64 0c0-11-9-20-20-20s-20 9-20 20 9 20 20 20 20-9 20-20z'></path></svg>",
+  "eraser": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path fill='currentColor' d='M497.941 273.941c18.745-18.745 18.745-49.137 0-67.882l-160-160c-18.745-18.745-49.136-18.746-67.883 0l-256 256c-18.745 18.745-18.745 49.137 0 67.882l96 96A48.004 48.004 0 0 0 144 480h356c6.627 0 12-5.373 12-12v-40c0-6.627-5.373-12-12-12H355.883l142.058-142.059zm-302.627-62.627l137.373 137.373L265.373 416H150.628l-80-80 124.686-124.686z'></path></svg>",
   "pen": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path fill='currentColor' d='M290.74 93.24l128.02 128.02-277.99 277.99-114.14 12.6C11.35 513.54-1.56 500.62.14 485.34l12.7-114.22 277.9-277.88zm207.2-19.06l-60.11-60.11c-18.75-18.75-49.16-18.75-67.91 0l-56.55 56.55 128.02 128.02 56.55-56.55c18.75-18.76 18.75-49.16 0-67.91z'></path></svg>",
   "question": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 384 512'><path fill='currentColor' d='M202.021 0C122.202 0 70.503 32.703 29.914 91.026c-7.363 10.58-5.093 25.086 5.178 32.874l43.138 32.709c10.373 7.865 25.132 6.026 33.253-4.148 25.049-31.381 43.63-49.449 82.757-49.449 30.764 0 68.816 19.799 68.816 49.631 0 22.552-18.617 34.134-48.993 51.164-35.423 19.86-82.299 44.576-82.299 106.405V320c0 13.255 10.745 24 24 24h72.471c13.255 0 24-10.745 24-24v-5.773c0-42.86 125.268-44.645 125.268-160.627C377.504 66.256 286.902 0 202.021 0zM192 373.459c-38.196 0-69.271 31.075-69.271 69.271 0 38.195 31.075 69.27 69.271 69.27s69.271-31.075 69.271-69.271-31.075-69.27-69.271-69.27z'></path></svg>",
   "save": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 512'><path fill='currentColor' d='M433.941 129.941l-83.882-83.882A48 48 0 0 0 316.118 32H48C21.49 32 0 53.49 0 80v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V163.882a48 48 0 0 0-14.059-33.941zM224 416c-35.346 0-64-28.654-64-64 0-35.346 28.654-64 64-64s64 28.654 64 64c0 35.346-28.654 64-64 64zm96-304.52V212c0 6.627-5.373 12-12 12H76c-6.627 0-12-5.373-12-12V108c0-6.627 5.373-12 12-12h228.52c3.183 0 6.235 1.264 8.485 3.515l3.48 3.48A11.996 11.996 0 0 1 320 111.48z'></path></svg>",
@@ -139,20 +140,19 @@ function loadTemplate(newTemplate) {
         break;
       case "number":
         newMetric.innerHTML = metric.name + "<br>";
-        let incButton = document.createElement("button");
-        incButton.classList.add("inc");
-        incButton.innerHTML = "00";
-        incButton.onclick = () => change(i, metric.type, 1);
-        newMetric.append(incButton);
-        let decButton = document.createElement("button");
-        decButton.classList.add("dec");
-        decButton.innerHTML = "−";
-        decButton.onclick = () => change(i, metric.type, -1);
-        newMetric.append(decButton);
+        let number = document.createElement("input");
+        number.classList.add("number");
+        number.type = "number";
+        number.value = "0";
+        number.min = "0";
+        number.max = "99";
+        number.onchange = () => change(i, metric.type);
+        newMetric.append(number);
         metricObject.value = 0;
         metricObject.max = 99;
-        if (metric.max) {
-          metricObject.max = Math.min(metric.max, 99);
+        if (metric.max < 99) {
+          metricObject.max = metric.max;
+          number.max = metric.max;
         }
         break;
       case "select":
@@ -170,9 +170,7 @@ function loadTemplate(newTemplate) {
         break;
       case "text":
         newMetric.innerHTML = metric.name;
-        if (metric.length == "long") {
-          newMetric.style.width = "100%";
-        }
+        newMetric.style.width = "100%";
         let input = document.createElement("input");
         input.placeholder = metric.tip ?? "";
         input.oninput = () => change(i, metric.type);
@@ -202,7 +200,6 @@ function loadTemplate(newTemplate) {
       }
       currentDiv = document.createElement("div");
       currentDiv.classList.add("flex", "spaced", "bordered");
-      metricsDiv.style.marginLeft = "8px";
     }
     currentDiv.append(newMetric);
     metricObject.element = newMetric;
@@ -223,10 +220,7 @@ function change(i, type, data = 0) {
       gameMetrics[i].value = !gameMetrics[i].value;
       break;
     case "number":
-      gameMetrics[i].value = Math.max(gameMetrics[i].value + data, 0);
-      gameMetrics[i].value = Math.min(gameMetrics[i].value, gameMetrics[i].max);
-      let inc = gameMetrics[i].element.querySelector(".inc");
-      inc.innerHTML = (`0${gameMetrics[i].value}`).slice(-2);
+      gameMetrics[i].value = gameMetrics[i].element.querySelector(".number").value;
       break;
     case "select":
       let select = gameMetrics[i].element.querySelector("select");
@@ -343,6 +337,15 @@ function saveSurvey() {
   let surveys = JSON.parse(localStorage.getItem("surveys") ?? "[]");
   surveys.push(survey);
   localStorage.setItem("surveys", JSON.stringify(surveys));
+  resetSurvey(false);
+}
+
+function resetSurvey(askUser = true) {
+  if (askUser) {
+    if (!confirm("Confirm reset?")) {
+      return;
+    }
+  }
   teamMetric.value = "";
   teamMetric.focus();
   matchCount = Math.min(parseInt(matchMetric.value) + 1, 999);
@@ -367,7 +370,7 @@ function saveSurvey() {
         break;
       case "number":
         gameMetrics[i].value = 0;
-        gameMetrics[i].element.querySelector(".inc").innerHTML = "00";
+        gameMetrics[i].element.querySelector(".number").value = "0";
         break;
       case "select":
         gameMetrics[i].value = gameMetrics[i].element.querySelector("option").value;
@@ -394,5 +397,10 @@ function downloadSurveys(askUser = true) {
   document.body.append(a);
   a.click();
   document.body.removeChild(a);
-  localStorage.removeItem("surveys");
+}
+
+function eraseSurveys() {
+  if (!confirm("Confirm erase?")) {
+    localStorage.removeItem("surveys");
+  }
 }
