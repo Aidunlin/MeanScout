@@ -14,7 +14,7 @@ class ToggleMetric extends Metric {
   reset() {
     this.element.innerHTML = "";
     this.button = document.createElement("button");
-    this.button.innerHTML = "<i class='square-empty'></i> " + this.name;
+    this.button.innerHTML = `<i class='square-empty'></i> ${this.name}`;
     this.button.onclick = () => this.change();
     this.element.append(this.button);
     this.value = false;
@@ -32,19 +32,18 @@ class ToggleMetric extends Metric {
 }
 
 class NumberMetric extends Metric {
-  constructor(name, max) {
+  constructor(name) {
     super(name);
-    this.max = Math.min(max, 99);
     this.reset();
   }
   reset() {
-    this.element.innerHTML = this.name + "<br>";
+    this.element.innerHTML = this.name;
     this.input = document.createElement("input");
     this.input.classList.add("number");
     this.input.type = "number";
-    this.input.value = "0";
-    this.input.min = "0";
-    this.input.max = this.max;
+    this.input.value = 0;
+    this.input.min = 0;
+    this.input.max = 99;
     this.input.onchange = () => this.change();
     this.element.append(this.input);
     this.value = 0;
@@ -120,21 +119,13 @@ class RatingMetric extends Metric {
   change(i) {
     let stars = this.ratingBar.children;
     [...stars].forEach(star => star.innerHTML = "<i class='star-empty'></i>");
-    if (i == 0 && this.value == 1) {
-      this.value = 0;
-    } else {
+    if (i == 0 && this.value == 1) this.value = 0;
+    else {
       for (let j = 0; j < i + 1; j++) {
         stars[j].innerHTML = "<i class='star-filled'></i>";
       }
       this.value = i + 1;
     }
-    [...this.ratingBar.querySelectorAll("i")].forEach(icon => {
-      icon.innerHTML = icons.question;
-      for (const i in icons) {
-        if (icon.classList.contains(i)) {
-          icon.innerHTML = icons[i];
-        }
-      }
-    });
+    refreshIcons();
   }
 }

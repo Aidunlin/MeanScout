@@ -32,7 +32,7 @@ To change the metrics present, simply copy and paste JSON-based templates into M
 {
   "metrics": [
     { "name": "Toggle", "type": "toggle", "group": "Group" },
-    { "name": "Number", "type": "number", "max": 10 },
+    { "name": "Number", "type": "number" },
     { "name": "Select", "type": "select", "values": ["Value 1", "Value 2", "Value 3"] },
     { "name": "Text",   "type": "text",   "tip": "Tip" },
     { "name": "Rating", "type": "rating" }
@@ -47,13 +47,12 @@ Each template should have an array of `metrics`. Optionally, a whitelist of `tea
 Each metric must have a `name` and a `type` (`toggle`, `number`, `select`, `text`, or `rating`). Use short/concise names for metrics to save space.
 
 - `toggle`: a toggleable button. Value is a boolean.
-- `number`: an incremental and decremental button. Value is a number. You can set a `max` value, but the maximum will always be 99.
+- `number`: an incremental and decremental button. Value is a number between 0 and 99.
 - `select`: a dropdown selector. Value is a string (selected option). There must be an array of string `values` to create options for the selector.
 - `text`: a text input. Value is a string. Setting a `tip` value will add a placeholder within the input field.
 - `rating`: a star rating bar. Value is a number (0-5). You can reset the rating bar to 0 by tapping the first star twice.
 
-Setting `group` to true (or a string) moves the metric in question to a new line, as every metric will be placed next to the last.
-Setting `group` with a string will add a group label before the current metric, and metrics after will appear to be grouped together.
+Setting `group` to a string adds a label before the metric and moves the metric to a new line. Metrics after will appear to be grouped together.
 
 ## Exporting
 

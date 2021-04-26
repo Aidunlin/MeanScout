@@ -1,16 +1,12 @@
 window.onbeforeunload = () => {
-  if (/aidunlin\.com/.test(window.location.hostname)) {
-    return true;
-  }
+  if (/aidunlin\.com/.test(window.location.hostname)) return true;
 };
 
 if ("serviceWorker" in navigator) {
-  window.onload = () => {
-    navigator.serviceWorker.register("./sw.js");
-  };
+  window.onload = () => navigator.serviceWorker.register("./sw.js");
 }
 
-const icons = {
+let icons = {
   "bars": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 512'><path fill='currentColor' d='M16 132h416c8.837 0 16-7.163 16-16V76c0-8.837-7.163-16-16-16H16C7.163 60 0 67.163 0 76v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z'></path></svg>",
   "copy": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 512'><path fill='currentColor' d='M320 448v40c0 13.255-10.745 24-24 24H24c-13.255 0-24-10.745-24-24V120c0-13.255 10.745-24 24-24h72v296c0 30.879 25.121 56 56 56h168zm0-344V0H152c-13.255 0-24 10.745-24 24v368c0 13.255 10.745 24 24 24h272c13.255 0 24-10.745 24-24V128H344c-13.2 0-24-10.8-24-24zm120.971-31.029L375.029 7.029A24 24 0 0 0 358.059 0H352v96h96v-6.059a24 24 0 0 0-7.029-16.97z'></path></svg>",
   "download": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path fill='currentColor' d='M216 0h80c13.3 0 24 10.7 24 24v168h87.7c17.8 0 26.7 21.5 14.1 34.1L269.7 378.3c-7.5 7.5-19.8 7.5-27.3 0L90.1 226.1c-12.6-12.6-3.7-34.1 14.1-34.1H192V24c0-13.3 10.7-24 24-24zm296 376v112c0 13.3-10.7 24-24 24H24c-13.3 0-24-10.7-24-24V376c0-13.3 10.7-24 24-24h146.7l49 49c20.1 20.1 52.5 20.1 72.6 0l49-49H488c13.3 0 24 10.7 24 24zm-124 88c0-11-9-20-20-20s-20 9-20 20 9 20 20 20 20-9 20-20zm64 0c0-11-9-20-20-20s-20 9-20 20 9 20 20 20 20-9 20-20z'></path></svg>",
@@ -25,13 +21,22 @@ const icons = {
   "undo": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path fill='currentColor' d='M212.333 224.333H12c-6.627 0-12-5.373-12-12V12C0 5.373 5.373 0 12 0h48c6.627 0 12 5.373 12 12v78.112C117.773 39.279 184.26 7.47 258.175 8.007c136.906.994 246.448 111.623 246.157 248.532C504.041 393.258 393.12 504 256.333 504c-64.089 0-122.496-24.313-166.51-64.215-5.099-4.622-5.334-12.554-.467-17.42l33.967-33.967c4.474-4.474 11.662-4.717 16.401-.525C170.76 415.336 211.58 432 256.333 432c97.268 0 176-78.716 176-176 0-97.267-78.716-176-176-176-58.496 0-110.28 28.476-142.274 72.333h98.274c6.627 0 12 5.373 12 12v48c0 6.627-5.373 12-12 12z'></path></svg>"
 };
 
-let metricsDiv = document.querySelector("#metrics");
+function refreshIcons() {
+  [...document.querySelectorAll("i")].forEach(icon => {
+    icon.innerHTML = icons.question;
+    for (let newIcon in icons) {
+      if (icon.classList.contains(newIcon)) icon.innerHTML = icons[newIcon];
+    }
+  });
+}
+
+let customMetrics = document.querySelector("#metrics-custom");
+
 let teamMetric = document.querySelector("#metric-team");
 let teamsList = document.querySelector("#teams");
 let matchMetric = document.querySelector("#metric-match");
 let absentMetric = document.querySelector("#metric-absent");
 
-let theme = "red";
 let scoutLocation = "Red Near";
 let matchCount = 1;
 let isAbsent = false;
@@ -39,7 +44,7 @@ let gameMetrics = [];
 let exampleTemplate = {
   metrics: [
     { name: "Toggle", type: "toggle", group: "Group" },
-    { name: "Number", type: "number", max: 10 },
+    { name: "Number", type: "number" },
     { name: "Select", type: "select", values: ["Value 1", "Value 2", "Value 3"] },
     { name: "Text", type: "text", tip: "Tip" },
     { name: "Rating", type: "rating" }
@@ -48,8 +53,6 @@ let exampleTemplate = {
 let currentTemplate = JSON.parse(localStorage.getItem("template") ?? JSON.stringify(exampleTemplate));
 loadTemplate(currentTemplate);
 setLocation(localStorage.getItem("location") ?? "Red Near");
-
-
 
 function copyTemplate() {
   let input = document.createElement("input");
@@ -68,17 +71,12 @@ function editTemplate() {
     let newTemplate = JSON.parse(newPrompt);
     let error = false;
     if (newTemplate.metrics) {
-      newTemplate.metrics.forEach((metric, i) => {
-        if (!metric.name
-          || ((metric.max ?? 1) < 1)
-          || !Array.isArray(metric.values ?? [])
-          || !/toggle|number|select|text|rating/.test(metric.type)) {
-          error = "Metric is invalid";
-        }
-      });
-    } else {
-      error = "Template is invalid";
-    }
+      for (let metric of newTemplate.metrics) {
+        if (!metric.name) error = "Metric has no name";
+        if (!Array.isArray(metric.values ?? [])) error = "Metric has invalid values";
+        if (!/toggle|number|select|text|rating/.test(metric.type)) error = "Metric has invalid type";
+      }
+    } else error = "Template has no metrics";
     if (error) {
       alert(`Could not set template! ${error}`);
       return;
@@ -88,11 +86,7 @@ function editTemplate() {
 }
 
 function setTemplate(newTemplate = undefined) {
-  if (!newTemplate) {
-    if (!confirm("Confirm reset?")) {
-      return;
-    }
-  }
+  if (!newTemplate) if (!confirm("Confirm reset?")) return;
   if (newTemplate) {
     currentTemplate = JSON.parse(JSON.stringify(newTemplate));
     localStorage.setItem("template", JSON.stringify(currentTemplate));
@@ -100,11 +94,9 @@ function setTemplate(newTemplate = undefined) {
     currentTemplate = JSON.parse(JSON.stringify(exampleTemplate));
     localStorage.removeItem("template");
   }
-  if (localStorage.getItem("surveys")) {
-    downloadSurveys(false);
-  }
+  if (localStorage.getItem("surveys")) downloadSurveys(false);
   loadTemplate(currentTemplate);
-  setLocation(scoutLocation);
+  refreshIcons();
 }
 
 function loadTemplate(newTemplate) {
@@ -114,16 +106,16 @@ function loadTemplate(newTemplate) {
     newOption.value = team;
     teamsList.append(newOption);
   });
-  metricsDiv.innerHTML = "";
+  customMetrics.innerHTML = "";
   gameMetrics = [];
   let metricObject;
-  newTemplate.metrics.forEach((metric, i) => {
+  newTemplate.metrics.forEach(metric => {
     switch (metric.type) {
       case "toggle":
         metricObject = new ToggleMetric(metric.name);
         break;
       case "number":
-        metricObject = new NumberMetric(metric.name, metric.max);
+        metricObject = new NumberMetric(metric.name);
         break;
       case "select":
         metricObject = new SelectMetric(metric.name, metric.values);
@@ -135,61 +127,37 @@ function loadTemplate(newTemplate) {
         metricObject = new RatingMetric(metric.name);
         break;
     }
-    if (metric.group) {
-      if (i > 0) {
-        metricsDiv.append(currentDiv);
-      }
-      if (typeof metric.group == "string") {
-        metricsDiv.innerHTML += "<span class='group'>" + metric.group + "</span>";
-      }
-    }
-    metricsDiv.append(metricObject.element);
+    if (metric.group) customMetrics.innerHTML += `<span class='group'>${metric.group}</span>`;
+    customMetrics.append(metricObject.element);
     gameMetrics.push(metricObject);
   });
 }
 
-
-
 function setLocation(newLocation) {
   let newTheme = "red";
-  if (/blue/.test(newLocation.toLowerCase())) {
-    newTheme = "blue";
-  }
-  document.documentElement.style.setProperty("--theme-color", "var(--" + newTheme + ")");
+  if (/blue/.test(newLocation.toLowerCase())) newTheme = "blue";
+  document.documentElement.style.setProperty("--theme-color", `var(--${newTheme})`);
   localStorage.setItem("location", newLocation);
   document.querySelector("#nav-location").innerHTML = newLocation;
-  theme = newTheme;
   scoutLocation = newLocation;
   document.querySelector("#menu-location").value = scoutLocation;
-  [...document.querySelectorAll("i")].forEach(icon => {
-    icon.innerHTML = icons.question;
-    for (const i in icons) {
-      if (icon.classList.contains(i)) {
-        icon.innerHTML = icons[i];
-      }
-    }
-  });
+  refreshIcons();
 }
-
-
 
 function toggleMenu() {
   document.querySelector("#menu").classList.toggle("show");
+  document.querySelector("#menu-toggle").classList.toggle("bg");
 }
 
 document.querySelector("#menu-toggle").onclick = () => toggleMenu();
 
 function toggleAbsent() {
-  metricsDiv.classList.toggle("hide");
+  customMetrics.classList.toggle("hide");
   absentMetric.innerHTML = "";
   let newIcon = document.createElement("i");
-  if (isAbsent) {
-    newIcon.classList.add("square-empty");
-    newIcon.innerHTML = icons["square-empty"];
-  } else {
-    newIcon.classList.add("square-checked");
-    newIcon.innerHTML = icons["square-checked"];
-  }
+  let newClass = `square-${isAbsent ? "empty" : "checked"}`;
+  newIcon.classList.add(newClass);
+  newIcon.innerHTML = icons[newClass];
   absentMetric.append(newIcon);
   absentMetric.innerHTML += " Absent";
   isAbsent = !isAbsent;
@@ -197,29 +165,25 @@ function toggleAbsent() {
 
 absentMetric.onclick = () => toggleAbsent();
 
-
-
 function saveSurvey() {
   if (!/^\d{1,4}[A-Z]?$/.test(teamMetric.value)) {
-    alert("Please enter a proper team value!");
+    alert("Invalid team value");
     teamMetric.focus();
     return;
   }
   if (currentTemplate.teams) {
-    if (!currentTemplate.teams.some((t) => t == teamMetric.value)) {
-      alert("Unaccepted team value!");
+    if (!currentTemplate.teams.some(team => team == teamMetric.value)) {
+      alert("Invalid team value");
       teamMetric.focus();
       return;
     }
   }
   if (!/\d{1,3}/.test(matchMetric.value)) {
-    alert("Please enter a proper match value!");
+    alert("Invalid match value");
     matchMetric.focus();
     return;
   }
-  if (!confirm("Confirm save?")) {
-    return;
-  }
+  if (!confirm("Confirm save?")) return;
   let survey = [
     { name: "Team", value: teamMetric.value },
     { name: "Match", value: matchMetric.value },
@@ -233,38 +197,27 @@ function saveSurvey() {
 }
 
 function resetSurvey(askUser = true) {
-  if (askUser) {
-    if (!confirm("Confirm reset?")) {
-      return;
-    }
-  }
+  if (askUser) if (!confirm("Confirm reset?")) return;
   teamMetric.value = "";
   teamMetric.focus();
-  matchCount = Math.min(parseInt(matchMetric.value) + 1, 999);
+  matchCount = Math.min(parseInt(matchMetric.value) + 1, 200);
   matchMetric.value = matchCount;
-  if (isAbsent) {
-    toggleAbsent();
-  }
+  if (isAbsent) toggleAbsent();
   gameMetrics.forEach(metric => metric.reset());
   setLocation(scoutLocation);
 }
 
 function downloadSurveys(askUser = true) {
-  if (askUser) {
-    if (!confirm("Confirm download?")) {
-      return;
-    }
-  }
-  let a = document.createElement("a");
-  a.href = "data:text/plain;charset=utf-8," + encodeURIComponent(localStorage.getItem("surveys"));
-  a.download = "surveys.json";
-  document.body.append(a);
-  a.click();
-  document.body.removeChild(a);
+  if (askUser) if (!confirm("Confirm download?")) return;
+  let anchor = document.createElement("a");
+  anchor.href = "data:text/plain;charset=utf-8,";
+  anchor.href += encodeURIComponent(localStorage.getItem("surveys"));
+  anchor.download = "surveys.json";
+  document.body.append(anchor);
+  anchor.click();
+  document.body.remove(anchor);
 }
 
 function eraseSurveys() {
-  if (!confirm("Confirm erase?")) {
-    localStorage.removeItem("surveys");
-  }
+  if (!confirm("Confirm erase?")) localStorage.removeItem("surveys");
 }

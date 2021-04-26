@@ -15,7 +15,7 @@ input, select, i, svg, #title, #nav-location, .number {
 * {
   border-radius: 0;
   box-sizing: border-box;
-  line-height: 1.5 !important;
+  line-height: 1.25 !important;
 }
 html {
   background: var(--bg-color);
@@ -63,10 +63,6 @@ svg {
   display: flex;
   flex-wrap: wrap;
 }
-.column {
-  align-items: flex-start;
-  flex-direction: column;
-}
 #menu, .bg input, .bg select, .bg button {
   background: rgba(127, 127, 127, 0.2);
 }
@@ -86,8 +82,7 @@ svg {
   color: var(--blue);
 }
 .number {
-  display: inline-block;
-  min-width: 100%;
+  width: 56px;
 }
 .star {
   padding: 8px;
@@ -101,7 +96,7 @@ svg {
 }
 
 #logo {
-  height: 32px;
+  height: 30px;
 }
 #nav-location {
   margin-left: auto;
@@ -109,14 +104,14 @@ svg {
 #menu-toggle {
   margin: 0;
 }
+#menu-toggle.bg {
+  background: rgba(127, 127, 127, 0.2);
+}
 #menu {
   display: none;
 }
 #metric-team {
   width: 100px;
-}
-#metric-match {
-  max-width: 80px;
 }
 
 input::-webkit-outer-spin-button,

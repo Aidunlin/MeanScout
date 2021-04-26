@@ -53,22 +53,22 @@
       </div>
     </div>
   </div>
-  <div class="flex column">
-    <div class="flex spaced bg" id="default">
+  <div class="flex" id="metrics">
+    <div class="flex spaced bg" id="metrics-default">
       <div>Team
-        <input id="metric-team" list="teams" autofocus>
+        <input id="metric-team" list="teams" autofocus maxlength="5">
+        <datalist id="teams"></datalist>
       </div>
-      <datalist id="teams"></datalist>
       <div>Match
-        <input id="metric-match" type="number" value="1" min="1">
+        <input id="metric-match" type="number" value="1" min="1" max="200">
       </div>
       <div>
         <button id="metric-absent"><i class="square-empty"></i> Absent</button>
       </div>
     </div>
-    <div class="flex spaced bg" id="metrics"></div>
+    <div class="flex spaced bg" id="metrics-custom"></div>
   </div>
-  <div class="flex column">
+  <div class="flex">
     <span class="group">Survey</span>
     <div class="flex spaced bg">
       <div>
