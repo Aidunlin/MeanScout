@@ -27,8 +27,8 @@ html {
   padding: 4px;
 }
 h1 {
-  border-bottom: 1px solid var(--main-color);
   font-size: 24px;
+  font-weight: bold;
   margin: 0;
 }
 button {
@@ -67,7 +67,7 @@ svg {
   align-items: flex-start;
   flex-direction: column;
 }
-#menu, .bordered input, .bordered select, .bordered button {
+#menu, .bg input, .bg select, .bg button {
   background: rgba(127, 127, 127, 0.2);
 }
 .spaced > * {
@@ -93,12 +93,11 @@ svg {
   padding: 8px;
 }
 .group {
-  border-bottom: 1px solid var(--main-color);
+  font-weight: bold;
+  width: 100%;
   margin-top: 8px;
   margin-left: 8px;
-}
-.inc {
-  text-align: left;
+  margin-bottom: 0;
 }
 
 #logo {
@@ -117,7 +116,7 @@ svg {
   width: 100px;
 }
 #metric-match {
-  max-width: fit-content;
+  max-width: 80px;
 }
 
 input::-webkit-outer-spin-button,

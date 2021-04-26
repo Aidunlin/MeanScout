@@ -1,5 +1,3 @@
-// Setup code
-
 window.onbeforeunload = () => {
   if (/aidunlin\.com/.test(window.location.hostname)) {
     return true;
@@ -51,7 +49,7 @@ let currentTemplate = JSON.parse(localStorage.getItem("template") ?? JSON.string
 loadTemplate(currentTemplate);
 setLocation(localStorage.getItem("location") ?? "Red Near");
 
-// Template button functions
+
 
 function copyTemplate() {
   let input = document.createElement("input");
@@ -109,8 +107,6 @@ function setTemplate(newTemplate = undefined) {
   setLocation(scoutLocation);
 }
 
-// Template code
-
 function loadTemplate(newTemplate) {
   teamsList.innerHTML = "";
   newTemplate.teams?.forEach(team => {
@@ -119,77 +115,25 @@ function loadTemplate(newTemplate) {
     teamsList.append(newOption);
   });
   metricsDiv.innerHTML = "";
-  metricsDiv.style.marginLeft = "0";
   gameMetrics = [];
-  let metricObject, newMetric;
-  let currentDiv = document.createElement("div");
-  currentDiv.classList.add("flex", "spaced", "bordered");
+  let metricObject;
   newTemplate.metrics.forEach((metric, i) => {
-    metricObject = {
-      name: metric.name,
-      type: metric.type
-    };
-    newMetric = document.createElement("div");
     switch (metric.type) {
       case "toggle":
-        let button = document.createElement("button");
-        button.innerHTML = "<i class='square-empty'></i> " + metric.name;
-        button.onclick = () => change(i, metric.type);
-        newMetric.append(button);
-        metricObject.value = false;
+        metricObject = new ToggleMetric(metric.name);
         break;
       case "number":
-        newMetric.innerHTML = metric.name + "<br>";
-        let number = document.createElement("input");
-        number.classList.add("number");
-        number.type = "number";
-        number.value = "0";
-        number.min = "0";
-        number.max = "99";
-        number.onchange = () => change(i, metric.type);
-        newMetric.append(number);
-        metricObject.value = 0;
-        metricObject.max = 99;
-        if (metric.max < 99) {
-          metricObject.max = metric.max;
-          number.max = metric.max;
-        }
+        metricObject = new NumberMetric(metric.name, metric.max);
         break;
       case "select":
-        newMetric.innerHTML = metric.name;
-        let select = document.createElement("select");
-        select.onchange = () => change(i, metric.type);
-        for (let value of metric.values) {
-          let option = document.createElement("option");
-          option.value = value;
-          option.innerHTML = value;
-          select.append(option);
-        }
-        newMetric.append(select);
-        metricObject.value = metric.values[0];
+        metricObject = new SelectMetric(metric.name, metric.values);
         break;
       case "text":
-        newMetric.innerHTML = metric.name;
-        newMetric.style.width = "100%";
-        let input = document.createElement("input");
-        input.placeholder = metric.tip ?? "";
-        input.oninput = () => change(i, metric.type);
-        newMetric.append(input);
-        metricObject.value = "";
+        metricObject = new TextMetric(metric.name, metric.tip);
         break;
       case "rating":
-        newMetric.innerHTML = metric.name;
-        let ratingBar = document.createElement("div");
-        ratingBar.classList.add("flex");
-        for (let j = 0; j < 5; j++) {
-          let star = document.createElement("button");
-          star.classList.add("star");
-          star.innerHTML = "<i class='star-empty'></i>";
-          star.onclick = () => change(i, metric.type, j);
-          ratingBar.append(star);
-        }
-        newMetric.append(ratingBar);
-        metricObject.value = 0;
+        metricObject = new RatingMetric(metric.name);
+        break;
     }
     if (metric.group) {
       if (i > 0) {
@@ -198,54 +142,13 @@ function loadTemplate(newTemplate) {
       if (typeof metric.group == "string") {
         metricsDiv.innerHTML += "<span class='group'>" + metric.group + "</span>";
       }
-      currentDiv = document.createElement("div");
-      currentDiv.classList.add("flex", "spaced", "bordered");
     }
-    currentDiv.append(newMetric);
-    metricObject.element = newMetric;
+    metricsDiv.append(metricObject.element);
     gameMetrics.push(metricObject);
   });
-  metricsDiv.append(currentDiv);
 }
 
-function change(i, type, data = 0) {
-  switch (type) {
-    case "toggle":
-      let button = gameMetrics[i].element.querySelector("button");
-      button.innerHTML = "";
-      let newIcon = document.createElement("i");
-      newIcon.classList.add(`square-${gameMetrics[i].value ? "empty" : "checked"}`);
-      button.append(newIcon);
-      button.innerHTML += ` ${gameMetrics[i].name}`;
-      gameMetrics[i].value = !gameMetrics[i].value;
-      break;
-    case "number":
-      gameMetrics[i].value = gameMetrics[i].element.querySelector(".number").value;
-      break;
-    case "select":
-      let select = gameMetrics[i].element.querySelector("select");
-      gameMetrics[i].value = select.value;
-      break;
-    case "text":
-      let text = gameMetrics[i].element.querySelector("input");
-      gameMetrics[i].value = `"${text.value.replace('"', "'")}"`;
-      break;
-    case "rating":
-      let stars = gameMetrics[i].element.querySelectorAll(".star");
-      [...stars].forEach(star => star.innerHTML = "<i class='star-empty'></i>");
-      if (data == 0 && gameMetrics[i].value == 1) {
-        gameMetrics[i].value = 0;
-      } else {
-        for (let j = 0; j < data + 1; j++) {
-          stars[j].innerHTML = "<i class='star-filled'></i>";
-        }
-        gameMetrics[i].value = data + 1;
-      }
-  }
-  setLocation(scoutLocation);
-}
 
-// Location/theme setter
 
 function setLocation(newLocation) {
   let newTheme = "red";
@@ -268,26 +171,13 @@ function setLocation(newLocation) {
   });
 }
 
-// Team/match input checkers
 
-function checkTeam() {
-  teamMetric.value = teamMetric.value.substring(0, 5).toUpperCase();
-  if (!/\w|\d/.test(teamMetric.value[teamMetric.value.length - 1])
-    || /[A-Z]/.test(teamMetric.value[teamMetric.value.length - 2])
-    || (/\d/.test(teamMetric.value[4]))) {
-    teamMetric.value = teamMetric.value.substring(0, teamMetric.value.length - 1);
-  }
-}
-
-function checkMatch() {
-  matchMetric.value = matchMetric.value.substring(0, 3);
-}
-
-// Button toggles
 
 function toggleMenu() {
   document.querySelector("#menu").classList.toggle("show");
 }
+
+document.querySelector("#menu-toggle").onclick = () => toggleMenu();
 
 function toggleAbsent() {
   metricsDiv.classList.toggle("hide");
@@ -305,10 +195,12 @@ function toggleAbsent() {
   isAbsent = !isAbsent;
 }
 
-// Survey functions
+absentMetric.onclick = () => toggleAbsent();
+
+
 
 function saveSurvey() {
-  if (!/\d{1,4}[A-Z]?/.test(teamMetric.value)) {
+  if (!/^\d{1,4}[A-Z]?$/.test(teamMetric.value)) {
     alert("Please enter a proper team value!");
     teamMetric.focus();
     return;
@@ -332,8 +224,8 @@ function saveSurvey() {
     { name: "Team", value: teamMetric.value },
     { name: "Match", value: matchMetric.value },
     { name: "Absent", value: isAbsent },
+    ...gameMetrics.map(metric => { return { name: metric.name, value: metric.value } })
   ];
-  gameMetrics.forEach(metric => survey.push({ name: metric.name, value: metric.value }));
   let surveys = JSON.parse(localStorage.getItem("surveys") ?? "[]");
   surveys.push(survey);
   localStorage.setItem("surveys", JSON.stringify(surveys));
@@ -353,35 +245,7 @@ function resetSurvey(askUser = true) {
   if (isAbsent) {
     toggleAbsent();
   }
-  for (let i = 0; i < gameMetrics.length; i++) {
-    switch (gameMetrics[i].type) {
-      case "toggle":
-        gameMetrics[i].value = false;
-        let button = gameMetrics[i].element.querySelector("button")
-        button.innerHTML = "";
-        let newIcon = document.createElement("i");
-        newIcon.classList.add("square-empty");
-        button.append(newIcon);
-        button.innerHTML += " " + gameMetrics[i].name;
-        break;
-      case "text":
-        gameMetrics[i].value = "";
-        gameMetrics[i].element.querySelector("input").value = "";
-        break;
-      case "number":
-        gameMetrics[i].value = 0;
-        gameMetrics[i].element.querySelector(".number").value = "0";
-        break;
-      case "select":
-        gameMetrics[i].value = gameMetrics[i].element.querySelector("option").value;
-        gameMetrics[i].element.querySelector("select").value = gameMetrics[i].value;
-        break;
-      case "rating":
-        gameMetrics[i].value = 0;
-        let stars = gameMetrics[i].element.querySelectorAll(".star");
-        [...stars].forEach(star => star.innerHTML = "<i class='star-empty'></i>");
-    }
-  }
+  gameMetrics.forEach(metric => metric.reset());
   setLocation(scoutLocation);
 }
 

@@ -23,15 +23,12 @@
     <img id="logo" src="./logo.png" alt>
     <h1 id="title">MeanScout</h1>
     <div id="nav-location"></div>
-    <button id="menu-toggle" onclick="toggleMenu()">
-      <i class="bars"></i>
-    </button>
+    <button id="menu-toggle"><i class="bars"></i></button>
   </div>
   <div class="flex" id="menu">
     <span class="group">Options</span>
-    <div class="flex spaced bordered">
-      <div>
-        Location
+    <div class="flex spaced bg">
+      <div>Location
         <select id="menu-location" onchange="setLocation(this.value)">
           <option class="red">Red Near</option>
           <option class="red">Red Mid</option>
@@ -41,75 +38,48 @@
           <option class="blue">Blue Far</option>
         </select>
       </div>
-      <div>
-        Surveys
+      <div>Surveys
         <div class="flex">
-          <button onclick="downloadSurveys()">
-            <i class="download"></i>
-            Download
-          </button>
-          <button onclick="eraseSurveys()">
-            <i class="eraser"></i>
-            Erase
-          </button>
+          <button onclick="downloadSurveys()"><i class="download"></i> Download</button>
+          <button onclick="eraseSurveys()"><i class="eraser"></i> Erase</button>
         </div>
       </div>
-      <div>
-        Template
+      <div>Template
         <div class="flex">
-          <button onclick="copyTemplate()">
-            <i class="copy"></i>
-            Copy
-          </button>
-          <button onclick="editTemplate()">
-            <i class="pen"></i>
-            Edit
-          </button>
-          <button onclick="setTemplate()">
-            <i class="undo"></i>
-            Reset
-          </button>
+          <button onclick="copyTemplate()"><i class="copy"></i> Copy</button>
+          <button onclick="editTemplate()"><i class="pen"></i> Edit</button>
+          <button onclick="setTemplate()"><i class="undo"></i> Reset</button>
         </div>
       </div>
     </div>
   </div>
   <div class="flex column">
-    <div class="flex spaced bordered" id="default">
-      <div>
-        Team
-        <input id="metric-team" oninput="checkTeam()" list="teams" autofocus>
+    <div class="flex spaced bg" id="default">
+      <div>Team
+        <input id="metric-team" list="teams" autofocus>
       </div>
       <datalist id="teams"></datalist>
-      <div>
-        Match
-        <input id="metric-match" oninput="checkMatch()" type="number" value="1" min="1">
+      <div>Match
+        <input id="metric-match" type="number" value="1" min="1">
       </div>
       <div>
-        <button id="metric-absent" onclick="toggleAbsent()">
-          <i class="square-empty"></i>
-          Absent
-        </button>
+        <button id="metric-absent"><i class="square-empty"></i> Absent</button>
       </div>
     </div>
-    <div class="flex column" id="metrics"></div>
+    <div class="flex spaced bg" id="metrics"></div>
   </div>
   <div class="flex column">
     <span class="group">Survey</span>
-    <div class="flex spaced bordered">
+    <div class="flex spaced bg">
       <div>
-        <button onclick="saveSurvey()">
-          <i class="save"></i>
-          Save
-        </button>
+        <button onclick="saveSurvey()"><i class="save"></i> Save</button>
       </div>
       <div>
-        <button onclick="resetSurvey()">
-          <i class="undo"></i>
-          Reset
-        </button>
+        <button onclick="resetSurvey()"><i class="undo"></i> Reset</button>
       </div>
     </div>
   </div>
+  <script src="./metric.js"></script>
   <script src="./index.js"></script>
 </body>
 
