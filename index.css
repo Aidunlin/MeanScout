@@ -16,6 +16,7 @@ input, select, i, svg, #title, #nav-location, .number {
   border-radius: 0;
   box-sizing: border-box;
   line-height: 1.25 !important;
+  outline: none;
 }
 html {
   background: var(--bg-color);
@@ -50,6 +51,9 @@ input, select {
   padding: 8px;
   width: 100%;
 }
+button:active, input:active, select:active {
+  opacity: 0.5;
+}
 select {
   cursor: pointer;
 }
@@ -81,18 +85,13 @@ svg {
 .blue {
   color: var(--blue);
 }
-.number {
-  width: 56px;
-}
 .star {
   padding: 8px;
 }
 .group {
   font-weight: bold;
   width: 100%;
-  margin-top: 8px;
-  margin-left: 8px;
-  margin-bottom: 0;
+  margin: 8px 8px 0;
 }
 
 #logo {

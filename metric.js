@@ -1,5 +1,5 @@
 class Metric {
-  constructor(name) {
+  constructor(name = "") {
     this.name = name;
     this.value = null;
     this.element = document.createElement("div");
@@ -7,7 +7,7 @@ class Metric {
 }
 
 class ToggleMetric extends Metric {
-  constructor(name) {
+  constructor(name = "Toggle") {
     super(name);
     this.reset();
   }
@@ -20,19 +20,14 @@ class ToggleMetric extends Metric {
     this.value = false;
   }
   change() {
-    this.button.innerHTML = "";
-    let newIcon = document.createElement("i");
-    let newClass = `square-${this.value ? "empty" : "checked"}`;
-    newIcon.classList.add(newClass);
-    newIcon.innerHTML = icons[newClass];
-    this.button.append(newIcon);
-    this.button.innerHTML += ` ${this.name}`;
+    this.button.innerHTML = `<i class="square-${this.value ? "empty" : "checked"}"></i> ${this.name}`;
     this.value = !this.value;
+    refreshIcons();
   }
 }
 
 class NumberMetric extends Metric {
-  constructor(name) {
+  constructor(name = "Number") {
     super(name);
     this.reset();
   }
@@ -54,7 +49,7 @@ class NumberMetric extends Metric {
 }
 
 class SelectMetric extends Metric {
-  constructor(name, values) {
+  constructor(name = "Select", values = []) {
     super(name);
     this.values = values;
     this.reset();
@@ -64,10 +59,7 @@ class SelectMetric extends Metric {
     this.select = document.createElement("select");
     this.select.onchange = () => this.change();
     for (let value of this.values) {
-      let option = document.createElement("option");
-      option.value = value;
-      option.innerHTML = value;
-      this.select.append(option);
+      this.select.innerHTML += `<option value="${value}">${value}</option>`;
     }
     this.element.append(this.select);
     this.value = this.values[0];
@@ -78,7 +70,7 @@ class SelectMetric extends Metric {
 }
 
 class TextMetric extends Metric {
-  constructor(name, tip) {
+  constructor(name = "Text", tip = "") {
     super(name);
     this.tip = tip;
     this.reset();
@@ -87,7 +79,7 @@ class TextMetric extends Metric {
     this.element.innerHTML = this.name;
     this.element.style.width = "100%";
     this.input = document.createElement("input");
-    this.input.placeholder = this.tip ?? "";
+    this.input.placeholder = this.tip;
     this.input.oninput = () => this.change();
     this.element.append(this.input);
     this.value = "";
@@ -98,7 +90,7 @@ class TextMetric extends Metric {
 }
 
 class RatingMetric extends Metric {
-  constructor(name) {
+  constructor(name = "Rating") {
     super(name);
     this.reset();
   }
@@ -116,16 +108,12 @@ class RatingMetric extends Metric {
     this.element.append(this.ratingBar);
     this.value = 0;
   }
-  change(i) {
-    let stars = this.ratingBar.children;
-    [...stars].forEach(star => star.innerHTML = "<i class='star-empty'></i>");
-    if (i == 0 && this.value == 1) this.value = 0;
-    else {
-      for (let j = 0; j < i + 1; j++) {
-        stars[j].innerHTML = "<i class='star-filled'></i>";
-      }
-      this.value = i + 1;
+  change(newValue) {
+    if (newValue == 0 && this.value == 1) newValue = -1;
+    for (let i = 0; i < 5; i++) {
+      this.ratingBar.children[i].innerHTML = `<i class='star-${newValue < i ? "empty" : "filled"}'></i>`;
     }
+    this.value = newValue + 1;
     refreshIcons();
   }
 }

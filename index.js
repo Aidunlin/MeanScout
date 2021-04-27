@@ -22,12 +22,12 @@ let icons = {
 };
 
 function refreshIcons() {
-  [...document.querySelectorAll("i")].forEach(icon => {
+  for (let icon of document.querySelectorAll("i")) {
     icon.innerHTML = icons.question;
     for (let newIcon in icons) {
       if (icon.classList.contains(newIcon)) icon.innerHTML = icons[newIcon];
     }
-  });
+  }
 }
 
 let customMetrics = document.querySelector("#metrics-custom");
@@ -101,15 +101,17 @@ function setTemplate(newTemplate = undefined) {
 
 function loadTemplate(newTemplate) {
   teamsList.innerHTML = "";
-  newTemplate.teams?.forEach(team => {
-    let newOption = document.createElement("option");
-    newOption.value = team;
-    teamsList.append(newOption);
-  });
+  if (newTemplate.teams) {
+    for (let team of newTemplate.teams) {
+      let newOption = document.createElement("option");
+      newOption.value = team;
+      teamsList.append(newOption);
+    }
+  }
   customMetrics.innerHTML = "";
   gameMetrics = [];
   let metricObject;
-  newTemplate.metrics.forEach(metric => {
+  for (let metric of newTemplate.metrics) {
     switch (metric.type) {
       case "toggle":
         metricObject = new ToggleMetric(metric.name);
@@ -130,7 +132,7 @@ function loadTemplate(newTemplate) {
     if (metric.group) customMetrics.innerHTML += `<span class='group'>${metric.group}</span>`;
     customMetrics.append(metricObject.element);
     gameMetrics.push(metricObject);
-  });
+  }
 }
 
 function setLocation(newLocation) {
@@ -200,10 +202,14 @@ function resetSurvey(askUser = true) {
   if (askUser) if (!confirm("Confirm reset?")) return;
   teamMetric.value = "";
   teamMetric.focus();
-  matchCount = Math.min(parseInt(matchMetric.value) + 1, 200);
-  matchMetric.value = matchCount;
+  if (!askUser) {
+    matchCount = Math.min(parseInt(matchMetric.value) + 1, 200);
+    matchMetric.value = matchCount;
+  }
   if (isAbsent) toggleAbsent();
-  gameMetrics.forEach(metric => metric.reset());
+  for (let metric of gameMetrics) {
+    metric.reset();
+  }
   setLocation(scoutLocation);
 }
 
