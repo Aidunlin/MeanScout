@@ -22,7 +22,7 @@ class ToggleMetric extends Metric {
   change() {
     this.button.innerHTML = `<i class="square-${this.value ? "empty" : "checked"}"></i> ${this.name}`;
     this.value = !this.value;
-    refreshIcons();
+    refreshIcons(this.element);
   }
 }
 
@@ -114,6 +114,6 @@ class RatingMetric extends Metric {
       this.ratingBar.children[i].innerHTML = `<i class='star-${newValue < i ? "empty" : "filled"}'></i>`;
     }
     this.value = newValue + 1;
-    refreshIcons();
+    refreshIcons(this.element);
   }
 }
