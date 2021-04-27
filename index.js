@@ -1,8 +1,5 @@
-document.querySelector("meta[property='og:url']").setAttribute("content", location.href);
-document.querySelector("meta[property='og:image']").setAttribute("content", location.href + "logo.png");
-
 window.onbeforeunload = () => {
-  if (/aidunlin\.com/.test(window.location.hostname)) return true;
+  if (/aidunlin\.com/.test(location.href)) return true;
 };
 
 if ("serviceWorker" in navigator) {
