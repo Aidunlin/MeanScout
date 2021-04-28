@@ -9,14 +9,16 @@ A lightweight FRC scouting web app.
 - Red/blue color variants, auto dark/light themes
 - Customizable metrics: toggles, numbers, selectors, textfields, and ratings
 - Optional team whitelisting
-- Uses `localStorage` to store entries
-- Exports entries as JSON arrays
+- Uses browser storage to store surveys
+- Exports surveys in JSON array
 
 ## Libraries
 
-- [Normalize.css](https://necolas.github.io/normalize.css/) with CSS based on [w3.css](https://www.w3schools.com/w3css/)
+- [Normalize.css](https://necolas.github.io/normalize.css/)
 - [FontAwesome Icons](https://fontawesome.com/)
 - [Workbox](https://developers.google.com/web/tools/workbox)
+
+Otherwise, MeanScout is built with native HTML/CSS/JS.
 
 ## Location
 
@@ -74,3 +76,11 @@ When saving/downloading, surveys will be stored in a JSON array. Each survey is 
   // ... surveys
 ]
 ```
+
+## Contributing
+
+Find a problem? Make an issue!
+
+Fix a problem? Make a pull request!
+
+All you'll need to develop MeanScout (or your own fork) is a text editor and a browser.

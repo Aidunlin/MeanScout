@@ -19,9 +19,13 @@ class ToggleMetric extends Metric {
     this.element.append(this.button);
     this.value = false;
   }
-  change() {
-    this.button.innerHTML = `<i class="square-${this.value ? "empty" : "checked"}"></i> ${this.name}`;
-    this.value = !this.value;
+  change(newValue = !this.value) {
+    this.update(newValue);
+    backupCurrentSurvey();
+  }
+  update(newValue) {
+    this.button.innerHTML = `<i class="square-${newValue ? "checked" : "empty"}"></i> ${this.name}`
+    this.value = newValue;
     refreshIcons(this.element);
   }
 }
@@ -39,12 +43,17 @@ class NumberMetric extends Metric {
     this.input.value = 0;
     this.input.min = 0;
     this.input.max = 99;
-    this.input.onchange = () => this.change();
+    this.input.oninput = () => this.change();
     this.element.append(this.input);
     this.value = 0;
   }
-  change() {
-    this.value = this.input.value;
+  change(newValue = this.input.value) {
+    this.value = newValue;
+    backupCurrentSurvey();
+  }
+  update(newValue) {
+    this.value = newValue;
+    this.input.value = newValue;
   }
 }
 
@@ -64,8 +73,13 @@ class SelectMetric extends Metric {
     this.element.append(this.select);
     this.value = this.values[0];
   }
-  change() {
-    this.value = this.select.value;
+  change(newValue = this.select.value) {
+    this.update(newValue);
+    backupCurrentSurvey();
+  }
+  update(newValue) {
+    this.value = newValue;
+    this.select.value = newValue;
   }
 }
 
@@ -84,8 +98,13 @@ class TextMetric extends Metric {
     this.element.append(this.input);
     this.value = "";
   }
-  change() {
-    this.value = this.input.value.replace('"', "'");
+  change(newValue = this.input.value.replace('"', "'")) {
+    this.value = newValue;
+    backupCurrentSurvey();
+  }
+  update(newValue) {
+    this.value = newValue;
+    this.input.value = newValue;
   }
 }
 
@@ -115,5 +134,14 @@ class RatingMetric extends Metric {
     }
     this.value = newValue + 1;
     refreshIcons(this.element);
+    backupCurrentSurvey();
+  }
+  update(newValue) {
+    if (newValue == 0) return;
+    for (let i = 0; i < 5; i++) {
+      this.ratingBar.children[i].innerHTML = `<i class='star-${newValue - 1 < i ? "empty" : "filled"}'></i>`;
+    }
+    this.value = newValue;
+    refreshIcons();
   }
 }

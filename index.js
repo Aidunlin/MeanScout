@@ -1,7 +1,3 @@
-window.onbeforeunload = () => {
-  if (/aidunlin\.com/.test(location.href)) return true;
-};
-
 if ("serviceWorker" in navigator) {
   window.onload = () => navigator.serviceWorker.register("./sw.js");
 }
@@ -53,6 +49,32 @@ let exampleTemplate = {
 let currentTemplate = JSON.parse(localStorage.getItem("template") ?? JSON.stringify(exampleTemplate));
 loadTemplate(currentTemplate);
 setLocation(localStorage.getItem("location") ?? "Red Near");
+
+if (localStorage.getItem("backup")) {
+  let surveyFromBackup = JSON.parse(localStorage.getItem("backup"));
+  teamMetric.value = surveyFromBackup.find(metric => metric.name == "Team").value;
+  matchCount = surveyFromBackup.find(metric => metric.name == "Match").value;
+  matchMetric.value = matchCount;
+  isAbsent = surveyFromBackup.find(metric => metric.name == "Absent").value;
+  if (isAbsent) {
+    absentMetric.innerHTML = "<i class='square-checked'></i> Absent";
+    customMetrics.classList.toggle("hide");
+    refreshIcons(absentMetric);
+  }
+  for (let i = 0; i < gameMetrics.length; i++) {
+    gameMetrics[i].update(surveyFromBackup.find(metric => metric.name == gameMetrics[i].name).value);
+  }
+}
+
+function backupCurrentSurvey() {
+  let survey = [
+    { name: "Team", value: teamMetric.value },
+    { name: "Match", value: matchMetric.value },
+    { name: "Absent", value: isAbsent },
+    ...gameMetrics.map(metric => { return { name: metric.name, value: metric.value } })
+  ];
+  localStorage.setItem("backup", JSON.stringify(survey));
+}
 
 function copyTemplate() {
   let input = document.createElement("input");
@@ -144,11 +166,15 @@ function toggleMenu() {
 
 document.querySelector("#menu-toggle").onclick = () => toggleMenu();
 
+teamMetric.oninput = () => backupCurrentSurvey();
+matchMetric.oninput = () => backupCurrentSurvey();
+
 function toggleAbsent() {
   customMetrics.classList.toggle("hide");
   absentMetric.innerHTML = `<i class="square-${isAbsent ? "empty" : "checked"}"></i> Absent`;
   refreshIcons(absentMetric);
   isAbsent = !isAbsent;
+  backupCurrentSurvey();
 }
 
 absentMetric.onclick = () => toggleAbsent();
@@ -197,6 +223,7 @@ function resetSurvey(askUser = true) {
     metric.reset();
   }
   refreshIcons();
+  localStorage.removeItem("backup");
 }
 
 function downloadSurveys(askUser = true) {
