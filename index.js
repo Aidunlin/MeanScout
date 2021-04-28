@@ -111,24 +111,15 @@ function loadTemplate(newTemplate) {
   customMetrics.innerHTML = "";
   gameMetrics = [];
   let metricObject;
+  let metricTypes = {
+    "toggle": ToggleMetric,
+    "number": NumberMetric,
+    "select": SelectMetric,
+    "text": TextMetric,
+    "rating": RatingMetric
+  };
   for (let metric of newTemplate.metrics) {
-    switch (metric.type) {
-      case "toggle":
-        metricObject = new ToggleMetric(metric.name);
-        break;
-      case "number":
-        metricObject = new NumberMetric(metric.name);
-        break;
-      case "select":
-        metricObject = new SelectMetric(metric.name, metric.values);
-        break;
-      case "text":
-        metricObject = new TextMetric(metric.name, metric.tip);
-        break;
-      case "rating":
-        metricObject = new RatingMetric(metric.name);
-        break;
-    }
+    metricObject = new metricTypes[metric.type](metric);
     if (metric.group) customMetrics.innerHTML += `<span class='group'>${metric.group}</span>`;
     customMetrics.append(metricObject.element);
     gameMetrics.push(metricObject);
@@ -155,13 +146,8 @@ document.querySelector("#menu-toggle").onclick = () => toggleMenu();
 
 function toggleAbsent() {
   customMetrics.classList.toggle("hide");
-  absentMetric.innerHTML = "";
-  let newIcon = document.createElement("i");
-  let newClass = `square-${isAbsent ? "empty" : "checked"}`;
-  newIcon.classList.add(newClass);
-  newIcon.innerHTML = icons[newClass];
-  absentMetric.append(newIcon);
-  absentMetric.innerHTML += " Absent";
+  absentMetric.innerHTML = `<i class="square-${isAbsent ? "empty" : "checked"}"></i> Absent`;
+  refreshIcons(absentMetric);
   isAbsent = !isAbsent;
 }
 
@@ -210,7 +196,7 @@ function resetSurvey(askUser = true) {
   for (let metric of gameMetrics) {
     metric.reset();
   }
-  setLocation(scoutLocation);
+  refreshIcons();
 }
 
 function downloadSurveys(askUser = true) {

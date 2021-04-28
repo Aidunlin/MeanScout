@@ -1,14 +1,14 @@
 class Metric {
-  constructor(name = "") {
-    this.name = name;
+  constructor(metric = { name: "" }) {
+    this.name = metric.name;
     this.value = null;
     this.element = document.createElement("div");
   }
 }
 
 class ToggleMetric extends Metric {
-  constructor(name = "Toggle") {
-    super(name);
+  constructor(metric = { name: "Toggle" }) {
+    super(metric);
     this.reset();
   }
   reset() {
@@ -27,8 +27,8 @@ class ToggleMetric extends Metric {
 }
 
 class NumberMetric extends Metric {
-  constructor(name = "Number") {
-    super(name);
+  constructor(metric = { name: "Number" }) {
+    super(metric);
     this.reset();
   }
   reset() {
@@ -49,9 +49,9 @@ class NumberMetric extends Metric {
 }
 
 class SelectMetric extends Metric {
-  constructor(name = "Select", values = []) {
-    super(name);
-    this.values = values;
+  constructor(metric = { name: "Select", values: [] }) {
+    super(metric);
+    this.values = metric.values;
     this.reset();
   }
   reset() {
@@ -70,9 +70,9 @@ class SelectMetric extends Metric {
 }
 
 class TextMetric extends Metric {
-  constructor(name = "Text", tip = "") {
-    super(name);
-    this.tip = tip;
+  constructor(metric = { name: "Text", tip: "" }) {
+    super(metric);
+    this.tip = metric.tip;
     this.reset();
   }
   reset() {
@@ -90,8 +90,8 @@ class TextMetric extends Metric {
 }
 
 class RatingMetric extends Metric {
-  constructor(name = "Rating") {
-    super(name);
+  constructor(metric = { name: "Rating" }) {
+    super(metric);
     this.reset();
   }
   reset() {
