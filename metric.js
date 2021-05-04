@@ -11,21 +11,20 @@ class ToggleMetric extends Metric {
     super(metric);
     this.reset();
   }
-  reset() {
+  reset(newValue = false) {
+    this.value = newValue;
     this.element.innerHTML = "";
     this.button = document.createElement("button");
-    this.button.innerHTML = `<i class='square-empty'></i> ${this.name}`;
-    this.button.onclick = () => this.change();
+    this.button.innerHTML = `<i class="square-${newValue ? "checked" : "empty"}"></i> ${this.name}`;
+    this.button.onclick = () => {
+      this.update();
+      backupCurrentSurvey();
+    };
     this.element.append(this.button);
-    this.value = false;
   }
-  change(newValue = !this.value) {
-    this.update(newValue);
-    backupCurrentSurvey();
-  }
-  update(newValue) {
-    this.button.innerHTML = `<i class="square-${newValue ? "checked" : "empty"}"></i> ${this.name}`
+  update(newValue = !this.value) {
     this.value = newValue;
+    this.button.innerHTML = `<i class="square-${newValue ? "checked" : "empty"}"></i> ${this.name}`;
     refreshIcons(this.element);
   }
 }
@@ -35,23 +34,40 @@ class NumberMetric extends Metric {
     super(metric);
     this.reset();
   }
-  reset() {
-    this.element.innerHTML = this.name;
+  reset(newValue = 0) {
+    this.value = newValue;
+    this.element.innerHTML = this.name + "<br>";
+    
+    this.incButton = document.createElement("button");
+    this.incButton.innerHTML = "&plus;";
+    this.incButton.onclick = () => {
+      this.update(parseInt(this.input.value) + 1);
+      backupCurrentSurvey();
+    }
+    this.element.append(this.incButton);
+    
     this.input = document.createElement("input");
     this.input.classList.add("number");
     this.input.type = "number";
-    this.input.value = 0;
+    this.input.value = newValue;
     this.input.min = 0;
     this.input.max = 99;
-    this.input.oninput = () => this.change();
+    this.input.oninput = () => {
+      this.update();
+      backupCurrentSurvey();
+    };
     this.element.append(this.input);
-    this.value = 0;
+    
+    this.decButton = document.createElement("button");
+    this.decButton.innerHTML = "&minus;";
+    this.decButton.onclick = () => {
+      this.update(parseInt(this.input.value) - 1);
+      backupCurrentSurvey();
+    }
+    this.element.append(this.decButton);
   }
-  change(newValue = this.input.value) {
-    this.value = newValue;
-    backupCurrentSurvey();
-  }
-  update(newValue) {
+  update(newValue = this.input.value) {
+    newValue = Math.max(Math.min(newValue, 99), 0);
     this.value = newValue;
     this.input.value = newValue;
   }
@@ -64,20 +80,17 @@ class SelectMetric extends Metric {
     this.reset();
   }
   reset() {
+    this.value = this.values[0];
     this.element.innerHTML = this.name;
     this.select = document.createElement("select");
-    this.select.onchange = () => this.change();
-    for (let value of this.values) {
-      this.select.innerHTML += `<option value="${value}">${value}</option>`;
-    }
+    this.select.onchange = () => {
+      this.update();
+      backupCurrentSurvey();
+    };
+    this.values.forEach(value => this.select.innerHTML += `<option value="${value}">${value}</option>`);
     this.element.append(this.select);
-    this.value = this.values[0];
   }
-  change(newValue = this.select.value) {
-    this.update(newValue);
-    backupCurrentSurvey();
-  }
-  update(newValue) {
+  update(newValue = this.select.value) {
     this.value = newValue;
     this.select.value = newValue;
   }
@@ -90,19 +103,18 @@ class TextMetric extends Metric {
     this.reset();
   }
   reset() {
+    this.value = "";
     this.element.innerHTML = this.name;
     this.element.style.width = "100%";
     this.input = document.createElement("input");
     this.input.placeholder = this.tip;
-    this.input.oninput = () => this.change();
+    this.input.oninput = () => {
+      this.update();
+      backupCurrentSurvey();
+    };
     this.element.append(this.input);
-    this.value = "";
   }
-  change(newValue = this.input.value.replace('"', "'")) {
-    this.value = newValue;
-    backupCurrentSurvey();
-  }
-  update(newValue) {
+  update(newValue = this.input.value.replace('"', "'")) {
     this.value = newValue;
     this.input.value = newValue;
   }
@@ -113,35 +125,28 @@ class RatingMetric extends Metric {
     super(metric);
     this.reset();
   }
-  reset() {
+  reset(newValue = 0) {
+    this.value = newValue;
     this.element.innerHTML = this.name;
     this.ratingBar = document.createElement("div");
     this.ratingBar.classList.add("flex");
     for (let i = 0; i < 5; i++) {
-      let star = document.createElement("button");
+      const star = document.createElement("button");
       star.classList.add("star");
-      star.innerHTML = "<i class='star-empty'></i>";
-      star.onclick = () => this.change(i);
+      star.innerHTML = `<i class="star-${newValue == i ? "filled" : "empty"}"></i>`;
+      star.onclick = () => {
+        this.update(i);
+        backupCurrentSurvey();
+      };
       this.ratingBar.append(star);
     }
     this.element.append(this.ratingBar);
-    this.value = 0;
-  }
-  change(newValue) {
-    if (newValue == 0 && this.value == 1) newValue = -1;
-    for (let i = 0; i < 5; i++) {
-      this.ratingBar.children[i].innerHTML = `<i class='star-${newValue < i ? "empty" : "filled"}'></i>`;
-    }
-    this.value = newValue + 1;
-    refreshIcons(this.element);
-    backupCurrentSurvey();
   }
   update(newValue) {
-    if (newValue == 0) return;
-    for (let i = 0; i < 5; i++) {
-      this.ratingBar.children[i].innerHTML = `<i class='star-${newValue - 1 < i ? "empty" : "filled"}'></i>`;
-    }
     this.value = newValue;
-    refreshIcons();
+    this.ratingBar.querySelectorAll(".star").forEach((star, i) => {
+      star.querySelector("i").className = `star-${newValue < i ? "empty" : "filled"}`;
+    });
+    refreshIcons(this.element);
   }
 }

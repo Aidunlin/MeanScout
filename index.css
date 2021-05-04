@@ -86,6 +86,11 @@ svg {
 .blue {
   color: var(--blue);
 }
+.number {
+  display: inline;
+  text-align: center;
+  width: initial;
+}
 .star {
   padding: 8px;
 }
@@ -116,9 +121,11 @@ svg {
 }
 
 input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
+input::-webkit-inner-spin-button,
+input::-webkit-calendar-picker-indicator {
+  display: none;
   margin: 0;
+  -webkit-appearance: none;
 }
 input[type=number] {
   -moz-appearance: textfield;
