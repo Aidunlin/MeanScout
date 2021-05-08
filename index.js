@@ -2,6 +2,9 @@ if ("serviceWorker" in navigator) {
   window.onload = () => navigator.serviceWorker.register("./sw.js");
 }
 
+/**
+ * An array of svg icons
+ */
 const icons = [
   { name: "bars", value: "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 512'><path fill='currentColor' d='M16 132h416c8.837 0 16-7.163 16-16V76c0-8.837-7.163-16-16-16H16C7.163 60 0 67.163 0 76v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z'></path></svg>" },
   { name: "copy", value: "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 512'><path fill='currentColor' d='M320 448v40c0 13.255-10.745 24-24 24H24c-13.255 0-24-10.745-24-24V120c0-13.255 10.745-24 24-24h72v296c0 30.879 25.121 56 56 56h168zm0-344V0H152c-13.255 0-24 10.745-24 24v368c0 13.255 10.745 24 24 24h272c13.255 0 24-10.745 24-24V128H344c-13.2 0-24-10.8-24-24zm120.971-31.029L375.029 7.029A24 24 0 0 0 358.059 0H352v96h96v-6.059a24 24 0 0 0-7.029-16.97z'></path></svg>" },
@@ -17,6 +20,10 @@ const icons = [
   { name: "undo", value: "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path fill='currentColor' d='M212.333 224.333H12c-6.627 0-12-5.373-12-12V12C0 5.373 5.373 0 12 0h48c6.627 0 12 5.373 12 12v78.112C117.773 39.279 184.26 7.47 258.175 8.007c136.906.994 246.448 111.623 246.157 248.532C504.041 393.258 393.12 504 256.333 504c-64.089 0-122.496-24.313-166.51-64.215-5.099-4.622-5.334-12.554-.467-17.42l33.967-33.967c4.474-4.474 11.662-4.717 16.401-.525C170.76 415.336 211.58 432 256.333 432c97.268 0 176-78.716 176-176 0-97.267-78.716-176-176-176-58.496 0-110.28 28.476-142.274 72.333h98.274c6.627 0 12 5.373 12 12v48c0 6.627-5.373 12-12 12z'></path></svg>" }
 ];
 
+/**
+ * Updates every `i` node within an element with a corresponding icon
+ * @param {HTMLElement} element The element to refresh icons under
+ */
 function refreshIcons(element = document) {
   element.querySelectorAll("i").forEach(iconElement => {
     iconElement.innerHTML = icons.question;
@@ -73,6 +80,9 @@ if (localStorage.getItem("backup")) {
   });
 }
 
+/**
+ * Stores the current unsaved survey to `localStorage`
+ */
 function backupCurrentSurvey() {
   localStorage.setItem("backup", JSON.stringify([
     { name: "Team", value: teamMetric.value },
@@ -82,17 +92,23 @@ function backupCurrentSurvey() {
   ]));
 }
 
+/**
+ * Copies the current template to clipboard
+ */
 function copyTemplate() {
   const input = document.createElement("input");
   input.value = JSON.stringify(currentTemplate);
   document.body.append(input);
   input.select();
-  input.setSelectionRange(0, input.value.length - 1);
+  input.setSelectionRange(0, input.value.length);
   document.execCommand("copy");
   input.remove();
   alert("Copied template");
 }
 
+/**
+ * Requests a new template and checks if the template is valid
+ */
 function editTemplate() {
   const newPrompt = prompt("Paste new template (leave blank to cancel):");
   if (newPrompt) {
@@ -102,7 +118,7 @@ function editTemplate() {
       newTemplate.metrics.forEach(metric => {
         if (!metric.name) error = "Metric has no name";
         if (!Array.isArray(metric.values ?? [])) error = "Metric has invalid values";
-        if (!/toggle|number|select|text|rating/.test(metric.type)) error = "Metric has invalid type";
+        if (!metricTypes.hasOwnProperty(metric.type)) error = "Metric has invalid type";
       });
     } else error = "Template has no metrics";
     if (error) {
@@ -113,22 +129,25 @@ function editTemplate() {
   }
 }
 
-function setTemplate(newTemplate = undefined) {
+/**
+ * Sets a new template or to example template
+ * @param {object} newTemplate An object that contains template data
+ */
+function setTemplate(newTemplate = exampleTemplate) {
   if (!newTemplate) if (prompt("Type 'reset' to reset the template") != "reset") return;
-  if (newTemplate) {
-    currentTemplate = JSON.parse(JSON.stringify(newTemplate));
-    localStorage.setItem("template", JSON.stringify(currentTemplate));
-  } else {
-    currentTemplate = JSON.parse(JSON.stringify(exampleTemplate));
-    localStorage.removeItem("template");
-  }
+  currentTemplate = JSON.parse(JSON.stringify(newTemplate));
+  localStorage.setItem("template", JSON.stringify(currentTemplate ?? ""));
   if (localStorage.getItem("surveys")) downloadSurveys(false);
   loadTemplate(currentTemplate);
   backupCurrentSurvey();
   refreshIcons();
 }
 
-function loadTemplate(newTemplate) {
+/**
+ * Loads a template into the UI
+ * @param {object} newTemplate An object that contains template data
+ */
+function loadTemplate(newTemplate = exampleTemplate) {
   teamsList.innerHTML = "";
   if (newTemplate.teams) {
     newTemplate.teams.forEach(team => {
@@ -146,7 +165,11 @@ function loadTemplate(newTemplate) {
   });
 }
 
-function setLocation(newLocation) {
+/**
+ * Sets a new scout location
+ * @param {string} newLocation A string that includes alliance color and robot position
+ */
+function setLocation(newLocation = "Red Near") {
   scoutLocation = newLocation;
   let newTheme = "red";
   if (/blue/.test(newLocation.toLowerCase())) newTheme = "blue";
@@ -157,6 +180,9 @@ function setLocation(newLocation) {
   refreshIcons();
 }
 
+/**
+ * Toggles the options menu
+ */
 function toggleMenu() {
   document.querySelector("#menu").classList.toggle("show");
   document.querySelector("#menu-toggle").classList.toggle("bg");
@@ -167,6 +193,9 @@ document.querySelector("#menu-toggle").onclick = () => toggleMenu();
 teamMetric.oninput = () => backupCurrentSurvey();
 matchMetric.oninput = () => backupCurrentSurvey();
 
+/**
+ * Toggles whether the team is absent
+ */
 function toggleAbsent() {
   customMetrics.classList.toggle("hide");
   absentMetric.innerHTML = `<i class="square-${isAbsent ? "empty" : "checked"}"></i> Absent`;
@@ -177,6 +206,9 @@ function toggleAbsent() {
 
 absentMetric.onclick = () => toggleAbsent();
 
+/**
+ * Validates and saves the current survey to `localStorage`
+ */
 function saveSurvey() {
   if (!/^\d{1,4}[A-Z]?$/.test(teamMetric.value)) {
     alert("Invalid team value");
@@ -207,6 +239,10 @@ function saveSurvey() {
   resetSurvey(false);
 }
 
+/**
+ * Resets the current survey
+ * @param {boolean} askUser A boolean that represents whether to prompt the user
+ */
 function resetSurvey(askUser = true) {
   if (askUser) if (prompt("Type 'reset' to reset the survey") != "reset") return;
   teamMetric.value = "";
@@ -221,6 +257,10 @@ function resetSurvey(askUser = true) {
   localStorage.removeItem("backup");
 }
 
+/**
+ * Downloads all surveys from `localStorage`
+ * @param {boolean} askUser A boolean that represents whether to prompt the user
+ */
 function downloadSurveys(askUser = true) {
   if (askUser) if (!confirm("Confirm download?")) return;
   const anchor = document.createElement("a");
@@ -231,6 +271,9 @@ function downloadSurveys(askUser = true) {
   anchor.remove();
 }
 
+/**
+ * Erases all surveys from `localStorage` after prompting the user
+ */
 function eraseSurveys() {
   if (prompt("Type 'erase' to erase saved surveys") == "erase") localStorage.removeItem("surveys");
 }
