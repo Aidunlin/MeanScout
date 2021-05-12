@@ -14,7 +14,7 @@ class ToggleMetric {
   update(newValue = !this.value) {
     this.value = newValue;
     this.button.innerHTML = `<i class="square-${newValue ? "checked" : "empty"}"></i> ${this.name}`;
-    refreshIcons(this.element);
+    refreshIcons(this.button);
   }
   reset() {
     this.update(false);
@@ -32,16 +32,16 @@ class NumberMetric {
     this.input.type = "number";
     this.input.value = 0;
     this.input.min = 0;
-    this.input.max = 99;
+    this.input.max = 999;
     this.input.oninput = () => {
       this.update();
       backupCurrentSurvey();
     };
-    this.element.append(this.createCrementor("&plus;", 1), this.input, this.createCrementor("&minus;", -1));
+    this.element.append(this.createCrementor("plus", 1), this.input, this.createCrementor("minus", -1));
   }
   createCrementor(text = "", dir = 0) {
     let newButton = document.createElement("button");
-    newButton.innerHTML = text;
+    newButton.innerHTML = `<i class="${text}"></i>`;
     newButton.onclick = () => {
       this.update(parseInt(this.input.value) + dir);
       backupCurrentSurvey();
@@ -49,7 +49,7 @@ class NumberMetric {
     return newButton;
   }
   update(newValue = this.input.value) {
-    newValue = Math.max(Math.min(newValue, 99), 0);
+    newValue = Math.max(Math.min(newValue, 999), 0);
     this.value = newValue;
     this.input.value = newValue;
   }
@@ -132,9 +132,75 @@ class RatingMetric {
     this.ratingBar.querySelectorAll(".star").forEach((star, i) => {
       star.querySelector("i").className = `star-${newValue < i ? "empty" : "filled"}`;
     });
-    refreshIcons(this.element);
+    refreshIcons(this.ratingBar);
   }
   reset() {
     this.update();
+  }
+}
+
+class TimerMetric {
+  constructor(metric = { name: "Timer" }) {
+    this.name = metric.name;
+    this.value = 0;
+    this.running = false;
+    this.interval = null;
+    this.element = document.createElement("div");
+    this.element.innerHTML = this.name + "<br>";
+    this.toggleBtn = document.createElement("button");
+    this.toggleBtn.innerHTML = `<i class="play"></i>`;
+    this.toggleBtn.onclick = () => {
+      this.toggle();
+    }
+    this.number = document.createElement("input");
+    this.number.classList.add("number");
+    this.number.type = "number";
+    this.number.value = 0;
+    this.number.min = 0;
+    this.number.max = 999;
+    this.number.oninput = () => {
+      this.update();
+      backupCurrentSurvey();
+    }
+    this.stopBtn = document.createElement("button");
+    this.stopBtn.innerHTML = `<i class="stop"></i>`;
+    this.stopBtn.onclick = () => {
+      this.stop();
+    }
+    this.element.append(this.toggleBtn, this.number, this.stopBtn);
+  }
+  toggle() {
+    if (this.running) {
+      this.running = false;
+      clearInterval(this.interval);
+      this.toggleBtn.innerHTML = `<i class="play"></i>`;
+    } else {
+      this.running = true;
+      this.interval = setInterval(() => {
+        if (this.running) {
+          this.update(parseFloat(this.value) + 0.1);
+          console.log(this.value);
+          backupCurrentSurvey();
+        }
+      }, 100);
+      this.toggleBtn.innerHTML = `<i class="pause"></i>`;
+    }
+    refreshIcons(this.toggleBtn);
+  }
+  stop() {
+    if (this.running) {
+      this.toggle();
+    }
+    this.update(0);
+    backupCurrentSurvey();
+  }
+  update(newValue = this.number.value) {
+    newValue = Math.max(newValue, 0);
+    this.value = newValue;
+    this.number.value = newValue.toFixed(1);
+  }
+  reset() {
+    this.update(0);
+    this.stop();
   }
 }

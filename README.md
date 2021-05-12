@@ -7,7 +7,7 @@ A lightweight FRC scouting web app.
 - Full offline support (progressive web app)
 - Lightweight mobile-first design
 - Red/blue color variants, auto dark/light themes
-- Customizable metrics: toggles, numbers, selectors, textfields, and ratings
+- Customizable metrics: toggles, numbers, selectors, textfields, ratings, and timers
 - Optional team whitelisting
 - Uses browser storage to store surveys
 - Exports surveys in JSON array
@@ -38,6 +38,7 @@ To change the metrics present, simply copy and paste JSON-based templates into M
     { "name": "Select", "type": "select", "values": ["Value 1", "Value 2", "Value 3"] },
     { "name": "Text",   "type": "text",   "tip": "Tip" },
     { "name": "Rating", "type": "rating" }
+    { "name": "Timer", "type": "timer" }
   ]
 }
 ```
@@ -46,13 +47,14 @@ The only metrics that can't be changed are team, match, and absent.
 
 Each template should have an array of `metrics`. Optionally, a whitelist of `teams` can be included to help scouts correctly identify teams.
 
-Each metric must have a `name` and a `type` (`toggle`, `number`, `select`, `text`, or `rating`). Use short/concise names for metrics to save space.
+Each metric must have a `name` and a `type` (`toggle`, `number`, `select`, `text`, `rating`, or `timer`). Use short/concise names for metrics to save space.
 
 - `toggle`: a toggleable button. Value is a boolean.
-- `number`: an incremental and decremental button. Value is a number between 0 and 99.
+- `number`: a number input with increment/decrement buttons. Value is an integer.
 - `select`: a dropdown selector. Value is a string (selected option). There must be an array of string `values` to create options for the selector.
 - `text`: a text input. Value is a string. Setting a `tip` value will add a placeholder within the input field.
 - `rating`: a star rating bar. Value is a number (0-5). You can reset the rating bar to 0 by tapping the first star twice.
+- `timer`: a number input with timing controls. Value is a decimal.
 
 Setting `group` to a string adds a label before the metric and moves the metric to a new line. Metrics after will appear to be grouped together.
 
@@ -71,6 +73,7 @@ When saving/downloading, surveys will be stored in a JSON array. Each survey is 
     { "name": "Select", "value": "Value 1" },
     { "name": "Text",   "value": "MeanScout is cool" },
     { "name": "Rating", "value": 5 }
+    { "name": "Timer", "value": 4.2 }
     // ... metrics
   ]
   // ... surveys

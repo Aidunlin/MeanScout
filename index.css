@@ -16,7 +16,6 @@ input, select, i, svg, #title, #nav-location, .number {
   border-radius: 0;
   box-sizing: border-box;
   line-height: 1.25 !important;
-  outline: none;
 }
 html {
   background: var(--bg-color);
@@ -59,8 +58,8 @@ select {
   cursor: pointer;
 }
 svg {
-  height: 24px;
-  vertical-align: -.125em;
+  height: 1em;
+  vertical-align: -.2em;
 }
 
 .flex {
