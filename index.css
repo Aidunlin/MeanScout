@@ -20,7 +20,7 @@ input, select, i, svg, #title, #nav-location, .number {
 html {
   background: var(--bg-color);
   color: var(--main-color);
-  font-family: monospace;
+  font-family: 'Courier New', Courier, monospace;
   font-size: 24px;
   margin: auto;
   max-width: 600px;
@@ -88,7 +88,7 @@ svg {
 .number {
   display: inline;
   text-align: center;
-  width: initial;
+  width: 100px;
 }
 .star {
   padding: 8px;
@@ -117,6 +117,9 @@ svg {
 }
 #metric-team {
   width: 100px;
+}
+#metric-match {
+  width: 80px;
 }
 
 input::-webkit-outer-spin-button,
