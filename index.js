@@ -38,6 +38,7 @@ function refreshIcons(element = document) {
   });
 }
 
+const downloadTypeSelect = document.querySelector("#download-type");
 const customMetrics = document.querySelector("#metrics-custom");
 
 const teamMetric = document.querySelector("#metric-team");
@@ -141,7 +142,7 @@ function editTemplate() {
  * @param {object} newTemplate An object that contains template data
  */
 function setTemplate(newTemplate = exampleTemplate) {
-  if (!newTemplate) if (prompt("Type 'reset' to reset the template") != "reset") return;
+  if (prompt("Type 'reset' to reset the template") != "reset") return;
   currentTemplate = JSON.parse(JSON.stringify(newTemplate));
   localStorage.setItem("template", JSON.stringify(currentTemplate ?? ""));
   if (localStorage.getItem("surveys")) downloadSurveys(false);
@@ -265,14 +266,38 @@ function resetSurvey(askUser = true) {
 }
 
 /**
- * Downloads all surveys from `localStorage`
+ * Downloads all surveys from `localStorage` either as JSON or CSV
  * @param {boolean} askUser A boolean that represents whether to prompt the user
  */
 function downloadSurveys(askUser = true) {
   if (askUser) if (!confirm("Confirm download?")) return;
   const anchor = document.createElement("a");
-  anchor.href = "data:text/plaincharset=utf-8," + encodeURIComponent(localStorage.getItem("surveys"));
-  anchor.download = "surveys.json";
+  anchor.href = "data:text/plain;charset=utf-8,";
+  switch (downloadTypeSelect.value) {
+    case "JSON":
+      anchor.href += encodeURIComponent(localStorage.getItem("surveys"));
+      anchor.download = "surveys.json";
+      break;
+    case "CSV":
+      let surveys = JSON.parse(localStorage.getItem("surveys"));
+      let csv = "";
+      if (surveys) {
+        surveys.forEach(survey => {
+          let surveyAsCSV = "";
+          survey.forEach(metric => {
+            if (typeof metric.value == "string") {
+              surveyAsCSV += "\"" + metric.value + "\",";
+            } else {
+              surveyAsCSV += metric.value + ",";
+            }
+          });
+          csv += surveyAsCSV + "\n";
+        });
+      }
+      anchor.href += encodeURIComponent(csv);
+      anchor.download = "surveys.csv";
+      break;
+  }
   document.body.append(anchor);
   anchor.click();
   anchor.remove();

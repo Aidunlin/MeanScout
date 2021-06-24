@@ -179,7 +179,6 @@ class TimerMetric {
       this.interval = setInterval(() => {
         if (this.running) {
           this.update(parseFloat(this.value) + 0.1);
-          console.log(this.value);
           backupCurrentSurvey();
         }
       }, 100);

@@ -10,7 +10,7 @@ A lightweight FRC scouting web app.
 - Customizable metrics: toggles, numbers, selectors, textfields, ratings, and timers
 - Optional team whitelisting
 - Uses browser storage to store surveys
-- Exports surveys in JSON array
+- Different export methods (i.e. JSON and CSV)
 
 ## Libraries
 
@@ -36,8 +36,8 @@ To change the metrics present, simply copy and paste JSON-based templates into M
     { "name": "Toggle", "type": "toggle", "group": "Group" },
     { "name": "Number", "type": "number" },
     { "name": "Select", "type": "select", "values": ["Value 1", "Value 2", "Value 3"] },
-    { "name": "Text",   "type": "text",   "tip": "Tip" },
-    { "name": "Rating", "type": "rating" }
+    { "name": "Text", "type": "text", "tip": "Tip" },
+    { "name": "Rating", "type": "rating" },
     { "name": "Timer", "type": "timer" }
   ]
 }
@@ -47,7 +47,9 @@ The only metrics that can't be changed are team, match, and absent.
 
 Each template should have an array of `metrics`. Optionally, a whitelist of `teams` can be included to help scouts correctly identify teams.
 
-Each metric must have a `name` and a `type` (`toggle`, `number`, `select`, `text`, `rating`, or `timer`). Use short/concise names for metrics to save space.
+Each metric must have a `name` and a `type`. Use short/concise names for metrics to save space.
+
+Types:
 
 - `toggle`: a toggleable button. Value is a boolean.
 - `number`: a number input with increment/decrement buttons. Value is an integer.
@@ -60,24 +62,33 @@ Setting `group` to a string adds a label before the metric and moves the metric 
 
 ## Exporting
 
-When saving/downloading, surveys will be stored in a JSON array. Each survey is also an array containing metric objects with names and values. Here is a sample with a single survey:
+When saving/downloading, surveys will be stored in a JSON array. Each survey is also an array containing metric objects with names and values. Here are some samples:
+
+JSON:
 
 ```json
 [
   [
-    { "name": "Team",   "value": "2471" },
-    { "name": "Match",  "value": "1" },
+    { "name": "Team", "value": "2471" },
+    { "name": "Match", "value": "1" },
     { "name": "Absent", "value": false },
     { "name": "Toggle", "value": false },
     { "name": "Number", "value": 3 },
     { "name": "Select", "value": "Value 1" },
-    { "name": "Text",   "value": "MeanScout is cool" },
+    { "name": "Text", "value": "MeanScout is cool" },
     { "name": "Rating", "value": 5 }
     { "name": "Timer", "value": 4.2 }
     // ... metrics
   ]
   // ... surveys
 ]
+```
+
+CSV:
+
+```csv
+"2471",1,false,false,3,"Value 1","MeanScout is cool",5,4.2, ... metrics
+... surveys
 ```
 
 ## Contributing
