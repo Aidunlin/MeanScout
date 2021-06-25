@@ -133,7 +133,7 @@ function editTemplate() {
       alert(`Could not set template! ${error}`);
       return;
     }
-    setTemplate(newTemplate);
+    setTemplate(newTemplate, false);
   }
 }
 
@@ -141,11 +141,10 @@ function editTemplate() {
  * Sets a new template or to example template
  * @param {object} newTemplate An object that contains template data
  */
-function setTemplate(newTemplate = exampleTemplate) {
-  if (prompt("Type 'reset' to reset the template") != "reset") return;
+function setTemplate(newTemplate = exampleTemplate, askUser = true) {
+  if (askUser) if (prompt("Type 'reset' to reset the template") != "reset") return;
   currentTemplate = JSON.parse(JSON.stringify(newTemplate));
   localStorage.setItem("template", JSON.stringify(currentTemplate ?? ""));
-  if (localStorage.getItem("surveys")) downloadSurveys(false);
   loadTemplate(currentTemplate);
   backupCurrentSurvey();
   refreshIcons();
@@ -167,7 +166,12 @@ function loadTemplate(newTemplate = exampleTemplate) {
   let metricObject;
   newTemplate.metrics.forEach(metric => {
     metricObject = new metricTypes[metric.type](metric);
-    if (metric.group) customMetrics.innerHTML += `<span class='group'>${metric.group}</span>`;
+    if (metric.group) {
+      let groupSpan = document.createElement("span");
+      groupSpan.classList.add("group");
+      groupSpan.innerHTML = metric.group;
+      customMetrics.append(groupSpan);
+    }
     customMetrics.append(metricObject.element);
     gameMetrics.push(metricObject);
   });
@@ -256,7 +260,7 @@ function resetSurvey(askUser = true) {
   teamMetric.value = "";
   teamMetric.focus();
   if (!askUser) {
-    matchCount = Math.min(parseInt(matchMetric.value) + 1, 999);
+    matchCount = parseInt(matchMetric.value) + 1;
     matchMetric.value = matchCount;
   }
   if (isAbsent) toggleAbsent();
@@ -285,11 +289,8 @@ function downloadSurveys(askUser = true) {
         surveys.forEach(survey => {
           let surveyAsCSV = "";
           survey.forEach(metric => {
-            if (typeof metric.value == "string") {
-              surveyAsCSV += "\"" + metric.value + "\",";
-            } else {
-              surveyAsCSV += metric.value + ",";
-            }
+            if (typeof metric.value == "string") surveyAsCSV += "\"" + metric.value + "\",";
+            else surveyAsCSV += metric.value + ",";
           });
           csv += surveyAsCSV + "\n";
         });

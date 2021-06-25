@@ -25,7 +25,7 @@ html {
   color: var(--main-color);
   font-size: 24px;
   margin: auto;
-  max-width: 600px;
+  max-width: 1000px;
   padding: 4px;
 }
 h1 {

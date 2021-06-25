@@ -3,18 +3,18 @@ class ToggleMetric {
     this.name = metric.name;
     this.value = false;
     this.element = document.createElement("div");
-    this.button = document.createElement("button");
-    this.button.innerHTML = `<i class="square-empty"></i> ${this.name}`;
-    this.button.onclick = () => {
+    this.tglButton = document.createElement("button");
+    this.tglButton.innerHTML = `<i class="square-empty"></i> ${this.name}`;
+    this.tglButton.onclick = () => {
       this.update();
       backupCurrentSurvey();
     };
-    this.element.append(this.button);
+    this.element.append(this.tglButton);
   }
   update(newValue = !this.value) {
     this.value = newValue;
-    this.button.innerHTML = `<i class="square-${newValue ? "checked" : "empty"}"></i> ${this.name}`;
-    refreshIcons(this.button);
+    this.tglButton.innerHTML = `<i class="square-${newValue ? "checked" : "empty"}"></i> ${this.name}`;
+    refreshIcons(this.tglButton);
   }
   reset() {
     this.update(false);
@@ -27,31 +27,31 @@ class NumberMetric {
     this.value = 0;
     this.element = document.createElement("div");
     this.element.innerHTML = this.name + "<br>";
-    this.input = document.createElement("input");
-    this.input.classList.add("number");
-    this.input.type = "number";
-    this.input.value = 0;
-    this.input.min = 0;
-    this.input.max = 999;
-    this.input.oninput = () => {
+    this.number = document.createElement("input");
+    this.number.classList.add("number");
+    this.number.type = "number";
+    this.number.value = 0;
+    this.number.pattern = "[0-9]*";
+    this.number.oninput = () => {
       this.update();
       backupCurrentSurvey();
     };
-    this.element.append(this.createCrementor("plus", 1), this.input, this.createCrementor("minus", -1));
+    this.incButton = this.createCrementor("plus", 1);
+    this.decButton = this.createCrementor("minus", -1);
+    this.element.append(this.incButton, this.number, this.decButton);
   }
   createCrementor(text = "", dir = 0) {
     let newButton = document.createElement("button");
     newButton.innerHTML = `<i class="${text}"></i>`;
     newButton.onclick = () => {
-      this.update(parseInt(this.input.value) + dir);
+      this.update(parseInt(this.number.value) + dir);
       backupCurrentSurvey();
-    }
+    };
     return newButton;
   }
-  update(newValue = this.input.value) {
-    newValue = Math.max(Math.min(newValue, 999), 0);
+  update(newValue = this.number.value) {
     this.value = newValue;
-    this.input.value = newValue;
+    this.number.value = newValue;
   }
   reset() {
     this.update(0);
@@ -156,8 +156,6 @@ class TimerMetric {
     this.number.classList.add("number");
     this.number.type = "number";
     this.number.value = 0;
-    this.number.min = 0;
-    this.number.max = 999;
     this.number.oninput = () => {
       this.update();
       backupCurrentSurvey();
