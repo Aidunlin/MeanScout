@@ -1,10 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap');
 :root {
-  color-scheme: light dark;
+  color-scheme: dark light;
   --red: #f44336;
   --blue: #2196f3;
   --theme-color: var(--red);
   --main-color: #fff;
+  --fg-color: rgba(127, 127, 127, 0.2);
   --bg-color: #000;
 }
 input, select, i, svg, #title, #nav-location, .number {
@@ -70,7 +71,7 @@ svg {
   flex-wrap: wrap;
 }
 #menu, .bg input, .bg select, .bg button {
-  background: rgba(127, 127, 127, 0.2);
+  background: var(--fg-color);
 }
 .spaced > * {
   margin: 8px;
@@ -112,7 +113,7 @@ svg {
   margin: 0;
 }
 #menu-toggle.bg {
-  background: rgba(127, 127, 127, 0.2);
+  background: var(--fg-color);
 }
 #menu {
   display: none;
