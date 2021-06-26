@@ -1,4 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap');
+@font-face {
+  font-family: 'Roboto Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/robotomono/v13/L0xuDF4xlVMF-BfR8bXMIhJHg45mwgGEFl0_3vq_ROW4.woff2) format('woff2');
+}
 :root {
   color-scheme: dark light;
   --red: #f44336;
@@ -8,25 +14,22 @@
   --fg-color: rgba(127, 127, 127, 0.2);
   --bg-color: #000;
 }
-input, select, i, svg, #title, #nav-location, .number {
+input, select, i, svg, #title, #location-text, .number {
   color: var(--theme-color);
 }
-#menu-toggle * {
-  color: var(--main-color);
-}
+
 * {
   border-radius: 0;
   box-sizing: border-box;
   font-family: "Roboto Mono", monospace;
+  font-size: 24px;
   line-height: 1.25 !important;
 }
 html {
   background: var(--bg-color);
   color: var(--main-color);
-  font-size: 24px;
   margin: auto;
-  max-width: 1000px;
-  padding: 4px;
+  max-width: 720px;
 }
 h1 {
   font-size: 24px;
@@ -91,7 +94,7 @@ svg {
 .number {
   display: inline;
   text-align: center;
-  width: 100px;
+  width: 80px;
 }
 .star {
   padding: 8px;
@@ -105,18 +108,22 @@ svg {
 
 #logo {
   height: 30px;
+  vertical-align: bottom;
 }
-#nav-location {
-  margin-left: auto;
-}
-#menu-toggle {
-  margin: 0;
-}
-#menu-toggle.bg {
+#menu-bar {
   background: var(--fg-color);
+  align-items: center;
+  justify-content: space-between;
 }
-#menu {
-  display: none;
+#menu-bar > * {
+  display: flex;
+  justify-content: center;
+}
+#menu-bar > *:first-child > * {
+  margin-right: auto;
+}
+#menu-bar > *:last-child > * {
+  margin-left: auto;
 }
 #metric-team {
   width: 100px;
@@ -124,10 +131,7 @@ svg {
 #metric-match {
   width: 80px;
 }
-
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button,
-input::-webkit-calendar-picker-indicator {
+::-webkit-outer-spin-button, ::-webkit-inner-spin-button, ::-webkit-calendar-picker-indicator {
   display: none;
   margin: 0;
   -webkit-appearance: none;
@@ -145,5 +149,10 @@ input[type=number] {
 @media (max-width: 400px) {
   #title {
     display: none;
+  }
+}
+@media (min-width: 600px) {
+  #menu-bar > * {
+    flex: 1;
   }
 }

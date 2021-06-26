@@ -41,10 +41,16 @@ function refreshIcons(element = document) {
 const downloadTypeSelect = document.querySelector("#download-type");
 const customMetrics = document.querySelector("#metrics-custom");
 
+const menuToggle = document.querySelector("#menu-toggle");
 const teamMetric = document.querySelector("#metric-team");
 const teamsList = document.querySelector("#teams");
 const matchMetric = document.querySelector("#metric-match");
 const absentMetric = document.querySelector("#metric-absent");
+
+menuToggle.onclick = () => toggleMenu();
+teamMetric.oninput = () => backupCurrentSurvey();
+matchMetric.oninput = () => backupCurrentSurvey();
+absentMetric.onclick = () => toggleAbsent();
 
 let scoutLocation = "Red Near";
 let matchCount = 1;
@@ -58,6 +64,7 @@ const metricTypes = {
   "rating": RatingMetric,
   "timer": TimerMetric,
 };
+
 const exampleTemplate = {
   metrics: [
     { name: "Toggle", type: "toggle", group: "Group" },
@@ -69,6 +76,7 @@ const exampleTemplate = {
   ]
 };
 let currentTemplate = JSON.parse(localStorage.getItem("template") ?? JSON.stringify(exampleTemplate));
+
 loadTemplate(currentTemplate);
 setLocation(localStorage.getItem("location") ?? "Red Near");
 
@@ -187,8 +195,8 @@ function setLocation(newLocation = "Red Near") {
   if (/blue/.test(newLocation.toLowerCase())) newTheme = "blue";
   document.documentElement.style.setProperty("--theme-color", `var(--${newTheme})`);
   localStorage.setItem("location", newLocation);
-  document.querySelector("#nav-location").innerHTML = newLocation;
-  document.querySelector("#menu-location").value = newLocation;
+  document.querySelector("#location-text").innerHTML = newLocation;
+  document.querySelector("#location-select").value = newLocation;
   refreshIcons();
 }
 
@@ -196,14 +204,8 @@ function setLocation(newLocation = "Red Near") {
  * Toggles the options menu
  */
 function toggleMenu() {
-  document.querySelector("#menu").classList.toggle("show");
-  document.querySelector("#menu-toggle").classList.toggle("bg");
+  document.querySelector("#menu").classList.toggle("hide");
 }
-
-document.querySelector("#menu-toggle").onclick = () => toggleMenu();
-
-teamMetric.oninput = () => backupCurrentSurvey();
-matchMetric.oninput = () => backupCurrentSurvey();
 
 /**
  * Toggles whether the team is absent
@@ -215,8 +217,6 @@ function toggleAbsent() {
   isAbsent = !isAbsent;
   backupCurrentSurvey();
 }
-
-absentMetric.onclick = () => toggleAbsent();
 
 /**
  * Validates and saves the current survey to `localStorage`
