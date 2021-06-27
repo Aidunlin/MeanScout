@@ -51,18 +51,20 @@ Each metric must have a `name` and a `type`. Use short/concise names for metrics
 
 Types:
 
-- `toggle`: a toggleable button. Value is a boolean.
-- `number`: a number input with increment/decrement buttons. Value is an integer.
-- `select`: a dropdown selector. Value is a string (selected option). There must be an array of string `values` to create options for the selector.
-- `text`: a text input. Value is a string. Setting a `tip` value will add a placeholder within the input field.
-- `rating`: a star rating bar. Value is a number (0-5). You can reset the rating bar to 0 by tapping the first star twice.
-- `timer`: a number input with timing controls. Value is a decimal.
+- `toggle`: A toggleable button. Value is a boolean.
+- `number`: A number input with increment/decrement buttons. Value is an integer.
+- `select`: A dropdown selector. Value is a string (selected option). There must be an array of string `values` to create options for the selector.
+- `text`: A text input. Value is a string. Setting a `tip` value will add a placeholder within the input field.
+- `rating`: A star rating bar. Value is a number (0-4).
+- `timer`: A number input with timing controls. Value is a decimal.
 
 Setting `group` to a string adds a label before the metric and moves the metric to a new line. Metrics after will appear to be grouped together.
 
 ## Exporting
 
-When saving/downloading, surveys will be stored in a JSON array. Each survey is also an array containing metric objects with names and values. Here are some samples:
+Surveys are stored in a JSON array. Each survey is also an array containing metric objects with names and values.
+
+Currently, you can export surveys either as JSON or CSV. Here are some samples:
 
 JSON:
 

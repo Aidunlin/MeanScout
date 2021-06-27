@@ -1,6 +1,6 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/6.1.5/workbox-sw.js");
 workbox.loadModule("workbox-strategies");
 workbox.routing.registerRoute(
-  ({url}) => !url.href.includes("README"),
-  new workbox.strategies.NetworkFirst({cacheName: "meanscout"})
+  () => { return true },
+  new workbox.strategies.NetworkFirst({ cacheName: "meanscout" })
 );

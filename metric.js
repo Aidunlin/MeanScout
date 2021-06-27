@@ -1,3 +1,4 @@
+/** A toggleable button. Value is a boolean. */
 class ToggleMetric {
   constructor(metric = { name: "Toggle" }) {
     this.name = metric.name;
@@ -23,6 +24,7 @@ class ToggleMetric {
   }
 }
 
+/** A number input with increment/decrement buttons. Value is an integer. */
 class NumberMetric {
   constructor(metric = { name: "Number" }) {
     this.name = metric.name;
@@ -64,6 +66,10 @@ class NumberMetric {
   }
 }
 
+/**
+ * A dropdown selector. Value is a string (selected option).
+ * There must be an array of string `values` to create options for the selector.
+ */
 class SelectMetric {
   constructor(metric = { name: "Select", values: [] }) {
     this.name = metric.name;
@@ -92,6 +98,10 @@ class SelectMetric {
   }
 }
 
+/**
+ * A text input. Value is a string.
+ * Setting a `tip` value will add a placeholder within the input field.
+ */
 class TextMetric {
   constructor(metric = { name: "Text", tip: "" }) {
     this.name = metric.name;
@@ -119,6 +129,7 @@ class TextMetric {
   }
 }
 
+/** A star rating bar. Value is a number (0-4). */
 class RatingMetric {
   constructor(metric = { name: "Rating" }) {
     this.name = metric.name;
@@ -153,6 +164,7 @@ class RatingMetric {
   }
 }
 
+/** A number input with timing controls. Value is a decimal. */
 class TimerMetric {
   constructor(metric = { name: "Timer" }) {
     this.name = metric.name;
