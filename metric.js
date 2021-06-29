@@ -8,7 +8,7 @@ class ToggleMetric {
     this.toggle.innerHTML = `<i class="square-empty"></i> ${this.name}`;
     this.toggle.onclick = () => {
       this.update();
-      backupCurrentSurvey();
+      backupSurvey();
     };
     this.element.append(this.toggle);
   }
@@ -38,7 +38,7 @@ class NumberMetric {
     this.number.pattern = "[0-9]*";
     this.number.oninput = () => {
       this.update();
-      backupCurrentSurvey();
+      backupSurvey();
     };
     this.incrementor = this.createCrementor("plus", 1);
     this.decrementor = this.createCrementor("minus", -1);
@@ -51,7 +51,7 @@ class NumberMetric {
     crementor.onclick = () => {
       if (!this.number.value) this.number.value = 0;
       this.update(parseInt(this.number.value) + dir);
-      backupCurrentSurvey();
+      backupSurvey();
     };
     return crementor;
   }
@@ -80,7 +80,7 @@ class SelectMetric {
     this.select = document.createElement("select");
     this.select.onchange = () => {
       this.update();
-      backupCurrentSurvey();
+      backupSurvey();
     };
     this.values.forEach(value => {
       this.select.innerHTML += `<option value="${value}">${value}</opion>`;
@@ -114,7 +114,7 @@ class TextMetric {
     this.input.placeholder = this.tip;
     this.input.oninput = () => {
       this.update();
-      backupCurrentSurvey();
+      backupSurvey();
     };
     this.element.append(this.input);
   }
@@ -144,7 +144,7 @@ class RatingMetric {
       star.innerHTML = `<i class="star-${i == 0 ? "filled" : "empty"}"></i>`;
       star.onclick = () => {
         this.update(i);
-        backupCurrentSurvey();
+        backupSurvey();
       };
       this.ratingBar.append(star);
     }
@@ -179,7 +179,7 @@ class TimerMetric {
     this.number.value = 0;
     this.number.oninput = () => {
       this.update();
-      backupCurrentSurvey();
+      backupSurvey();
     }
     this.toggleBtn = this.createButton(`<i class="play"></i>`);
     this.toggleBtn.onclick = () => this.toggle();
@@ -205,7 +205,7 @@ class TimerMetric {
         if (this.running) {
           this.update(parseFloat(this.value) + 0.1);
           this.number.value = parseFloat(this.number.value).toFixed(1);
-          backupCurrentSurvey();
+          backupSurvey();
         }
       }, 100);
       this.toggleBtn.innerHTML = `<i class="pause"></i>`;
@@ -218,7 +218,7 @@ class TimerMetric {
       this.toggle();
     }
     this.update(0);
-    backupCurrentSurvey();
+    backupSurvey();
   }
 
   update(newValue = this.number.value) {

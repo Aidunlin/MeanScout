@@ -2,21 +2,36 @@ if ("serviceWorker" in navigator) {
   window.onload = () => navigator.serviceWorker.register("./sw.js");
 }
 
-const downloadTypeSelect = document.querySelector("#download-type");
-const customMetrics = document.querySelector("#metrics-custom");
-
-const menuToggle = document.querySelector("#menu-toggle");
+const menuToggleButton = document.querySelector("#menu-toggle-btn");
+const locationText = document.querySelector("#location-text");
+const menuDiv = document.querySelector("#menu");
+const locationSelect = document.querySelector("#location-select");
+const templateCopyButton = document.querySelector("#template-copy-btn");
+const templateEditButton = document.querySelector("#template-edit-btn");
+const downloadSelect = document.querySelector("#download-type-sel");
+const surveysDownloadButton = document.querySelector("#surveys-download-btn");
+const surveysEraseButton = document.querySelector("#surveys-erase-btn");
 const teamMetric = document.querySelector("#metric-team");
-const teamsList = document.querySelector("#teams");
+const teamMetricList = document.querySelector("#teams-list");
 const matchMetric = document.querySelector("#metric-match");
 const absentMetric = document.querySelector("#metric-absent");
+const customMetricsDiv = document.querySelector("#metrics-custom");
+const surveySaveButton = document.querySelector("#survey-save-btn");
+const surveyResetButton = document.querySelector("#survey-reset-btn");
 
-menuToggle.onclick = () => toggleMenu();
-teamMetric.oninput = () => backupCurrentSurvey();
-matchMetric.oninput = () => backupCurrentSurvey();
+menuToggleButton.onclick = () => toggleMenu();
+locationSelect.onchange = e => setLocation(e.target.value);
+templateCopyButton.onclick = () => copyTemplate();
+templateEditButton.onclick = () => editTemplate();
+surveysDownloadButton.onclick = () => downloadSurveys();
+surveysEraseButton.onclick = () => eraseSurveys();
+teamMetric.oninput = () => backupSurvey();
+matchMetric.oninput = () => backupSurvey();
 absentMetric.onclick = () => toggleAbsent();
+surveySaveButton.onclick = () => saveSurvey();
+surveyResetButton.onclick = () => resetSurvey();
 
-if (window.location.href.includes("localhost")) menuToggle.click();
+if (window.location.href.includes("localhost")) toggleMenu();
 
 let scoutLocation = "Red Near";
 let matchCount = 1;
@@ -41,55 +56,55 @@ const exampleTemplate = {
     { name: "Timer", type: "timer" },
   ]
 };
-let currentTemplate = JSON.parse(localStorage.getItem("template") ?? JSON.stringify(exampleTemplate));
+let currentTemplate = JSON.parse(localStorage.template ?? JSON.stringify(exampleTemplate));
 
 loadTemplate(currentTemplate);
-setLocation(localStorage.getItem("location") ?? "Red Near");
+setLocation(localStorage.location ?? "Red Near");
 
-if (localStorage.getItem("backup")) {
-  const backupSurvey = JSON.parse(localStorage.getItem("backup"));
-  teamMetric.value = backupSurvey.find(metric => metric.name == "Team").value;
-  matchCount = backupSurvey.find(metric => metric.name == "Match").value;
+if (localStorage.backup) {
+  const backup = JSON.parse(localStorage.backup);
+  teamMetric.value = backup.find(metric => metric.name == "Team").value;
+  matchCount = backup.find(metric => metric.name == "Match").value;
   matchMetric.value = matchCount;
-  isAbsent = backupSurvey.find(metric => metric.name == "Absent").value;
+  isAbsent = backup.find(metric => metric.name == "Absent").value;
   if (isAbsent) {
     absentMetric.innerHTML = "<i class='square-checked'></i> Absent";
-    customMetrics.classList.toggle("hide");
+    customMetricsDiv.classList.toggle("hide");
     refreshIcons(absentMetric);
   }
   gameMetrics.forEach(metric => {
-    metric.update(backupSurvey.find(m => m.name == metric.name).value);
+    metric.update(backup.find(m => m.name == metric.name).value);
   });
 }
 
 /**
  * Stores the current unsaved survey to `localStorage`
  */
-function backupCurrentSurvey() {
-  localStorage.setItem("backup", JSON.stringify([
+function backupSurvey() {
+  localStorage.backup = JSON.stringify([
     { name: "Team", value: teamMetric.value },
     { name: "Match", value: matchMetric.value },
     { name: "Absent", value: isAbsent },
     ...gameMetrics.map(metric => { return { name: metric.name, value: metric.value } })
-  ]));
+  ]);
 }
 
 /**
  * Toggles the options menu
  */
 function toggleMenu() {
-  document.querySelector("#menu").classList.toggle("hide");
+  menuDiv.classList.toggle("hide");
 }
 
 /**
  * Toggles whether the team is absent
  */
 function toggleAbsent() {
-  customMetrics.classList.toggle("hide");
+  customMetricsDiv.classList.toggle("hide");
   absentMetric.innerHTML = `<i class="square-${isAbsent ? "empty" : "checked"}"></i> Absent`;
   refreshIcons(absentMetric);
   isAbsent = !isAbsent;
-  backupCurrentSurvey();
+  backupSurvey();
 }
 
 /**
@@ -110,22 +125,26 @@ function copyTemplate() {
  * Requests a new template and checks if the template is valid
  */
 function editTemplate() {
-  const newPrompt = prompt("Paste new template (leave blank to cancel):");
+  const newPrompt = prompt("Paste new template (you can also 'reset' the template):");
   if (newPrompt) {
-    const newTemplate = JSON.parse(newPrompt);
-    let error;
-    if (newTemplate.metrics) {
-      newTemplate.metrics.forEach(metric => {
-        if (!metric.name) error = "Metric has no name";
-        if (!Array.isArray(metric.values ?? [])) error = "Metric has invalid values";
-        if (!metricTypes.hasOwnProperty(metric.type)) error = "Metric has invalid type";
-      });
-    } else error = "Template has no metrics";
-    if (error) {
-      alert(`Could not set template! ${error}`);
-      return;
+    if (newPrompt == "reset") {
+      setTemplate();
+    } else {
+      const newTemplate = JSON.parse(newPrompt);
+      let error;
+      if (newTemplate.metrics) {
+        newTemplate.metrics.forEach(metric => {
+          if (!metric.name) error = "Metric has no name";
+          if (!Array.isArray(metric.values ?? [])) error = "Metric has invalid values";
+          if (!metricTypes.hasOwnProperty(metric.type)) error = "Metric has invalid type";
+        });
+      } else error = "Template has no metrics";
+      if (error) {
+        alert(`Could not set template! ${error}`);
+        return;
+      }
+      setTemplate(newTemplate);
     }
-    setTemplate(newTemplate, false);
   }
 }
 
@@ -133,12 +152,11 @@ function editTemplate() {
  * Sets a new template or to example template
  * @param {object} newTemplate An object that contains template data
  */
-function setTemplate(newTemplate = exampleTemplate, askUser = true) {
-  if (askUser) if (prompt("Type 'reset' to reset the template") != "reset") return;
+function setTemplate(newTemplate = exampleTemplate) {
   currentTemplate = JSON.parse(JSON.stringify(newTemplate));
-  localStorage.setItem("template", JSON.stringify(currentTemplate ?? ""));
+  localStorage.template = JSON.stringify(currentTemplate ?? "");
   loadTemplate(currentTemplate);
-  backupCurrentSurvey();
+  backupSurvey();
   refreshIcons();
 }
 
@@ -147,13 +165,13 @@ function setTemplate(newTemplate = exampleTemplate, askUser = true) {
  * @param {object} newTemplate An object that contains template data
  */
 function loadTemplate(newTemplate = exampleTemplate) {
-  teamsList.innerHTML = "";
+  teamMetricList.innerHTML = "";
   if (newTemplate.teams) {
     newTemplate.teams.forEach(team => {
-      teamsList.innerHTML += `<option value="${team}">`;
+      teamMetricList.innerHTML += `<option value="${team}">`;
     });
   }
-  customMetrics.innerHTML = "";
+  customMetricsDiv.innerHTML = "";
   gameMetrics = [];
   let metricObject;
   newTemplate.metrics.forEach(metric => {
@@ -162,9 +180,9 @@ function loadTemplate(newTemplate = exampleTemplate) {
       let groupSpan = document.createElement("span");
       groupSpan.classList.add("group");
       groupSpan.innerHTML = metric.group;
-      customMetrics.append(groupSpan);
+      customMetricsDiv.append(groupSpan);
     }
-    customMetrics.append(metricObject.element);
+    customMetricsDiv.append(metricObject.element);
     gameMetrics.push(metricObject);
   });
 }
@@ -178,9 +196,9 @@ function setLocation(newLocation = "Red Near") {
   let newTheme = "red";
   if (/blue/.test(newLocation.toLowerCase())) newTheme = "blue";
   document.documentElement.style.setProperty("--theme-color", `var(--${newTheme})`);
-  localStorage.setItem("location", newLocation);
-  document.querySelector("#location-text").innerHTML = newLocation;
-  document.querySelector("#location-select").value = newLocation;
+  localStorage.location = newLocation;
+  locationText.innerHTML = newLocation;
+  locationSelect.value = newLocation;
   refreshIcons();
 }
 
@@ -206,14 +224,14 @@ function saveSurvey() {
     return;
   }
   if (!confirm("Confirm save?")) return;
-  let surveys = JSON.parse(localStorage.getItem("surveys") ?? "[]");
+  let surveys = JSON.parse(localStorage.surveys ?? "[]");
   surveys.push([
     { name: "Team", value: teamMetric.value },
     { name: "Match", value: matchMetric.value },
     { name: "Absent", value: isAbsent },
     ...gameMetrics.map(metric => { return { name: metric.name, value: metric.value } })
   ]);
-  localStorage.setItem("surveys", JSON.stringify(surveys));
+  localStorage.surveys = JSON.stringify(surveys);
   resetSurvey(false);
 }
 
@@ -232,7 +250,7 @@ function resetSurvey(askUser = true) {
   if (isAbsent) toggleAbsent();
   gameMetrics.forEach(metric => metric.reset());
   refreshIcons();
-  localStorage.removeItem("backup");
+  localStorage.backup = "";
 }
 
 /**
@@ -243,13 +261,13 @@ function downloadSurveys(askUser = true) {
   if (askUser) if (!confirm("Confirm download?")) return;
   const anchor = document.createElement("a");
   anchor.href = "data:text/plain;charset=utf-8,";
-  switch (downloadTypeSelect.value) {
+  switch (downloadSelect.value) {
     case "JSON":
-      anchor.href += encodeURIComponent(localStorage.getItem("surveys"));
+      anchor.href += encodeURIComponent(localStorage.surveys);
       anchor.download = "surveys.json";
       break;
     case "CSV":
-      let surveys = JSON.parse(localStorage.getItem("surveys"));
+      let surveys = JSON.parse(localStorage.surveys);
       let csv = "";
       if (surveys) {
         surveys.forEach(survey => {
@@ -274,5 +292,5 @@ function downloadSurveys(askUser = true) {
  * Erases all surveys from `localStorage` after prompting the user
  */
 function eraseSurveys() {
-  if (prompt("Type 'erase' to erase saved surveys") == "erase") localStorage.removeItem("surveys");
+  if (prompt("Type 'erase' to erase saved surveys") == "erase") localStorage.surveys = "";
 }
