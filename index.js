@@ -31,12 +31,15 @@ absentMetric.onclick = () => toggleAbsent();
 surveySaveButton.onclick = () => saveSurvey();
 surveyResetButton.onclick = () => resetSurvey();
 
+// Useful when developing
 if (window.location.href.includes("localhost")) toggleMenu();
 
 let scoutLocation = "Red Near";
 let matchCount = 1;
 let isAbsent = false;
 let gameMetrics = [];
+
+// If you make a new type, be sure to add it here
 const metricTypes = {
   "toggle": ToggleMetric,
   "number": NumberMetric,
@@ -46,6 +49,7 @@ const metricTypes = {
   "timer": TimerMetric,
 };
 
+// The example template showcases each metric type
 const exampleTemplate = {
   metrics: [
     { name: "Toggle", type: "toggle", group: "Group" },
@@ -56,8 +60,8 @@ const exampleTemplate = {
     { name: "Timer", type: "timer" },
   ]
 };
-let currentTemplate = JSON.parse(localStorage.template ?? JSON.stringify(exampleTemplate));
 
+let currentTemplate = JSON.parse(localStorage.template ?? JSON.stringify(exampleTemplate));
 loadTemplate(currentTemplate);
 setLocation(localStorage.location ?? "Red Near");
 
@@ -77,9 +81,7 @@ if (localStorage.backup) {
   });
 }
 
-/**
- * Stores the current unsaved survey to `localStorage`
- */
+/** Stores the current unsaved survey to `localStorage` */
 function backupSurvey() {
   localStorage.backup = JSON.stringify([
     { name: "Team", value: teamMetric.value },
@@ -89,16 +91,12 @@ function backupSurvey() {
   ]);
 }
 
-/**
- * Toggles the options menu
- */
+/** Toggles the options menu */
 function toggleMenu() {
   menuDiv.classList.toggle("hide");
 }
 
-/**
- * Toggles whether the team is absent
- */
+/** Toggles whether the team is absent */
 function toggleAbsent() {
   customMetricsDiv.classList.toggle("hide");
   absentMetric.innerHTML = `<i class="square-${isAbsent ? "empty" : "checked"}"></i> Absent`;
@@ -107,9 +105,7 @@ function toggleAbsent() {
   backupSurvey();
 }
 
-/**
- * Copies the current template to clipboard
- */
+/** Copies the current template to clipboard */
 function copyTemplate() {
   const input = document.createElement("input");
   input.value = JSON.stringify(currentTemplate);
@@ -121,9 +117,7 @@ function copyTemplate() {
   alert("Copied template");
 }
 
-/**
- * Requests a new template and checks if the template is valid
- */
+/** Requests a new template and checks if the template is valid */
 function editTemplate() {
   const newPrompt = prompt("Paste new template (you can also 'reset' the template):");
   if (newPrompt) {
@@ -202,10 +196,9 @@ function setLocation(newLocation = "Red Near") {
   refreshIcons();
 }
 
-/**
- * Validates and saves the current survey to `localStorage`
- */
+/** Validates and saves the current survey to `localStorage` */
 function saveSurvey() {
+  // Matches a 1-4 long sequence of numbers and an optional character
   if (!/^\d{1,4}[A-Z]?$/.test(teamMetric.value)) {
     alert("Invalid team value");
     teamMetric.focus();
@@ -218,6 +211,7 @@ function saveSurvey() {
       return;
     }
   }
+  // Matches a 1-3 long sequence of numbers
   if (!/\d{1,3}/.test(matchMetric.value)) {
     alert("Invalid match value");
     matchMetric.focus();
@@ -288,9 +282,7 @@ function downloadSurveys(askUser = true) {
   anchor.remove();
 }
 
-/**
- * Erases all surveys from `localStorage` after prompting the user
- */
+/** Erases all surveys from `localStorage` after prompting the user */
 function eraseSurveys() {
   if (prompt("Type 'erase' to erase saved surveys") == "erase") localStorage.surveys = "";
 }

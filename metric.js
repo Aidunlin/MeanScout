@@ -1,3 +1,5 @@
+// After creating a new metric, don't forget to add it to `metricTypes`, the example template, and the README.
+
 /** A toggleable button. Value is a boolean. */
 class ToggleMetric {
   constructor(metric = { name: "Toggle" }) {

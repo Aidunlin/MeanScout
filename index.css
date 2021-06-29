@@ -1,3 +1,4 @@
+/* Monospace fonts FTW */
 @font-face {
   font-family: 'Roboto Mono';
   font-style: normal;
@@ -6,6 +7,7 @@
   src: url(https://fonts.gstatic.com/s/robotomono/v13/L0xuDF4xlVMF-BfR8bXMIhJHg45mwgGEFl0_3vq_ROW4.woff2) format('woff2');
 }
 
+/* `--theme-color` will change based on the selected location */
 :root {
   color-scheme: dark light;
   --red: #f44336;
@@ -14,6 +16,13 @@
   --main-color: #fff;
   --fg-color: rgba(127, 127, 127, 0.2);
   --bg-color: #000;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --main-color: #000;
+    --bg-color: #fff;
+  }
 }
 
 .red {
@@ -32,13 +41,6 @@ svg,
 #title,
 #location-text {
   color: var(--theme-color);
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    --main-color: #000;
-    --bg-color: #fff;
-  }
 }
 
 * {

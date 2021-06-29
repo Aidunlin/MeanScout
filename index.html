@@ -3,8 +3,10 @@
 
 <head>
   <meta charset="utf-8">
+  <!-- `user-scalable=no` prevents zooming on mobile devices after tapping twice -->
   <meta name="viewport" content="width=device-width,user-scalable=no">
   <meta name="description" content="A lightweight FRC scouting web app.">
+  <!-- Open Graph Protocol, used as a preview in Discord, Slack, etc. -->
   <meta property="og:title" content="MeanScout">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://aidunlin.com/MeanScout/">
@@ -83,6 +85,7 @@
       <button id="survey-reset-btn"><i class="undo"></i> Reset</button>
     </div>
   </div>
+  <!-- `index.js` should always go last -->
   <script src="./icon.js"></script>
   <script src="./metric.js"></script>
   <script src="./index.js"></script>
