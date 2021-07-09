@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <!-- `user-scalable=no` prevents zooming on mobile devices after tapping twice -->
-  <meta name="viewport" content="width=device-width,user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="A lightweight FRC scouting web app.">
   <!-- Open Graph Protocol, used as a preview in Discord, Slack, etc. -->
   <meta property="og:title" content="MeanScout">
@@ -22,15 +22,8 @@
 
 <body>
   <div class="flex spaced" id="menu-bar">
-    <div>
-      <button id="menu-toggle-btn"><img id="logo" src="./logo.png" alt></button>
-    </div>
-    <div>
-      <h1 id="title">MeanScout</h1>
-    </div>
-    <div>
-      <span id="location-text"></span>
-    </div>
+    <button id="menu-toggle-btn"><img class="text-icon" id="logo" src="./logo.png" alt>MeanScout</button>
+    <span id="location-text"></span>
   </div>
   <div class="flex hide" id="menu">
     <span class="group">Options</span>
@@ -47,8 +40,8 @@
       </div>
       <div>Template
         <div class="flex">
-          <button id="template-copy-btn"><i class="copy"></i> Copy</button>
-          <button id="template-edit-btn"><i class="pen"></i> Edit</button>
+          <button id="template-copy-btn"><i class="copy text-icon"></i>Copy</button>
+          <button id="template-edit-btn"><i class="pen text-icon"></i>Edit</button>
         </div>
       </div>
       <div>Surveys
@@ -59,8 +52,8 @@
               <option>CSV</option>
             </select>
           </div>
-          <button id="surveys-download-btn"><i class="download"></i> Download</button>
-          <button id="surveys-erase-btn"><i class="eraser"></i> Erase</button>
+          <button id="surveys-download-btn"><i class="download text-icon"></i>Download</button>
+          <button id="surveys-erase-btn"><i class="eraser text-icon"></i>Erase</button>
         </div>
       </div>
     </div>
@@ -75,14 +68,14 @@
         <input id="metric-match" type="number" value="1" pattern="[0-9]*">
       </div>
       <div>
-        <button id="metric-absent"><i class="square-empty"></i> Absent</button>
+        <button id="metric-absent"><i class="square-empty text-icon"></i>Absent</button>
       </div>
     </div>
     <div class="flex spaced" id="metrics-custom"></div>
     <span class="group">Survey</span>
     <div class="flex spaced">
-      <button id="survey-save-btn"><i class="save"></i> Save</button>
-      <button id="survey-reset-btn"><i class="undo"></i> Reset</button>
+      <button id="survey-save-btn"><i class="save text-icon"></i>Save</button>
+      <button id="survey-reset-btn"><i class="undo text-icon"></i>Reset</button>
     </div>
   </div>
   <!-- `index.js` should always go last -->

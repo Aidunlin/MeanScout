@@ -31,9 +31,6 @@ absentMetric.onclick = () => toggleAbsent();
 surveySaveButton.onclick = () => saveSurvey();
 surveyResetButton.onclick = () => resetSurvey();
 
-// Useful when developing
-if (window.location.href.includes("localhost")) toggleMenu();
-
 let scoutLocation = "Red Near";
 let matchCount = 1;
 let isAbsent = false;
@@ -72,7 +69,7 @@ if (localStorage.backup) {
   matchMetric.value = matchCount;
   isAbsent = backup.find(metric => metric.name == "Absent").value;
   if (isAbsent) {
-    absentMetric.innerHTML = "<i class='square-checked'></i> Absent";
+    absentMetric.innerHTML = "<i class='square-checked text-icon'></i>Absent";
     customMetricsDiv.classList.toggle("hide");
     refreshIcons(absentMetric);
   }
@@ -99,7 +96,7 @@ function toggleMenu() {
 /** Toggles whether the team is absent */
 function toggleAbsent() {
   customMetricsDiv.classList.toggle("hide");
-  absentMetric.innerHTML = `<i class="square-${isAbsent ? "empty" : "checked"}"></i> Absent`;
+  absentMetric.innerHTML = `<i class="square-${isAbsent ? "empty" : "checked"} text-icon"></i>Absent`;
   refreshIcons(absentMetric);
   isAbsent = !isAbsent;
   backupSurvey();

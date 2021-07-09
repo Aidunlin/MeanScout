@@ -7,7 +7,7 @@ class ToggleMetric {
     this.value = false;
     this.element = document.createElement("div");
     this.toggle = document.createElement("button");
-    this.toggle.innerHTML = `<i class="square-empty"></i> ${this.name}`;
+    this.toggle.innerHTML = `<i class="square-empty text-icon"></i>${this.name}`;
     this.toggle.onclick = () => {
       this.update();
       backupSurvey();
@@ -17,7 +17,7 @@ class ToggleMetric {
 
   update(newValue = !this.value) {
     this.value = newValue;
-    this.toggle.innerHTML = `<i class="square-${newValue ? "checked" : "empty"}"></i> ${this.name}`;
+    this.toggle.innerHTML = `<i class="square-${newValue ? "checked" : "empty"} text-icon"></i>${this.name}`;
     refreshIcons(this.toggle);
   }
 
