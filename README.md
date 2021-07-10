@@ -14,7 +14,6 @@ A lightweight FRC scouting web app.
 
 ## Libraries
 
-- [Normalize.css](https://necolas.github.io/normalize.css/)
 - [FontAwesome Icons](https://fontawesome.com/)
 - [Workbox](https://developers.google.com/web/tools/workbox)
 
