@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <!-- `user-scalable=no` prevents zooming on mobile devices after tapping twice -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A lightweight FRC scouting web app.">
+  <meta name="theme-color" content="#000000">
+  <!-- Open Graph Protocol, used as a preview in Discord, Slack, etc. -->
+  <meta property="og:title" content="MeanScout">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://aidunlin.com/MeanScout/">
+  <meta property="og:image" content="https://aidunlin.com/MeanScout/logo.png">
+  <meta property="og:description" content="A lightweight FRC scouting web app.">
+  <title>MeanScout</title>
+  <link rel="apple-touch-icon" href="./logo.png">
+  <link rel="icon" href="./logo.png">
+  <link rel="manifest" href="./app.webmanifest">
+  <link rel="stylesheet" href="./index.css">
+
+  <link href="./build/svelte.css" rel="stylesheet">
+  <script defer src="./build/svelte.js"></script>
+</head>
+
+<body>
+  <div class="spaced" id="hello-world-container"></div>
+  <div class="flex spaced" id="menu-bar">
+    <button id="menu-toggle-btn"><img class="text-icon" id="logo" src="./logo.png" alt>MeanScout</button>
+    <span id="location-text"></span>
+  </div>
+  <div class="flex hide" id="menu">
+    <span class="group">Options</span>
+    <div class="flex spaced">
+      <div>Location
+        <select id="location-select">
+          <option class="red">Red Near</option>
+          <option class="red">Red Mid</option>
+          <option class="red">Red Far</option>
+          <option class="blue">Blue Near</option>
+          <option class="blue">Blue Mid</option>
+          <option class="blue">Blue Far</option>
+        </select>
+      </div>
+      <div>Template
+        <div class="flex">
+          <button id="template-copy-btn"><i class="copy text-icon"></i>Copy</button>
+          <button id="template-edit-btn"><i class="pen text-icon"></i>Edit</button>
+        </div>
+      </div>
+      <div>Surveys
+        <div class="flex">
+          <div>
+            <select id="download-type-sel">
+              <option>JSON</option>
+              <option>CSV</option>
+            </select>
+          </div>
+          <button id="surveys-download-btn"><i class="download text-icon"></i>Download</button>
+          <button id="surveys-erase-btn"><i class="eraser text-icon"></i>Erase</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="flex" id="main">
+    <div class="flex spaced" id="metrics-default">
+      <div>Team
+        <input id="metric-team" list="teams" autofocus maxlength="5">
+        <datalist id="teams-list"></datalist>
+      </div>
+      <div>Match
+        <input id="metric-match" type="number" value="1" pattern="[0-9]*">
+      </div>
+      <div>
+        <button id="metric-absent"><i class="square-empty text-icon"></i>Absent</button>
+      </div>
+    </div>
+    <div class="flex spaced" id="metrics-custom"></div>
+    <span class="group">Survey</span>
+    <div class="flex spaced">
+      <button id="survey-save-btn"><i class="save text-icon"></i>Save</button>
+      <button id="survey-reset-btn"><i class="undo text-icon"></i>Reset</button>
+    </div>
+  </div>
+  <!-- `index.js` should always go last -->
+  <script src="./icon.js"></script>
+  <script src="./metric.js"></script>
+  <script src="./index.js"></script>
+</body>
+
+</html>
