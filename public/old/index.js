@@ -1,53 +1,53 @@
 // Offline
-if ("serviceWorker" in navigator) {
-  window.onload = () => {
-    navigator.serviceWorker.register("./sw.js");
-  }
-}
+// if ("serviceWorker" in navigator) {
+//   window.onload = () => {
+//     navigator.serviceWorker.register("./sw.js");
+//   }
+// }
 
-const menuToggleButton = document.querySelector("#menu-toggle-btn");
-const locationText = document.querySelector("#location-text");
-const menuDiv = document.querySelector("#menu");
-const locationSelect = document.querySelector("#location-select");
-const templateCopyButton = document.querySelector("#template-copy-btn");
-const templateEditButton = document.querySelector("#template-edit-btn");
-const downloadSelect = document.querySelector("#download-type-sel");
-const surveysDownloadButton = document.querySelector("#surveys-download-btn");
-const surveysEraseButton = document.querySelector("#surveys-erase-btn");
-const teamMetric = document.querySelector("#metric-team");
-const teamMetricList = document.querySelector("#teams-list");
-const matchMetric = document.querySelector("#metric-match");
-const absentMetric = document.querySelector("#metric-absent");
-const customMetricsDiv = document.querySelector("#metrics-custom");
-const surveySaveButton = document.querySelector("#survey-save-btn");
-const surveyResetButton = document.querySelector("#survey-reset-btn");
+// const menuToggleButton = document.querySelector("#menu-toggle-btn");
+// const locationText = document.querySelector("#location-text");
+// const menuDiv = document.querySelector("#menu");
+// const locationSelect = document.querySelector("#location-select");
+// const templateCopyButton = document.querySelector("#template-copy-btn");
+// const templateEditButton = document.querySelector("#template-edit-btn");
+// const downloadSelect = document.querySelector("#download-type-sel");
+// const surveysDownloadButton = document.querySelector("#surveys-download-btn");
+// const surveysEraseButton = document.querySelector("#surveys-erase-btn");
+// const teamMetric = document.querySelector("#metric-team");
+// const teamMetricList = document.querySelector("#teams-list");
+// const matchMetric = document.querySelector("#metric-match");
+// const absentMetric = document.querySelector("#metric-absent");
+// const customMetricsDiv = document.querySelector("#metrics-custom");
+// const surveySaveButton = document.querySelector("#survey-save-btn");
+// const surveyResetButton = document.querySelector("#survey-reset-btn");
 
-menuToggleButton.onclick = () => toggleMenu();
-locationSelect.onchange = e => setLocation(e.target.value);
-templateCopyButton.onclick = () => copyTemplate();
-templateEditButton.onclick = () => editTemplate();
-surveysDownloadButton.onclick = () => downloadSurveys();
-surveysEraseButton.onclick = () => eraseSurveys();
-teamMetric.oninput = () => backupSurvey();
-matchMetric.oninput = () => backupSurvey();
-absentMetric.onclick = () => toggleAbsent();
-surveySaveButton.onclick = () => saveSurvey();
-surveyResetButton.onclick = () => resetSurvey();
+// menuToggleButton.onclick = () => toggleMenu();
+// locationSelect.onchange = e => setLocation(e.target.value);
+// templateCopyButton.onclick = () => copyTemplate();
+// templateEditButton.onclick = () => editTemplate();
+// surveysDownloadButton.onclick = () => downloadSurveys();
+// surveysEraseButton.onclick = () => eraseSurveys();
+// teamMetric.oninput = () => backupSurvey();
+// matchMetric.oninput = () => backupSurvey();
+// absentMetric.onclick = () => toggleAbsent();
+// surveySaveButton.onclick = () => saveSurvey();
+// surveyResetButton.onclick = () => resetSurvey();
 
-let scoutLocation = "Red Near";
-let matchCount = 1;
-let isAbsent = false;
-let gameMetrics = [];
+// let scoutLocation = "Red Near";
+// let matchCount = 1;
+// let isAbsent = false;
+// let gameMetrics = [];
 
 // If you make a new type, be sure to add it here
-const metricTypes = {
-  "toggle": ToggleMetric,
-  "number": NumberMetric,
-  "select": SelectMetric,
-  "text": TextMetric,
-  "rating": RatingMetric,
-  "timer": TimerMetric,
-};
+// const metricTypes = {
+//   "toggle": ToggleMetric,
+//   "number": NumberMetric,
+//   "select": SelectMetric,
+//   "text": TextMetric,
+//   "rating": RatingMetric,
+//   "timer": TimerMetric,
+// };
 
 // The example template showcases each metric type
 const exampleTemplate = {
@@ -63,7 +63,7 @@ const exampleTemplate = {
 
 let currentTemplate = JSON.parse(localStorage.template ?? JSON.stringify(exampleTemplate));
 loadTemplate(currentTemplate);
-setLocation(localStorage.location ?? "Red Near");
+// setLocation(localStorage.location ?? "Red Near");
 
 if (localStorage.backup) {
   const backup = JSON.parse(localStorage.backup);
@@ -92,18 +92,18 @@ function backupSurvey() {
 }
 
 /** Toggles the options menu */
-function toggleMenu() {
-  menuDiv.classList.toggle("hide");
-}
+// function toggleMenu() {
+//   menuDiv.classList.toggle("hide");
+// }
 
 /** Toggles whether the team is absent */
-function toggleAbsent() {
-  customMetricsDiv.classList.toggle("hide");
-  absentMetric.innerHTML = `<i class="square-${isAbsent ? "empty" : "checked"} text-icon"></i>Absent`;
-  refreshIcons(absentMetric);
-  isAbsent = !isAbsent;
-  backupSurvey();
-}
+// function toggleAbsent() {
+//   customMetricsDiv.classList.toggle("hide");
+//   absentMetric.innerHTML = `<i class="square-${isAbsent ? "empty" : "checked"} text-icon"></i>Absent`;
+//   refreshIcons(absentMetric);
+//   isAbsent = !isAbsent;
+//   backupSurvey();
+// }
 
 /** Copies the current template to clipboard */
 function copyTemplate() {
@@ -193,16 +193,16 @@ function loadTemplate(newTemplate = exampleTemplate) {
  * Sets a new scout location
  * @param {string} newLocation A string that includes alliance color and robot position
  */
-function setLocation(newLocation = "Red Near") {
-  scoutLocation = newLocation;
-  let newTheme = "red";
-  if (/blue/.test(newLocation.toLowerCase())) newTheme = "blue";
-  document.documentElement.style.setProperty("--theme-color", `var(--${newTheme})`);
-  localStorage.location = newLocation;
-  locationText.innerHTML = newLocation;
-  locationSelect.value = newLocation;
-  refreshIcons();
-}
+// function setLocation(newLocation = "Red Near") {
+//   scoutLocation = newLocation;
+//   let newTheme = "red";
+//   if (/blue/.test(newLocation.toLowerCase())) newTheme = "blue";
+//   document.documentElement.style.setProperty("--theme-color", `var(--${newTheme})`);
+//   localStorage.location = newLocation;
+//   locationText.innerHTML = newLocation;
+//   locationSelect.value = newLocation;
+//   refreshIcons();
+// }
 
 /** Validates and saves the current survey to `localStorage` */
 function saveSurvey() {

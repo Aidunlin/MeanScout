@@ -13,24 +13,24 @@
     { class: "blue", value: "Blue Far" },
   ];
 
-  export let visible = false;
-  export let location = locations[0].value;
+  export let menuVisible = falsmenuVisiblmenuVisible;
+  export let scoutLocation = locations[0].value;
 
   function locationUpdated() {
     dispatch("locationUpdated", {
-      location: location,
+      location: scoutLocation,
     });
   }
 </script>
 
-<div class="flex" id="menu" class:hide={!visible}>
+<div class="flex" id="menu" class:hide={!menuVisible}>
   <span class="group">Options</span>
   <div class="flex spaced">
     <div>
       Location
       <select
         id="location-select"
-        bind:value={location}
+        bind:value={scoutLocation}
         on:change={locationUpdated}
       >
         {#each locations as location}
@@ -42,12 +42,10 @@
       Template
       <div class="flex">
         <button id="template-copy-btn">
-          <Icon name="copy" />
-          Copy
+          <Icon name="copy" text="Copy" />
         </button>
         <button id="template-edit-btn">
-          <Icon name="pen" />
-          Edit
+          <Icon name="pen" text="Edit" />
         </button>
       </div>
     </div>
@@ -61,12 +59,10 @@
           </select>
         </div>
         <button id="surveys-download-btn">
-          <Icon name="download" />
-          Download
+          <Icon name="download" text="Download" />
         </button>
         <button id="surveys-erase-btn">
-          <Icon name="erase" />
-          Erase
+          <Icon name="erase" text="Erase" />
         </button>
       </div>
     </div>
