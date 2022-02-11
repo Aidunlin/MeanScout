@@ -27,7 +27,9 @@ function refreshIcons(element = document) {
   element.querySelectorAll("i").forEach(iconElement => {
     iconElement.innerHTML = icons.question;
     icons.forEach(icon => {
-      if (iconElement.classList.contains(icon.name)) iconElement.innerHTML = icon.value;
+      if (iconElement.classList.contains(icon.name)) {
+        iconElement.innerHTML = icon.value;
+      }
     });
   });
 }

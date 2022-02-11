@@ -1,5 +1,7 @@
-import HelloWorld from './HelloWorld.svelte';
+import App from "./App.svelte";
 
-new HelloWorld({
-  target: document.querySelector('#hello-world-container'),
+var app = new App({
+  target: document.body
 });
+
+export default app;

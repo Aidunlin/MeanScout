@@ -1,5 +1,8 @@
+// Offline
 if ("serviceWorker" in navigator) {
-  window.onload = () => navigator.serviceWorker.register("./sw.js");
+  window.onload = () => {
+    navigator.serviceWorker.register("./sw.js");
+  }
 }
 
 const menuToggleButton = document.querySelector("#menu-toggle-btn");
@@ -125,11 +128,19 @@ function editTemplate() {
       let error;
       if (newTemplate.metrics) {
         newTemplate.metrics.forEach(metric => {
-          if (!metric.name) error = "Metric has no name";
-          if (!Array.isArray(metric.values ?? [])) error = "Metric has invalid values";
-          if (!metricTypes.hasOwnProperty(metric.type)) error = "Metric has invalid type";
+          if (!metric.name) {
+            error = "Metric has no name";
+          }
+          if (!Array.isArray(metric.values ?? [])) {
+            error = "Metric has invalid values";
+          }
+          if (!metricTypes.hasOwnProperty(metric.type)) {
+            error = "Metric has invalid type";
+          }
         });
-      } else error = "Template has no metrics";
+      } else {
+        error = "Template has no metrics";
+      }
       if (error) {
         alert(`Could not set template! ${error}`);
         return;
@@ -214,7 +225,9 @@ function saveSurvey() {
     matchMetric.focus();
     return;
   }
-  if (!confirm("Confirm save?")) return;
+  if (!confirm("Confirm save?")) {
+    return;
+  }
   let surveys = JSON.parse(localStorage.surveys ?? "[]");
   surveys.push([
     { name: "Team", value: teamMetric.value },
@@ -231,49 +244,59 @@ function saveSurvey() {
  * @param {boolean} askUser A boolean that represents whether to prompt the user
  */
 function resetSurvey(askUser = true) {
-  if (askUser) if (prompt("Type 'reset' to reset the survey") != "reset") return;
+  if (askUser) {
+    if (prompt("Type 'reset' to reset the survey") != "reset") {
+      return;
+    }
+  }
   teamMetric.value = "";
   teamMetric.focus();
   if (!askUser) {
     matchCount = parseInt(matchMetric.value) + 1;
     matchMetric.value = matchCount;
   }
-  if (isAbsent) toggleAbsent();
+  if (isAbsent) {
+    toggleAbsent();
+  }
   gameMetrics.forEach(metric => metric.reset());
   refreshIcons();
   localStorage.backup = "";
 }
 
 /**
- * Downloads all surveys from `localStorage` either as JSON or CSV
+ * Downloads all surveys from `localStorage` either as CSV or JSON
  * @param {boolean} askUser A boolean that represents whether to prompt the user
  */
 function downloadSurveys(askUser = true) {
-  if (askUser) if (!confirm("Confirm download?")) return;
+  if (askUser) {
+    if (!confirm("Confirm download?")) {
+      return;
+    }
+  }
   const anchor = document.createElement("a");
   anchor.href = "data:text/plain;charset=utf-8,";
-  switch (downloadSelect.value) {
-    case "JSON":
-      anchor.href += encodeURIComponent(localStorage.surveys);
-      anchor.download = "surveys.json";
-      break;
-    case "CSV":
-      let surveys = JSON.parse(localStorage.surveys);
-      let csv = "";
-      if (surveys) {
-        surveys.forEach(survey => {
-          let surveyAsCSV = "";
-          survey.forEach(metric => {
-            if (typeof metric.value == "string") surveyAsCSV += "\"" + metric.value + "\",";
-            else surveyAsCSV += metric.value + ",";
-          });
-          csv += surveyAsCSV + "\n";
+  if (downloadSelect.value == "CSV") {
+    let surveys = JSON.parse(localStorage.surveys);
+    let csv = "";
+    if (surveys) {
+      surveys.forEach(survey => {
+        let surveyAsCSV = "";
+        survey.forEach(metric => {
+          if (typeof metric.value == "string") {
+            surveyAsCSV += "\"" + metric.value + "\",";
+          } else {
+            surveyAsCSV += metric.value + ",";
+          }
         });
-      }
-      anchor.href += encodeURIComponent(csv);
-      anchor.download = "surveys.csv";
-      break;
-  }
+        csv += surveyAsCSV + "\n";
+      });
+    }
+    anchor.href += encodeURIComponent(csv);
+    anchor.download = "surveys.csv";
+  } else if (downloadSelect.value == "JSON") {
+    anchor.href += encodeURIComponent(localStorage.surveys);
+    anchor.download = "surveys.json";
+  } 
   document.body.append(anchor);
   anchor.click();
   anchor.remove();
@@ -281,5 +304,7 @@ function downloadSurveys(askUser = true) {
 
 /** Erases all surveys from `localStorage` after prompting the user */
 function eraseSurveys() {
-  if (prompt("Type 'erase' to erase saved surveys") == "erase") localStorage.surveys = "[]";
+  if (prompt("Type 'erase' to erase saved surveys") == "erase") {
+    localStorage.surveys = "[]";
+  }
 }

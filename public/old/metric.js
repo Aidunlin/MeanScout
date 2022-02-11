@@ -50,8 +50,11 @@ class NumberMetric {
   createCrementor(text = "", dir = 0) {
     let crementor = document.createElement("button");
     crementor.innerHTML = `<i class="${text}"></i>`;
+    crementor.ariaLabel = text;
     crementor.onclick = () => {
-      if (!this.number.value) this.number.value = 0;
+      if (!this.number.value) {
+        this.number.value = 0;
+      }
       this.update(parseInt(this.number.value) + dir);
       backupSurvey();
     };
@@ -144,6 +147,7 @@ class RatingMetric {
       const star = document.createElement("button");
       star.classList.add("star");
       star.innerHTML = `<i class="star-${i == 0 ? "filled" : "empty"}"></i>`;
+      star.ariaLabel = `star ${i + 1}`;
       star.onclick = () => {
         this.update(i);
         backupSurvey();
@@ -185,8 +189,10 @@ class TimerMetric {
     }
     this.toggleBtn = this.createButton(`<i class="play"></i>`);
     this.toggleBtn.onclick = () => this.toggle();
+    this.toggleBtn.ariaLabel = "toggle";
     this.stopBtn = this.createButton(`<i class="stop"></i>`);
     this.stopBtn.onclick = () => this.stop();
+    this.stopBtn.ariaLabel = "stop";
     this.element.append(this.toggleBtn, this.number, this.stopBtn);
   }
 
