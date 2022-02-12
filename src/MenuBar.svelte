@@ -1,9 +1,8 @@
 <script>
-  export let menuVisible = false;
-  export let scoutLocation = "Red Near";
+  import { msData } from "./stores.js";
 
   function toggleMenu() {
-    menuVisible = !menuVisible;
+    $msData.menuVisible = !$msData.menuVisible;
   }
 </script>
 
@@ -11,5 +10,5 @@
   <button id="menu-toggle-btn" on:click={toggleMenu}>
     <img class="text-icon" id="logo" src="./logo.svg" alt />MeanScout
   </button>
-  <span id="location-text">{scoutLocation}</span>
+  <span id="location-text">{$msData.location}</span>
 </div>

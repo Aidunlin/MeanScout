@@ -1,5 +1,3 @@
-<!-- Never format this lol -->
-
 <script>
   export let name = "";
   export let text = "";

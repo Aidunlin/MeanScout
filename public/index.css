@@ -1,4 +1,3 @@
-/* `--theme-color` will change based on the selected location */
 :root {
   color-scheme: dark light;
   --red: #f44336;
@@ -141,7 +140,7 @@ svg,
 ::-webkit-outer-spin-button,
 ::-webkit-inner-spin-button,
 ::-webkit-calendar-picker-indicator {
-  display: none;
+  display: none !important;
   margin: 0;
   -webkit-appearance: none;
 }

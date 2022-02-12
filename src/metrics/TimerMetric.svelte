@@ -1,5 +1,8 @@
 <script>
+  import { createEventDispatcher } from "svelte";
   import Icon from "../Icon.svelte";
+
+  const dispatch = createEventDispatcher();
 
   export let name = "Timer";
   export let value = 0;
@@ -7,10 +10,15 @@
 
   let interval = null;
 
+  function changed() {
+    dispatch("update");
+  }
+
   function toggle() {
     if (running) {
       running = false;
       clearInterval(interval);
+      changed();
     } else {
       running = true;
       interval = setInterval(() => {
@@ -26,6 +34,7 @@
       toggle();
     }
     value = 0;
+    changed();
   }
 </script>
 
@@ -35,7 +44,7 @@
     <button on:click={toggle}>
       <Icon name={running ? "pause" : "play"} />
     </button>
-    <input type="number" class="number" bind:value>
+    <input type="number" class="number" bind:value on:change={changed} />
     <button on:click={reset}>
       <Icon name="stop" />
     </button>
