@@ -1,7 +1,7 @@
 <script>
-  import { msData, metricTypes, exampleTemplate } from "./stores.js";
+  import { msData, exampleTemplate } from "./stores.js";
   import Icon from "./Icon.svelte";
-  import { SelectMetric } from "./metrics/metrics.js";
+  import Metric, { metricTypes, getDefaultValue } from "./Metric.svelte";
 
   let locations = [
     "Red Near",
@@ -30,22 +30,26 @@
       navigator.clipboard.writeText(JSON.stringify($msData.currentTemplate));
       alert("Copied template");
     } else {
-      prompt("Copy the template below", JSON.stringify($msData.currentTemplate));
+      prompt(
+        "Copy the template below",
+        JSON.stringify($msData.currentTemplate)
+      );
     }
   }
 
   function setTemplate(newTemplate = null) {
     localStorage.backup = "";
-    $msData.currentTemplate = JSON.parse(JSON.stringify(newTemplate ?? $exampleTemplate));
+    $msData.currentTemplate = JSON.parse(
+      JSON.stringify(newTemplate ?? $exampleTemplate)
+    );
     localStorage.template = JSON.stringify($msData.currentTemplate);
     $msData.customMetrics = $msData.currentTemplate.metrics.map((metric) => {
-      let defaultValue = $metricTypes.find(type => type.name == metric.type).default;
+      let defaultValue = getDefaultValue(metric.type);
       if (metric.type == "select") {
         defaultValue = metric.values[0];
       }
       return { ...metric, value: defaultValue, default: defaultValue };
     });
-
   }
 
   function editTemplate() {
@@ -54,22 +58,30 @@
       if (newPrompt == "reset") {
         setTemplate();
       } else {
-        const newTemplate = JSON.parse(newPrompt);
-        let error;
-        if (newTemplate.metrics) {
-          newTemplate.metrics.forEach(metric => {
-            if (!metric.name) {
-              error = "Metric has no name";
-            }
-            if (!Array.isArray(metric.values ?? [])) {
-              error = "Metric has invalid values";
-            }
-            if (!metric.type in $metricTypes) {
-              error = "Metric has invalid type";
-            }
-          });
-        } else {
-          error = "Template has no metrics";
+        let newTemplate;
+        let error = "";
+        try {
+          newTemplate = JSON.parse(newPrompt);
+          if (!Array.isArray(newTemplate.teams ?? [])) {
+            error += "Template has invalid teams";
+          }
+          if (newTemplate.metrics) {
+            newTemplate.metrics.forEach((metric, i) => {
+              if (!metric.name) {
+                error += `\nMetric ${i + 1} has no name`;
+              }
+              if (!Array.isArray(metric.values ?? [])) {
+                error += `\nMetric ${metric.name ?? i + 1} has invalid values`;
+              }
+              if (!metricTypes.some(type => type.name == metric.type)) {
+                error += `\nMetric ${metric.name ?? i + 1} has invalid type`;
+              }
+            });
+          } else {
+            error += "\nTemplate has no metrics";
+          }
+        } catch (e) {
+          error += "\n" + e;
         }
         if (error) {
           alert(`Could not set template! ${error}`);
@@ -87,11 +99,11 @@
       let surveys = JSON.parse(localStorage.surveys);
       let csv = "";
       if (surveys) {
-        surveys.forEach(survey => {
+        surveys.forEach((survey) => {
           let surveyAsCSV = "";
-          survey.forEach(metric => {
+          survey.forEach((metric) => {
             if (typeof metric.value == "string") {
-              surveyAsCSV += "\"" + metric.value + "\",";
+              surveyAsCSV += '"' + metric.value + '",';
             } else {
               surveyAsCSV += metric.value + ",";
             }
@@ -104,7 +116,7 @@
     } else if (surveyType == "JSON") {
       anchor.href += encodeURIComponent(localStorage.surveys);
       anchor.download = "surveys.json";
-    } 
+    }
     document.body.append(anchor);
     anchor.click();
     anchor.remove();
@@ -135,8 +147,9 @@
 <div class="flex" id="menu" class:hide={!$msData.menuVisible}>
   <span class="group">Options</span>
   <div class="flex spaced">
-    <SelectMetric
+    <Metric
       name="Location"
+      type="select"
       values={locations}
       bind:value={$msData.location}
       on:update={locationUpdated}
@@ -154,7 +167,12 @@
     </div>
     <span class="group">Surveys</span>
     <div class="flex">
-      <SelectMetric name="" values={surveyTypes} bind:value={surveyType} />
+      <Metric
+        name=""
+        type="select"
+        values={surveyTypes}
+        bind:value={surveyType}
+      />
       <button on:click={askDownloadSurveys}>
         <Icon name="download" text="Download" />
       </button>

@@ -1,7 +1,7 @@
 <script>
-  import { msData, metricTypes, exampleTemplate } from "./stores.js";
+  import { msData, exampleTemplate } from "./stores.js";
   import Icon from "./Icon.svelte";
-  import { ToggleMetric } from "./metrics/metrics.js";
+  import Metric, { getDefaultValue } from "./Metric.svelte";
 
   function getSurvey() {
     return [
@@ -62,7 +62,7 @@
   function loadTemplate() {
     $msData.currentTemplate = JSON.parse(localStorage.template ?? JSON.stringify($exampleTemplate));
     $msData.customMetrics = $msData.currentTemplate.metrics.map((metric) => {
-      let defaultValue = $metricTypes.find(type => type.name == metric.type).default;
+      let defaultValue = getDefaultValue(metric.type);
       if (metric.type == "select") {
         defaultValue = metric.values[0];
       }
@@ -119,7 +119,7 @@
       />
     </div>
     <div>
-      <ToggleMetric name="Absent" bind:value={$msData.isAbsent} on:update={backupSurvey} />
+      <Metric name="Absent" type="toggle" bind:value={$msData.isAbsent} on:update={backupSurvey} />
     </div>
   </div>
 
@@ -128,12 +128,12 @@
       {#if metric.group}
         <span class="group">{metric.group}</span>
       {/if}
-      <svelte:component
-        this={$metricTypes.find(type => type.name == metric.type).metric}
-        values={metric.values ?? ["Option"]}
-        tip={metric.tip ?? ""}
+      <Metric
         bind:name={$msData.customMetrics[i].name}
+        type={metric.type}
         bind:value={$msData.customMetrics[i].value}
+        values={metric.values ?? [""]}
+        tip={metric.tip ?? ""}
         on:update={backupSurvey}
       />
     {/each}

@@ -1,12 +1,4 @@
 import { writable } from "svelte/store";
-import {
-  ToggleMetric,
-  NumberMetric,
-  SelectMetric,
-  TextMetric,
-  RatingMetric,
-  TimerMetric,
-} from "./metrics/metrics.js";
 
 export const exampleTemplate = writable({
   metrics: [
@@ -18,15 +10,6 @@ export const exampleTemplate = writable({
     { name: "Timer", type: "timer" },
   ]
 });
-
-export const metricTypes = writable([
-  { name: "toggle", metric: ToggleMetric, default: false },
-  { name: "number", metric: NumberMetric, default: 0 },
-  { name: "select", metric: SelectMetric, default: 0 },
-  { name: "text", metric: TextMetric, default: "" },
-  { name: "rating", metric: RatingMetric, default: 0 },
-  { name: "timer", metric: TimerMetric, default: 0 },
-]);
 
 export const msData = writable({
   location: "Red Near",
