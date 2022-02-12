@@ -640,7 +640,7 @@ var app = (function () {
     			path: "M400 288h-352c-17.69 0-32-14.32-32-32.01s14.31-31.99 32-31.99h352c17.69 0 32 14.3 32 31.99S417.7 288 400 288z"
     		},
     		"pause": {
-    			width: 320,
+    			width: 384,
     			path: "M272 63.1l-32 0c-26.51 0-48 21.49-48 47.1v288c0 26.51 21.49 48 48 48L272 448c26.51 0 48-21.49 48-48v-288C320 85.49 298.5 63.1 272 63.1zM80 63.1l-32 0c-26.51 0-48 21.49-48 48v288C0 426.5 21.49 448 48 448l32 0c26.51 0 48-21.49 48-48v-288C128 85.49 106.5 63.1 80 63.1z"
     		},
     		"pen": {
@@ -940,8 +940,9 @@ var app = (function () {
     			attr_dev(input, "type", "number");
     			attr_dev(input, "class", "number");
     			attr_dev(input, "pattern", "[0-9]*");
+    			input.readOnly = true;
     			add_location(input, file$7, 26, 4, 482);
-    			add_location(button1, file$7, 27, 4, 554);
+    			add_location(button1, file$7, 27, 4, 563);
     			attr_dev(div0, "class", "flex");
     			add_location(div0, file$7, 22, 2, 380);
     			add_location(div1, file$7, 20, 0, 361);
@@ -1834,8 +1835,9 @@ var app = (function () {
     			add_location(button0, file$3, 43, 4, 791);
     			attr_dev(input, "type", "number");
     			attr_dev(input, "class", "number");
+    			input.readOnly = true;
     			add_location(input, file$3, 46, 4, 888);
-    			add_location(button1, file$3, 47, 4, 963);
+    			add_location(button1, file$3, 47, 4, 972);
     			attr_dev(div0, "class", "flex");
     			add_location(div0, file$3, 42, 2, 767);
     			add_location(div1, file$3, 40, 0, 748);
@@ -2041,8 +2043,7 @@ var app = (function () {
         { name: "Text", type: "text", tip: "Tip" },
         { name: "Rating", type: "rating" },
         { name: "Timer", type: "timer" },
-      ],
-      teams: [1111, 2222, 3333, 4444, 555, 666, 777]
+      ]
     });
 
     const metricTypes = writable([
@@ -2181,10 +2182,10 @@ var app = (function () {
     const file$1 = "src\\Menu.svelte";
 
     function create_fragment$2(ctx) {
-    	let div5;
-    	let span;
-    	let t1;
     	let div4;
+    	let span0;
+    	let t1;
+    	let div3;
     	let selectmetric0;
     	let updating_value;
     	let t2;
@@ -2197,15 +2198,15 @@ var app = (function () {
     	let button1;
     	let icon1;
     	let t5;
-    	let div3;
-    	let t6;
+    	let span1;
+    	let t7;
     	let div2;
     	let selectmetric1;
     	let updating_value_1;
-    	let t7;
+    	let t8;
     	let button2;
     	let icon2;
-    	let t8;
+    	let t9;
     	let button3;
     	let icon3;
     	let current;
@@ -2231,7 +2232,7 @@ var app = (function () {
     		});
 
     	binding_callbacks.push(() => bind(selectmetric0, 'value', selectmetric0_value_binding));
-    	selectmetric0.$on("updated", /*locationUpdated*/ ctx[4]);
+    	selectmetric0.$on("update", /*locationUpdated*/ ctx[4]);
 
     	icon0 = new Icon({
     			props: { name: "copy", text: "Copy" },
@@ -2272,11 +2273,11 @@ var app = (function () {
 
     	const block = {
     		c: function create() {
-    			div5 = element("div");
-    			span = element("span");
-    			span.textContent = "Options";
-    			t1 = space();
     			div4 = element("div");
+    			span0 = element("span");
+    			span0.textContent = "Options";
+    			t1 = space();
+    			div3 = element("div");
     			create_component(selectmetric0.$$.fragment);
     			t2 = space();
     			div1 = element("div");
@@ -2288,50 +2289,48 @@ var app = (function () {
     			button1 = element("button");
     			create_component(icon1.$$.fragment);
     			t5 = space();
-    			div3 = element("div");
-    			t6 = text("Surveys\r\n      ");
+    			span1 = element("span");
+    			span1.textContent = "Surveys";
+    			t7 = space();
     			div2 = element("div");
     			create_component(selectmetric1.$$.fragment);
-    			t7 = space();
+    			t8 = space();
     			button2 = element("button");
     			create_component(icon2.$$.fragment);
-    			t8 = space();
+    			t9 = space();
     			button3 = element("button");
     			create_component(icon3.$$.fragment);
-    			attr_dev(span, "class", "group");
-    			add_location(span, file$1, 135, 2, 3987);
-    			attr_dev(button0, "id", "template-copy-btn");
-    			add_location(button0, file$1, 146, 8, 4262);
-    			attr_dev(button1, "id", "template-edit-btn");
-    			add_location(button1, file$1, 149, 8, 4390);
+    			attr_dev(span0, "class", "group");
+    			add_location(span0, file$1, 135, 2, 3987);
+    			add_location(button0, file$1, 146, 8, 4261);
+    			add_location(button1, file$1, 149, 8, 4366);
     			attr_dev(div0, "class", "flex");
-    			add_location(div0, file$1, 145, 6, 4234);
-    			add_location(div1, file$1, 143, 4, 4205);
-    			attr_dev(button2, "id", "surveys-download-btn");
-    			add_location(button2, file$1, 158, 8, 4674);
-    			attr_dev(button3, "id", "surveys-erase-btn");
-    			add_location(button3, file$1, 161, 8, 4819);
+    			add_location(div0, file$1, 145, 6, 4233);
+    			add_location(div1, file$1, 143, 4, 4204);
+    			attr_dev(span1, "class", "group");
+    			add_location(span1, file$1, 154, 4, 4492);
+    			add_location(button2, file$1, 157, 6, 4635);
     			attr_dev(div2, "class", "flex");
-    			add_location(div2, file$1, 156, 6, 4567);
-    			add_location(div3, file$1, 154, 4, 4539);
-    			attr_dev(div4, "class", "flex spaced");
-    			add_location(div4, file$1, 136, 2, 4025);
-    			attr_dev(div5, "class", "flex");
-    			attr_dev(div5, "id", "menu");
-    			toggle_class(div5, "hide", !/*$msData*/ ctx[1].menuVisible);
-    			add_location(div5, file$1, 134, 0, 3921);
+    			add_location(div2, file$1, 155, 4, 4532);
+    			add_location(button3, file$1, 161, 4, 4758);
+    			attr_dev(div3, "class", "flex spaced");
+    			add_location(div3, file$1, 136, 2, 4025);
+    			attr_dev(div4, "class", "flex");
+    			attr_dev(div4, "id", "menu");
+    			toggle_class(div4, "hide", !/*$msData*/ ctx[1].menuVisible);
+    			add_location(div4, file$1, 134, 0, 3921);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
     		},
     		m: function mount(target, anchor) {
-    			insert_dev(target, div5, anchor);
-    			append_dev(div5, span);
-    			append_dev(div5, t1);
-    			append_dev(div5, div4);
-    			mount_component(selectmetric0, div4, null);
-    			append_dev(div4, t2);
-    			append_dev(div4, div1);
+    			insert_dev(target, div4, anchor);
+    			append_dev(div4, span0);
+    			append_dev(div4, t1);
+    			append_dev(div4, div3);
+    			mount_component(selectmetric0, div3, null);
+    			append_dev(div3, t2);
+    			append_dev(div3, div1);
     			append_dev(div1, t3);
     			append_dev(div1, div0);
     			append_dev(div0, button0);
@@ -2339,16 +2338,16 @@ var app = (function () {
     			append_dev(div0, t4);
     			append_dev(div0, button1);
     			mount_component(icon1, button1, null);
-    			append_dev(div4, t5);
-    			append_dev(div4, div3);
-    			append_dev(div3, t6);
+    			append_dev(div3, t5);
+    			append_dev(div3, span1);
+    			append_dev(div3, t7);
     			append_dev(div3, div2);
     			mount_component(selectmetric1, div2, null);
-    			append_dev(div2, t7);
+    			append_dev(div2, t8);
     			append_dev(div2, button2);
     			mount_component(icon2, button2, null);
-    			append_dev(div2, t8);
-    			append_dev(div2, button3);
+    			append_dev(div3, t9);
+    			append_dev(div3, button3);
     			mount_component(icon3, button3, null);
     			current = true;
 
@@ -2385,7 +2384,7 @@ var app = (function () {
     			selectmetric1.$set(selectmetric1_changes);
 
     			if (dirty & /*$msData*/ 2) {
-    				toggle_class(div5, "hide", !/*$msData*/ ctx[1].menuVisible);
+    				toggle_class(div4, "hide", !/*$msData*/ ctx[1].menuVisible);
     			}
     		},
     		i: function intro(local) {
@@ -2408,7 +2407,7 @@ var app = (function () {
     			current = false;
     		},
     		d: function destroy(detaching) {
-    			if (detaching) detach_dev(div5);
+    			if (detaching) detach_dev(div4);
     			destroy_component(selectmetric0);
     			destroy_component(icon0);
     			destroy_component(icon1);
@@ -2664,19 +2663,19 @@ var app = (function () {
 
     function get_each_context(ctx, list, i) {
     	const child_ctx = ctx.slice();
-    	child_ctx[15] = list[i];
-    	child_ctx[16] = list;
-    	child_ctx[17] = i;
+    	child_ctx[17] = list[i];
+    	child_ctx[18] = list;
+    	child_ctx[19] = i;
     	return child_ctx;
     }
 
     function get_each_context_1(ctx, list, i) {
     	const child_ctx = ctx.slice();
-    	child_ctx[18] = list[i];
+    	child_ctx[20] = list[i];
     	return child_ctx;
     }
 
-    // (99:8) {#each $msData.currentTemplate.teams ?? [] as team}
+    // (106:8) {#each $msData.currentTemplate.teams ?? [] as team}
     function create_each_block_1(ctx) {
     	let option;
     	let option_value_value;
@@ -2684,15 +2683,15 @@ var app = (function () {
     	const block = {
     		c: function create() {
     			option = element("option");
-    			option.__value = option_value_value = /*team*/ ctx[18];
+    			option.__value = option_value_value = /*team*/ ctx[20];
     			option.value = option.__value;
-    			add_location(option, file, 99, 10, 3183);
+    			add_location(option, file, 106, 10, 3246);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, option, anchor);
     		},
     		p: function update(ctx, dirty) {
-    			if (dirty & /*$msData*/ 1 && option_value_value !== (option_value_value = /*team*/ ctx[18])) {
+    			if (dirty & /*$msData*/ 1 && option_value_value !== (option_value_value = /*team*/ ctx[20])) {
     				prop_dev(option, "__value", option_value_value);
     				option.value = option.__value;
     			}
@@ -2706,17 +2705,17 @@ var app = (function () {
     		block,
     		id: create_each_block_1.name,
     		type: "each",
-    		source: "(99:8) {#each $msData.currentTemplate.teams ?? [] as team}",
+    		source: "(106:8) {#each $msData.currentTemplate.teams ?? [] as team}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (121:6) {#if metric.group}
+    // (128:6) {#if metric.group}
     function create_if_block(ctx) {
     	let span;
-    	let t_value = /*metric*/ ctx[15].group + "";
+    	let t_value = /*metric*/ ctx[17].group + "";
     	let t;
 
     	const block = {
@@ -2724,14 +2723,14 @@ var app = (function () {
     			span = element("span");
     			t = text(t_value);
     			attr_dev(span, "class", "group");
-    			add_location(span, file, 121, 8, 3767);
+    			add_location(span, file, 128, 8, 3810);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, span, anchor);
     			append_dev(span, t);
     		},
     		p: function update(ctx, dirty) {
-    			if (dirty & /*$msData*/ 1 && t_value !== (t_value = /*metric*/ ctx[15].group + "")) set_data_dev(t, t_value);
+    			if (dirty & /*$msData*/ 1 && t_value !== (t_value = /*metric*/ ctx[17].group + "")) set_data_dev(t, t_value);
     		},
     		d: function destroy(detaching) {
     			if (detaching) detach_dev(span);
@@ -2742,14 +2741,14 @@ var app = (function () {
     		block,
     		id: create_if_block.name,
     		type: "if",
-    		source: "(121:6) {#if metric.group}",
+    		source: "(128:6) {#if metric.group}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (120:4) {#each $msData.currentTemplate.metrics ?? [] as metric, i}
+    // (127:4) {#each $msData.currentTemplate.metrics ?? [] as metric, i}
     function create_each_block(ctx) {
     	let t;
     	let switch_instance;
@@ -2757,34 +2756,34 @@ var app = (function () {
     	let updating_value;
     	let switch_instance_anchor;
     	let current;
-    	let if_block = /*metric*/ ctx[15].group && create_if_block(ctx);
+    	let if_block = /*metric*/ ctx[17].group && create_if_block(ctx);
 
     	function switch_instance_name_binding(value) {
-    		/*switch_instance_name_binding*/ ctx[9](value, /*i*/ ctx[17]);
+    		/*switch_instance_name_binding*/ ctx[9](value, /*i*/ ctx[19]);
     	}
 
     	function switch_instance_value_binding(value) {
-    		/*switch_instance_value_binding*/ ctx[10](value, /*i*/ ctx[17]);
+    		/*switch_instance_value_binding*/ ctx[10](value, /*i*/ ctx[19]);
     	}
 
     	function func(...args) {
-    		return /*func*/ ctx[11](/*metric*/ ctx[15], ...args);
+    		return /*func*/ ctx[11](/*metric*/ ctx[17], ...args);
     	}
 
     	var switch_value = /*$metricTypes*/ ctx[1].find(func).metric;
 
     	function switch_props(ctx) {
     		let switch_instance_props = {
-    			values: /*metric*/ ctx[15].values ?? ["Option"],
-    			tip: /*metric*/ ctx[15].tip ?? ""
+    			values: /*metric*/ ctx[17].values ?? ["Option"],
+    			tip: /*metric*/ ctx[17].tip ?? ""
     		};
 
-    		if (/*$msData*/ ctx[0].customMetrics[/*i*/ ctx[17]].name !== void 0) {
-    			switch_instance_props.name = /*$msData*/ ctx[0].customMetrics[/*i*/ ctx[17]].name;
+    		if (/*$msData*/ ctx[0].customMetrics[/*i*/ ctx[19]].name !== void 0) {
+    			switch_instance_props.name = /*$msData*/ ctx[0].customMetrics[/*i*/ ctx[19]].name;
     		}
 
-    		if (/*$msData*/ ctx[0].customMetrics[/*i*/ ctx[17]].value !== void 0) {
-    			switch_instance_props.value = /*$msData*/ ctx[0].customMetrics[/*i*/ ctx[17]].value;
+    		if (/*$msData*/ ctx[0].customMetrics[/*i*/ ctx[19]].value !== void 0) {
+    			switch_instance_props.value = /*$msData*/ ctx[0].customMetrics[/*i*/ ctx[19]].value;
     		}
 
     		return {
@@ -2821,7 +2820,7 @@ var app = (function () {
     		p: function update(new_ctx, dirty) {
     			ctx = new_ctx;
 
-    			if (/*metric*/ ctx[15].group) {
+    			if (/*metric*/ ctx[17].group) {
     				if (if_block) {
     					if_block.p(ctx, dirty);
     				} else {
@@ -2835,18 +2834,18 @@ var app = (function () {
     			}
 
     			const switch_instance_changes = {};
-    			if (dirty & /*$msData*/ 1) switch_instance_changes.values = /*metric*/ ctx[15].values ?? ["Option"];
-    			if (dirty & /*$msData*/ 1) switch_instance_changes.tip = /*metric*/ ctx[15].tip ?? "";
+    			if (dirty & /*$msData*/ 1) switch_instance_changes.values = /*metric*/ ctx[17].values ?? ["Option"];
+    			if (dirty & /*$msData*/ 1) switch_instance_changes.tip = /*metric*/ ctx[17].tip ?? "";
 
     			if (!updating_name && dirty & /*$msData*/ 1) {
     				updating_name = true;
-    				switch_instance_changes.name = /*$msData*/ ctx[0].customMetrics[/*i*/ ctx[17]].name;
+    				switch_instance_changes.name = /*$msData*/ ctx[0].customMetrics[/*i*/ ctx[19]].name;
     				add_flush_callback(() => updating_name = false);
     			}
 
     			if (!updating_value && dirty & /*$msData*/ 1) {
     				updating_value = true;
-    				switch_instance_changes.value = /*$msData*/ ctx[0].customMetrics[/*i*/ ctx[17]].value;
+    				switch_instance_changes.value = /*$msData*/ ctx[0].customMetrics[/*i*/ ctx[19]].value;
     				add_flush_callback(() => updating_value = false);
     			}
 
@@ -2898,7 +2897,7 @@ var app = (function () {
     		block,
     		id: create_each_block.name,
     		type: "each",
-    		source: "(120:4) {#each $msData.currentTemplate.metrics ?? [] as metric, i}",
+    		source: "(127:4) {#each $msData.currentTemplate.metrics ?? [] as metric, i}",
     		ctx
     	});
 
@@ -3023,32 +3022,29 @@ var app = (function () {
     			attr_dev(input0, "id", "metric-team");
     			attr_dev(input0, "list", "teams-list");
     			attr_dev(input0, "maxlength", "5");
-    			add_location(input0, file, 90, 6, 2915);
+    			add_location(input0, file, 97, 6, 2978);
     			attr_dev(datalist, "id", "teams-list");
-    			add_location(datalist, file, 97, 6, 3084);
-    			add_location(div0, file, 88, 4, 2890);
+    			add_location(datalist, file, 104, 6, 3147);
+    			add_location(div0, file, 95, 4, 2953);
     			attr_dev(input1, "id", "metric-match");
     			attr_dev(input1, "type", "number");
     			attr_dev(input1, "pattern", "[0-9]*");
-    			add_location(input1, file, 105, 6, 3286);
-    			add_location(div1, file, 103, 4, 3260);
-    			add_location(div2, file, 113, 4, 3466);
+    			add_location(input1, file, 112, 6, 3349);
+    			add_location(div1, file, 110, 4, 3323);
+    			add_location(div2, file, 120, 4, 3529);
     			attr_dev(div3, "class", "flex spaced");
-    			attr_dev(div3, "id", "metrics-default");
-    			add_location(div3, file, 87, 2, 2838);
+    			add_location(div3, file, 94, 2, 2922);
     			attr_dev(div4, "class", "flex spaced");
-    			attr_dev(div4, "id", "metrics-custom");
     			toggle_class(div4, "hide", /*$msData*/ ctx[0].isAbsent);
-    			add_location(div4, file, 118, 2, 3592);
+    			add_location(div4, file, 125, 2, 3655);
     			attr_dev(span, "class", "group");
-    			add_location(span, file, 134, 2, 4176);
-    			add_location(button0, file, 136, 4, 4244);
-    			add_location(button1, file, 139, 4, 4335);
+    			add_location(span, file, 141, 2, 4219);
+    			add_location(button0, file, 143, 4, 4287);
+    			add_location(button1, file, 146, 4, 4378);
     			attr_dev(div5, "class", "flex spaced");
-    			add_location(div5, file, 135, 2, 4213);
+    			add_location(div5, file, 142, 2, 4256);
     			attr_dev(div6, "class", "flex");
-    			attr_dev(div6, "id", "main");
-    			add_location(div6, file, 86, 0, 2806);
+    			add_location(div6, file, 93, 0, 2900);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -3301,7 +3297,7 @@ var app = (function () {
     		}
     	}
 
-    	function load() {
+    	function loadTemplate() {
     		set_store_value(msData, $msData.currentTemplate = JSON.parse(localStorage.template ?? JSON.stringify($exampleTemplate)), $msData);
 
     		set_store_value(
@@ -3321,16 +3317,24 @@ var app = (function () {
     			}),
     			$msData
     		);
+    	}
+
+    	function loadBackup() {
+    		const backup = JSON.parse(localStorage.backup);
+    		set_store_value(msData, $msData.team = backup.find(metric => metric.name == "Team").value, $msData);
+    		set_store_value(msData, $msData.match = backup.find(metric => metric.name == "Match").value, $msData);
+    		set_store_value(msData, $msData.isAbsent = backup.find(metric => metric.name == "Absent").value, $msData);
+
+    		$msData.customMetrics.forEach(metric => {
+    			metric.value = backup.find(m => m.name == metric.name).value;
+    		});
+    	}
+
+    	function load() {
+    		loadTemplate();
 
     		if (localStorage.backup) {
-    			const backup = JSON.parse(localStorage.backup);
-    			set_store_value(msData, $msData.team = backup.find(metric => metric.name == "Team").value, $msData);
-    			set_store_value(msData, $msData.match = backup.find(metric => metric.name == "Match").value, $msData);
-    			set_store_value(msData, $msData.isAbsent = backup.find(metric => metric.name == "Absent").value, $msData);
-
-    			$msData.customMetrics.forEach(metric => {
-    				metric.value = backup.find(m => m.name == metric.name).value;
-    			});
+    			loadBackup();
     		}
     	}
 
@@ -3384,6 +3388,8 @@ var app = (function () {
     		saveSurvey,
     		resetSurvey,
     		askResetSurvey,
+    		loadTemplate,
+    		loadBackup,
     		load,
     		$msData,
     		$metricTypes,

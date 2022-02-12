@@ -59,7 +59,7 @@
     }
   }
 
-  function load() {
+  function loadTemplate() {
     $msData.currentTemplate = JSON.parse(localStorage.template ?? JSON.stringify($exampleTemplate));
     $msData.customMetrics = $msData.currentTemplate.metrics.map((metric) => {
       let defaultValue = $metricTypes.find(type => type.name == metric.type).default;
@@ -68,24 +68,31 @@
       }
       return { ...metric, value: defaultValue, default: defaultValue };
     });
+  }
 
+  function loadBackup() {
+    const backup = JSON.parse(localStorage.backup);
+    $msData.team = backup.find(metric => metric.name == "Team").value;
+    $msData.match = backup.find(metric => metric.name == "Match").value;
+    $msData.isAbsent = backup.find(metric => metric.name == "Absent").value;
+    
+    $msData.customMetrics.forEach(metric => {
+      metric.value = backup.find(m => m.name == metric.name).value;
+    });
+  }
+
+  function load() {
+    loadTemplate();
     if (localStorage.backup) {
-      const backup = JSON.parse(localStorage.backup);
-      $msData.team = backup.find(metric => metric.name == "Team").value;
-      $msData.match = backup.find(metric => metric.name == "Match").value;
-      $msData.isAbsent = backup.find(metric => metric.name == "Absent").value;
-      
-      $msData.customMetrics.forEach(metric => {
-        metric.value = backup.find(m => m.name == metric.name).value;
-      });
+      loadBackup();
     }
   }
 </script>
 
 <svelte:window on:load={load} />
 
-<div class="flex" id="main">
-  <div class="flex spaced" id="metrics-default">
+<div class="flex">
+  <div class="flex spaced">
     <div>
       Team
       <input
@@ -116,7 +123,7 @@
     </div>
   </div>
 
-  <div class="flex spaced" id="metrics-custom" class:hide={$msData.isAbsent}>
+  <div class="flex spaced" class:hide={$msData.isAbsent}>
     {#each $msData.currentTemplate.metrics ?? [] as metric, i}
       {#if metric.group}
         <span class="group">{metric.group}</span>

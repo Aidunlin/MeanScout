@@ -24,7 +24,7 @@
     <button on:click={increment}>
       <Icon name="plus" />
     </button>
-    <input type="number" class="number" pattern="[0-9]*" bind:value />
+    <input type="number" class="number" pattern="[0-9]*" readonly bind:value />
     <button on:click={decrement}>
       <Icon name="minus" />
     </button>

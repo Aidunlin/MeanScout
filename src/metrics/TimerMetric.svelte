@@ -44,7 +44,7 @@
     <button on:click={toggle}>
       <Icon name={running ? "pause" : "play"} />
     </button>
-    <input type="number" class="number" bind:value on:change={changed} />
+    <input type="number" class="number" readonly bind:value on:change={changed} />
     <button on:click={reset}>
       <Icon name="stop" />
     </button>

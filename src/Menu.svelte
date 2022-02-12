@@ -139,30 +139,28 @@
       name="Location"
       values={locations}
       bind:value={$msData.location}
-      on:updated={locationUpdated}
+      on:update={locationUpdated}
     />
     <div>
       Template
       <div class="flex">
-        <button id="template-copy-btn" on:click={copyTemplate}>
+        <button on:click={copyTemplate}>
           <Icon name="copy" text="Copy" />
         </button>
-        <button id="template-edit-btn" on:click={editTemplate}>
+        <button on:click={editTemplate}>
           <Icon name="pen" text="Edit" />
         </button>
       </div>
     </div>
-    <div>
-      Surveys
-      <div class="flex">
-        <SelectMetric name="" values={surveyTypes} bind:value={surveyType} />
-        <button id="surveys-download-btn" on:click={askDownloadSurveys}>
-          <Icon name="download" text="Download" />
-        </button>
-        <button id="surveys-erase-btn" on:click={eraseSurveys}>
-          <Icon name="erase" text="Erase" />
-        </button>
-      </div>
+    <span class="group">Surveys</span>
+    <div class="flex">
+      <SelectMetric name="" values={surveyTypes} bind:value={surveyType} />
+      <button on:click={askDownloadSurveys}>
+        <Icon name="download" text="Download" />
+      </button>
     </div>
+    <button on:click={eraseSurveys}>
+      <Icon name="erase" text="Erase" />
+    </button>
   </div>
 </div>
