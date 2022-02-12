@@ -35,7 +35,7 @@
   }
 
   function setTemplate(newTemplate = null) {
-    localStorage.backup = "[]";
+    localStorage.backup = "";
     $msData.currentTemplate = JSON.parse(JSON.stringify(newTemplate ?? $exampleTemplate));
     localStorage.template = JSON.stringify($msData.currentTemplate);
     $msData.customMetrics = $msData.currentTemplate.metrics.map((metric) => {

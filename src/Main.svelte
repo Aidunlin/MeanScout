@@ -50,7 +50,7 @@
     $msData.isAbsent = false;
     $msData.customMetrics.forEach((metric) => (metric.value = metric.default));
     document.querySelector("#metric-team").focus();
-    localStorage.backup = "[]";
+    localStorage.backup = "";
   }
 
   function askResetSurvey() {

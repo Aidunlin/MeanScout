@@ -2299,27 +2299,27 @@ var app = (function () {
     			button3 = element("button");
     			create_component(icon3.$$.fragment);
     			attr_dev(span, "class", "group");
-    			add_location(span, file$1, 135, 2, 3989);
+    			add_location(span, file$1, 135, 2, 3987);
     			attr_dev(button0, "id", "template-copy-btn");
-    			add_location(button0, file$1, 146, 8, 4264);
+    			add_location(button0, file$1, 146, 8, 4262);
     			attr_dev(button1, "id", "template-edit-btn");
-    			add_location(button1, file$1, 149, 8, 4392);
+    			add_location(button1, file$1, 149, 8, 4390);
     			attr_dev(div0, "class", "flex");
-    			add_location(div0, file$1, 145, 6, 4236);
-    			add_location(div1, file$1, 143, 4, 4207);
+    			add_location(div0, file$1, 145, 6, 4234);
+    			add_location(div1, file$1, 143, 4, 4205);
     			attr_dev(button2, "id", "surveys-download-btn");
-    			add_location(button2, file$1, 158, 8, 4676);
+    			add_location(button2, file$1, 158, 8, 4674);
     			attr_dev(button3, "id", "surveys-erase-btn");
-    			add_location(button3, file$1, 161, 8, 4821);
+    			add_location(button3, file$1, 161, 8, 4819);
     			attr_dev(div2, "class", "flex");
-    			add_location(div2, file$1, 156, 6, 4569);
-    			add_location(div3, file$1, 154, 4, 4541);
+    			add_location(div2, file$1, 156, 6, 4567);
+    			add_location(div3, file$1, 154, 4, 4539);
     			attr_dev(div4, "class", "flex spaced");
-    			add_location(div4, file$1, 136, 2, 4027);
+    			add_location(div4, file$1, 136, 2, 4025);
     			attr_dev(div5, "class", "flex");
     			attr_dev(div5, "id", "menu");
     			toggle_class(div5, "hide", !/*$msData*/ ctx[1].menuVisible);
-    			add_location(div5, file$1, 134, 0, 3923);
+    			add_location(div5, file$1, 134, 0, 3921);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -2470,7 +2470,7 @@ var app = (function () {
     	}
 
     	function setTemplate(newTemplate = null) {
-    		localStorage.backup = "[]";
+    		localStorage.backup = "";
     		set_store_value(msData, $msData.currentTemplate = JSON.parse(JSON.stringify(newTemplate ?? $exampleTemplate)), $msData);
     		localStorage.template = JSON.stringify($msData.currentTemplate);
 
@@ -2686,7 +2686,7 @@ var app = (function () {
     			option = element("option");
     			option.__value = option_value_value = /*team*/ ctx[18];
     			option.value = option.__value;
-    			add_location(option, file, 99, 10, 3185);
+    			add_location(option, file, 99, 10, 3183);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, option, anchor);
@@ -2724,7 +2724,7 @@ var app = (function () {
     			span = element("span");
     			t = text(t_value);
     			attr_dev(span, "class", "group");
-    			add_location(span, file, 121, 8, 3769);
+    			add_location(span, file, 121, 8, 3767);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, span, anchor);
@@ -3023,32 +3023,32 @@ var app = (function () {
     			attr_dev(input0, "id", "metric-team");
     			attr_dev(input0, "list", "teams-list");
     			attr_dev(input0, "maxlength", "5");
-    			add_location(input0, file, 90, 6, 2917);
+    			add_location(input0, file, 90, 6, 2915);
     			attr_dev(datalist, "id", "teams-list");
-    			add_location(datalist, file, 97, 6, 3086);
-    			add_location(div0, file, 88, 4, 2892);
+    			add_location(datalist, file, 97, 6, 3084);
+    			add_location(div0, file, 88, 4, 2890);
     			attr_dev(input1, "id", "metric-match");
     			attr_dev(input1, "type", "number");
     			attr_dev(input1, "pattern", "[0-9]*");
-    			add_location(input1, file, 105, 6, 3288);
-    			add_location(div1, file, 103, 4, 3262);
-    			add_location(div2, file, 113, 4, 3468);
+    			add_location(input1, file, 105, 6, 3286);
+    			add_location(div1, file, 103, 4, 3260);
+    			add_location(div2, file, 113, 4, 3466);
     			attr_dev(div3, "class", "flex spaced");
     			attr_dev(div3, "id", "metrics-default");
-    			add_location(div3, file, 87, 2, 2840);
+    			add_location(div3, file, 87, 2, 2838);
     			attr_dev(div4, "class", "flex spaced");
     			attr_dev(div4, "id", "metrics-custom");
     			toggle_class(div4, "hide", /*$msData*/ ctx[0].isAbsent);
-    			add_location(div4, file, 118, 2, 3594);
+    			add_location(div4, file, 118, 2, 3592);
     			attr_dev(span, "class", "group");
-    			add_location(span, file, 134, 2, 4178);
-    			add_location(button0, file, 136, 4, 4246);
-    			add_location(button1, file, 139, 4, 4337);
+    			add_location(span, file, 134, 2, 4176);
+    			add_location(button0, file, 136, 4, 4244);
+    			add_location(button1, file, 139, 4, 4335);
     			attr_dev(div5, "class", "flex spaced");
-    			add_location(div5, file, 135, 2, 4215);
+    			add_location(div5, file, 135, 2, 4213);
     			attr_dev(div6, "class", "flex");
     			attr_dev(div6, "id", "main");
-    			add_location(div6, file, 86, 0, 2808);
+    			add_location(div6, file, 86, 0, 2806);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -3292,7 +3292,7 @@ var app = (function () {
     		set_store_value(msData, $msData.isAbsent = false, $msData);
     		$msData.customMetrics.forEach(metric => metric.value = metric.default);
     		document.querySelector("#metric-team").focus();
-    		localStorage.backup = "[]";
+    		localStorage.backup = "";
     	}
 
     	function askResetSurvey() {
