@@ -7,6 +7,7 @@
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("./sw.js");
     }
+    
     document.body.classList.remove("hide");
   }
 </script>

@@ -8,6 +8,7 @@
       { name: "Team", value: $msData.team },
       { name: "Match", value: $msData.match },
       { name: "Absent", value: $msData.isAbsent },
+
       ...$msData.customMetrics.map((metric) => {
         return { name: metric.name, value: metric.value };
       }),
@@ -18,25 +19,33 @@
     localStorage.backup = JSON.stringify(getSurvey());
   }
 
-  function saveSurvey() {
+  function validateSurvey() {
     if (!/^\d{1,4}[A-Z]?$/.test($msData.team)) {
-      alert("Invalid team value");
       document.querySelector("#metric-team").focus();
-      return;
+      return "Invalid team value";
     }
+
     if ($msData.currentTemplate.teams) {
       if (!$msData.currentTemplate.teams.some((team) => team == $msData.team)) {
-        alert("Invalid team value");
         document.querySelector("#metric-team").focus();
-        return;
+        return "Team value not whitelisted";
       }
     }
+
     if (!/\d{1,3}/.test($msData.match)) {
-      alert("Invalid match value");
       document.querySelector("#metric-match").focus();
-      return;
+      return "Invalid match value";
     }
-    if (confirm("Confirm save?")) {
+
+    return "";
+  }
+
+  function saveSurvey() {
+    let error = validateSurvey();
+
+    if (error) {
+      alert(`Could not save survey! ${error}`);
+    } else if (confirm("Confirm save?")) {
       let surveys = JSON.parse(localStorage.surveys ?? "[]");
       surveys.push(getSurvey());
       localStorage.surveys = JSON.stringify(surveys);
@@ -60,29 +69,35 @@
   }
 
   function loadTemplate() {
-    $msData.currentTemplate = JSON.parse(localStorage.template ?? JSON.stringify($exampleTemplate));
+    $msData.currentTemplate = JSON.parse(
+      localStorage.template ?? JSON.stringify($exampleTemplate)
+    );
+
     $msData.customMetrics = $msData.currentTemplate.metrics.map((metric) => {
       let defaultValue = getDefaultValue(metric.type);
+
       if (metric.type == "select") {
         defaultValue = metric.values[0];
       }
+
       return { ...metric, value: defaultValue, default: defaultValue };
     });
   }
 
   function loadBackup() {
     const backup = JSON.parse(localStorage.backup);
-    $msData.team = backup.find(metric => metric.name == "Team").value;
-    $msData.match = backup.find(metric => metric.name == "Match").value;
-    $msData.isAbsent = backup.find(metric => metric.name == "Absent").value;
-    
-    $msData.customMetrics.forEach(metric => {
-      metric.value = backup.find(m => m.name == metric.name).value;
+    $msData.team = backup.find((metric) => metric.name == "Team").value;
+    $msData.match = backup.find((metric) => metric.name == "Match").value;
+    $msData.isAbsent = backup.find((metric) => metric.name == "Absent").value;
+
+    $msData.customMetrics.forEach((metric) => {
+      metric.value = backup.find((m) => m.name == metric.name).value;
     });
   }
 
   function load() {
     loadTemplate();
+    
     if (localStorage.backup) {
       loadBackup();
     }
@@ -119,7 +134,12 @@
       />
     </div>
     <div>
-      <Metric name="Absent" type="toggle" bind:value={$msData.isAbsent} on:update={backupSurvey} />
+      <Metric
+        name="Absent"
+        type="toggle"
+        bind:value={$msData.isAbsent}
+        on:update={backupSurvey}
+      />
     </div>
   </div>
 

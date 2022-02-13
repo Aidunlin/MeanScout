@@ -73,6 +73,7 @@
       if (running) {
         toggle();
       }
+
       value = 0;
       sendUpdate();
     }
@@ -82,7 +83,7 @@
 {#if type == "toggle"}
   <div>
     <button on:click={toggle}>
-      <Icon name="square-{value ? 'checked' : 'empty'}" text={name} />
+      <Icon name={value ? "check" : "nocheck"} text={name} />
     </button>
   </div>
 {:else if type == "number"}
@@ -124,7 +125,7 @@
     <div class="flex">
       {#each [...Array(count).keys()] as i}
         <button class="star" on:click={() => update(i)}>
-          <Icon name="star-{value >= i ? 'filled' : 'empty'}" />
+          <Icon name={value >= i ? "star" : "nostar"} />
         </button>
       {/each}
     </div>
