@@ -2,10 +2,10 @@
   import {
     msData,
     exampleTemplate,
-    locations,
-    surveyTypes,
     metricTypes,
     getDefaultValue,
+    locations,
+    surveyTypes,
   } from "./stores.js";
   import Icon from "./Icon.svelte";
   import Metric from "./Metric.svelte";
@@ -13,9 +13,12 @@
   let surveyType = surveyTypes[0];
 
   function locationUpdated() {
-    let newTheme = "red";
+    localStorage.location = $msData.location;
+    let newTheme = "";
 
-    if (/blue/.test($msData.location.toLowerCase())) {
+    if ($msData.location.toLowerCase().includes("red")) {
+      newTheme = "red";
+    } else if ($msData.location.toLowerCase().includes("blue")) {
       newTheme = "blue";
     }
 
@@ -23,8 +26,6 @@
       "--theme-color",
       `var(--${newTheme})`
     );
-
-    localStorage.location = $msData.location;
   }
 
   function copyTemplate() {
@@ -113,37 +114,39 @@
     }
   }
 
+  function generateCSV(surveys) {
+    let csv = "";
+    if (surveys) {
+      surveys.forEach((survey) => {
+        let surveyAsCSV = "";
+
+        survey.forEach((metric) => {
+          if (typeof metric.value == "string") {
+            surveyAsCSV += '"' + metric.value + '",';
+          } else {
+            surveyAsCSV += metric.value + ",";
+          }
+        });
+
+        csv += surveyAsCSV + "\n";
+      });
+    }
+    return csv;
+  }
+
   function downloadSurveys() {
     const anchor = document.createElement("a");
     anchor.href = "data:text/plain;charset=utf-8,";
 
     if (surveyType == "CSV") {
-      let surveys = JSON.parse(localStorage.surveys);
-      let csv = "";
-
-      if (surveys) {
-        surveys.forEach((survey) => {
-          let surveyAsCSV = "";
-
-          survey.forEach((metric) => {
-            if (typeof metric.value == "string") {
-              surveyAsCSV += '"' + metric.value + '",';
-            } else {
-              surveyAsCSV += metric.value + ",";
-            }
-          });
-
-          csv += surveyAsCSV + "\n";
-        });
-      }
-
-      anchor.href += encodeURIComponent(csv);
-      anchor.download = "surveys.csv";
+      anchor.href += encodeURIComponent(
+        generateCSV(JSON.parse(localStorage.surveys))
+      );
     } else if (surveyType == "JSON") {
       anchor.href += encodeURIComponent(localStorage.surveys);
-      anchor.download = "surveys.json";
     }
 
+    anchor.download = `surveys.${surveyType.toLowerCase()}`;
     document.body.append(anchor);
     anchor.click();
     anchor.remove();

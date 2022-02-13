@@ -2,6 +2,18 @@
   import { msData } from "./stores.js";
   import Icon from "./Icon.svelte";
 
+  function getSurvey() {
+    return [
+      { name: "Team", value: $msData.team },
+      { name: "Match", value: $msData.match },
+      { name: "Absent", value: $msData.isAbsent },
+
+      ...$msData.customMetrics.map((metric) => {
+        return { name: metric.name, value: metric.value };
+      }),
+    ];
+  }
+
   function validateSurvey() {
     if (!/^\d{1,4}[A-Z]?$/.test($msData.team)) {
       return "Invalid team value";
@@ -26,9 +38,11 @@
     if (error) {
       alert(`Could not save survey! ${error}`);
     } else if (confirm("Confirm save?")) {
-      let surveys = JSON.parse(localStorage.surveys ?? "[]");
-      surveys.push(getSurvey());
-      localStorage.surveys = JSON.stringify(surveys);
+      localStorage.surveys = JSON.stringify([
+        ...JSON.parse(localStorage.surveys ?? "[]"),
+        getSurvey(),
+      ]);
+      
       resetSurvey();
       $msData.match++;
     }
