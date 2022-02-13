@@ -1,6 +1,6 @@
 import { writable } from "svelte/store";
 
-export const exampleTemplate = writable({
+export const exampleTemplate = {
   metrics: [
     { name: "Toggle", type: "toggle", group: "Group" },
     { name: "Number", type: "number" },
@@ -9,7 +9,31 @@ export const exampleTemplate = writable({
     { name: "Rating", type: "rating" },
     { name: "Timer", type: "timer" },
   ]
-});
+};
+
+export const metricTypes = [
+  { name: "toggle", default: false },
+  { name: "number", default: 0 },
+  { name: "select", default: 0 },
+  { name: "text", default: "" },
+  { name: "rating", default: 0 },
+  { name: "timer", default: 0 },
+];
+
+export function getDefaultValue(typeName) {
+  return metricTypes.find((type) => type.name == typeName).default ?? null;
+}
+
+export const locations = [
+  "Red Near",
+  "Red Mid",
+  "Red Far",
+  "Blue Near",
+  "Blue Mid",
+  "Blue Far",
+];
+
+export const surveyTypes = ["CSV", "JSON"];
 
 export const msData = writable({
   location: "Red Near",

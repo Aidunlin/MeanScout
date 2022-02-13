@@ -1,18 +1,15 @@
 <script>
-  import { msData, exampleTemplate } from "./stores.js";
+  import {
+    msData,
+    exampleTemplate,
+    locations,
+    surveyTypes,
+    metricTypes,
+    getDefaultValue,
+  } from "./stores.js";
   import Icon from "./Icon.svelte";
-  import Metric, { metricTypes, getDefaultValue } from "./Metric.svelte";
+  import Metric from "./Metric.svelte";
 
-  let locations = [
-    "Red Near",
-    "Red Mid",
-    "Red Far",
-    "Blue Near",
-    "Blue Mid",
-    "Blue Far",
-  ];
-
-  let surveyTypes = ["CSV", "JSON"];
   let surveyType = surveyTypes[0];
 
   function locationUpdated() {
@@ -42,12 +39,12 @@
   }
 
   function setTemplate(newTemplate = null) {
-    localStorage.backup = "";
-
     $msData.currentTemplate = JSON.parse(
-      JSON.stringify(newTemplate ?? $exampleTemplate)
+      JSON.stringify(newTemplate ?? exampleTemplate)
     );
+
     localStorage.template = JSON.stringify($msData.currentTemplate);
+    localStorage.backup = "";
 
     $msData.customMetrics = $msData.currentTemplate.metrics.map((metric) => {
       let defaultValue = getDefaultValue(metric.type);
@@ -55,7 +52,7 @@
       if (metric.type == "select") {
         defaultValue = metric.values[0];
       }
-      
+
       return { ...metric, value: defaultValue, default: defaultValue };
     });
   }
@@ -135,7 +132,7 @@
               surveyAsCSV += metric.value + ",";
             }
           });
-          
+
           csv += surveyAsCSV + "\n";
         });
       }
@@ -174,43 +171,34 @@
 
 <svelte:window on:load={load} />
 
-<div class="flex" id="menu" class:hide={!$msData.menuVisible}>
-  <span class="group">Options</span>
-  <div class="flex spaced">
-    <Metric
-      name="Location"
-      type="select"
-      values={locations}
-      bind:value={$msData.location}
-      on:update={locationUpdated}
-    />
+<div class="flex spaced bg" id="menu" class:hide={!$msData.menuVisible}>
+  <Metric
+    name="Location"
+    type="select"
+    values={locations}
+    bind:value={$msData.location}
+    on:update={locationUpdated}
+  />
 
-    <div>
-      Template
-      <div class="flex">
-        <button on:click={copyTemplate}>
-          <Icon name="copy" text="Copy" />
-        </button>
-        <button on:click={editTemplate}>
-          <Icon name="pen" text="Edit" />
-        </button>
-      </div>
-    </div>
+  <span class="group">Template</span>
+  <button on:click={copyTemplate}>
+    <Icon name="copy" text="Copy" />
+  </button>
+  <button on:click={editTemplate}>
+    <Icon name="pen" text="Edit" />
+  </button>
 
-    <span class="group">Surveys</span>
-    <div class="flex">
-      <Metric
-        name=""
-        type="select"
-        values={surveyTypes}
-        bind:value={surveyType}
-      />
-      <button on:click={askDownloadSurveys}>
-        <Icon name="download" text="Download" />
-      </button>
-    </div>
-    <button on:click={eraseSurveys}>
-      <Icon name="erase" text="Erase" />
-    </button>
-  </div>
+  <span class="group">Surveys</span>
+  <Metric
+    name="Type"
+    type="select"
+    values={surveyTypes}
+    bind:value={surveyType}
+  />
+  <button on:click={askDownloadSurveys}>
+    <Icon name="download" text="Download" />
+  </button>
+  <button on:click={eraseSurveys}>
+    <Icon name="erase" text="Erase" />
+  </button>
 </div>

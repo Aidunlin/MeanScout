@@ -1,18 +1,3 @@
-<script context="module">
-  export const metricTypes = [
-    { name: "toggle", default: false },
-    { name: "number", default: 0 },
-    { name: "select", default: 0 },
-    { name: "text", default: "" },
-    { name: "rating", default: 0 },
-    { name: "timer", default: 0 },
-  ];
-
-  export function getDefaultValue(typeName) {
-    return metricTypes.find((type) => type.name == typeName).default ?? null;
-  }
-</script>
-
 <script>
   import { createEventDispatcher } from "svelte";
   import Icon from "./Icon.svelte";

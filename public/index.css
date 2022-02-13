@@ -31,11 +31,19 @@ html {
   color: var(--text-color);
   margin: auto;
   max-width: 720px;
+  min-height: 100vh;
   touch-action: pan-y;
 }
 
 body {
+  display: flex;
+  flex-direction: column;
   margin: 0;
+  min-height: 100vh;
+}
+
+body > *:last-of-type {
+  margin-top: auto;
 }
 
 button,
@@ -113,8 +121,7 @@ svg,
   padding: 8px;
 }
 
-#menu,
-#menu-bar {
+.bg {
   background: var(--fg-color);
 }
 
