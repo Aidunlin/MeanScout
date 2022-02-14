@@ -1,11 +1,11 @@
 :root {
-  color-scheme: dark;
-  --red: #f44336;
-  --blue: #2196f3;
-  --theme-color: var(--red);
-  --text-color: #fff;
-  --fg-color: rgba(127, 127, 127, 0.2);
   --bg-color: #000;
+  --blue: #2196f3;
+  --fg-color: rgba(127, 127, 127, 0.2);
+  --red: #f44336;
+  --text-color: #fff;
+  --theme-color: var(--red);
+  color-scheme: dark;
 }
 
 * {
@@ -18,17 +18,12 @@
   line-height: 1.25;
 }
 
-option,
-svg,
-svg *,
-#menu-toggle-btn,
-#location-text {
+input, select, option, svg, svg *, #menu-toggle-btn, #location-text {
   color: var(--theme-color);
 }
 
 html {
   background: var(--bg-color);
-  color: var(--text-color);
   margin: auto;
   max-width: 720px;
   min-height: 100vh;
@@ -42,26 +37,23 @@ body {
   min-height: 100vh;
 }
 
-button,
-input,
-select {
+button, input, select, .number, .bg {
   background: var(--fg-color);
-  height: 46px;
+}
+
+button, input, select, .number, #location-text  {
   padding: 8px;
 }
 
 button {
   cursor: pointer;
-  text-align: left;
   text-decoration: none;
-  white-space: nowrap;
 }
 
 input,
 select {
   -webkit-appearance: none;
   appearance: none;
-  color: var(--theme-color);
   display: block;
   width: 100%;
 }
@@ -70,8 +62,7 @@ select {
   cursor: pointer;
 }
 
-svg,
-#logo {
+svg, #logo {
   height: 30px;
   vertical-align: bottom;
 }
@@ -90,10 +81,6 @@ svg,
   margin: 8px;
 }
 
-.bg {
-  background: var(--fg-color);
-}
-
 .extend-down {
   margin-top: auto;
 }
@@ -102,48 +89,37 @@ svg,
   display: none !important;
 }
 
+.group, .max-width {
+  width: 100%;
+}
+
 .group {
   font-weight: bolder;
   margin: 8px 8px 0;
   text-decoration: underline;
-  width: 100%;
+}
+
+.number,
+#metric-match {
+  width: 80px;
 }
 
 .number {
-  color: var(--text-color);
-  display: inline;
   text-align: center;
-  width: 80px;
 }
 
 .text-icon {
   padding-right: 8px;
-}
-#location-text {
-  padding: 8px;
 }
 
 #metric-team {
   width: 100px;
 }
 
-#metric-match {
-  width: 80px;
-}
-
-::-webkit-outer-spin-button,
-::-webkit-inner-spin-button,
-::-webkit-calendar-picker-indicator {
+::-webkit-outer-spin-button, ::-webkit-inner-spin-button, ::-webkit-calendar-picker-indicator {
   -webkit-appearance: none;
   display: none !important;
   margin: 0;
-}
-
-::-webkit-scrollbar,
-::-webkit-scrollbar-thumb,
-::-webkit-scrollbar-corner {
-  background: var(--fg-color);
-  width: 16px;
 }
 
 input[type=number] {

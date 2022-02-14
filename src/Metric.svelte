@@ -4,134 +4,121 @@
 
   const dispatch = createEventDispatcher();
 
+  /** (required) The custom name of the metric */
   export let name = "";
+  /** (required) The type of the metric */
   export let type = "";
+  /** The value stored by the metric */
   export let value = null;
+  /** (optional) Group name for this and subsequent metrics */
+  export let group = "";
 
+  /** (`select`, required) Possible metric values */
   export let values = [];
+  /** (`text`, optional) Placeholder text */
   export let tip = "";
-  export let count = 5;
 
+  /** (`timer`) Whether the timer is running */
   let running = false;
+  /** (`timer`) Interval reference for the timer */
   let interval = null;
 
-  function sendUpdate() {
-    dispatch("update");
-  }
-
+  /** (`toggle` function) */
   function toggle() {
-    if (type == "toggle") {
-      value = !value;
-      sendUpdate();
-    } else if (type == "timer") {
-      if (running) {
-        running = false;
-        clearInterval(interval);
-        sendUpdate();
-      } else {
-        running = true;
-        interval = setInterval(() => {
-          if (running) {
-            value = (parseFloat(value) + 0.1).toFixed(1);
-          }
-        }, 100);
-      }
-    }
+    value = !value;
   }
 
-  function crement(i) {
-    if (type == "number") {
-      value += i;
-      sendUpdate();
-    }
+  /** (`number` function) */
+  function increment() {
+    value++;
   }
 
+  /** (`number` function) */
+  function decrement() {
+    value--;
+  }
+
+  /** (`rating` function) */
   function update(newValue) {
-    if (type == "rating") {
-      value = newValue;
-      sendUpdate();
-    }
+    value = newValue;
   }
 
-  function reset() {
+  /** (`timer` function) */
+  function start() {
+    running = true;
+    interval = setInterval(() => {
+      if (running) {
+        value = (parseFloat(value) + 0.1).toFixed(1);
+      }
+    }, 100);
+  }
+
+  /** (`timer` function) */
+  function pause() {
+    running = false;
+    clearInterval(interval);
+  }
+
+  /** (`timer` function) */
+  function stop() {
     if (type == "timer") {
       if (running) {
-        toggle();
+        pause();
       }
 
       value = 0;
-      sendUpdate();
     }
+  }
+
+  // Svelte calls `dispatch()` whenever `value` changes
+  $: {
+    value;
+    dispatch("update");
   }
 </script>
 
-{#if type == "toggle"}
-  <div>
-    <button on:click={toggle}>
-      <Icon name={value ? "check" : "nocheck"} text={name} />
-    </button>
-  </div>
-{:else if type == "number"}
-  <div>
+{#if group}
+  <span class="group">{group}</span>
+{/if}
+<div class:max-width={type == "text"}>
+  {#if type != "toggle"}
     {name}
-    <div class="flex">
-      <button on:click={() => crement(1)}>
+  {/if}
+  <div class="flex">
+    {#if type == "toggle"}
+      <button on:click={toggle}>
+        <Icon name={value ? "check" : "nocheck"} text={name} />
+      </button>
+    {:else if type == "number"}
+      <button on:click={increment}>
         <Icon name="plus" />
       </button>
-      <input
-        type="number"
-        class="number"
-        pattern="[0-9]*"
-        readonly
-        bind:value
-      />
-      <button on:click={() => crement(-1)}>
+      <span class="number">{value}</span>
+      <button on:click={decrement}>
         <Icon name="minus" />
       </button>
-    </div>
-  </div>
-{:else if type == "select"}
-  <div>
-    {name}
-    <select bind:value on:change={sendUpdate}>
-      {#each values as val}
-        <option value={val}>{val}</option>
-      {/each}
-    </select>
-  </div>
-{:else if type == "text"}
-  <div style="width:100%">
-    {name}
-    <input placeholder={tip} bind:value on:change={sendUpdate} />
-  </div>
-{:else if type == "rating"}
-  <div>
-    {name}
-    <div class="flex">
-      {#each [...Array(count).keys()] as i}
-        <button class="star" on:click={() => update(i)}>
+    {:else if type == "select"}
+      <select bind:value>
+        {#each values as val}
+          <option value={val}>{val}</option>
+        {/each}
+      </select>
+    {:else if type == "text"}
+      <input placeholder={tip} bind:value />
+    {:else if type == "rating"}
+      {#each [...Array(5).keys()] as i}
+        <button on:click={() => update(i)}>
           <Icon name={value >= i ? "star" : "nostar"} />
         </button>
       {/each}
-    </div>
-  </div>
-{:else if type == "timer"}
-  <div>
-    {name}
-    <div class="flex">
-      <button on:click={toggle}>
+    {:else if type == "timer"}
+      <button on:click={running ? pause : start}>
         <Icon name={running ? "pause" : "play"} />
       </button>
-      <input
-        type="number"
-        class="number"
-        readonly
-        bind:value
-        on:change={sendUpdate}
-      />
-      <button on:click={reset}>
+      <span class="number">{value}</span>
+      <button on:click={stop}>
         <Icon name="stop" />
       </button>
-    </div>
+    {/if}
   </div>
-{/if}
+</div>
