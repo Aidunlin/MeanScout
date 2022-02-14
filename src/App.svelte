@@ -9,7 +9,7 @@
   /** Parses and loads the current template from `localStorage` (or `exampleTemplate`) */
   function loadTemplate() {
     $ms.currentTemplate = JSON.parse(
-      localStorage.template ?? JSON.stringify(exampleTemplate)
+      localStorage.getItem("template") ?? JSON.stringify(exampleTemplate)
     );
 
     $ms.customMetrics = $ms.currentTemplate.metrics.map((metric) => {
@@ -25,14 +25,17 @@
 
   /** Parses and loads the survey backup from `localStorage` */
   function loadBackup() {
-    const backup = JSON.parse(localStorage.backup);
-    $ms.team = backup.find((metric) => metric.name == "Team").value;
-    $ms.match = backup.find((metric) => metric.name == "Match").value;
-    $ms.isAbsent = backup.find((metric) => metric.name == "Absent").value;
+    const backup = JSON.parse(localStorage.getItem("backup"));
 
-    $ms.customMetrics.forEach((metric) => {
-      metric.value = backup.find((m) => m.name == metric.name).value;
-    });
+    if (backup) {
+      $ms.team = backup.find((metric) => metric.name == "Team").value;
+      $ms.match = backup.find((metric) => metric.name == "Match").value;
+      $ms.isAbsent = backup.find((metric) => metric.name == "Absent").value;
+
+      $ms.customMetrics.forEach((metric) => {
+        metric.value = backup.find((m) => m.name == metric.name).value;
+      });
+    }
   }
 
   /** Registers service worker, loads template and backup */
@@ -44,10 +47,7 @@
     }
 
     loadTemplate();
-
-    if (localStorage.backup) {
-      loadBackup();
-    }
+    loadBackup();
   }
 </script>
 

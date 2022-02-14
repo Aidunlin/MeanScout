@@ -1,20 +1,12 @@
 <script>
-  import {
-    ms,
-    exampleTemplate,
-    metricTypes,
-    getMetricDefaultValue,
-    locations,
-    surveyTypes,
-  } from "./global.js";
-  import Icon from "./Icon.svelte";
+  import { ms, locations } from "./global.js";
   import Metric from "./Metric.svelte";
-
-  let surveyType = surveyTypes[0];
+  import TemplateMenu from "./TemplateMenu.svelte";
+  import SurveysMenu from "./SurveysMenu.svelte";
 
   /** Updates `localStorage` and app theme with `$ms.location` */
   function locationUpdated() {
-    localStorage.location = $ms.location;
+    localStorage.setItem("location", $ms.location);
     let newTheme = "";
 
     if ($ms.location.toLowerCase().includes("red")) {
@@ -29,164 +21,12 @@
     );
   }
 
-  /** Writes the current template to the device's clipboard */
-  function copyTemplate() {
-    let templateString = JSON.stringify($ms.currentTemplate);
-
-    if ("clipboard" in navigator) {
-      navigator.clipboard.writeText(templateString);
-      alert("Copied template");
-    } else {
-      prompt("Copy the template below", templateString);
-    }
-  }
-
-  /**
-   * Sets a new template (or resets to `exampleTemplate`), updates `localStorage` and `$ms.customMetrics`
-   * @param newTemplate (optional) The template to use
-   */
-  function setTemplate(newTemplate = {}) {
-    $ms.currentTemplate = JSON.parse(
-      JSON.stringify(newTemplate ?? exampleTemplate)
-    );
-
-    localStorage.template = JSON.stringify($ms.currentTemplate);
-    localStorage.backup = "";
-
-    $ms.customMetrics = $ms.currentTemplate.metrics.map((metric) => {
-      let defaultValue = getMetricDefaultValue(metric.type);
-
-      if (metric.type == "select") {
-        defaultValue = metric.values[0];
-      }
-
-      return { ...metric, value: defaultValue, default: defaultValue };
-    });
-  }
-
-  /**
-   * Checks if a stringified template is valid
-   * @param templateString A stringified template
-   * @returns An object containing a template object or error string
-   */
-  function validateTemplate(templateString) {
-    let result = {
-      template: {},
-      error: "",
-    };
-
-    try {
-      result.template = JSON.parse(templateString);
-    } catch (e) {
-      result.error = e;
-      return result;
-    }
-
-    if (!Array.isArray(result.template.teams ?? [])) {
-      result.error += "Template has invalid teams";
-    }
-
-    if (result.template.metrics) {
-      result.template.metrics.forEach((metric, i) => {
-        if (!metric.name) {
-          result.error += `\nMetric ${i + 1} has no name`;
-        }
-
-        if (!Array.isArray(metric.values ?? [])) {
-          result.error += `\nMetric ${metric.name ?? i + 1} has invalid values`;
-        }
-
-        if (!metricTypes.some((type) => type.name == metric.type)) {
-          result.error += `\nMetric ${metric.name ?? i + 1} has invalid type`;
-        }
-      });
-    } else {
-      result.error += "\nTemplate has no metrics";
-    }
-
-    return result;
-  }
-
-  /** Prompts the user to enter a new template, or reset to `exampleTemplate` */
-  function editTemplate() {
-    const newPrompt = prompt("Paste new template (you can also 'reset'):");
-
-    if (newPrompt) {
-      if (newPrompt == "reset") {
-        setTemplate();
-      } else {
-        let result = validateTemplate(templateString);
-
-        if (result.error) {
-          alert(`Could not set template! ${result.error}`);
-        } else {
-          setTemplate(result.template);
-        }
-      }
-    }
-  }
-
-  /**
-   * Creates a multiline CSV string for an array of surveys
-   * @param surveys An array of surveys (each survey is an array of metric objects)
-   */
-  function generateCSV(surveys) {
-    let csv = "";
-    if (surveys) {
-      surveys.forEach((survey) => {
-        let surveyAsCSV = "";
-
-        survey.forEach((metric) => {
-          if (typeof metric.value == "string") {
-            surveyAsCSV += '"' + metric.value + '",';
-          } else {
-            surveyAsCSV += metric.value + ",";
-          }
-        });
-
-        csv += surveyAsCSV + "\n";
-      });
-    }
-    return csv;
-  }
-
-  /** Creates and downloads a file containing surveys */
-  function downloadSurveys() {
-    const anchor = document.createElement("a");
-    anchor.href = "data:text/plain;charset=utf-8,";
-
-    if (surveyType == "CSV") {
-      anchor.href += encodeURIComponent(
-        generateCSV(JSON.parse(localStorage.surveys))
-      );
-    } else if (surveyType == "JSON") {
-      anchor.href += encodeURIComponent(localStorage.surveys);
-    }
-
-    anchor.download = `surveys.${surveyType.toLowerCase()}`;
-    document.body.append(anchor);
-    anchor.click();
-    anchor.remove();
-  }
-
-  /** Checks if the user wants to download surveys, doing so if they confirm */
-  function askDownloadSurveys() {
-    if (confirm("Confirm download?")) {
-      downloadSurveys();
-    }
-  }
-
-  /** Confirms the user wants to erase stored surveys in `localStorage`, doing so if they confirm */
-  function eraseSurveys() {
-    if (prompt("Type 'erase' to erase saved surveys") == "erase") {
-      localStorage.surveys = "[]";
-    }
-  }
-
   /** Sets `$ms.location` if already set in `localStorage` */
   function load() {
-    if (localStorage.location) {
-      $ms.location = localStorage.location;
+    let storedLocation = localStorage.getItem("location");
+
+    if (locations.some((location) => location == storedLocation)) {
+      $ms.location = storedLocation;
       locationUpdated();
     }
   }
@@ -202,26 +42,6 @@
     bind:value={$ms.location}
     on:update={locationUpdated}
   />
-
-  <span class="group">Template</span>
-  <button on:click={copyTemplate}>
-    <Icon name="copy" text="Copy" />
-  </button>
-  <button on:click={editTemplate}>
-    <Icon name="pen" text="Edit" />
-  </button>
-
-  <span class="group">Surveys</span>
-  <Metric
-    name="Type"
-    type="select"
-    values={surveyTypes}
-    bind:value={surveyType}
-  />
-  <button on:click={askDownloadSurveys}>
-    <Icon name="download" text="Download" />
-  </button>
-  <button on:click={eraseSurveys}>
-    <Icon name="erase" text="Erase" />
-  </button>
+  <TemplateMenu />
+  <SurveysMenu />
 </div>

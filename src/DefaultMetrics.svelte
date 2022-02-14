@@ -30,13 +30,11 @@
       on:change={backupSurvey($ms)}
     />
   </div>
-  
-  <div>
-    <Metric
-      name="Absent"
-      type="toggle"
-      bind:value={$ms.isAbsent}
-      on:update={backupSurvey($ms)}
-    />
-  </div>
+
+  <Metric
+    name="Absent"
+    type="toggle"
+    bind:value={$ms.isAbsent}
+    on:update={backupSurvey($ms)}
+  />
 </div>

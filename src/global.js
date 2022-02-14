@@ -64,7 +64,7 @@ export function getSurvey(data) {
  * @param {object} data A reference to `ms` (must be referenced outside of definition)
  */
 export function backupSurvey(data) {
-  localStorage.backup = JSON.stringify(getSurvey(data));
+  localStorage.setItem("backup", JSON.stringify(getSurvey(data)));
 }
 
 /**

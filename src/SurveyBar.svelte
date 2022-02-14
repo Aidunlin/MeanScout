@@ -28,22 +28,22 @@
     if (error) {
       alert(`Could not save survey! ${error}`);
     } else if (confirm("Confirm save?")) {
-      localStorage.surveys = JSON.stringify([
-        ...JSON.parse(localStorage.surveys ?? "[]"),
+      let updatedSurveys = JSON.stringify([
+        ...JSON.parse(localStorage.getItem("surveys") ?? "[]"),
         getSurvey($ms),
       ]);
-      
+
+      localStorage.setItem("surveys", updatedSurveys);
       resetSurvey();
       $ms.match++;
     }
   }
 
-  /** Clears out temporary survey data (excluding match) */
+  /** Resets all metrics excluding match */
   function resetSurvey() {
     $ms.team = "";
     $ms.isAbsent = false;
     $ms.customMetrics.forEach((metric) => (metric.value = metric.default));
-    localStorage.backup = "";
   }
 
   /** Prompts the user if they want to reset, then calls `resetSurvey()` */
