@@ -1,6 +1,6 @@
 <script>
   import { surveyTypes } from "./global.js";
-  import Icon from "./Icon.svelte";
+  import IconButton from "./IconButton.svelte";
   import Metric from "./Metric.svelte";
 
   /** The file type to be utilized when downloading surveys */
@@ -75,9 +75,5 @@
   values={surveyTypes}
   bind:value={surveyType}
 />
-<button on:click={askDownloadSurveys}>
-  <Icon name="download" text="Download" />
-</button>
-<button on:click={eraseSurveys}>
-  <Icon name="erase" text="Erase" />
-</button>
+<IconButton on:click={askDownloadSurveys} icon="download" text="Download" />
+<IconButton on:click={eraseSurveys} icon="erase" text="Erase" />

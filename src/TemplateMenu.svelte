@@ -5,7 +5,7 @@
     metricTypes,
     getMetricDefaultValue,
   } from "./global.js";
-  import Icon from "./Icon.svelte";
+  import IconButton from "./IconButton.svelte";
 
   /** Writes the current template to the device's clipboard */
   function copyTemplate() {
@@ -106,9 +106,5 @@
 </script>
 
 <span class="group">Template</span>
-<button on:click={copyTemplate}>
-  <Icon name="copy" text="Copy" />
-</button>
-<button on:click={editTemplate}>
-  <Icon name="pen" text="Edit" />
-</button>
+<IconButton on:click={copyTemplate} icon="copy" text="Copy" />
+<IconButton on:click={editTemplate} icon="pen" text="Edit" />

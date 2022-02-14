@@ -1,6 +1,6 @@
 <script>
   import { createEventDispatcher } from "svelte";
-  import Icon from "./Icon.svelte";
+  import IconButton from "./IconButton.svelte";
 
   const dispatch = createEventDispatcher();
 
@@ -86,17 +86,15 @@
   {/if}
   <div class="flex">
     {#if type == "toggle"}
-      <button on:click={toggle}>
-        <Icon name={value ? "check" : "nocheck"} text={name} />
-      </button>
+      <IconButton
+        on:click={toggle}
+        icon={value ? "check" : "nocheck"}
+        text={name}
+      />
     {:else if type == "number"}
-      <button on:click={increment}>
-        <Icon name="plus" />
-      </button>
+      <IconButton on:click={increment} icon="plus" />
       <span class="number">{value}</span>
-      <button on:click={decrement}>
-        <Icon name="minus" />
-      </button>
+      <IconButton on:click={decrement} icon="minus" />
     {:else if type == "select"}
       <select bind:value>
         {#each values as val}
@@ -107,18 +105,18 @@
       <input placeholder={tip} bind:value />
     {:else if type == "rating"}
       {#each [...Array(5).keys()] as i}
-        <button on:click={() => update(i)}>
-          <Icon name={value >= i ? "star" : "nostar"} />
-        </button>
+        <IconButton
+          on:click={() => update(i)}
+          icon={value >= i ? "star" : "nostar"}
+        />
       {/each}
     {:else if type == "timer"}
-      <button on:click={running ? pause : start}>
-        <Icon name={running ? "pause" : "play"} />
-      </button>
+      <IconButton
+        on:click={running ? pause : start}
+        icon={running ? "pause" : "play"}
+      />
       <span class="number">{value}</span>
-      <button on:click={stop}>
-        <Icon name="stop" />
-      </button>
+      <IconButton on:click={stop} icon="stop" />
     {/if}
   </div>
 </div>

@@ -1,6 +1,6 @@
 <script>
   import { ms, getSurvey } from "./global.js";
-  import Icon from "./Icon.svelte";
+  import IconButton from "./IconButton.svelte";
 
   /** Returns a truthy string if the survey is valid, empty string otherwise */
   function validateSurvey() {
@@ -55,14 +55,6 @@
 </script>
 
 <div class="flex space-between spaced bg extend-down">
-  <div>
-    <button on:click={saveSurvey}>
-      <Icon name="save" text="Save" />
-    </button>
-  </div>
-  <div>
-    <button on:click={askResetSurvey}>
-      <Icon name="reset" text="Reset" />
-    </button>
-  </div>
+  <IconButton on:click={saveSurvey} icon="save" text="Save" />
+  <IconButton on:click={askResetSurvey} icon="reset" text="Reset" />
 </div>

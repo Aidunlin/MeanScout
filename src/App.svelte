@@ -40,14 +40,17 @@
 
   /** Registers service worker, loads template and backup */
   function load() {
-    document.body.classList.remove("hide");
-
     if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("./sw.js");
+      try {
+        navigator.serviceWorker.register("./sw.js");
+      } catch (e) {
+        console.log(e);
+      }
     }
-
+    
     loadTemplate();
     loadBackup();
+    document.body.classList.remove("hide");
   }
 </script>
 
