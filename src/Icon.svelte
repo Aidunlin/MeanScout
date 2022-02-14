@@ -1,5 +1,5 @@
 <script>
-  import { getIcon } from "./stores.js";
+  import { getIcon } from "./global.js";
 
   export let name = "";
   export let text = "";

@@ -1,6 +1,6 @@
 import { writable } from "svelte/store";
 
-export const msData = writable({
+export const ms = writable({
   location: "Red Near",
   team: "",
   match: 1,
@@ -30,8 +30,20 @@ export const metricTypes = [
   { name: "timer", default: 0 },
 ];
 
-export function getDefaultValue(typeName) {
+export function getMetricDefaultValue(typeName) {
   return metricTypes.find((type) => type.name == typeName).default ?? null;
+}
+
+export function getSurvey(data) {
+  return [
+    { name: "Team", value: data.team },
+    { name: "Match", value: data.match },
+    { name: "Absent", value: data.isAbsent },
+
+    ...data.customMetrics.map((metric) => {
+      return { name: metric.name, value: metric.value };
+    }),
+  ];
 }
 
 export const icons = {

@@ -1,24 +1,24 @@
 <script>
   import {
-    msData,
+    ms,
     exampleTemplate,
     metricTypes,
-    getDefaultValue,
+    getMetricDefaultValue,
     locations,
     surveyTypes,
-  } from "./stores.js";
+  } from "./global.js";
   import Icon from "./Icon.svelte";
   import Metric from "./Metric.svelte";
 
   let surveyType = surveyTypes[0];
 
   function locationUpdated() {
-    localStorage.location = $msData.location;
+    localStorage.location = $ms.location;
     let newTheme = "";
 
-    if ($msData.location.toLowerCase().includes("red")) {
+    if ($ms.location.toLowerCase().includes("red")) {
       newTheme = "red";
-    } else if ($msData.location.toLowerCase().includes("blue")) {
+    } else if ($ms.location.toLowerCase().includes("blue")) {
       newTheme = "blue";
     }
 
@@ -29,7 +29,7 @@
   }
 
   function copyTemplate() {
-    let templateString = JSON.stringify($msData.currentTemplate);
+    let templateString = JSON.stringify($ms.currentTemplate);
 
     if ("clipboard" in navigator) {
       navigator.clipboard.writeText(templateString);
@@ -40,15 +40,15 @@
   }
 
   function setTemplate(newTemplate = null) {
-    $msData.currentTemplate = JSON.parse(
+    $ms.currentTemplate = JSON.parse(
       JSON.stringify(newTemplate ?? exampleTemplate)
     );
 
-    localStorage.template = JSON.stringify($msData.currentTemplate);
+    localStorage.template = JSON.stringify($ms.currentTemplate);
     localStorage.backup = "";
 
-    $msData.customMetrics = $msData.currentTemplate.metrics.map((metric) => {
-      let defaultValue = getDefaultValue(metric.type);
+    $ms.customMetrics = $ms.currentTemplate.metrics.map((metric) => {
+      let defaultValue = getMetricDefaultValue(metric.type);
 
       if (metric.type == "select") {
         defaultValue = metric.values[0];
@@ -166,7 +166,7 @@
 
   function load() {
     if (localStorage.location) {
-      $msData.location = localStorage.location;
+      $ms.location = localStorage.location;
       locationUpdated();
     }
   }
@@ -174,12 +174,12 @@
 
 <svelte:window on:load={load} />
 
-<div class="flex spaced bg" id="menu" class:hide={!$msData.menuVisible}>
+<div class="flex spaced bg" id="menu" class:hide={!$ms.menuVisible}>
   <Metric
     name="Location"
     type="select"
     values={locations}
-    bind:value={$msData.location}
+    bind:value={$ms.location}
     on:update={locationUpdated}
   />
 

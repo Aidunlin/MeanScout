@@ -1,21 +1,9 @@
 <script>
-  import { msData } from "./stores.js";
+  import { ms, getSurvey } from "./global.js";
   import Metric from "./Metric.svelte";
 
-  function getSurvey() {
-    return [
-      { name: "Team", value: $msData.team },
-      { name: "Match", value: $msData.match },
-      { name: "Absent", value: $msData.isAbsent },
-
-      ...$msData.customMetrics.map((metric) => {
-        return { name: metric.name, value: metric.value };
-      }),
-    ];
-  }
-
   function backupSurvey() {
-    localStorage.backup = JSON.stringify(getSurvey());
+    localStorage.backup = JSON.stringify(getSurvey($ms));
   }
 </script>
 
@@ -26,11 +14,11 @@
       id="metric-team"
       list="teams-list"
       maxlength="5"
-      bind:value={$msData.team}
+      bind:value={$ms.team}
       on:change={backupSurvey}
     />
     <datalist id="teams-list">
-      {#each $msData.currentTemplate.teams ?? [] as team}
+      {#each $ms.currentTemplate.teams ?? [] as team}
         <option value={team} />
       {/each}
     </datalist>
@@ -41,7 +29,7 @@
       id="metric-match"
       type="number"
       pattern="[0-9]*"
-      bind:value={$msData.match}
+      bind:value={$ms.match}
       on:change={backupSurvey}
     />
   </div>
@@ -49,7 +37,7 @@
     <Metric
       name="Absent"
       type="toggle"
-      bind:value={$msData.isAbsent}
+      bind:value={$ms.isAbsent}
       on:update={backupSurvey}
     />
   </div>

@@ -1,31 +1,19 @@
 <script>
-  import { msData } from "./stores.js";
+  import { ms, getSurvey } from "./global.js";
   import Icon from "./Icon.svelte";
 
-  function getSurvey() {
-    return [
-      { name: "Team", value: $msData.team },
-      { name: "Match", value: $msData.match },
-      { name: "Absent", value: $msData.isAbsent },
-
-      ...$msData.customMetrics.map((metric) => {
-        return { name: metric.name, value: metric.value };
-      }),
-    ];
-  }
-
   function validateSurvey() {
-    if (!/^\d{1,4}[A-Z]?$/.test($msData.team)) {
+    if (!/^\d{1,4}[A-Z]?$/.test($ms.team)) {
       return "Invalid team value";
     }
 
-    if ($msData.currentTemplate.teams) {
-      if (!$msData.currentTemplate.teams.some((team) => team == $msData.team)) {
+    if ($ms.currentTemplate.teams) {
+      if (!$ms.currentTemplate.teams.some((team) => team == $ms.team)) {
         return "Team value not whitelisted";
       }
     }
 
-    if (!/\d{1,3}/.test($msData.match)) {
+    if (!/\d{1,3}/.test($ms.match)) {
       return "Invalid match value";
     }
 
@@ -40,18 +28,18 @@
     } else if (confirm("Confirm save?")) {
       localStorage.surveys = JSON.stringify([
         ...JSON.parse(localStorage.surveys ?? "[]"),
-        getSurvey(),
+        getSurvey($ms),
       ]);
       
       resetSurvey();
-      $msData.match++;
+      $ms.match++;
     }
   }
 
   function resetSurvey() {
-    $msData.team = "";
-    $msData.isAbsent = false;
-    $msData.customMetrics.forEach((metric) => (metric.value = metric.default));
+    $ms.team = "";
+    $ms.isAbsent = false;
+    $ms.customMetrics.forEach((metric) => (metric.value = metric.default));
     localStorage.backup = "";
   }
 
@@ -62,7 +50,7 @@
   }
 </script>
 
-<div class="flex spaced bg" style="justify-content: space-between">
+<div class="flex space-between spaced bg extend-down">
   <div>
     <button on:click={saveSurvey}>
       <Icon name="save" text="Save" />
