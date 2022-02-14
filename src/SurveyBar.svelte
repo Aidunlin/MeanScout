@@ -2,6 +2,7 @@
   import { ms, getSurvey } from "./global.js";
   import Icon from "./Icon.svelte";
 
+  /** Returns a truthy string if the survey is valid, empty string otherwise */
   function validateSurvey() {
     if (!/^\d{1,4}[A-Z]?$/.test($ms.team)) {
       return "Invalid team value";
@@ -20,6 +21,7 @@
     return "";
   }
 
+  /** Checks and saves survey to `localStorage`, then updates the UI */
   function saveSurvey() {
     let error = validateSurvey();
 
@@ -36,6 +38,7 @@
     }
   }
 
+  /** Clears out temporary survey data (excluding match) */
   function resetSurvey() {
     $ms.team = "";
     $ms.isAbsent = false;
@@ -43,6 +46,7 @@
     localStorage.backup = "";
   }
 
+  /** Prompts the user if they want to reset, then calls `resetSurvey()` */
   function askResetSurvey() {
     if (prompt("Type 'reset' to reset the survey") == "reset") {
       resetSurvey();

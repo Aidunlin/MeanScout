@@ -1,10 +1,6 @@
 <script>
-  import { ms, getSurvey } from "./global.js";
+  import { ms, backupSurvey } from "./global.js";
   import Metric from "./Metric.svelte";
-
-  function backupSurvey() {
-    localStorage.backup = JSON.stringify(getSurvey($ms));
-  }
 </script>
 
 <div class="flex spaced" class:hide={$ms.isAbsent}>
@@ -13,7 +9,7 @@
       {...metric}
       bind:name={$ms.customMetrics[i].name}
       bind:value={$ms.customMetrics[i].value}
-      on:update={backupSurvey}
+      on:update={backupSurvey($ms)}
     />
   {/each}
 </div>

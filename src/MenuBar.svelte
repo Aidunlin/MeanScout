@@ -1,6 +1,7 @@
 <script>
   import { ms } from "./global.js";
 
+  /** D... do I really need to explain this one? */
   function toggleMenu() {
     $ms.menuVisible = !$ms.menuVisible;
   }

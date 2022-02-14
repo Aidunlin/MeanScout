@@ -6,6 +6,7 @@
   import CustomMetrics from "./CustomMetrics.svelte";
   import SurveyBar from "./SurveyBar.svelte";
 
+  /** Parses and loads the current template from `localStorage` (or `exampleTemplate`) */
   function loadTemplate() {
     $ms.currentTemplate = JSON.parse(
       localStorage.template ?? JSON.stringify(exampleTemplate)
@@ -22,6 +23,7 @@
     });
   }
 
+  /** Parses and loads the survey backup from `localStorage` */
   function loadBackup() {
     const backup = JSON.parse(localStorage.backup);
     $ms.team = backup.find((metric) => metric.name == "Team").value;
@@ -33,6 +35,7 @@
     });
   }
 
+  /** Registers service worker, loads template and backup */
   function load() {
     document.body.classList.remove("hide");
 

@@ -12,6 +12,7 @@
 
   let surveyType = surveyTypes[0];
 
+  /** Updates `localStorage` and app theme with `$ms.location` */
   function locationUpdated() {
     localStorage.location = $ms.location;
     let newTheme = "";
@@ -28,6 +29,7 @@
     );
   }
 
+  /** Writes the current template to the device's clipboard */
   function copyTemplate() {
     let templateString = JSON.stringify($ms.currentTemplate);
 
@@ -39,7 +41,11 @@
     }
   }
 
-  function setTemplate(newTemplate = null) {
+  /**
+   * Sets a new template (or resets to `exampleTemplate`), updates `localStorage` and `$ms.customMetrics`
+   * @param newTemplate (optional) The template to use
+   */
+  function setTemplate(newTemplate = {}) {
     $ms.currentTemplate = JSON.parse(
       JSON.stringify(newTemplate ?? exampleTemplate)
     );
@@ -58,6 +64,11 @@
     });
   }
 
+  /**
+   * Checks if a stringified template is valid
+   * @param templateString A stringified template
+   * @returns An object containing a template object or error string
+   */
   function validateTemplate(templateString) {
     let result = {
       template: {},
@@ -96,8 +107,9 @@
     return result;
   }
 
+  /** Prompts the user to enter a new template, or reset to `exampleTemplate` */
   function editTemplate() {
-    const newPrompt = prompt("Pase new template (you can also 'reset'):");
+    const newPrompt = prompt("Paste new template (you can also 'reset'):");
 
     if (newPrompt) {
       if (newPrompt == "reset") {
@@ -114,6 +126,10 @@
     }
   }
 
+  /**
+   * Creates a multiline CSV string for an array of surveys
+   * @param surveys An array of surveys (each survey is an array of metric objects)
+   */
   function generateCSV(surveys) {
     let csv = "";
     if (surveys) {
@@ -134,6 +150,7 @@
     return csv;
   }
 
+  /** Creates and downloads a file containing surveys */
   function downloadSurveys() {
     const anchor = document.createElement("a");
     anchor.href = "data:text/plain;charset=utf-8,";
@@ -152,18 +169,21 @@
     anchor.remove();
   }
 
+  /** Checks if the user wants to download surveys, doing so if they confirm */
   function askDownloadSurveys() {
     if (confirm("Confirm download?")) {
       downloadSurveys();
     }
   }
 
+  /** Confirms the user wants to erase stored surveys in `localStorage`, doing so if they confirm */
   function eraseSurveys() {
     if (prompt("Type 'erase' to erase saved surveys") == "erase") {
       localStorage.surveys = "[]";
     }
   }
 
+  /** Sets `$ms.location` if already set in `localStorage` */
   function load() {
     if (localStorage.location) {
       $ms.location = localStorage.location;

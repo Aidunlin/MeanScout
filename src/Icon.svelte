@@ -1,11 +1,18 @@
 <script>
   import { getIcon } from "./global.js";
 
+  /** (required) The name of the icon, as defined in global.js */
   export let name = "";
+  /** (optional) Text accompanying the icon */
   export let text = "";
 
-  let icon;
+  /** SVG information for the icon */
+  let icon = {
+    width: 0,
+    path: "",
+  };
 
+  // Svelte updates icon data whenever `name` changes
   $: icon = getIcon(name);
 </script>
 
