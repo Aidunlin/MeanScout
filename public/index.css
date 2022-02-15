@@ -1,11 +1,19 @@
-:root {
-  --bg-color: #000;
-  --blue: #2196f3;
-  --fg-color: rgba(127, 127, 127, 0.2);
-  --red: #f44336;
-  --text-color: #fff;
-  --theme-color: var(--red);
-  color-scheme: dark;
+@media (max-width: 360px) {
+  * {
+    text-align: center;
+  }
+
+  .spaced > *, #metric-team, #metric-match, .flex button:only-child {
+    width: 100% !important;
+  }
+
+  .spaced .flex > * {
+    flex: auto;
+  }
+
+  #location-text {
+    display: none;
+  }
 }
 
 * {
@@ -19,7 +27,14 @@
 }
 
 html {
+  --bg-color: #000;
+  --blue: #2196f3;
+  --fg-color: rgba(127, 127, 127, 0.2);
+  --red: #f44336;
+  --text-color: #fff;
+  --theme-color: var(--red);
   background: var(--bg-color);
+  color-scheme: dark;
   margin: auto;
   max-width: 720px;
   touch-action: pan-y;
@@ -49,8 +64,7 @@ button {
   text-decoration: none;
 }
 
-input,
-select {
+input, select {
   -webkit-appearance: none;
   appearance: none;
   display: block;
@@ -76,8 +90,9 @@ svg, #logo {
   justify-content: space-between;
 }
 
-.spaced > * {
-  margin: 8px;
+.spaced {
+  gap: 8px;
+  padding: 8px;
 }
 
 .extend-down {
@@ -94,8 +109,11 @@ svg, #logo {
 
 .group {
   font-weight: bolder;
-  margin: 8px 8px 0;
   text-decoration: underline;
+}
+
+.group:not(:first-child) {
+  padding-top: 8px;
 }
 
 .number, #metric-match {
@@ -108,6 +126,10 @@ svg, #logo {
 
 .text-icon {
   padding-right: 8px;
+}
+
+.star {
+  padding: 8px 6px;
 }
 
 #metric-team {

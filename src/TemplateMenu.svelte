@@ -92,8 +92,9 @@
     if (newPrompt) {
       if (newPrompt == "reset") {
         setTemplate();
+        localStorage.removeItem("template");
       } else {
-        let result = validateTemplate(templateString);
+        let result = validateTemplate(newPrompt);
 
         if (result.error) {
           alert(`Could not set template! ${result.error}`);

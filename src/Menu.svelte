@@ -35,6 +35,7 @@
 <svelte:window on:load={load} />
 
 <div class="flex spaced bg" id="menu" class:hide={!$ms.menuVisible}>
+  <span class="group">Options</span>
   <Metric
     name="Location"
     type="select"

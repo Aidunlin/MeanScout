@@ -4,6 +4,8 @@
 </script>
 
 <div class="flex spaced">
+  <span class="group">Info</span>
+
   <div>
     Team
     <input

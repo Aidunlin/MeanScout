@@ -23,26 +23,6 @@
   /** (`timer`) Interval reference for the timer */
   let interval = null;
 
-  /** (`toggle` function) */
-  function toggle() {
-    value = !value;
-  }
-
-  /** (`number` function) */
-  function increment() {
-    value++;
-  }
-
-  /** (`number` function) */
-  function decrement() {
-    value--;
-  }
-
-  /** (`rating` function) */
-  function update(newValue) {
-    value = newValue;
-  }
-
   /** (`timer` function) */
   function start() {
     running = true;
@@ -87,14 +67,14 @@
   <div class="flex">
     {#if type == "toggle"}
       <IconButton
-        on:click={toggle}
+        on:click={() => value = !value}
         icon={value ? "check" : "nocheck"}
         text={name}
       />
     {:else if type == "number"}
-      <IconButton on:click={increment} icon="plus" />
+      <IconButton on:click={() => value++} icon="plus" />
       <span class="number">{value}</span>
-      <IconButton on:click={decrement} icon="minus" />
+      <IconButton on:click={() => value--} icon="minus" />
     {:else if type == "select"}
       <select bind:value>
         {#each values as val}
@@ -106,7 +86,7 @@
     {:else if type == "rating"}
       {#each [...Array(5).keys()] as i}
         <IconButton
-          on:click={() => update(i)}
+          on:click={() => value = i}
           icon={value >= i ? "star" : "nostar"}
         />
       {/each}
