@@ -1,23 +1,22 @@
 # MeanScout
 
-A lightweight FRC scouting web app.
+A lightweight FRC scouting web app, built with Svelte.
 
 ## Features
 
 - Full offline support (progressive web app)
 - Lightweight mobile-first design
-- Red/blue color variants, auto dark/light themes
+- Red/blue color theme variants
 - Customizable metrics: toggles, numbers, selectors, textfields, ratings, and timers
 - Optional team whitelisting
 - Uses browser storage to store surveys
-- Different export methods (i.e. JSON and CSV)
+- Different export methods (CSV, JSON)
 
-## Libraries
+## Frameworks/Libraries
 
-- [FontAwesome Icons](https://fontawesome.com/)
-- [Workbox](https://developers.google.com/web/tools/workbox)
-
-Otherwise, MeanScout is built with native HTML/CSS/JS.
+- [Svelte](https://svelte.dev/) - Front end compiler
+- [FontAwesome](https://fontawesome.com/) - Icons
+- [Workbox](https://developers.google.com/web/tools/workbox) - Offline service worker
 
 ## Location
 
@@ -52,18 +51,25 @@ Types:
 
 - `toggle`: A toggleable button. Value is a boolean.
 - `number`: A number input with increment/decrement buttons. Value is an integer.
-- `select`: A dropdown selector. Value is a string (selected option). There must be an array of string `values` to create options for the selector.
+- `select`: A dropdown selector. Value is a string (selected option). There also must be an array of string `values` to create options for the selector.
 - `text`: A text input. Value is a string. Setting a `tip` value will add a placeholder within the input field.
 - `rating`: A star rating bar. Value is a number (0-4).
 - `timer`: A number input with timing controls. Value is a decimal.
 
-Setting `group` to a string adds a label before the metric and moves the metric to a new line. Metrics after will appear to be grouped together.
+Setting `group` with a string adds a label before the metric and moves the metric to a new line. Metrics after will appear to be grouped together.
 
 ## Exporting
 
 Surveys are stored in a JSON array. Each survey is also an array containing metric objects with names and values.
 
-Currently, you can export surveys either as JSON or CSV. Here are some samples:
+Currently, you can export surveys either as CSV or JSON. Here are some samples:
+
+CSV:
+
+```csv
+2471,1,false,true,3,"Value 1","MeanScout is cool",5,4.2, ... metrics
+... surveys
+```
 
 JSON:
 
@@ -71,25 +77,18 @@ JSON:
 [
   [
     { "name": "Team", "value": "2471" },
-    { "name": "Match", "value": "1" },
+    { "name": "Match", "value": 1 },
     { "name": "Absent", "value": false },
-    { "name": "Toggle", "value": false },
+    { "name": "Toggle", "value": true },
     { "name": "Number", "value": 3 },
     { "name": "Select", "value": "Value 1" },
     { "name": "Text", "value": "MeanScout is cool" },
-    { "name": "Rating", "value": 5 }
+    { "name": "Rating", "value": 5 },
     { "name": "Timer", "value": 4.2 }
     // ... metrics
   ]
   // ... surveys
 ]
-```
-
-CSV:
-
-```csv
-"2471",1,false,false,3,"Value 1","MeanScout is cool",5,4.2, ... metrics
-... surveys
 ```
 
 ## Contributing
@@ -98,4 +97,8 @@ Find a problem? Make an issue!
 
 Fix a problem? Make a pull request!
 
-All you'll need to develop MeanScout (or your own fork) is a text editor and a browser.
+To develop MeanScout (or a fork), you will need Node.js/npm, a text editor, and a browser. After cloning, use `npm install` in the root folder to build your `node_modules`. The `public` folder contains everything your browser needs to run the app, so deploy with it set as your publish directory.
+
+`npm run build`: builds minified script files to the `public/build` folder, should be used for deployment
+
+`npm run dev`: runs a local web server that refreshes and builds MeanScout as you go

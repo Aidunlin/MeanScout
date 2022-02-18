@@ -6,9 +6,11 @@
   "display": "standalone",
   "theme_color": "#000000",
   "background_color": "#000000",
-  "icons": [{
-    "src": "./logo.png",
-    "type": "image/png",
-    "sizes": "512x512"
-  }]
+  "icons": [
+    {
+      "src": "./logo.png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ]
 }
