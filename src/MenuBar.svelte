@@ -1,14 +1,10 @@
 <script>
-  import { ms } from "./global.js";
+  import { ms } from "./Global.svelte";
 
-  /** D... do I really need to explain this one? */
   function toggleMenu() {
     $ms.menuVisible = !$ms.menuVisible;
-    if ($ms.menuVisible) {
-      localStorage.setItem("menuVisible", true);
-    } else {
-      localStorage.removeItem("menuVisible");
-    }
+    if ($ms.menuVisible) localStorage.setItem("menuVisible", true);
+    else localStorage.removeItem("menuVisible");
   }
 
   function load() {

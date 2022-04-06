@@ -27,9 +27,7 @@
   function start() {
     running = true;
     interval = setInterval(() => {
-      if (running) {
-        value = (parseFloat(value) + 0.1).toFixed(1);
-      }
+      if (running) value = (parseFloat(value) + 0.1).toFixed(1);
     }, 100);
   }
 
@@ -42,10 +40,7 @@
   /** (`timer` function) */
   function stop() {
     if (type == "timer") {
-      if (running) {
-        pause();
-      }
-
+      if (running) pause();
       value = 0;
     }
   }
@@ -66,11 +61,7 @@
   {/if}
   <div class="flex">
     {#if type == "toggle"}
-      <IconButton
-        on:click={() => value = !value}
-        icon={value ? "check" : "nocheck"}
-        text={name}
-      />
+      <IconButton on:click={() => (value = !value)} icon={value ? "check" : "nocheck"} text={name} />
     {:else if type == "number"}
       <IconButton on:click={() => value++} icon="plus" />
       <span class="number">{value}</span>
@@ -85,16 +76,10 @@
       <input placeholder={tip} bind:value />
     {:else if type == "rating"}
       {#each [...Array(5).keys()] as i}
-        <IconButton
-          on:click={() => value = i}
-          icon={value >= i ? "star" : "nostar"}
-        />
+        <IconButton on:click={() => (value = i)} icon={value >= i ? "star" : "nostar"} />
       {/each}
     {:else if type == "timer"}
-      <IconButton
-        on:click={running ? pause : start}
-        icon={running ? "pause" : "play"}
-      />
+      <IconButton on:click={running ? pause : start} icon={running ? "pause" : "play"} />
       <span class="number">{value}</span>
       <IconButton on:click={stop} icon="stop" />
     {/if}

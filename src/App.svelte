@@ -1,5 +1,5 @@
 <script>
-  import { ms, exampleTemplate, getMetricDefaultValue } from "./global.js";
+  import { ms, exampleTemplate, getMetricDefaultValue } from "./Global.svelte";
   import MenuBar from "./MenuBar.svelte";
   import Menu from "./Menu.svelte";
   import DefaultMetrics from "./DefaultMetrics.svelte";
@@ -8,17 +8,10 @@
 
   /** Parses and loads the current template from `localStorage` (or `exampleTemplate`) */
   function loadTemplate() {
-    $ms.currentTemplate = JSON.parse(
-      localStorage.getItem("template") ?? JSON.stringify(exampleTemplate)
-    );
-
-    $ms.customMetrics = $ms.currentTemplate.metrics.map((metric) => {
+    $ms.template = JSON.parse(localStorage.getItem("template") ?? JSON.stringify(exampleTemplate));
+    $ms.metrics = $ms.template.metrics.map((metric) => {
       let defaultValue = getMetricDefaultValue(metric.type);
-
-      if (metric.type == "select") {
-        defaultValue = metric.values[0];
-      }
-
+      if (metric.type == "select") defaultValue = metric.values[0];
       return { ...metric, value: defaultValue, default: defaultValue };
     });
   }
@@ -26,15 +19,11 @@
   /** Parses and loads the survey backup from `localStorage` */
   function loadBackup() {
     const backup = JSON.parse(localStorage.getItem("backup"));
-
     if (backup) {
       $ms.team = backup.find((metric) => metric.name == "Team").value;
       $ms.match = backup.find((metric) => metric.name == "Match").value;
       $ms.isAbsent = backup.find((metric) => metric.name == "Absent").value;
-
-      $ms.customMetrics.forEach((metric) => {
-        metric.value = backup.find((m) => m.name == metric.name).value;
-      });
+      $ms.metrics.forEach((metric) => (metric.value = backup.find((m) => m.name == metric.name).value));
     }
   }
 
@@ -47,7 +36,6 @@
         console.log(e);
       }
     }
-    
     loadTemplate();
     loadBackup();
     document.body.classList.remove("hide");
