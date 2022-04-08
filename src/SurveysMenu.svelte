@@ -1,16 +1,16 @@
-<script>
-  import { surveyTypes } from "./Global.svelte";
+<script lang="ts">
+  import { FileFormat, fileFormats } from "./Global.svelte";
   import IconButton from "./IconButton.svelte";
   import Metric from "./Metric.svelte";
 
   /** The file type to be utilized when downloading surveys */
-  let surveyType = surveyTypes[0];
+  let surveyType: FileFormat = "CSV";
 
   /**
    * Creates a multiline CSV string for an array of surveys
    * @param surveys An array of surveys (each survey is an array of metric objects)
    */
-  function generateCSV(surveys) {
+  function generateCSV(surveys: { name: string; value: any }[][]) {
     let csv = "";
     if (surveys) {
       surveys.forEach((survey) => {
@@ -52,6 +52,6 @@
 </script>
 
 <span class="group">Surveys</span>
-<Metric name="Type" type="select" values={surveyTypes} bind:value={surveyType} />
+<Metric name="Type" type="select" values={Object.values(fileFormats)} bind:value={surveyType} />
 <IconButton on:click={askDownloadSurveys} icon="download" text="Download" />
 <IconButton on:click={eraseSurveys} icon="erase" text="Erase" />

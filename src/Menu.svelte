@@ -1,5 +1,5 @@
-<script>
-  import { ms, locations } from "./Global.svelte";
+<script lang="ts">
+  import { ms, locations, Location } from "./Global.svelte";
   import Metric from "./Metric.svelte";
   import TemplateMenu from "./TemplateMenu.svelte";
   import SurveysMenu from "./SurveysMenu.svelte";
@@ -15,7 +15,7 @@
 
   /** Sets `$ms.location` if already set in `localStorage` */
   function load() {
-    let storedLocation = localStorage.getItem("location");
+    let storedLocation = localStorage.getItem("location") as Location;
     if (locations.some((location) => location == storedLocation)) {
       $ms.location = storedLocation;
       locationUpdated();
@@ -25,9 +25,9 @@
 
 <svelte:window on:load={load} />
 
-<div class="flex spaced bg" id="menu" class:hide={!$ms.menuVisible}>
+<div class="flex spaced bg extend-bg" id="menu" class:hide={!$ms.menuVisible}>
   <span class="group">Options</span>
-  <Metric name="Location" type="select" values={locations} bind:value={$ms.location} on:update={locationUpdated} />
+  <Metric name="Location" type="select" values={Object.values(locations)} bind:value={$ms.location} on:update={locationUpdated} />
   <TemplateMenu />
   <SurveysMenu />
 </div>

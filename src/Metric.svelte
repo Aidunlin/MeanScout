@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { createEventDispatcher } from "svelte";
   import IconButton from "./IconButton.svelte";
 
@@ -21,7 +21,7 @@
   /** (`timer`) Whether the timer is running */
   let running = false;
   /** (`timer`) Interval reference for the timer */
-  let interval = null;
+  let interval: NodeJS.Timer;
 
   /** (`timer` function) */
   function start() {

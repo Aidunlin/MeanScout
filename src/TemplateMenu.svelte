@@ -1,5 +1,5 @@
-<script>
-  import { ms, exampleTemplate, metricTypes, getMetricDefaultValue } from "./Global.svelte";
+<script lang="ts">
+  import { ms, exampleTemplate, metricDefaults, getMetricDefaultValue, Template } from "./Global.svelte";
   import IconButton from "./IconButton.svelte";
 
   /** Writes the current template to the device's clipboard */
@@ -15,7 +15,7 @@
    * Sets a new template (or resets to `exampleTemplate`), updates `localStorage` and `$ms.metrics`
    * @param newTemplate (optional) The template to use
    */
-  function setTemplate(newTemplate) {
+  function setTemplate(newTemplate?: Template) {
     $ms.template = JSON.parse(JSON.stringify(newTemplate ?? exampleTemplate));
     localStorage.setItem("template", JSON.stringify($ms.template));
     localStorage.removeItem("backup");
@@ -31,8 +31,8 @@
    * @param templateString A stringified template
    * @returns An object containing a template object or error string
    */
-  function validateTemplate(templateString) {
-    let result = { template: {}, error: "" };
+  function validateTemplate(templateString: string) {
+    let result: { template: Template; error: string } = { template: null, error: "" };
     try {
       result.template = JSON.parse(templateString);
     } catch (e) {
@@ -44,8 +44,9 @@
     else {
       result.template.metrics.forEach((metric, i) => {
         if (!metric.name) result.error += `\nMetric ${i + 1} has no name`;
-        if (!Array.isArray(metric.values ?? [])) result.error += `\nMetric ${metric.name ?? i + 1} has invalid values`;
-        if (!metricTypes.some((type) => type.name == metric.type))
+        if (metric.type == "select" && !Array.isArray(metric.values ?? []))
+          result.error += `\nMetric ${metric.name ?? i + 1} has invalid values`;
+        if (!metricDefaults.some((type) => type.name == metric.type))
           result.error += `\nMetric ${metric.name ?? i + 1} has invalid type`;
       });
     }

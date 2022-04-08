@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { ms, exampleTemplate, getMetricDefaultValue } from "./Global.svelte";
   import MenuBar from "./MenuBar.svelte";
   import Menu from "./Menu.svelte";
@@ -18,12 +18,12 @@
 
   /** Parses and loads the survey backup from `localStorage` */
   function loadBackup() {
-    const backup = JSON.parse(localStorage.getItem("backup"));
+    const backup = JSON.parse(localStorage.getItem("backup")) as { name: string; value: any }[];
     if (backup) {
       $ms.team = backup.find((metric) => metric.name == "Team").value;
       $ms.match = backup.find((metric) => metric.name == "Match").value;
       $ms.isAbsent = backup.find((metric) => metric.name == "Absent").value;
-      $ms.metrics.forEach((metric) => (metric.value = backup.find((m) => m.name == metric.name).value));
+      $ms.metrics.forEach((metric, i) => (metric.value = backup[i + 3].value));
     }
   }
 

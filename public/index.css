@@ -3,7 +3,10 @@
     text-align: center;
   }
 
-  .spaced > *, #metric-team, #metric-match, .flex button:only-child {
+  .spaced > *,
+  #metric-team,
+  #metric-match,
+  .flex button:only-child {
     width: 100% !important;
   }
 
@@ -47,15 +50,28 @@ body {
   min-height: 100vh;
 }
 
-input, select, option, path, #menu-toggle-btn, #location-text {
+input,
+select,
+option,
+path,
+#menu-toggle-btn,
+#location-text {
   color: var(--theme-color);
 }
 
-button, input, select, .number, .bg {
+button,
+input,
+select,
+.number,
+.bg {
   background: var(--fg-color);
 }
 
-button, input, select, .number, #location-text  {
+button,
+input,
+select,
+.number,
+#location-text {
   padding: 8px;
 }
 
@@ -64,7 +80,8 @@ button {
   text-decoration: none;
 }
 
-input, select {
+input,
+select {
   -webkit-appearance: none;
   appearance: none;
   display: block;
@@ -75,7 +92,8 @@ select {
   cursor: pointer;
 }
 
-svg, #logo {
+svg,
+#logo {
   height: 30px;
   vertical-align: bottom;
 }
@@ -99,11 +117,19 @@ svg, #logo {
   margin-top: auto;
 }
 
+.extend-bg {
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  padding-left: calc(50vw - 50% + 8px);
+  padding-right: calc(50vw - 50% + 8px);
+}
+
 .hide {
   display: none !important;
 }
 
-.group, .max-width {
+.group,
+.max-width {
   width: 100%;
 }
 
@@ -116,7 +142,8 @@ svg, #logo {
   padding-top: 8px;
 }
 
-.number, #metric-match {
+.number,
+#metric-match {
   width: 80px;
 }
 
@@ -136,13 +163,15 @@ svg, #logo {
   width: 100px;
 }
 
-::-webkit-outer-spin-button, ::-webkit-inner-spin-button, ::-webkit-calendar-picker-indicator {
+::-webkit-outer-spin-button,
+::-webkit-inner-spin-button,
+::-webkit-calendar-picker-indicator {
   -webkit-appearance: none;
   display: none !important;
   margin: 0;
 }
 
-input[type=number] {
+input[type="number"] {
   -moz-appearance: textfield;
   -webkit-appearance: textfield;
 }

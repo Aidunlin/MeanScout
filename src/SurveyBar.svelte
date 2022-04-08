@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { ms, getSurvey } from "./Global.svelte";
   import IconButton from "./IconButton.svelte";
 
@@ -8,7 +8,7 @@
     if ($ms.template.teams) {
       if (!$ms.template.teams.some((team) => team == $ms.team)) return "Team value not whitelisted";
     }
-    if (!/\d{1,3}/.test($ms.match)) return "Invalid match value";
+    if (!/\d{1,3}/.test(`${$ms.match}`)) return "Invalid match value";
     return "";
   }
 
@@ -37,7 +37,7 @@
   }
 </script>
 
-<div class="flex space-between spaced bg extend-down">
+<div class="flex space-between spaced bg extend-bg extend-down">
   <IconButton on:click={saveSurvey} icon="save" text="Save" />
   <IconButton on:click={askResetSurvey} icon="reset" text="Reset" />
 </div>

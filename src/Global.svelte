@@ -1,19 +1,62 @@
-<script context="module">
+<script lang="ts" context="module">
   import { writable } from "svelte/store";
 
+  /** List of supported survey file types */
+  export const fileFormats = ["CSV", "JSON"] as const;
+  export type FileFormat = typeof fileFormats[number];
+
+  /** List of robot locations */
+  export const locations = ["Red Near", "Red Mid", "Red Far", "Blue Near", "Blue Mid", "Blue Far"] as const;
+  export type Location = typeof locations[number];
+
+  /** List of metric types */
+  export const metricTypes = ["toggle", "number", "select", "text", "rating", "timer"] as const;
+  export type MetricType = typeof metricTypes[number];
+
+  type BaseMetric = {
+    name: string;
+    type: MetricType;
+    group?: string;
+  }
+
+  type UniqueMetric =
+    | { type: "toggle" }
+    | { type: "number" }
+    | { type: "select"; values: string[] }
+    | { type: "text"; tip?: string }
+    | { type: "rating" }
+    | { type: "timer" };
+
+  export type CustomMetric = BaseMetric & UniqueMetric;
+
+  export interface Template {
+    teams?: string[];
+    metrics: CustomMetric[];
+  }
+
+  interface MS {
+    location: Location;
+    team: string;
+    match: number;
+    isAbsent: boolean;
+    template: Template;
+    metrics: { name: string; value: any; default: any }[];
+    menuVisible: boolean;
+  }
+
   /** Global object of state values, must use `$ms` to use/change a value */
-  export const ms = writable({
+  export const ms = writable<MS>({
     location: "Red Near",
     team: "",
     match: 1,
     isAbsent: false,
-    template: {},
+    template: null,
     metrics: [],
     menuVisible: false,
   });
 
   /** Default template used to showcase different metrics */
-  export const exampleTemplate = {
+  export const exampleTemplate: Template = {
     metrics: [
       { name: "Toggle", type: "toggle", group: "Group" },
       { name: "Number", type: "number" },
@@ -25,7 +68,7 @@
   };
 
   /** Default values for each metric type */
-  export const metricTypes = [
+  export const metricDefaults: { name: MetricType; default: any }[] = [
     { name: "toggle", default: false },
     { name: "number", default: 0 },
     { name: "select", default: 0 },
@@ -36,19 +79,19 @@
 
   /**
    * Helper function for getting default metric values
-   * @param {string} typeName The metric's type
-   * @returns The default value defined in `metricTypes` or `null`
+   * @param type The metric's type
+   * @returns The default value defined in `metricDefaults` or `null`
    */
-  export function getMetricDefaultValue(typeName) {
-    return metricTypes.find((type) => type.name == typeName).default ?? null;
+  export function getMetricDefaultValue(type: MetricType) {
+    return metricDefaults.find((t) => t.name == type)?.default;
   }
 
   /**
    * Helper function for creating a survey
-   * @param {object} data A reference to `ms` (must be referenced outside of definition)
+   * @param data A reference to `ms` (must be referenced outside of definition)
    * @returns An array of objects, each representing a metric
    */
-  export function getSurvey(data) {
+  export function getSurvey(data: MS) {
     return [
       { name: "Team", value: data.team },
       { name: "Match", value: data.match },
@@ -61,9 +104,9 @@
 
   /**
    * Helper function for storing a backup to `localStorage`
-   * @param {object} data A reference to `ms` (must be referenced outside of definition)
+   * @param data A reference to `ms` (must be referenced outside of definition)
    */
-  export function backupSurvey(data) {
+  export function backupSurvey(data: MS) {
     localStorage.setItem("backup", JSON.stringify(getSurvey(data)));
   }
 
@@ -160,16 +203,10 @@
 
   /**
    * Helper function for getting icon information
-   * @param {string} iconName The name of the icon
+   * @param iconName The name of the icon
    * @returns SVG information for the icon
    */
-  export function getIcon(iconName) {
+  export function getIcon(iconName: string) {
     return icons.find((icon) => icon.name == iconName) ?? icons.find((icon) => icon.name == "question");
   }
-
-  /** List of robot locations */
-  export const locations = ["Red Near", "Red Mid", "Red Far", "Blue Near", "Blue Mid", "Blue Far"];
-
-  /** List of supported survey file types */
-  export const surveyTypes = ["CSV", "JSON"];
 </script>
