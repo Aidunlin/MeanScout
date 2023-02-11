@@ -1,5 +1,11 @@
 <script lang="ts">
-  import { ms, exampleTemplate, metricDefaults, getMetricDefaultValue, Template } from "./Global.svelte";
+  import {
+    ms,
+    exampleTemplate,
+    metricDefaults,
+    getMetricDefaultValue,
+    type Template,
+  } from "./Global.svelte";
   import IconButton from "./IconButton.svelte";
 
   /** Writes the current template to the device's clipboard */
@@ -32,14 +38,18 @@
    * @returns An object containing a template object or error string
    */
   function validateTemplate(templateString: string) {
-    let result: { template: Template; error: string } = { template: null, error: "" };
+    let result: { template: Template; error: string } = {
+      template: null,
+      error: "",
+    };
     try {
       result.template = JSON.parse(templateString);
     } catch (e) {
       result.error = e;
       return result;
     }
-    if (!Array.isArray(result.template.teams ?? [])) result.error += "Template has invalid teams";
+    if (!Array.isArray(result.template.teams ?? []))
+      result.error += "Template has invalid teams";
     if (!result.template.metrics) result.error += "\nTemplate has no metrics";
     else {
       result.template.metrics.forEach((metric, i) => {

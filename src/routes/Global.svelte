@@ -6,18 +6,32 @@
   export type FileFormat = typeof fileFormats[number];
 
   /** List of robot locations */
-  export const locations = ["Red Near", "Red Mid", "Red Far", "Blue Near", "Blue Mid", "Blue Far"] as const;
+  export const locations = [
+    "Red Near",
+    "Red Mid",
+    "Red Far",
+    "Blue Near",
+    "Blue Mid",
+    "Blue Far",
+  ] as const;
   export type Location = typeof locations[number];
 
   /** List of metric types */
-  export const metricTypes = ["toggle", "number", "select", "text", "rating", "timer"] as const;
+  export const metricTypes = [
+    "toggle",
+    "number",
+    "select",
+    "text",
+    "rating",
+    "timer",
+  ] as const;
   export type MetricType = typeof metricTypes[number];
 
   type BaseMetric = {
     name: string;
     type: MetricType;
     group?: string;
-  }
+  };
 
   type UniqueMetric =
     | { type: "toggle" }
@@ -60,7 +74,11 @@
     metrics: [
       { name: "Toggle", type: "toggle", group: "Group" },
       { name: "Number", type: "number" },
-      { name: "Select", type: "select", values: ["Value 1", "Value 2", "Value 3"] },
+      {
+        name: "Select",
+        type: "select",
+        values: ["Value 1", "Value 2", "Value 3"],
+      },
       { name: "Text", type: "text", tip: "Tip" },
       { name: "Rating", type: "rating" },
       { name: "Timer", type: "timer" },
@@ -207,6 +225,9 @@
    * @returns SVG information for the icon
    */
   export function getIcon(iconName: string) {
-    return icons.find((icon) => icon.name == iconName) ?? icons.find((icon) => icon.name == "question");
+    return (
+      icons.find((icon) => icon.name == iconName) ??
+      icons.find((icon) => icon.name == "question")
+    );
   }
 </script>

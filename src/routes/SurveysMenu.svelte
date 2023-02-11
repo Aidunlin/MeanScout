@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { FileFormat, fileFormats } from "./Global.svelte";
+  import { type FileFormat, fileFormats } from "./Global.svelte";
   import IconButton from "./IconButton.svelte";
   import Metric from "./Metric.svelte";
 
@@ -16,7 +16,8 @@
       surveys.forEach((survey) => {
         let surveyAsCSV = "";
         survey.forEach((metric) => {
-          if (typeof metric.value == "string") surveyAsCSV += '"' + metric.value + '",';
+          if (typeof metric.value == "string")
+            surveyAsCSV += '"' + metric.value + '",';
           else surveyAsCSV += metric.value + ",";
         });
         csv += surveyAsCSV + "\n";
@@ -31,8 +32,12 @@
     if (storedSurveys) {
       const anchor = document.createElement("a");
       anchor.href = "data:text/plain;charset=utf-8,";
-      if (surveyType == "CSV") anchor.href += encodeURIComponent(generateCSV(JSON.parse(storedSurveys)));
-      else if (surveyType == "JSON") anchor.href += encodeURIComponent(storedSurveys);
+      if (surveyType == "CSV")
+        anchor.href += encodeURIComponent(
+          generateCSV(JSON.parse(storedSurveys))
+        );
+      else if (surveyType == "JSON")
+        anchor.href += encodeURIComponent(storedSurveys);
       anchor.download = `surveys.${surveyType.toLowerCase()}`;
       document.body.append(anchor);
       anchor.click();
@@ -47,11 +52,17 @@
 
   /** Confirms the user wants to erase stored surveys in `localStorage`, doing so if they confirm */
   function eraseSurveys() {
-    if (prompt("Type 'erase' to erase saved surveys") == "erase") localStorage.removeItem("surveys");
+    if (prompt("Type 'erase' to erase saved surveys") == "erase")
+      localStorage.removeItem("surveys");
   }
 </script>
 
 <span class="group">Surveys</span>
-<Metric name="Type" type="select" values={Object.values(fileFormats)} bind:value={surveyType} />
+<Metric
+  name="Type"
+  type="select"
+  values={Object.values(fileFormats)}
+  bind:value={surveyType}
+/>
 <IconButton on:click={askDownloadSurveys} icon="download" text="Download" />
 <IconButton on:click={eraseSurveys} icon="erase" text="Erase" />

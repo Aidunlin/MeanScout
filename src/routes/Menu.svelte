@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { ms, locations, Location } from "./Global.svelte";
+  import { onMount } from "svelte";
+  import { ms, locations, type Location } from "./Global.svelte";
   import Metric from "./Metric.svelte";
   import TemplateMenu from "./TemplateMenu.svelte";
   import SurveysMenu from "./SurveysMenu.svelte";
@@ -10,24 +11,31 @@
     let newTheme = "";
     if ($ms.location.toLowerCase().includes("red")) newTheme = "red";
     else if ($ms.location.toLowerCase().includes("blue")) newTheme = "blue";
-    document.documentElement.style.setProperty("--theme-color", `var(--${newTheme})`);
+    document.documentElement.style.setProperty(
+      "--theme-color",
+      `var(--${newTheme})`
+    );
   }
 
   /** Sets `$ms.location` if already set in `localStorage` */
-  function load() {
+  onMount(() => {
     let storedLocation = localStorage.getItem("location") as Location;
     if (locations.some((location) => location == storedLocation)) {
       $ms.location = storedLocation;
       locationUpdated();
     }
-  }
+  });
 </script>
-
-<svelte:window on:load={load} />
 
 <div class="flex spaced bg extend-bg" id="menu" class:hide={!$ms.menuVisible}>
   <span class="group">Options</span>
-  <Metric name="Location" type="select" values={Object.values(locations)} bind:value={$ms.location} on:update={locationUpdated} />
+  <Metric
+    name="Location"
+    type="select"
+    values={Object.values(locations)}
+    bind:value={$ms.location}
+    on:update={locationUpdated}
+  />
   <TemplateMenu />
   <SurveysMenu />
 </div>

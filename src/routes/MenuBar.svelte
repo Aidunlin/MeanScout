@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from "svelte";
   import { ms } from "./Global.svelte";
 
   function toggleMenu() {
@@ -6,13 +7,11 @@
     if ($ms.menuVisible) localStorage.setItem("menuVisible", "true");
     else localStorage.removeItem("menuVisible");
   }
-
-  function load() {
+  
+  onMount(() => {
     $ms.menuVisible = !!localStorage.getItem("menuVisible");
-  }
+  });
 </script>
-
-<svelte:window on:load={load} />
 
 <div class="flex space-between spaced bg extend-bg">
   <button id="menu-toggle-btn" on:click={toggleMenu}>
