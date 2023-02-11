@@ -9,12 +9,12 @@
   /** (required) The type of the metric */
   export let type = "";
   /** The value stored by the metric */
-  export let value = null;
+  export let value: any = null;
   /** (optional) Group name for this and subsequent metrics */
   export let group = "";
 
   /** (`select`, required) Possible metric values */
-  export let values = [];
+  export let values: any[] = [];
   /** (`text`, optional) Placeholder text */
   export let tip = "";
 

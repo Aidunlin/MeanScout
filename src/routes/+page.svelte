@@ -21,14 +21,14 @@
 
   /** Parses and loads the survey backup from `localStorage` */
   function loadBackup() {
-    const backup = JSON.parse(localStorage.getItem("backup")) as {
+    const backup = JSON.parse(localStorage.getItem("backup") ?? "[]") as {
       name: string;
       value: any;
     }[];
-    if (backup) {
-      $ms.team = backup.find((metric) => metric.name == "Team").value;
-      $ms.match = backup.find((metric) => metric.name == "Match").value;
-      $ms.isAbsent = backup.find((metric) => metric.name == "Absent").value;
+    if (backup.length) {
+      $ms.team = backup.find((metric) => metric.name == "Team")?.value;
+      $ms.match = backup.find((metric) => metric.name == "Match")?.value;
+      $ms.isAbsent = backup.find((metric) => metric.name == "Absent")?.value;
       $ms.metrics.forEach((metric, i) => (metric.value = backup[i + 3].value));
     }
   }

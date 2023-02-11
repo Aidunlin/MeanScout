@@ -33,33 +33,31 @@
   }
 
   /**
-   * Checks if a stringified template is valid
+   * Parses a stringified template
    * @param templateString A stringified template
-   * @returns An object containing a template object or error string
+   * @returns A template object or an error string
    */
-  function validateTemplate(templateString: string) {
-    let result: { template: Template; error: string } = {
-      template: null,
-      error: "",
-    };
+  function parseTemplate(templateString: string): string | Template {
+    let result: Template;
+    let error = "";
     try {
-      result.template = JSON.parse(templateString);
+      result = JSON.parse(templateString) as Template;
     } catch (e) {
-      result.error = e;
-      return result;
+      return "Invalid template string";
     }
-    if (!Array.isArray(result.template.teams ?? []))
-      result.error += "Template has invalid teams";
-    if (!result.template.metrics) result.error += "\nTemplate has no metrics";
+    if (!Array.isArray(result.teams ?? []))
+      error += "Template has invalid teams";
+    if (!result.metrics) error += "\nTemplate has no metrics";
     else {
-      result.template.metrics.forEach((metric, i) => {
-        if (!metric.name) result.error += `\nMetric ${i + 1} has no name`;
+      result.metrics.forEach((metric, i) => {
+        if (!metric.name) error += `\nMetric ${i + 1} has no name`;
         if (metric.type == "select" && !Array.isArray(metric.values ?? []))
-          result.error += `\nMetric ${metric.name ?? i + 1} has invalid values`;
+          error += `\nMetric ${metric.name ?? i + 1} has invalid values`;
         if (!metricDefaults.some((type) => type.name == metric.type))
-          result.error += `\nMetric ${metric.name ?? i + 1} has invalid type`;
+          error += `\nMetric ${metric.name ?? i + 1} has invalid type`;
       });
     }
+    if (error) return error;
     return result;
   }
 
@@ -71,9 +69,9 @@
         setTemplate();
         localStorage.removeItem("template");
       } else {
-        let result = validateTemplate(newPrompt);
-        if (result.error) alert(`Could not set template! ${result.error}`);
-        else setTemplate(result.template);
+        let result = parseTemplate(newPrompt);
+        if (typeof result == "string") alert(`Could not set template! ${result}`);
+        else setTemplate(result);
       }
     }
   }
