@@ -70,7 +70,8 @@
         localStorage.removeItem("template");
       } else {
         let result = parseTemplate(newPrompt);
-        if (typeof result == "string") alert(`Could not set template! ${result}`);
+        if (typeof result == "string")
+          alert(`Could not set template! ${result}`);
         else setTemplate(result);
       }
     }
