@@ -4,8 +4,11 @@
 
   function toggleMenu() {
     $ms.menuVisible = !$ms.menuVisible;
-    if ($ms.menuVisible) localStorage.setItem("menuVisible", "true");
-    else localStorage.removeItem("menuVisible");
+    if ($ms.menuVisible) {
+      localStorage.setItem("menuVisible", "true");
+    } else {
+      localStorage.removeItem("menuVisible");
+    }
   }
 
   onMount(() => {

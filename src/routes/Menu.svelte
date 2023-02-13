@@ -9,8 +9,11 @@
   function locationUpdated() {
     localStorage.setItem("location", $ms.location);
     let newTheme = "";
-    if ($ms.location.toLowerCase().includes("red")) newTheme = "red";
-    else if ($ms.location.toLowerCase().includes("blue")) newTheme = "blue";
+    if ($ms.location.toLowerCase().includes("red")) {
+      newTheme = "red";
+    } else if ($ms.location.toLowerCase().includes("blue")) {
+      newTheme = "blue";
+    }
     document.documentElement.style.setProperty(
       "--theme-color",
       `var(--${newTheme})`

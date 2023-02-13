@@ -14,7 +14,9 @@
     if ("clipboard" in navigator) {
       navigator.clipboard.writeText(templateString);
       alert("Copied template");
-    } else prompt("Copy the template below", templateString);
+    } else {
+      prompt("Copy the template below", templateString);
+    }
   }
 
   /**
@@ -27,7 +29,9 @@
     localStorage.removeItem("backup");
     $ms.metrics = $ms.template.metrics.map((metric) => {
       let defaultValue = getMetricDefaultValue(metric.type);
-      if (metric.type == "select") defaultValue = metric.values[0];
+      if (metric.type == "select") {
+        defaultValue = metric.values[0];
+      }
       return { ...metric, value: defaultValue, default: defaultValue };
     });
   }
@@ -45,19 +49,27 @@
     } catch (e) {
       return "Invalid template string";
     }
-    if (!Array.isArray(result.teams ?? []))
+    if (!Array.isArray(result.teams ?? [])) {
       error += "Template has invalid teams";
-    if (!result.metrics) error += "\nTemplate has no metrics";
-    else {
+    }
+    if (!result.metrics) {
+      error += "\nTemplate has no metrics";
+    } else {
       result.metrics.forEach((metric, i) => {
-        if (!metric.name) error += `\nMetric ${i + 1} has no name`;
-        if (metric.type == "select" && !Array.isArray(metric.values ?? []))
+        if (!metric.name) {
+          error += `\nMetric ${i + 1} has no name`;
+        }
+        if (metric.type == "select" && !Array.isArray(metric.values ?? [])) {
           error += `\nMetric ${metric.name ?? i + 1} has invalid values`;
-        if (!metricDefaults.some((type) => type.name == metric.type))
+        }
+        if (!metricDefaults.some((type) => type.name == metric.type)) {
           error += `\nMetric ${metric.name ?? i + 1} has invalid type`;
+        }
       });
     }
-    if (error) return error;
+    if (error) {
+      return error;
+    }
     return result;
   }
 
@@ -70,9 +82,11 @@
         localStorage.removeItem("template");
       } else {
         let result = parseTemplate(newPrompt);
-        if (typeof result == "string")
+        if (typeof result == "string") {
           alert(`Could not set template! ${result}`);
-        else setTemplate(result);
+        } else {
+          setTemplate(result);
+        }
       }
     }
   }

@@ -16,9 +16,11 @@
       surveys.forEach((survey) => {
         let surveyAsCSV = "";
         survey.forEach((metric) => {
-          if (typeof metric.value == "string")
+          if (typeof metric.value == "string") {
             surveyAsCSV += '"' + metric.value + '",';
-          else surveyAsCSV += metric.value + ",";
+          } else {
+            surveyAsCSV += metric.value + ",";
+          }
         });
         csv += surveyAsCSV + "\n";
       });
@@ -32,12 +34,13 @@
     if (storedSurveys) {
       const anchor = document.createElement("a");
       anchor.href = "data:text/plain;charset=utf-8,";
-      if (surveyType == "CSV")
+      if (surveyType == "CSV") {
         anchor.href += encodeURIComponent(
           generateCSV(JSON.parse(storedSurveys))
         );
-      else if (surveyType == "JSON")
+      } else if (surveyType == "JSON") {
         anchor.href += encodeURIComponent(storedSurveys);
+      }
       anchor.download = `surveys.${surveyType.toLowerCase()}`;
       document.body.append(anchor);
       anchor.click();
@@ -47,13 +50,16 @@
 
   /** Checks if the user wants to download surveys, doing so if they confirm */
   function askDownloadSurveys() {
-    if (confirm("Confirm download?")) downloadSurveys();
+    if (confirm("Confirm download?")) {
+      downloadSurveys();
+    }
   }
 
   /** Confirms the user wants to erase stored surveys in `localStorage`, doing so if they confirm */
   function eraseSurveys() {
-    if (prompt("Type 'erase' to erase saved surveys") == "erase")
+    if (confirm("Confirm erase?")) {
       localStorage.removeItem("surveys");
+    }
   }
 </script>
 

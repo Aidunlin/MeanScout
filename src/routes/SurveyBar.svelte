@@ -4,20 +4,26 @@
 
   /** Returns a truthy string if the survey is valid, empty string otherwise */
   function validateSurvey() {
-    if (!/^\d{1,4}[A-Z]?$/.test($ms.team)) return "Invalid team value";
-    if ($ms.template.teams) {
-      if (!$ms.template.teams.some((team) => team == $ms.team))
-        return "Team value not whitelisted";
+    if (!/^\d{1,4}[A-Z]?$/.test($ms.team)) {
+      return "Invalid team value";
     }
-    if (!/\d{1,3}/.test(`${$ms.match}`)) return "Invalid match value";
+    if ($ms.template.teams) {
+      if (!$ms.template.teams.some((team) => team == $ms.team)) {
+        return "Team value not whitelisted";
+      }
+    }
+    if (!/\d{1,3}/.test(`${$ms.match}`)) {
+      return "Invalid match value";
+    }
     return "";
   }
 
   /** Checks and saves survey to `localStorage`, then updates the UI */
   function saveSurvey() {
     let error = validateSurvey();
-    if (error) alert(`Could not save survey! ${error}`);
-    else if (confirm("Confirm save?")) {
+    if (error) {
+      alert(`Could not save survey! ${error}`);
+    } else if (confirm("Confirm save?")) {
       let updatedSurveys = JSON.stringify([
         ...JSON.parse(localStorage.getItem("surveys") ?? "[]"),
         getSurvey($ms),
@@ -37,7 +43,9 @@
 
   /** Prompts the user if they want to reset, then calls `resetSurvey()` */
   function askResetSurvey() {
-    if (prompt("Type 'reset' to reset the survey") == "reset") resetSurvey();
+    if (confirm("Confirm reset?")) {
+      resetSurvey();
+    }
   }
 </script>
 

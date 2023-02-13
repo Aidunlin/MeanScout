@@ -27,7 +27,9 @@
   function start() {
     running = true;
     interval = setInterval(() => {
-      if (running) value = (parseFloat(value) + 0.1).toFixed(1);
+      if (running) {
+        value = (parseFloat(value) + 0.1).toFixed(1);
+      }
     }, 100);
   }
 
@@ -40,7 +42,9 @@
   /** (`timer` function) */
   function stop() {
     if (type == "timer") {
-      if (running) pause();
+      if (running) {
+        pause();
+      }
       value = 0;
     }
   }

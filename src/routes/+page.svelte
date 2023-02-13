@@ -14,7 +14,9 @@
     );
     $ms.metrics = $ms.template.metrics.map((metric) => {
       let defaultValue = getMetricDefaultValue(metric.type);
-      if (metric.type == "select") defaultValue = metric.values[0];
+      if (metric.type == "select") {
+        defaultValue = metric.values[0];
+      }
       return { ...metric, value: defaultValue, default: defaultValue };
     });
   }
