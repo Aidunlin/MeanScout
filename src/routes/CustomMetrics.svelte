@@ -4,10 +4,9 @@
 </script>
 
 <div class="flex spaced" class:hide={$ms.isAbsent}>
-  {#each $ms.template?.metrics ?? [] as metric, i}
+  {#each $ms.metrics as _, i}
     <Metric
-      {...metric}
-      bind:name={$ms.metrics[i].name}
+      bind:config={$ms.metrics[i].config}
       bind:value={$ms.metrics[i].value}
       on:update={() => backupSurvey($ms)}
     />

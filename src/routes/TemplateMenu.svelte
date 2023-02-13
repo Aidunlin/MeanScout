@@ -10,7 +10,10 @@
 
   /** Writes the current template to the device's clipboard */
   function copyTemplate() {
-    let templateString = JSON.stringify($ms.template);
+    let templateString = JSON.stringify({
+      metrics: $ms.metrics.map((metric) => metric.config),
+      teams: $ms.teams,
+    });
     if ("clipboard" in navigator) {
       navigator.clipboard.writeText(templateString);
       alert("Copied template");
@@ -23,16 +26,12 @@
    * Sets a new template (or resets to `exampleTemplate`), updates `localStorage` and `$ms.metrics`
    * @param newTemplate (optional) The template to use
    */
-  function setTemplate(newTemplate?: Template) {
-    $ms.template = JSON.parse(JSON.stringify(newTemplate ?? exampleTemplate));
-    localStorage.setItem("template", JSON.stringify($ms.template));
+  function setTemplate(newTemplate: Template) {
+    localStorage.setItem("template", JSON.stringify(newTemplate));
     localStorage.removeItem("backup");
-    $ms.metrics = $ms.template.metrics.map((metric) => {
-      let defaultValue = getMetricDefaultValue(metric.type);
-      if (metric.type == "select") {
-        defaultValue = metric.values[0];
-      }
-      return { ...metric, value: defaultValue, default: defaultValue };
+    $ms.metrics = newTemplate.metrics.map((config) => {
+      let value = getMetricDefaultValue(config);
+      return { config, value };
     });
   }
 
@@ -78,7 +77,7 @@
     const newPrompt = prompt("Paste new template (you can also 'reset'):");
     if (newPrompt) {
       if (newPrompt == "reset") {
-        setTemplate();
+        setTemplate(exampleTemplate);
         localStorage.removeItem("template");
       } else {
         let result = parseTemplate(newPrompt);

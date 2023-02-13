@@ -41,22 +41,27 @@
     | { type: "rating" }
     | { type: "timer" };
 
-  export type CustomMetric = BaseMetric & UniqueMetric;
+  export type MetricConfig = BaseMetric & UniqueMetric;
 
-  export interface Template {
+  export type Metric = {
+    config: MetricConfig;
+    value: any;
+  };
+
+  export type Template = {
+    metrics: MetricConfig[];
     teams?: string[];
-    metrics: CustomMetric[];
-  }
+  };
 
-  interface MS {
+  type MS = {
     location: Location;
     team: string;
     match: number;
     isAbsent: boolean;
-    template: Template;
-    metrics: { name: string; value: any; default: any }[];
+    metrics: Metric[];
+    teams: string[];
     menuVisible: boolean;
-  }
+  };
 
   /** Global object of state values, must use `$ms` to use/change a value */
   export const ms = writable<MS>({
@@ -64,8 +69,8 @@
     team: "",
     match: 1,
     isAbsent: false,
-    template: { metrics: [] },
     metrics: [],
+    teams: [],
     menuVisible: false,
   });
 
@@ -100,8 +105,12 @@
    * @param type The metric's type
    * @returns The default value defined in `metricDefaults` or `null`
    */
-  export function getMetricDefaultValue(type: MetricType) {
-    return metricDefaults.find((t) => t.name == type)?.default;
+  export function getMetricDefaultValue(config: MetricConfig) {
+    if (config.type == "select") {
+      return config.values[0];
+    } else {
+      return metricDefaults.find((t) => t.name == config.type)?.default;
+    }
   }
 
   /**
@@ -109,13 +118,13 @@
    * @param data A reference to `ms` (must be referenced outside of definition)
    * @returns An array of objects, each representing a metric
    */
-  export function getSurvey(data: MS) {
+  export function getSurvey(data: MS): { name: string; value: any }[] {
     return [
       { name: "Team", value: data.team },
       { name: "Match", value: data.match },
       { name: "Absent", value: data.isAbsent },
       ...data.metrics.map((metric) => {
-        return { name: metric.name, value: metric.value };
+        return { name: metric.config.name, value: metric.value };
       }),
     ];
   }

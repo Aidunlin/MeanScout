@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { ms, getSurvey } from "./Global.svelte";
+  import { ms, getSurvey, getMetricDefaultValue } from "./Global.svelte";
   import IconButton from "./IconButton.svelte";
 
   /** Returns a truthy string if the survey is valid, empty string otherwise */
@@ -7,10 +7,8 @@
     if (!/^\d{1,4}[A-Z]?$/.test($ms.team)) {
       return "Invalid team value";
     }
-    if ($ms.template.teams) {
-      if (!$ms.template.teams.some((team) => team == $ms.team)) {
-        return "Team value not whitelisted";
-      }
+    if ($ms.teams.length && !$ms.teams.some((team) => team == $ms.team)) {
+      return "Team value not whitelisted";
     }
     if (!/\d{1,3}/.test(`${$ms.match}`)) {
       return "Invalid match value";
@@ -38,7 +36,9 @@
   function resetSurvey() {
     $ms.team = "";
     $ms.isAbsent = false;
-    $ms.metrics.forEach((metric) => (metric.value = metric.default));
+    $ms.metrics.forEach((metric) => {
+      metric.value = getMetricDefaultValue(metric.config);
+    });
   }
 
   /** Prompts the user if they want to reset, then calls `resetSurvey()` */

@@ -33,9 +33,11 @@
 <div class="flex spaced bg extend-bg" id="menu" class:hide={!$ms.menuVisible}>
   <span class="group">Options</span>
   <Metric
-    name="Location"
-    type="select"
-    values={Object.values(locations)}
+    config={{
+      name: "Location",
+      type: "select",
+      values: Object.values(locations),
+    }}
     bind:value={$ms.location}
     on:update={locationUpdated}
   />

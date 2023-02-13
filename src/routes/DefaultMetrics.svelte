@@ -15,7 +15,7 @@
       on:change={() => backupSurvey($ms)}
     />
     <datalist id="teams-list">
-      {#each $ms.template?.teams ?? [] as team}
+      {#each $ms.teams as team}
         <option value={team} />
       {/each}
     </datalist>
@@ -31,8 +31,7 @@
     />
   </div>
   <Metric
-    name="Absent"
-    type="toggle"
+    config={{ name: "Absent", type: "toggle" }}
     bind:value={$ms.isAbsent}
     on:update={() => backupSurvey($ms)}
   />

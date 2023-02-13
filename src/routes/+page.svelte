@@ -1,6 +1,11 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { ms, exampleTemplate, getMetricDefaultValue } from "./Global.svelte";
+  import {
+    ms,
+    exampleTemplate,
+    getMetricDefaultValue,
+    type Template,
+  } from "./Global.svelte";
   import MenuBar from "./MenuBar.svelte";
   import Menu from "./Menu.svelte";
   import DefaultMetrics from "./DefaultMetrics.svelte";
@@ -9,15 +14,15 @@
 
   /** Parses and loads the current template from `localStorage` (or `exampleTemplate`) */
   function loadTemplate() {
-    $ms.template = JSON.parse(
+    let template: Template = JSON.parse(
       localStorage.getItem("template") ?? JSON.stringify(exampleTemplate)
     );
-    $ms.metrics = $ms.template.metrics.map((metric) => {
-      let defaultValue = getMetricDefaultValue(metric.type);
-      if (metric.type == "select") {
-        defaultValue = metric.values[0];
-      }
-      return { ...metric, value: defaultValue, default: defaultValue };
+    if (template.teams) {
+      $ms.teams = template.teams;
+    }
+    $ms.metrics = template.metrics.map((config) => {
+      let value = getMetricDefaultValue(config);
+      return { config, value };
     });
   }
 

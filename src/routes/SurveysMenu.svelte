@@ -65,9 +65,7 @@
 
 <span class="group">Surveys</span>
 <Metric
-  name="Type"
-  type="select"
-  values={Object.values(fileFormats)}
+  config={{ name: "Type", type: "select", values: Object.values(fileFormats) }}
   bind:value={surveyType}
 />
 <IconButton on:click={askDownloadSurveys} icon="download" text="Download" />
