@@ -1,12 +1,21 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
-  import type { MetricConfig, MetricType } from "./Global.svelte";
+  import type { MetricConfig } from "./Global.svelte";
   import IconButton from "./IconButton.svelte";
 
   const dispatch = createEventDispatcher();
 
   export let config: MetricConfig;
   export let value: any;
+
+  /** (`rating`) function */
+  function rate(i: number) {
+    if (value == i + 1) {
+      value = 0;
+    } else {
+      value = i + 1;
+    }
+  }
 
   /** (`timer`) Whether the timer is running */
   let running = false;
@@ -75,8 +84,8 @@
     {:else if config.type == "rating"}
       {#each [...Array(5).keys()] as i}
         <IconButton
-          on:click={() => (value = i)}
-          icon={value >= i ? "star" : "nostar"}
+          on:click={() => rate(i)}
+          icon={value > i ? "star" : "nostar"}
         />
       {/each}
     {:else if config.type == "timer"}
