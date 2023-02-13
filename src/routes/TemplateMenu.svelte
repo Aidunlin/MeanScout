@@ -5,8 +5,8 @@
     metricDefaults,
     getMetricDefaultValue,
     type Template,
-  } from "./Global.svelte";
-  import IconButton from "./IconButton.svelte";
+  } from "$lib/Global.svelte";
+  import IconButton from "$lib/IconButton.svelte";
 
   /** Writes the current template to the device's clipboard */
   function copyTemplate() {

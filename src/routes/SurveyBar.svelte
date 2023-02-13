@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { ms, getSurvey, getMetricDefaultValue } from "./Global.svelte";
-  import IconButton from "./IconButton.svelte";
+  import { ms, getSurvey, getMetricDefaultValue } from "$lib/Global.svelte";
+  import IconButton from "$lib/IconButton.svelte";
 
   /** Returns a truthy string if the survey is valid, empty string otherwise */
   function validateSurvey() {

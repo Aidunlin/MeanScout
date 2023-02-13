@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { ms } from "./Global.svelte";
+  import { ms } from "$lib/Global.svelte";
 
   function toggleMenu() {
     $ms.menuVisible = !$ms.menuVisible;

@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { type FileFormat, fileFormats } from "./Global.svelte";
-  import IconButton from "./IconButton.svelte";
-  import Metric from "./Metric.svelte";
+  import { type FileFormat, fileFormats } from "$lib/Global.svelte";
+  import IconButton from "$lib/IconButton.svelte";
+  import Metric from "$lib/Metric.svelte";
 
   /** The file type to be utilized when downloading surveys */
   let surveyType: FileFormat = "CSV";

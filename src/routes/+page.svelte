@@ -5,7 +5,7 @@
     exampleTemplate,
     getMetricDefaultValue,
     type Template,
-  } from "./Global.svelte";
+  } from "$lib/Global.svelte";
   import MenuBar from "./MenuBar.svelte";
   import Menu from "./Menu.svelte";
   import DefaultMetrics from "./DefaultMetrics.svelte";

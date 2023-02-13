@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { ms, backupSurvey } from "./Global.svelte";
-  import Metric from "./Metric.svelte";
+  import { ms, backupSurvey } from "$lib/Global.svelte";
+  import Metric from "$lib/Metric.svelte";
 </script>
 
 <div class="flex spaced" class:hide={$ms.isAbsent}>

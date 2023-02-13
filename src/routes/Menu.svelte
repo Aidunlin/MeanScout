@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { ms, locations, type Location } from "./Global.svelte";
-  import Metric from "./Metric.svelte";
+  import { ms, locations, type Location } from "$lib/Global.svelte";
+  import Metric from "$lib/Metric.svelte";
   import TemplateMenu from "./TemplateMenu.svelte";
   import SurveysMenu from "./SurveysMenu.svelte";
 
