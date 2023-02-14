@@ -90,26 +90,27 @@
     ],
   };
 
-  /** Default values for each metric type */
-  export const metricDefaults: { name: MetricType; default: any }[] = [
-    { name: "toggle", default: false },
-    { name: "number", default: 0 },
-    { name: "select", default: 0 },
-    { name: "text", default: "" },
-    { name: "rating", default: 0 },
-    { name: "timer", default: 0 },
-  ];
-
   /**
    * Helper function for getting default metric values
    * @param type The metric's type
-   * @returns The default value defined in `metricDefaults` or `null`
+   * @returns The default value defined in `metricDefaults` or `undefined`
    */
   export function getMetricDefaultValue(config: MetricConfig) {
-    if (config.type == "select") {
-      return config.values[0];
-    } else {
-      return metricDefaults.find((t) => t.name == config.type)?.default;
+    switch (config.type) {
+      case "toggle":
+        return false;
+      case "number":
+        return 0;
+      case "select":
+        return config.values[0];
+      case "text":
+        return "";
+      case "rating":
+        return 0;
+      case "timer":
+        return 0;
+      default:
+        return undefined;
     }
   }
 

@@ -2,9 +2,9 @@
   import {
     ms,
     exampleTemplate,
-    metricDefaults,
     type Template,
     createMetricFromConfig,
+    metricTypes,
   } from "$lib/Global.svelte";
   import IconButton from "$lib/IconButton.svelte";
 
@@ -58,7 +58,7 @@
         if (metric.type == "select" && !Array.isArray(metric.values ?? [])) {
           error += `\nMetric ${metric.name ?? i + 1} has invalid values`;
         }
-        if (!metricDefaults.some((type) => type.name == metric.type)) {
+        if (!metricTypes.includes(metric.type)) {
           error += `\nMetric ${metric.name ?? i + 1} has invalid type`;
         }
       });
