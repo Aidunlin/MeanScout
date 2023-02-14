@@ -3,8 +3,8 @@
     ms,
     exampleTemplate,
     metricDefaults,
-    getMetricDefaultValue,
     type Template,
+    createMetricFromConfig,
   } from "$lib/Global.svelte";
   import IconButton from "$lib/IconButton.svelte";
 
@@ -29,10 +29,7 @@
   function setTemplate(newTemplate: Template) {
     localStorage.setItem("template", JSON.stringify(newTemplate));
     localStorage.removeItem("backup");
-    $ms.metrics = newTemplate.metrics.map((config) => {
-      let value = getMetricDefaultValue(config);
-      return { config, value };
-    });
+    $ms.metrics = newTemplate.metrics.map(createMetricFromConfig);
   }
 
   /**

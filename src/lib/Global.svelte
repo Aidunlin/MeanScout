@@ -113,6 +113,10 @@
     }
   }
 
+  export function createMetricFromConfig(config: MetricConfig): Metric {
+    return { config, value: getMetricDefaultValue(config) };
+  }
+
   /**
    * Helper function for creating a survey
    * @param data A reference to `ms` (must be referenced outside of definition)

@@ -3,8 +3,8 @@
   import {
     ms,
     exampleTemplate,
-    getMetricDefaultValue,
     type Template,
+    createMetricFromConfig,
   } from "$lib/Global.svelte";
   import MenuBar from "./MenuBar.svelte";
   import Menu from "./Menu.svelte";
@@ -20,10 +20,7 @@
     if (template.teams) {
       $ms.teams = template.teams;
     }
-    $ms.metrics = template.metrics.map((config) => {
-      let value = getMetricDefaultValue(config);
-      return { config, value };
-    });
+    $ms.metrics = template.metrics.map(createMetricFromConfig);
   }
 
   /** Parses and loads the survey backup from `localStorage` */
