@@ -1,18 +1,18 @@
 <script lang="ts">
+  import { locations } from "$lib/locations";
+  import { createMetricFromConfig } from "$lib/metrics";
   import {
     currentLocation,
+    customMetrics,
     menuVisible,
     savedSurveys,
-    customMetrics,
-    teamWhitelist,
     surveyFileType,
+    teamWhitelist,
   } from "$lib/stores";
   import { downloadSurveys, surveyFileTypes } from "$lib/surveys";
-  import { createMetricFromConfig } from "$lib/metrics";
   import { exampleTemplate, parseTemplate, type Template } from "$lib/templates";
-  import { locations } from "$lib/locations";
-  import Metric from "./Metric.svelte";
   import IconButton from "./IconButton.svelte";
+  import Metric from "./Metric.svelte";
 
   /** Writes the current template to the device's clipboard */
   function copyTemplate() {

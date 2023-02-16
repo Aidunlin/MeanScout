@@ -1,8 +1,8 @@
 import { browser } from "$app/environment";
 import { writable } from "svelte/store";
-import type { Metric } from "./metrics";
 import { setTheme, type Location } from "./locations";
-import type { SurveyFileType, DefaultMetrics, Survey } from "./surveys";
+import type { Metric } from "./metrics";
+import type { DefaultMetrics, Survey, SurveyFileType } from "./surveys";
 
 /**
  * Creates a writable store that automatically synchronizes with `localStorage`.

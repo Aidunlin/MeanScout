@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { defaultMetrics, teamWhitelist, savedSurveys, customMetrics } from "$lib/stores";
   import { resetMetric } from "$lib/metrics";
+  import { customMetrics, defaultMetrics, savedSurveys, teamWhitelist } from "$lib/stores";
   import { getSurvey, validateSurvey } from "$lib/surveys";
-  import Metric from "./Metric.svelte";
   import IconButton from "./IconButton.svelte";
+  import Metric from "./Metric.svelte";
 
   /** Saves survey to localStorage */
   function saveSurvey() {
