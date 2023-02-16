@@ -1,6 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
-  import type { MetricConfig } from "./Global.svelte";
+  import type { MetricConfig } from "./metrics";
   import IconButton from "./IconButton.svelte";
 
   const dispatch = createEventDispatcher();

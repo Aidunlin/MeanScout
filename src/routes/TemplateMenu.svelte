@@ -1,6 +1,7 @@
 <script lang="ts">
   import { customMetrics, teamWhitelist } from "$lib/stores";
-  import { exampleTemplate, type Template, createMetricFromConfig, metricTypes } from "$lib/Global.svelte";
+  import { createMetricFromConfig, metricTypes } from "$lib/metrics";
+  import { exampleTemplate, type Template } from "$lib/Global.svelte";
   import IconButton from "$lib/IconButton.svelte";
 
   /** Writes the current template to the device's clipboard */

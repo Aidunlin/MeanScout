@@ -1,6 +1,7 @@
 <script lang="ts">
   import { defaultMetrics, teamWhitelist, savedSurveys, customMetrics } from "$lib/stores";
-  import { getSurvey, getMetricDefaultValue } from "$lib/Global.svelte";
+  import { getMetricDefaultValue } from "$lib/metrics";
+  import { getSurvey } from "$lib/Global.svelte";
   import IconButton from "$lib/IconButton.svelte";
 
   /** Returns a truthy string if the survey is valid, empty string otherwise */
