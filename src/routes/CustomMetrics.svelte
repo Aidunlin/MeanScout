@@ -5,10 +5,6 @@
 
 <div class="flex spaced" class:hide={$ms.isAbsent}>
   {#each $ms.metrics as _, i}
-    <Metric
-      bind:config={$ms.metrics[i].config}
-      bind:value={$ms.metrics[i].value}
-      on:update={() => backupSurvey($ms)}
-    />
+    <Metric bind:config={$ms.metrics[i].config} bind:value={$ms.metrics[i].value} on:update={() => backupSurvey($ms)} />
   {/each}
 </div>

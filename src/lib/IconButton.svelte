@@ -14,11 +14,7 @@
 </script>
 
 <button on:click class:star={icon.includes("star")}>
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 {svg.width} 512"
-    class:text-icon={text}
-  >
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {svg.width} 512" class:text-icon={text}>
     <path fill="currentColor" d={svg.path} />
   </svg>{text}
 </button>

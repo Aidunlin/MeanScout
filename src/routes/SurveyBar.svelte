@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { ms, getSurvey, getMetricDefaultValue } from "$lib/Global.svelte";
+  import { ms, getSurvey, getMetricDefaultValue, savedSurveys } from "$lib/Global.svelte";
   import IconButton from "$lib/IconButton.svelte";
 
   /** Returns a truthy string if the survey is valid, empty string otherwise */
@@ -22,11 +22,7 @@
     if (error) {
       alert(`Could not save survey! ${error}`);
     } else if (confirm("Confirm save?")) {
-      let updatedSurveys = JSON.stringify([
-        ...JSON.parse(localStorage.getItem("surveys") ?? "[]"),
-        getSurvey($ms),
-      ]);
-      localStorage.setItem("surveys", updatedSurveys);
+      $savedSurveys = [...$savedSurveys, getSurvey($ms)];
       resetSurvey();
       $ms.match++;
     }

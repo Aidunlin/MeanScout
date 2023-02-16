@@ -64,11 +64,7 @@
   {/if}
   <div class="flex">
     {#if config.type == "toggle"}
-      <IconButton
-        on:click={() => (value = !value)}
-        icon={value ? "check" : "nocheck"}
-        text={config.name}
-      />
+      <IconButton on:click={() => (value = !value)} icon={value ? "check" : "nocheck"} text={config.name} />
     {:else if config.type == "number"}
       <IconButton on:click={() => value++} icon="plus" />
       <span class="number">{value}</span>
@@ -83,16 +79,10 @@
       <input placeholder={config.tip} bind:value />
     {:else if config.type == "rating"}
       {#each [...Array(5).keys()] as i}
-        <IconButton
-          on:click={() => rate(i)}
-          icon={value > i ? "star" : "nostar"}
-        />
+        <IconButton on:click={() => rate(i)} icon={value > i ? "star" : "nostar"} />
       {/each}
     {:else if config.type == "timer"}
-      <IconButton
-        on:click={running ? pause : start}
-        icon={running ? "pause" : "play"}
-      />
+      <IconButton on:click={running ? pause : start} icon={running ? "pause" : "play"} />
       <span class="number">{value}</span>
       <IconButton on:click={stop} icon="stop" />
     {/if}

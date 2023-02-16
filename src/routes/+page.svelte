@@ -1,11 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import {
-    ms,
-    exampleTemplate,
-    type Template,
-    createMetricFromConfig,
-  } from "$lib/Global.svelte";
+  import { ms, exampleTemplate, type Template, createMetricFromConfig } from "$lib/Global.svelte";
   import MenuBar from "./MenuBar.svelte";
   import Menu from "./Menu.svelte";
   import DefaultMetrics from "./DefaultMetrics.svelte";
@@ -14,9 +9,7 @@
 
   /** Parses and loads the current template from `localStorage` (or `exampleTemplate`) */
   function loadTemplate() {
-    let template: Template = JSON.parse(
-      localStorage.getItem("template") ?? JSON.stringify(exampleTemplate)
-    );
+    let template: Template = JSON.parse(localStorage.getItem("template") ?? JSON.stringify(exampleTemplate));
     if (template.teams) {
       $ms.teams = template.teams;
     }

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { type FileFormat, fileFormats } from "$lib/Global.svelte";
+  import { type FileFormat, fileFormats, savedSurveys } from "$lib/Global.svelte";
   import IconButton from "$lib/IconButton.svelte";
   import Metric from "$lib/Metric.svelte";
 
@@ -30,43 +30,35 @@
 
   /** Creates and downloads a file containing surveys */
   function downloadSurveys() {
-    let storedSurveys = localStorage.getItem("surveys");
-    if (storedSurveys) {
-      const anchor = document.createElement("a");
-      anchor.href = "data:text/plain;charset=utf-8,";
-      if (surveyType == "CSV") {
-        anchor.href += encodeURIComponent(
-          generateCSV(JSON.parse(storedSurveys))
-        );
-      } else if (surveyType == "JSON") {
-        anchor.href += encodeURIComponent(storedSurveys);
-      }
-      anchor.download = `surveys.${surveyType.toLowerCase()}`;
-      document.body.append(anchor);
-      anchor.click();
-      anchor.remove();
+    const anchor = document.createElement("a");
+    anchor.href = "data:text/plain;charset=utf-8,";
+    if (surveyType == "CSV") {
+      anchor.href += encodeURIComponent(generateCSV($savedSurveys));
+    } else if (surveyType == "JSON") {
+      anchor.href += encodeURIComponent(JSON.stringify($savedSurveys));
     }
+    anchor.download = `surveys.${surveyType.toLowerCase()}`;
+    document.body.append(anchor);
+    anchor.click();
+    anchor.remove();
   }
 
   /** Checks if the user wants to download surveys, doing so if they confirm */
   function askDownloadSurveys() {
-    if (confirm("Confirm download?")) {
+    if ($savedSurveys && confirm("Confirm download?")) {
       downloadSurveys();
     }
   }
 
-  /** Confirms the user wants to erase stored surveys in `localStorage`, doing so if they confirm */
+  /** Confirms the user wants to erase saved surveys, doing so if they confirm */
   function eraseSurveys() {
     if (confirm("Confirm erase?")) {
-      localStorage.removeItem("surveys");
+      $savedSurveys = [];
     }
   }
 </script>
 
 <span class="group">Surveys</span>
-<Metric
-  config={{ name: "Type", type: "select", values: Object.values(fileFormats) }}
-  bind:value={surveyType}
-/>
+<Metric config={{ name: "Type", type: "select", values: Object.values(fileFormats) }} bind:value={surveyType} />
 <IconButton on:click={askDownloadSurveys} icon="download" text="Download" />
 <IconButton on:click={eraseSurveys} icon="erase" text="Erase" />

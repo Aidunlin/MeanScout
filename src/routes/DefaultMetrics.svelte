@@ -7,13 +7,7 @@
   <span class="group">Info</span>
   <div>
     Team
-    <input
-      id="metric-team"
-      list="teams-list"
-      maxlength="5"
-      bind:value={$ms.team}
-      on:change={() => backupSurvey($ms)}
-    />
+    <input id="metric-team" list="teams-list" maxlength="5" bind:value={$ms.team} on:change={() => backupSurvey($ms)} />
     <datalist id="teams-list">
       {#each $ms.teams as team}
         <option value={team} />
@@ -30,9 +24,5 @@
       on:change={() => backupSurvey($ms)}
     />
   </div>
-  <Metric
-    config={{ name: "Absent", type: "toggle" }}
-    bind:value={$ms.isAbsent}
-    on:update={() => backupSurvey($ms)}
-  />
+  <Metric config={{ name: "Absent", type: "toggle" }} bind:value={$ms.isAbsent} on:update={() => backupSurvey($ms)} />
 </div>

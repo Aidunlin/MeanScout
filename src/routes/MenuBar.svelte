@@ -1,24 +1,10 @@
 <script lang="ts">
-  import { onMount } from "svelte";
-  import { ms } from "$lib/Global.svelte";
-
-  function toggleMenu() {
-    $ms.menuVisible = !$ms.menuVisible;
-    if ($ms.menuVisible) {
-      localStorage.setItem("menuVisible", "true");
-    } else {
-      localStorage.removeItem("menuVisible");
-    }
-  }
-
-  onMount(() => {
-    $ms.menuVisible = !!localStorage.getItem("menuVisible");
-  });
+  import { menuVisible, currentLocation } from "$lib/Global.svelte";
 </script>
 
 <div class="flex space-between spaced bg extend-bg">
-  <button id="menu-toggle-btn" on:click={toggleMenu}>
+  <button id="menu-toggle-btn" on:click={() => ($menuVisible = !$menuVisible)}>
     <img class="text-icon" id="logo" src="./logo.png" alt="" />MeanScout
   </button>
-  <span id="location-text">{$ms.location}</span>
+  <span id="location-text">{$currentLocation}</span>
 </div>

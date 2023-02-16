@@ -1,4 +1,5 @@
 <script lang="ts" context="module">
+  import { browser } from "$app/environment";
   import { writable } from "svelte/store";
 
   /** List of supported survey file types */
@@ -6,25 +7,11 @@
   export type FileFormat = typeof fileFormats[number];
 
   /** List of robot locations */
-  export const locations = [
-    "Red Near",
-    "Red Mid",
-    "Red Far",
-    "Blue Near",
-    "Blue Mid",
-    "Blue Far",
-  ] as const;
+  export const locations = ["Red Near", "Red Mid", "Red Far", "Blue Near", "Blue Mid", "Blue Far"] as const;
   export type Location = typeof locations[number];
 
   /** List of metric types */
-  export const metricTypes = [
-    "toggle",
-    "number",
-    "select",
-    "text",
-    "rating",
-    "timer",
-  ] as const;
+  export const metricTypes = ["toggle", "number", "select", "text", "rating", "timer"] as const;
   export type MetricType = typeof metricTypes[number];
 
   type BaseMetric = {
@@ -54,24 +41,76 @@
   };
 
   type MS = {
-    location: Location;
     team: string;
     match: number;
     isAbsent: boolean;
     metrics: Metric[];
     teams: string[];
-    menuVisible: boolean;
   };
+
+  type Survey = { name: string; value: any }[];
+
+  /**
+   * Creates a writable store that automatically synchronizes with `localStorage`.
+   *
+   * @param key The localStorage key to read to and write from.
+   * @param start The initial value for the store and localStorage.
+   * @param fromString Converts the value in localStorage to a usable value (use JSON.parse() for arrays and objects).
+   * @param toString Converts data to a string value (use JSON.stringify() for arrays and objects).
+   */
+  export function localStorageStore<T>(
+    key: string,
+    start: T,
+    fromString: (str: string) => T,
+    toString?: (val: T) => string
+  ) {
+    let defaultValue = start;
+
+    try {
+      if (browser) {
+        defaultValue = fromString(localStorage[key]);
+      }
+    } catch (error) {
+      console.log(`Could not get value from localStorage.${key}, using default`);
+    }
+
+    let store = writable(defaultValue);
+
+    store.subscribe((value) => {
+      if (!browser) return;
+      if (!value) value = start;
+      localStorage[key] = toString ? toString(value) : value;
+    });
+
+    return store;
+  }
+
+  export const menuVisible = localStorageStore("menuVisible", false, (str) => str === "true");
+
+  export const currentLocation = localStorageStore<Location>("location", "Red Near", (str) => str as Location);
+
+  currentLocation.subscribe((value) => {
+    if (!browser || !value) return;
+
+    let newTheme = "";
+    if (value.toLowerCase().includes("red")) {
+      newTheme = "red";
+    } else if (value.toLowerCase().includes("blue")) {
+      newTheme = "blue";
+    }
+
+    document.documentElement.style.setProperty("--theme-color", `var(--${newTheme})`);
+  });
+
+  export const savedSurveys = localStorageStore<Survey[]>("surveys", [], JSON.parse, JSON.stringify);
 
   /** Global object of state values, must use `$ms` to use/change a value */
   export const ms = writable<MS>({
-    location: "Red Near",
     team: "",
     match: 1,
     isAbsent: false,
     metrics: [],
     teams: [],
-    menuVisible: false,
   });
 
   /** Default template used to showcase different metrics */
@@ -123,7 +162,7 @@
    * @param data A reference to `ms` (must be referenced outside of definition)
    * @returns An array of objects, each representing a metric
    */
-  export function getSurvey(data: MS): { name: string; value: any }[] {
+  export function getSurvey(data: MS): Survey {
     return [
       { name: "Team", value: data.team },
       { name: "Match", value: data.match },

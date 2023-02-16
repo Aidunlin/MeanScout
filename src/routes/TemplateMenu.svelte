@@ -1,11 +1,5 @@
 <script lang="ts">
-  import {
-    ms,
-    exampleTemplate,
-    type Template,
-    createMetricFromConfig,
-    metricTypes,
-  } from "$lib/Global.svelte";
+  import { ms, exampleTemplate, type Template, createMetricFromConfig, metricTypes } from "$lib/Global.svelte";
   import IconButton from "$lib/IconButton.svelte";
 
   /** Writes the current template to the device's clipboard */
