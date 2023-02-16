@@ -1,6 +1,6 @@
 <script lang="ts" context="module">
   import type { MetricConfig, Metric } from "./metrics";
-  
+
   /** List of supported survey file types */
   export const fileFormats = ["CSV", "JSON"] as const;
   export type FileFormat = typeof fileFormats[number];

@@ -2,6 +2,7 @@
   import { defaultMetrics, teamWhitelist, savedSurveys, customMetrics } from "$lib/stores";
   import { getMetricDefaultValue } from "$lib/metrics";
   import { getSurvey } from "$lib/Global.svelte";
+  import Metric from "$lib/Metric.svelte";
   import IconButton from "$lib/IconButton.svelte";
 
   /** Returns a truthy string if the survey is valid, empty string otherwise */
@@ -46,6 +47,30 @@
     }
   }
 </script>
+
+<div class="flex spaced">
+  <span class="group">Info</span>
+  <div>
+    Team
+    <input id="metric-team" list="teams-list" maxlength="5" bind:value={$defaultMetrics.team} />
+    <datalist id="teams-list">
+      {#each $teamWhitelist as team}
+        <option value={team} />
+      {/each}
+    </datalist>
+  </div>
+  <div>
+    Match
+    <input id="metric-match" type="number" pattern="[0-9]*" bind:value={$defaultMetrics.match} />
+  </div>
+  <Metric config={{ name: "Absent", type: "toggle" }} bind:value={$defaultMetrics.isAbsent} />
+</div>
+
+<div class="flex spaced" class:hide={$defaultMetrics.isAbsent}>
+  {#each $customMetrics as _, i}
+    <Metric bind:config={$customMetrics[i].config} bind:value={$customMetrics[i].value} />
+  {/each}
+</div>
 
 <div class="flex space-between spaced bg extend-bg extend-down">
   <IconButton on:click={saveSurvey} icon="save" text="Save" />
