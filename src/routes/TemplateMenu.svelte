@@ -1,12 +1,19 @@
 <script lang="ts">
-  import { ms, exampleTemplate, type Template, createMetricFromConfig, metricTypes } from "$lib/Global.svelte";
+  import {
+    exampleTemplate,
+    customMetrics,
+    type Template,
+    createMetricFromConfig,
+    metricTypes,
+    teamWhitelist,
+  } from "$lib/Global.svelte";
   import IconButton from "$lib/IconButton.svelte";
 
   /** Writes the current template to the device's clipboard */
   function copyTemplate() {
     let templateString = JSON.stringify({
-      metrics: $ms.metrics.map((metric) => metric.config),
-      teams: $ms.teams,
+      metrics: $customMetrics.map((metric) => metric.config),
+      teams: $teamWhitelist,
     });
     if ("clipboard" in navigator) {
       navigator.clipboard.writeText(templateString);
@@ -17,13 +24,12 @@
   }
 
   /**
-   * Sets a new template (or resets to `exampleTemplate`), updates `localStorage` and `$ms.metrics`
-   * @param newTemplate (optional) The template to use
+   * Sets a new template
+   * @param newTemplate The template to use
    */
   function setTemplate(newTemplate: Template) {
-    localStorage.setItem("template", JSON.stringify(newTemplate));
-    localStorage.removeItem("backup");
-    $ms.metrics = newTemplate.metrics.map(createMetricFromConfig);
+    $customMetrics = newTemplate.metrics.map(createMetricFromConfig);
+    if (newTemplate.teams) $teamWhitelist = newTemplate.teams;
   }
 
   /**
@@ -69,7 +75,6 @@
     if (newPrompt) {
       if (newPrompt == "reset") {
         setTemplate(exampleTemplate);
-        localStorage.removeItem("template");
       } else {
         let result = parseTemplate(newPrompt);
         if (typeof result == "string") {

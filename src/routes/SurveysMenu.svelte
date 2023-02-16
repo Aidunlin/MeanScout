@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { type FileFormat, fileFormats, savedSurveys } from "$lib/Global.svelte";
+  import { type FileFormat, fileFormats, savedSurveys, type Survey } from "$lib/Global.svelte";
   import IconButton from "$lib/IconButton.svelte";
   import Metric from "$lib/Metric.svelte";
 
@@ -10,7 +10,7 @@
    * Creates a multiline CSV string for an array of surveys
    * @param surveys An array of surveys (each survey is an array of metric objects)
    */
-  function generateCSV(surveys: { name: string; value: any }[][]) {
+  function generateCSV(surveys: Survey[]) {
     let csv = "";
     if (surveys) {
       surveys.forEach((survey) => {

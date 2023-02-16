@@ -1,38 +1,45 @@
 <script lang="ts">
-  import { ms, getSurvey, getMetricDefaultValue, savedSurveys } from "$lib/Global.svelte";
+  import {
+    defaultMetrics,
+    teamWhitelist,
+    getSurvey,
+    getMetricDefaultValue,
+    savedSurveys,
+    customMetrics,
+  } from "$lib/Global.svelte";
   import IconButton from "$lib/IconButton.svelte";
 
   /** Returns a truthy string if the survey is valid, empty string otherwise */
   function validateSurvey() {
-    if (!/^\d{1,4}[A-Z]?$/.test($ms.team)) {
+    if (!/^\d{1,4}[A-Z]?$/.test($defaultMetrics.team)) {
       return "Invalid team value";
     }
-    if ($ms.teams.length && !$ms.teams.some((team) => team == $ms.team)) {
+    if ($teamWhitelist.length && !$teamWhitelist.some((team) => team == $defaultMetrics.team)) {
       return "Team value not whitelisted";
     }
-    if (!/\d{1,3}/.test(`${$ms.match}`)) {
+    if (!/\d{1,3}/.test(`${$defaultMetrics.match}`)) {
       return "Invalid match value";
     }
     return "";
   }
 
-  /** Checks and saves survey to `localStorage`, then updates the UI */
+  /** Saves survey to localStorage */
   function saveSurvey() {
     let error = validateSurvey();
     if (error) {
       alert(`Could not save survey! ${error}`);
     } else if (confirm("Confirm save?")) {
-      $savedSurveys = [...$savedSurveys, getSurvey($ms)];
+      $savedSurveys = [...$savedSurveys, getSurvey($defaultMetrics, $customMetrics)];
       resetSurvey();
-      $ms.match++;
+      $defaultMetrics.match++;
     }
   }
 
   /** Resets all metrics excluding match */
   function resetSurvey() {
-    $ms.team = "";
-    $ms.isAbsent = false;
-    $ms.metrics.forEach((metric) => {
+    $defaultMetrics.team = "";
+    $defaultMetrics.isAbsent = false;
+    $customMetrics.forEach((metric) => {
       metric.value = getMetricDefaultValue(metric.config);
     });
   }

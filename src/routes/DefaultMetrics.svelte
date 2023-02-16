@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { ms, backupSurvey } from "$lib/Global.svelte";
+  import { defaultMetrics, teamWhitelist } from "$lib/Global.svelte";
   import Metric from "$lib/Metric.svelte";
 </script>
 
@@ -7,22 +7,16 @@
   <span class="group">Info</span>
   <div>
     Team
-    <input id="metric-team" list="teams-list" maxlength="5" bind:value={$ms.team} on:change={() => backupSurvey($ms)} />
+    <input id="metric-team" list="teams-list" maxlength="5" bind:value={$defaultMetrics.team} />
     <datalist id="teams-list">
-      {#each $ms.teams as team}
+      {#each $teamWhitelist as team}
         <option value={team} />
       {/each}
     </datalist>
   </div>
   <div>
     Match
-    <input
-      id="metric-match"
-      type="number"
-      pattern="[0-9]*"
-      bind:value={$ms.match}
-      on:change={() => backupSurvey($ms)}
-    />
+    <input id="metric-match" type="number" pattern="[0-9]*" bind:value={$defaultMetrics.match} />
   </div>
-  <Metric config={{ name: "Absent", type: "toggle" }} bind:value={$ms.isAbsent} on:update={() => backupSurvey($ms)} />
+  <Metric config={{ name: "Absent", type: "toggle" }} bind:value={$defaultMetrics.isAbsent} />
 </div>

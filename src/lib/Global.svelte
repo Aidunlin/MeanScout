@@ -40,79 +40,6 @@
     teams?: string[];
   };
 
-  type MS = {
-    team: string;
-    match: number;
-    isAbsent: boolean;
-    metrics: Metric[];
-    teams: string[];
-  };
-
-  type Survey = { name: string; value: any }[];
-
-  /**
-   * Creates a writable store that automatically synchronizes with `localStorage`.
-   *
-   * @param key The localStorage key to read to and write from.
-   * @param start The initial value for the store and localStorage.
-   * @param fromString Converts the value in localStorage to a usable value (use JSON.parse() for arrays and objects).
-   * @param toString Converts data to a string value (use JSON.stringify() for arrays and objects).
-   */
-  export function localStorageStore<T>(
-    key: string,
-    start: T,
-    fromString: (str: string) => T,
-    toString?: (val: T) => string
-  ) {
-    let defaultValue = start;
-
-    try {
-      if (browser) {
-        defaultValue = fromString(localStorage[key]);
-      }
-    } catch (error) {
-      console.log(`Could not get value from localStorage.${key}, using default`);
-    }
-
-    let store = writable(defaultValue);
-
-    store.subscribe((value) => {
-      if (!browser) return;
-      if (!value) value = start;
-      localStorage[key] = toString ? toString(value) : value;
-    });
-
-    return store;
-  }
-
-  export const menuVisible = localStorageStore("menuVisible", false, (str) => str === "true");
-
-  export const currentLocation = localStorageStore<Location>("location", "Red Near", (str) => str as Location);
-
-  currentLocation.subscribe((value) => {
-    if (!browser || !value) return;
-
-    let newTheme = "";
-    if (value.toLowerCase().includes("red")) {
-      newTheme = "red";
-    } else if (value.toLowerCase().includes("blue")) {
-      newTheme = "blue";
-    }
-
-    document.documentElement.style.setProperty("--theme-color", `var(--${newTheme})`);
-  });
-
-  export const savedSurveys = localStorageStore<Survey[]>("surveys", [], JSON.parse, JSON.stringify);
-
-  /** Global object of state values, must use `$ms` to use/change a value */
-  export const ms = writable<MS>({
-    team: "",
-    match: 1,
-    isAbsent: false,
-    metrics: [],
-    teams: [],
-  });
-
   /** Default template used to showcase different metrics */
   export const exampleTemplate: Template = {
     metrics: [
@@ -128,6 +55,63 @@
       { name: "Timer", type: "timer" },
     ],
   };
+
+  export type DefaultMetrics = {
+    team: string;
+    match: number;
+    isAbsent: boolean;
+  };
+
+  export type Survey = { name: string; value: any }[];
+
+  /**
+   * Creates a writable store that automatically synchronizes with `localStorage`.
+   *
+   * @param key The localStorage key to read/write.
+   * @param start The initial value for the store and localStorage.
+   * @param subscriber An optional callback for additional subscriber logic.
+   */
+  export function localStorageStore<T>(key: string, start: T, subscriber?: (val: T) => void) {
+    try {
+      if (browser) {
+        start = JSON.parse(localStorage[key]);
+      }
+    } catch (error) {
+      console.log(`Could not get value from localStorage.${key}, using default`);
+    }
+    let store = writable(start);
+    store.subscribe((value) => {
+      if (!browser) return;
+      if (!value) value = start;
+      localStorage[key] = JSON.stringify(value);
+      if (subscriber) subscriber(value);
+    });
+    return store;
+  }
+
+  export const currentLocation = localStorageStore<Location>("currentLocation", "Red Near", (val) => {
+    let newTheme = "";
+    if (val.toLowerCase().includes("red")) {
+      newTheme = "red";
+    } else if (val.toLowerCase().includes("blue")) {
+      newTheme = "blue";
+    }
+    document.documentElement.style.setProperty("--theme-color", `var(--${newTheme})`);
+  });
+
+  export const customMetrics = localStorageStore<Metric[]>("customMetrics", []);
+
+  export const defaultMetrics = localStorageStore<DefaultMetrics>("defaultMetrics", {
+    team: "",
+    match: 1,
+    isAbsent: false,
+  });
+
+  export const menuVisible = localStorageStore<boolean>("menuVisible", false);
+
+  export const savedSurveys = localStorageStore<Survey[]>("savedSurveys", []);
+
+  export const teamWhitelist = localStorageStore<string[]>("teamWhitelist", []);
 
   /**
    * Helper function for getting default metric values
@@ -162,23 +146,15 @@
    * @param data A reference to `ms` (must be referenced outside of definition)
    * @returns An array of objects, each representing a metric
    */
-  export function getSurvey(data: MS): Survey {
+  export function getSurvey(defaultMetrics: DefaultMetrics, customMetrics: Metric[]): Survey {
     return [
-      { name: "Team", value: data.team },
-      { name: "Match", value: data.match },
-      { name: "Absent", value: data.isAbsent },
-      ...data.metrics.map((metric) => {
+      { name: "Team", value: defaultMetrics.team },
+      { name: "Match", value: defaultMetrics.match },
+      { name: "Absent", value: defaultMetrics.isAbsent },
+      ...customMetrics.map((metric) => {
         return { name: metric.config.name, value: metric.value };
       }),
     ];
-  }
-
-  /**
-   * Helper function for storing a backup to `localStorage`
-   * @param data A reference to `ms` (must be referenced outside of definition)
-   */
-  export function backupSurvey(data: MS) {
-    localStorage.setItem("backup", JSON.stringify(getSurvey(data)));
   }
 
   /**
