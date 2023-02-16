@@ -1,9 +1,5 @@
 <script lang="ts" context="module">
-  import type { MetricConfig, Metric } from "./metrics";
-
-  /** List of supported survey file types */
-  export const fileFormats = ["CSV", "JSON"] as const;
-  export type FileFormat = typeof fileFormats[number];
+  import type { MetricConfig } from "./metrics";
 
   /** List of robot locations */
   export const locations = ["Red Near", "Red Mid", "Red Far", "Blue Near", "Blue Mid", "Blue Far"] as const;
@@ -29,28 +25,4 @@
       { name: "Timer", type: "timer" },
     ],
   };
-
-  export type DefaultMetrics = {
-    team: string;
-    match: number;
-    isAbsent: boolean;
-  };
-
-  export type Survey = { name: string; value: any }[];
-
-  /**
-   * Helper function for creating a survey
-   * @param data A reference to `ms` (must be referenced outside of definition)
-   * @returns An array of objects, each representing a metric
-   */
-  export function getSurvey(defaultMetrics: DefaultMetrics, customMetrics: Metric[]): Survey {
-    return [
-      { name: "Team", value: defaultMetrics.team },
-      { name: "Match", value: defaultMetrics.match },
-      { name: "Absent", value: defaultMetrics.isAbsent },
-      ...customMetrics.map((metric) => {
-        return { name: metric.config.name, value: metric.value };
-      }),
-    ];
-  }
 </script>

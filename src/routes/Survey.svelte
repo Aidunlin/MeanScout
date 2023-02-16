@@ -1,27 +1,13 @@
 <script lang="ts">
   import { defaultMetrics, teamWhitelist, savedSurveys, customMetrics } from "$lib/stores";
   import { getMetricDefaultValue } from "$lib/metrics";
-  import { getSurvey } from "$lib/Global.svelte";
+  import { getSurvey, validateSurvey } from "$lib/surveys";
   import Metric from "$lib/Metric.svelte";
   import IconButton from "$lib/IconButton.svelte";
 
-  /** Returns a truthy string if the survey is valid, empty string otherwise */
-  function validateSurvey() {
-    if (!/^\d{1,4}[A-Z]?$/.test($defaultMetrics.team)) {
-      return "Invalid team value";
-    }
-    if ($teamWhitelist.length && !$teamWhitelist.some((team) => team == $defaultMetrics.team)) {
-      return "Team value not whitelisted";
-    }
-    if (!/\d{1,3}/.test(`${$defaultMetrics.match}`)) {
-      return "Invalid match value";
-    }
-    return "";
-  }
-
   /** Saves survey to localStorage */
   function saveSurvey() {
-    let error = validateSurvey();
+    let error = validateSurvey($defaultMetrics, $teamWhitelist);
     if (error) {
       alert(`Could not save survey! ${error}`);
     } else if (confirm("Confirm save?")) {

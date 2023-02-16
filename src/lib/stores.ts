@@ -1,7 +1,8 @@
 import { browser } from "$app/environment";
 import { writable } from "svelte/store";
 import type { Metric } from "./metrics";
-import type { Location, DefaultMetrics, Survey } from "./Global.svelte";
+import type { Location } from "./Global.svelte";
+import type { SurveyFileType, DefaultMetrics, Survey } from "./surveys";
 
 /**
  * Creates a writable store that automatically synchronizes with `localStorage`.
@@ -49,5 +50,7 @@ export const defaultMetrics = localStorageStore<DefaultMetrics>("defaultMetrics"
 export const menuVisible = localStorageStore<boolean>("menuVisible", false);
 
 export const savedSurveys = localStorageStore<Survey[]>("savedSurveys", []);
+
+export const surveyFileType = localStorageStore<SurveyFileType>("surveyFileType", "CSV");
 
 export const teamWhitelist = localStorageStore<string[]>("teamWhitelist", []);
