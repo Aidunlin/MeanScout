@@ -77,3 +77,8 @@ export function getMetricDefaultValue(config: MetricConfig) {
 export function createMetricFromConfig(config: MetricConfig): Metric {
   return { config, value: getMetricDefaultValue(config) };
 }
+
+export function resetMetric(metric: Metric) {
+  metric.value = getMetricDefaultValue(metric.config);
+  return metric;
+}

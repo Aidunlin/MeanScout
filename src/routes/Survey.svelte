@@ -1,6 +1,6 @@
 <script lang="ts">
   import { defaultMetrics, teamWhitelist, savedSurveys, customMetrics } from "$lib/stores";
-  import { getMetricDefaultValue } from "$lib/metrics";
+  import { resetMetric } from "$lib/metrics";
   import { getSurvey, validateSurvey } from "$lib/surveys";
   import Metric from "$lib/Metric.svelte";
   import IconButton from "$lib/IconButton.svelte";
@@ -21,9 +21,7 @@
   function resetSurvey() {
     $defaultMetrics.team = "";
     $defaultMetrics.isAbsent = false;
-    $customMetrics.forEach((metric) => {
-      metric.value = getMetricDefaultValue(metric.config);
-    });
+    $customMetrics = $customMetrics.map(resetMetric);
   }
 
   /** Prompts the user if they want to reset, then calls `resetSurvey()` */

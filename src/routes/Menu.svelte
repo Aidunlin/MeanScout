@@ -8,8 +8,9 @@
     surveyFileType,
   } from "$lib/stores";
   import { downloadSurveys, surveyFileTypes } from "$lib/surveys";
-  import { createMetricFromConfig, metricTypes } from "$lib/metrics";
-  import { locations, exampleTemplate, type Template } from "$lib/Global.svelte";
+  import { createMetricFromConfig } from "$lib/metrics";
+  import { exampleTemplate, parseTemplate, type Template } from "$lib/templates";
+  import { locations } from "$lib/Global.svelte";
   import Metric from "$lib/Metric.svelte";
   import IconButton from "$lib/IconButton.svelte";
 
@@ -34,43 +35,6 @@
   function setTemplate(newTemplate: Template) {
     $customMetrics = newTemplate.metrics.map(createMetricFromConfig);
     if (newTemplate.teams) $teamWhitelist = newTemplate.teams;
-  }
-
-  /**
-   * Parses a stringified template
-   * @param templateString A stringified template
-   * @returns A template object or an error string
-   */
-  function parseTemplate(templateString: string): string | Template {
-    let result: Template;
-    let error = "";
-    try {
-      result = JSON.parse(templateString) as Template;
-    } catch (e) {
-      return "Invalid template string";
-    }
-    if (!Array.isArray(result.teams ?? [])) {
-      error += "Template has invalid teams";
-    }
-    if (!result.metrics) {
-      error += "\nTemplate has no metrics";
-    } else {
-      result.metrics.forEach((metric, i) => {
-        if (!metric.name) {
-          error += `\nMetric ${i + 1} has no name`;
-        }
-        if (metric.type == "select" && !Array.isArray(metric.values ?? [])) {
-          error += `\nMetric ${metric.name ?? i + 1} has invalid values`;
-        }
-        if (!metricTypes.includes(metric.type)) {
-          error += `\nMetric ${metric.name ?? i + 1} has invalid type`;
-        }
-      });
-    }
-    if (error) {
-      return error;
-    }
-    return result;
   }
 
   /** Prompts the user to enter a new template, or reset to `exampleTemplate` */
