@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { type FileFormat, fileFormats, savedSurveys, type Survey } from "$lib/Global.svelte";
+  import { savedSurveys } from "$lib/stores";
+  import { type FileFormat, fileFormats, type Survey } from "$lib/Global.svelte";
   import IconButton from "$lib/IconButton.svelte";
   import Metric from "$lib/Metric.svelte";
 

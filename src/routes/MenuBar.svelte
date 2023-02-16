@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { menuVisible, currentLocation } from "$lib/Global.svelte";
+  import { menuVisible, currentLocation } from "$lib/stores";
 </script>
 
 <div class="flex space-between spaced bg extend-bg">

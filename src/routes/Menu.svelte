@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { currentLocation, menuVisible, locations } from "$lib/Global.svelte";
+  import { currentLocation, menuVisible } from "$lib/stores";
+  import { locations } from "$lib/Global.svelte";
   import Metric from "$lib/Metric.svelte";
   import TemplateMenu from "./TemplateMenu.svelte";
   import SurveysMenu from "./SurveysMenu.svelte";

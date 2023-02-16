@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { defaultMetrics, teamWhitelist } from "$lib/Global.svelte";
+  import { defaultMetrics, teamWhitelist } from "$lib/stores";
   import Metric from "$lib/Metric.svelte";
 </script>
 
