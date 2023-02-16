@@ -2,8 +2,8 @@
   import { defaultMetrics, teamWhitelist, savedSurveys, customMetrics } from "$lib/stores";
   import { resetMetric } from "$lib/metrics";
   import { getSurvey, validateSurvey } from "$lib/surveys";
-  import Metric from "$lib/Metric.svelte";
-  import IconButton from "$lib/IconButton.svelte";
+  import Metric from "./Metric.svelte";
+  import IconButton from "./IconButton.svelte";
 
   /** Saves survey to localStorage */
   function saveSurvey() {

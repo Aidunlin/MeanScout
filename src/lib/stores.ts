@@ -1,7 +1,7 @@
 import { browser } from "$app/environment";
 import { writable } from "svelte/store";
 import type { Metric } from "./metrics";
-import type { Location } from "./Global.svelte";
+import { setTheme, type Location } from "./locations";
 import type { SurveyFileType, DefaultMetrics, Survey } from "./surveys";
 
 /**
@@ -29,15 +29,7 @@ export function localStorageStore<T>(key: string, start: T, subscriber?: (val: T
   return store;
 }
 
-export const currentLocation = localStorageStore<Location>("currentLocation", "Red Near", (val) => {
-  let newTheme = "";
-  if (val.toLowerCase().includes("red")) {
-    newTheme = "red";
-  } else if (val.toLowerCase().includes("blue")) {
-    newTheme = "blue";
-  }
-  document.documentElement.style.setProperty("--theme-color", `var(--${newTheme})`);
-});
+export const currentLocation = localStorageStore<Location>("currentLocation", "Red Near", setTheme);
 
 export const customMetrics = localStorageStore<Metric[]>("customMetrics", []);
 

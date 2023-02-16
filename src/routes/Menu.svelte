@@ -10,9 +10,9 @@
   import { downloadSurveys, surveyFileTypes } from "$lib/surveys";
   import { createMetricFromConfig } from "$lib/metrics";
   import { exampleTemplate, parseTemplate, type Template } from "$lib/templates";
-  import { locations } from "$lib/Global.svelte";
-  import Metric from "$lib/Metric.svelte";
-  import IconButton from "$lib/IconButton.svelte";
+  import { locations } from "$lib/locations";
+  import Metric from "./Metric.svelte";
+  import IconButton from "./IconButton.svelte";
 
   /** Writes the current template to the device's clipboard */
   function copyTemplate() {
