@@ -1,79 +1,41 @@
-import type { Metric } from "./metrics";
+import { entryToCSV, type Entry } from "./entries";
+import type { MetricConfig } from "./metrics";
+import type { Template } from "./templates";
 
-/** List of supported survey file types */
-export const surveyFileTypes = ["CSV", "JSON"] as const;
-export type SurveyFileType = typeof surveyFileTypes[number];
-
-export type DefaultMetrics = {
-  team: string;
-  match: number;
-  isAbsent: boolean;
+export type Survey = {
+  name: string;
+  configs: MetricConfig[];
+  teams: string[];
+  entries: Entry[];
 };
 
-export type Survey = { name: string; value: any }[];
-
-/**
- * Helper function for creating a survey
- * @param data A reference to `ms` (must be referenced outside of definition)
- * @returns An array of objects, each representing a metric
- */
-export function getSurvey(defaultMetrics: DefaultMetrics, customMetrics: Metric[]): Survey {
-  return [
-    { name: "Team", value: defaultMetrics.team },
-    { name: "Match", value: defaultMetrics.match },
-    { name: "Absent", value: defaultMetrics.isAbsent },
-    ...customMetrics.map((metric) => {
-      return { name: metric.config.name, value: metric.value };
-    }),
-  ];
+export function templateToSurvey(template: Template): Survey {
+  return { name: template.name, configs: template.configs, teams: template.teams, entries: [] };
 }
 
-/** Returns a truthy string if the survey is valid, empty string otherwise */
-export function validateSurvey(defaultMetrics: DefaultMetrics, teamWhitelist: string[]) {
-  if (!/^\d{1,4}[A-Z]?$/.test(defaultMetrics.team)) {
-    return "Invalid team value";
-  }
-  if (teamWhitelist.length && !teamWhitelist.some((team) => team == defaultMetrics.team)) {
-    return "Team value not whitelisted";
-  }
-  if (!/\d{1,3}/.test(`${defaultMetrics.match}`)) {
-    return "Invalid match value";
-  }
-  return "";
+export function surveyToTemplate(survey: Survey): Template {
+  return {
+    name: survey.name,
+    configs: survey.configs,
+    teams: survey.teams,
+  };
 }
 
-/**
- * Creates a multiline CSV string for an array of surveys
- * @param surveys An array of surveys (each survey is an array of metric objects)
- */
-export function generateCSV(surveys: Survey[]) {
-  let csv = "";
-  if (surveys) {
-    surveys.forEach((survey) => {
-      let surveyAsCSV = "";
-      survey.forEach((metric) => {
-        if (typeof metric.value == "string") {
-          surveyAsCSV += '"' + metric.value + '",';
-        } else {
-          surveyAsCSV += metric.value + ",";
-        }
-      });
-      csv += surveyAsCSV + "\n";
-    });
-  }
+function surveyToCSV(survey: Survey) {
+  let csv = "Team,Match,Absent";
+  survey.configs.forEach((config) => {
+    csv += `,${config.name}\n`;
+  });
+  survey.entries.forEach((entry) => {
+    csv += `${entryToCSV(entry)}\n`;
+  });
   return csv;
 }
 
-/** Creates and downloads a file containing surveys */
-export function downloadSurveys(fileType: SurveyFileType, savedSurveys: Survey[]) {
+export function downloadSurvey(survey: Survey) {
   const anchor = document.createElement("a");
-  anchor.href = "data:text/plain;charset=utf-8,";
-  if (fileType == "CSV") {
-    anchor.href += encodeURIComponent(generateCSV(savedSurveys));
-  } else if (fileType == "JSON") {
-    anchor.href += encodeURIComponent(JSON.stringify(savedSurveys));
-  }
-  anchor.download = `surveys.${fileType.toLowerCase()}`;
+  anchor.download = "surveys.csv";
+  anchor.href = "data:text/plain;charset=utf-8," + encodeURIComponent(surveyToCSV(survey));
   document.body.append(anchor);
   anchor.click();
   anchor.remove();

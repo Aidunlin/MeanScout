@@ -1,16 +1,9 @@
 import { browser } from "$app/environment";
-import { writable } from "svelte/store";
-import { setTheme, type Location } from "./locations";
-import type { Metric } from "./metrics";
-import type { DefaultMetrics, Survey, SurveyFileType } from "./surveys";
+import { derived, writable } from "svelte/store";
+import type { Entry } from "./entries";
+import { templateToSurvey, type Survey } from "./surveys";
+import { exampleTemplate } from "./templates";
 
-/**
- * Creates a writable store that automatically synchronizes with `localStorage`.
- *
- * @param key The localStorage key to read/write.
- * @param start The initial value for the store and localStorage.
- * @param subscriber An optional callback for additional subscriber logic.
- */
 export function localStorageStore<T>(key: string, start: T, subscriber?: (val: T) => void) {
   try {
     if (browser) {
@@ -29,20 +22,11 @@ export function localStorageStore<T>(key: string, start: T, subscriber?: (val: T
   return store;
 }
 
-export const currentLocation = localStorageStore<Location>("currentLocation", "Red Near", setTheme);
+export const surveys = localStorageStore<Survey[]>("surveys", [templateToSurvey(JSON.parse(JSON.stringify(exampleTemplate)))]);
+export const currentSurveyName = localStorageStore<string>("currentSurvey", exampleTemplate.name);
 
-export const customMetrics = localStorageStore<Metric[]>("customMetrics", []);
-
-export const defaultMetrics = localStorageStore<DefaultMetrics>("defaultMetrics", {
-  team: "",
-  match: 1,
-  isAbsent: false,
+export const currentSurveyIndex = derived([surveys, currentSurveyName], ([$surveys, $surveyName]) => {
+  return $surveys.map((survey) => survey.name).indexOf($surveyName);
 });
 
-export const menuVisible = localStorageStore<boolean>("menuVisible", false);
-
-export const savedSurveys = localStorageStore<Survey[]>("savedSurveys", []);
-
-export const surveyFileType = localStorageStore<SurveyFileType>("surveyFileType", "CSV");
-
-export const teamWhitelist = localStorageStore<string[]>("teamWhitelist", []);
+export const currentEntry = localStorageStore<Entry | undefined>("currentEntry", undefined);

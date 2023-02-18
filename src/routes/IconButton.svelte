@@ -1,15 +1,11 @@
 <script>
   import { getIcon } from "$lib/icons";
 
-  /** (required) The name of the icon, as defined in Global.svelte */
   export let icon = "";
-  /** (optional) Text accompanying the icon */
   export let text = "";
 
-  /** SVG info for the icon */
   let svg = { width: 0, path: "" };
 
-  // Svelte updates svg info whenever `icon` changes
   $: svg = getIcon(icon);
 </script>
 

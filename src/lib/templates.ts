@@ -1,14 +1,15 @@
 import { metricTypes, type MetricConfig } from "./metrics";
 
 export type Template = {
-  metrics: MetricConfig[];
-  teams?: string[];
+  name: string;
+  configs: MetricConfig[];
+  teams: string[];
 };
 
-/** Default template used to showcase different metrics */
 export const exampleTemplate: Template = {
-  metrics: [
-    { name: "Toggle", type: "toggle", group: "Group" },
+  name: "Example",
+  configs: [
+    { name: "Toggle", type: "toggle", group: "Example" },
     { name: "Number", type: "number" },
     {
       name: "Select",
@@ -19,13 +20,9 @@ export const exampleTemplate: Template = {
     { name: "Rating", type: "rating" },
     { name: "Timer", type: "timer" },
   ],
+  teams: [],
 };
 
-/**
- * Parses a stringified template
- * @param templateString A stringified template
- * @returns A template object or an error string
- */
 export function parseTemplate(templateString: string): string | Template {
   let result: Template;
   let error = "";
@@ -34,13 +31,16 @@ export function parseTemplate(templateString: string): string | Template {
   } catch (e) {
     return "Invalid template string";
   }
-  if (!Array.isArray(result.teams ?? [])) {
-    error += "Template has invalid teams";
+  if (!result.name) {
+    error += "\nTemplate has no name";
   }
-  if (!result.metrics) {
+  if (!Array.isArray(result.teams ?? [])) {
+    error += "\nTemplate has invalid teams";
+  }
+  if (!result.configs) {
     error += "\nTemplate has no metrics";
   } else {
-    result.metrics.forEach((metric, i) => {
+    result.configs.forEach((metric, i) => {
       if (!metric.name) {
         error += `\nMetric ${i + 1} has no name`;
       }

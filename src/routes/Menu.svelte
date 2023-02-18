@@ -1,25 +1,35 @@
 <script lang="ts">
-  import { locations } from "$lib/locations";
-  import { createMetricFromConfig } from "$lib/metrics";
-  import {
-    currentLocation,
-    customMetrics,
-    menuVisible,
-    savedSurveys,
-    surveyFileType,
-    teamWhitelist,
-  } from "$lib/stores";
-  import { downloadSurveys, surveyFileTypes } from "$lib/surveys";
-  import { exampleTemplate, parseTemplate, type Template } from "$lib/templates";
+  import { getMetricDefaultValue } from "$lib/metrics";
+  import { currentEntry, currentSurveyIndex, currentSurveyName, localStorageStore, surveys } from "$lib/stores";
+  import { downloadSurvey, surveyToTemplate, templateToSurvey } from "$lib/surveys";
+  import { exampleTemplate, parseTemplate } from "$lib/templates";
   import IconButton from "./IconButton.svelte";
-  import Metric from "./Metric.svelte";
+  import MetricEditor from "./MetricEditor.svelte";
 
-  /** Writes the current template to the device's clipboard */
+  type MenuState = "hide" | "show";
+  const menuState = localStorageStore<MenuState>("menuState", "hide");
+
+  function toggleMenu() {
+    $menuState = $menuState == "hide" ? "show" : "hide";
+  }
+
+  const locations = ["Red Near", "Red Mid", "Red Far", "Blue Near", "Blue Mid", "Blue Far"] as const;
+  type Location = typeof locations[number];
+  const currentLocation = localStorageStore<Location>("currentLocation", "Red Near", setTheme);
+
+  function setTheme(location: Location) {
+    let newTheme = location.split(" ")[0].toLowerCase();
+    document.documentElement.style.setProperty("--theme-color", `var(--${newTheme})`);
+  }
+
+  $: surveyNames = $surveys.map((survey) => survey.name);
+
   function copyTemplate() {
-    let templateString = JSON.stringify({
-      metrics: $customMetrics.map((metric) => metric.config),
-      teams: $teamWhitelist,
-    });
+    if ($currentSurveyIndex < 0) {
+      alert("Could not copy template");
+      return;
+    }
+    let templateString = JSON.stringify(surveyToTemplate($surveys[$currentSurveyIndex]));
     if ("clipboard" in navigator) {
       navigator.clipboard.writeText(templateString);
       alert("Copied template");
@@ -28,57 +38,64 @@
     }
   }
 
-  /**
-   * Sets a new template
-   * @param newTemplate The template to use
-   */
-  function setTemplate(newTemplate: Template) {
-    $customMetrics = newTemplate.metrics.map(createMetricFromConfig);
-    if (newTemplate.teams) $teamWhitelist = newTemplate.teams;
-  }
-
-  /** Prompts the user to enter a new template, or reset to `exampleTemplate` */
-  function editTemplate() {
-    const newPrompt = prompt("Paste new template (you can also 'reset'):");
+  function newTemplate() {
+    const newPrompt = prompt("Paste new template:");
     if (newPrompt) {
-      if (newPrompt == "reset") {
-        setTemplate(exampleTemplate);
+      let result = parseTemplate(newPrompt);
+      if (typeof result == "string") {
+        alert(`Could not set template! ${result}`);
       } else {
-        let result = parseTemplate(newPrompt);
-        if (typeof result == "string") {
-          alert(`Could not set template! ${result}`);
+        if ($surveys.map((survey) => survey.name).includes(result.name)) {
+          alert(`Could not set template! ${result.name} already exists`);
         } else {
-          setTemplate(result);
+          console.log(templateToSurvey(result));
+          $surveys = [...$surveys, templateToSurvey(result)];
+          // $currentSurveyName = result.name;
         }
       }
     }
   }
 
-  /** Checks if the user wants to download surveys, doing so if they confirm */
-  function askDownloadSurveys() {
-    if ($savedSurveys && confirm("Confirm download?")) {
-      downloadSurveys($surveyFileType, $savedSurveys);
+  function deleteSurvey() {
+    if (confirm("Confirm delete?")) {
+      let surveyName = $currentSurveyName;
+      $surveys = $surveys.filter((survey) => survey.name != surveyName);
+      if (!$surveys.length) {
+        $surveys = [templateToSurvey(exampleTemplate)];
+      }
+      $currentSurveyName = $surveys[0].name;
+      $currentEntry = {
+        team: "",
+        match: 1,
+        isAbsent: false,
+        metrics: $surveys[$currentSurveyIndex].configs.map(getMetricDefaultValue),
+      };
     }
   }
 
-  /** Confirms the user wants to erase saved surveys, doing so if they confirm */
-  function eraseSurveys() {
-    if (confirm("Confirm erase?")) {
-      $savedSurveys = [];
+  function askDownloadEntries() {
+    if ($currentSurveyIndex >= 0 && confirm("Confirm download?")) {
+      downloadSurvey($surveys[$currentSurveyIndex]);
+    }
+  }
+
+  function eraseEntries() {
+    if ($currentSurveyIndex >= 0 && confirm("Confirm erase?")) {
+      $surveys[$currentSurveyIndex].entries = [];
     }
   }
 </script>
 
 <div class="flex space-between spaced bg extend-bg">
-  <button id="menu-toggle-btn" on:click={() => ($menuVisible = !$menuVisible)}>
+  <button id="menu-toggle-btn" on:click={toggleMenu}>
     <img class="text-icon" id="logo" src="./logo.png" alt="" />MeanScout
   </button>
   <span id="location-text">{$currentLocation}</span>
 </div>
 
-<div class="flex spaced bg extend-bg" id="menu" class:hide={!$menuVisible}>
+<div class="flex spaced bg extend-bg" id="menu" class:hide={$menuState == "hide"}>
   <span class="group">Options</span>
-  <Metric
+  <MetricEditor
     config={{
       name: "Location",
       type: "select",
@@ -87,15 +104,16 @@
     bind:value={$currentLocation}
   />
 
-  <span class="group">Template</span>
-  <IconButton on:click={copyTemplate} icon="copy" text="Copy" />
-  <IconButton on:click={editTemplate} icon="pen" text="Edit" />
-
   <span class="group">Surveys</span>
-  <Metric
-    config={{ name: "Type", type: "select", values: Object.values(surveyFileTypes) }}
-    bind:value={$surveyFileType}
+  <IconButton on:click={newTemplate} icon="pen" text="New" />
+  <MetricEditor
+    config={{ name: "Current", type: "select", values: surveyNames }}
+    bind:value={$currentSurveyName}
   />
-  <IconButton on:click={askDownloadSurveys} icon="download" text="Download" />
-  <IconButton on:click={eraseSurveys} icon="erase" text="Erase" />
+  <IconButton on:click={copyTemplate} icon="copy" text="Copy" />
+  <IconButton on:click={deleteSurvey} icon="reset" text="Delete" />
+
+  <span class="group">Entries</span>
+  <IconButton on:click={askDownloadEntries} icon="download" text="Download" />
+  <IconButton on:click={eraseEntries} icon="erase" text="Erase" />
 </div>

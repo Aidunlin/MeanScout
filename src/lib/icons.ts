@@ -1,4 +1,3 @@
-/** Contains SVG information for every icon */
 const icons = [
   {
     name: "bars",
@@ -82,11 +81,6 @@ const icons = [
   },
 ];
 
-/**
- * Helper function for getting icon information
- * @param iconName The name of the icon
- * @returns SVG information for the icon
- */
 export function getIcon(iconName: string) {
   return (
     icons.find((icon) => icon.name == iconName) ?? {

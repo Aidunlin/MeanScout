@@ -1,4 +1,3 @@
-/** List of metric types */
 export const metricTypes = ["toggle", "number", "select", "text", "rating", "timer"] as const;
 export type MetricType = typeof metricTypes[number];
 
@@ -50,11 +49,6 @@ export type Metric = {
   value: any;
 };
 
-/**
- * Helper function for getting default metric values
- * @param type The metric's type
- * @returns The default value defined in `metricDefaults` or `undefined`
- */
 export function getMetricDefaultValue(config: MetricConfig) {
   switch (config.type) {
     case "toggle":
@@ -74,11 +68,6 @@ export function getMetricDefaultValue(config: MetricConfig) {
   }
 }
 
-export function createMetricFromConfig(config: MetricConfig): Metric {
+export function configToMetric(config: MetricConfig): Metric {
   return { config, value: getMetricDefaultValue(config) };
-}
-
-export function resetMetric(metric: Metric) {
-  metric.value = getMetricDefaultValue(metric.config);
-  return metric;
 }

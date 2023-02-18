@@ -8,7 +8,11 @@
   export let config: MetricConfig;
   export let value: any;
 
-  /** (`rating`) function */
+  $: {
+    value;
+    dispatch("update");
+  }
+
   function rate(i: number) {
     if (value == i + 1) {
       value = 0;
@@ -17,12 +21,9 @@
     }
   }
 
-  /** (`timer`) Whether the timer is running */
   let running = false;
-  /** (`timer`) Interval reference for the timer */
   let interval: NodeJS.Timer;
 
-  /** (`timer` function) */
   function start() {
     running = true;
     interval = setInterval(() => {
@@ -32,13 +33,11 @@
     }, 100);
   }
 
-  /** (`timer` function) */
   function pause() {
     running = false;
     clearInterval(interval);
   }
 
-  /** (`timer` function) */
   function stop() {
     if (config.type == "timer") {
       if (running) {
@@ -47,21 +46,17 @@
       value = 0;
     }
   }
-
-  // Svelte calls `dispatch()` whenever `value` changes
-  $: {
-    value;
-    dispatch("update");
-  }
 </script>
 
 {#if config.group}
   <span class="group">{config.group}</span>
 {/if}
+
 <div class:max-width={config.type == "text"}>
   {#if config.type != "toggle"}
     {config.name}
   {/if}
+
   <div class="flex">
     {#if config.type == "toggle"}
       <IconButton on:click={() => (value = !value)} icon={value ? "check" : "nocheck"} text={config.name} />

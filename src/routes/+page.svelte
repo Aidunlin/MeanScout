@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import EntryEditor from "./EntryEditor.svelte";
   import Menu from "./Menu.svelte";
-  import Survey from "./Survey.svelte";
 
   onMount(() => document.body.classList.remove("hide"));
 </script>
@@ -11,4 +11,4 @@
 </svelte:head>
 
 <Menu />
-<Survey />
+<EntryEditor />
