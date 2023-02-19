@@ -8,24 +8,6 @@ export type Survey = {
   entries: Entry[];
 };
 
-export const exampleSurvey: Survey = {
-  name: "Example",
-  configs: [
-    { name: "Toggle", type: "toggle", group: "Example" },
-    { name: "Number", type: "number" },
-    {
-      name: "Select",
-      type: "select",
-      values: ["Value 1", "Value 2", "Value 3"],
-    },
-    { name: "Text", type: "text", tip: "Tip" },
-    { name: "Rating", type: "rating" },
-    { name: "Timer", type: "timer" },
-  ],
-  teams: [],
-  entries: [],
-};
-
 export function parseSurvey(surveyString: string): string | Survey {
   let result: Survey;
   let error = "";

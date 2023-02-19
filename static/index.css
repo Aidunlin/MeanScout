@@ -13,10 +13,6 @@
   .spaced .flex > * {
     flex: auto;
   }
-
-  #location-text {
-    display: none;
-  }
 }
 
 * {
@@ -45,6 +41,15 @@ html {
   touch-action: pan-y;
 }
 
+:focus-visible {
+  outline: var(--text-color) solid 2px;
+}
+
+::selection {
+  color: var(--text-color);
+  background-color: var(--theme-color);
+}
+
 body {
   display: flex;
   flex-direction: column;
@@ -55,9 +60,7 @@ body {
 input,
 select,
 option,
-path,
-#menu-toggle-btn,
-#location-text {
+path {
   color: var(--theme-color);
 }
 
@@ -72,9 +75,13 @@ select,
 button,
 input,
 select,
-.number,
-#location-text {
+.number {
   padding: var(--inner-gap);
+}
+
+h1 {
+  margin: 0;
+  padding: var(--inner-gap) 0;
 }
 
 button {
@@ -95,18 +102,17 @@ select {
 }
 
 svg {
-  height: 30px;
   vertical-align: bottom;
 }
 
+svg,
 #logo {
   height: 30px;
-  padding-right: 8px;
-  vertical-align: bottom;
+  flex-grow: 0;
 }
 
 .flex {
-  align-items: flex-end;
+  align-items: center;
   display: flex;
   flex-wrap: wrap;
 }
@@ -118,6 +124,14 @@ svg {
 .spaced {
   gap: var(--outer-gap);
   padding: var(--outer-gap);
+}
+
+.spaced-inner {
+  gap: var(--outer-gap);
+}
+
+.spaced-within {
+  padding: var(--inner-gap);
 }
 
 .extend-down {
@@ -141,7 +155,6 @@ svg {
 }
 
 .group {
-  font-weight: bolder;
   text-decoration: underline;
 }
 
@@ -149,7 +162,14 @@ svg {
   padding-top: var(--outer-gap);
 }
 
-.number, #metric-match {
+.list-button-main {
+  color: var(--theme-color);
+  flex-grow: 1;
+  text-align: left;
+}
+
+.number,
+#metric-match {
   width: 80px;
 }
 
@@ -178,6 +198,7 @@ svg {
 }
 
 input[type="number"] {
+  appearance: textfield;
   -moz-appearance: textfield;
   -webkit-appearance: textfield;
 }
