@@ -19,7 +19,4 @@
 </svelte:head>
 
 <Menu bind:currentSurvey={$surveys[$currentSurveyIndex]} />
-
-{#if $currentEntry}
-  <EntryEditor bind:currentSurvey={$surveys[$currentSurveyIndex]} bind:currentEntry={$currentEntry} />
-{/if}
+<EntryEditor bind:currentSurvey={$surveys[$currentSurveyIndex]} />

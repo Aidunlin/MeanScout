@@ -1,8 +1,7 @@
 import { browser } from "$app/environment";
 import { derived, writable } from "svelte/store";
-import type { Entry } from "./entries";
-import { templateToSurvey, type Survey } from "./surveys";
-import { exampleTemplate } from "./templates";
+import { newEntry, type Entry } from "./entries";
+import { exampleSurvey, type Survey } from "./surveys";
 
 export function localStorageStore<T>(key: string, start: T, subscriber?: (val: T) => void) {
   try {
@@ -22,11 +21,11 @@ export function localStorageStore<T>(key: string, start: T, subscriber?: (val: T
   return store;
 }
 
-export const surveys = localStorageStore<Survey[]>("surveys", [templateToSurvey(exampleTemplate)]);
-export const currentSurveyName = localStorageStore<string>("currentSurvey", exampleTemplate.name);
+export const surveys = localStorageStore<Survey[]>("surveys", [exampleSurvey]);
+export const currentSurveyName = localStorageStore<string>("currentSurvey", exampleSurvey.name);
 
 export const currentSurveyIndex = derived([surveys, currentSurveyName], ([$surveys, $surveyName]) => {
   return $surveys.map((survey) => survey.name).indexOf($surveyName);
 });
 
-export const currentEntry = localStorageStore<Entry | undefined>("currentEntry", undefined);
+export const currentEntry = localStorageStore<Entry>("currentEntry", newEntry(exampleSurvey));

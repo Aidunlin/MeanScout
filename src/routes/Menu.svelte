@@ -1,8 +1,7 @@
 <script lang="ts">
   import { newEntry, resetCustom } from "$lib/entries";
   import { currentEntry, currentSurveyName, localStorageStore, surveys } from "$lib/stores";
-  import { downloadSurvey, surveyToTemplate, templateToSurvey, type Survey } from "$lib/surveys";
-  import { exampleTemplate, parseTemplate } from "$lib/templates";
+  import { downloadSurveyEntries, exampleSurvey, parseSurvey, type Survey } from "$lib/surveys";
   import IconButton from "./IconButton.svelte";
   import MetricEditor from "./MetricEditor.svelte";
 
@@ -26,30 +25,29 @@
 
   $: surveyNames = $surveys.map((survey) => survey.name);
 
-  function copyTemplate() {
-    let templateString = JSON.stringify(surveyToTemplate(currentSurvey));
+  function copySurvey() {
+    let surveyString = JSON.stringify(currentSurvey as Omit<Survey, "entries">);
     if ("clipboard" in navigator) {
-      navigator.clipboard.writeText(templateString);
-      alert("Copied template");
+      navigator.clipboard.writeText(surveyString);
+      alert("Copied survey");
     } else {
-      prompt("Copy the template below", templateString);
+      prompt("Copy the survey below", surveyString);
     }
   }
 
-  function newTemplate() {
-    const newPrompt = prompt("Paste new template:");
+  function newSurvey() {
+    const newPrompt = prompt("Paste new survey:");
     if (newPrompt) {
-      let result = parseTemplate(newPrompt);
+      let result = parseSurvey(newPrompt);
       if (typeof result == "string") {
-        alert(`Could not set template! ${result}`);
+        alert(`Could not set survey! ${result}`);
       } else {
         if (surveyNames.includes(result.name)) {
-          alert(`Could not set template! ${result.name} already exists`);
+          alert(`Could not set survey! ${result.name} already exists`);
         } else {
-          let survey = templateToSurvey(result);
-          $surveys = [survey, ...$surveys];
-          $currentSurveyName = survey.name;
-          $currentEntry = newEntry(survey);
+          $surveys = [result, ...$surveys];
+          $currentSurveyName = result.name;
+          $currentEntry = newEntry(result);
         }
       }
     }
@@ -63,17 +61,16 @@
         $surveys = $surveys.filter((s) => s.name != $currentSurveyName);
         $currentSurveyName = survey.name;
       } else {
-        let survey = templateToSurvey(exampleTemplate);
-        $currentEntry = newEntry(survey);
-        $surveys = [survey];
-        $currentSurveyName = survey.name;
+        $currentEntry = newEntry(exampleSurvey);
+        $surveys = [exampleSurvey];
+        $currentSurveyName = exampleSurvey.name;
       }
     }
   }
 
   function askDownloadEntries() {
     if (confirm("Confirm download?")) {
-      downloadSurvey(currentSurvey);
+      downloadSurveyEntries(currentSurvey);
     }
   }
 
@@ -103,13 +100,13 @@
   />
 
   <span class="group">Surveys</span>
-  <IconButton on:click={newTemplate} icon="pen" text="New" />
+  <IconButton on:click={newSurvey} icon="pen" text="New" />
   <MetricEditor
     config={{ name: "Current", type: "select", values: surveyNames }}
     bind:value={$currentSurveyName}
     on:update={() => ($currentEntry = resetCustom(currentSurvey, $currentEntry))}
   />
-  <IconButton on:click={copyTemplate} icon="copy" text="Copy" />
+  <IconButton on:click={copySurvey} icon="copy" text="Copy" />
   <IconButton on:click={deleteSurvey} icon="reset" text="Delete" />
 
   <span class="group">Entries</span>
