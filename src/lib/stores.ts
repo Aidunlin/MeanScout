@@ -22,7 +22,7 @@ export function localStorageStore<T>(key: string, start: T, subscriber?: (val: T
   return store;
 }
 
-export const surveys = localStorageStore<Survey[]>("surveys", [templateToSurvey(JSON.parse(JSON.stringify(exampleTemplate)))]);
+export const surveys = localStorageStore<Survey[]>("surveys", [templateToSurvey(exampleTemplate)]);
 export const currentSurveyName = localStorageStore<string>("currentSurvey", exampleTemplate.name);
 
 export const currentSurveyIndex = derived([surveys, currentSurveyName], ([$surveys, $surveyName]) => {

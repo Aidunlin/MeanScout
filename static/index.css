@@ -36,6 +36,8 @@ html {
   --red: #f44336;
   --text-color: #fff;
   --theme-color: var(--red);
+  --outer-gap: 12px;
+  --inner-gap: 8px;
   background: var(--bg-color);
   color-scheme: dark;
   margin: auto;
@@ -72,7 +74,7 @@ input,
 select,
 .number,
 #location-text {
-  padding: 8px;
+  padding: var(--inner-gap);
 }
 
 button {
@@ -92,9 +94,14 @@ select {
   cursor: pointer;
 }
 
-svg,
+svg {
+  height: 30px;
+  vertical-align: bottom;
+}
+
 #logo {
   height: 30px;
+  padding-right: 8px;
   vertical-align: bottom;
 }
 
@@ -109,8 +116,8 @@ svg,
 }
 
 .spaced {
-  gap: 8px;
-  padding: 8px;
+  gap: var(--outer-gap);
+  padding: var(--outer-gap);
 }
 
 .extend-down {
@@ -120,8 +127,8 @@ svg,
 .extend-bg {
   margin-left: calc(50% - 50vw);
   margin-right: calc(50% - 50vw);
-  padding-left: calc(50vw - 50% + 8px);
-  padding-right: calc(50vw - 50% + 8px);
+  padding-left: calc(50vw - 50% + var(--outer-gap));
+  padding-right: calc(50vw - 50% + var(--outer-gap));
 }
 
 .hide {
@@ -139,11 +146,10 @@ svg,
 }
 
 .group:not(:first-child) {
-  padding-top: 8px;
+  padding-top: var(--outer-gap);
 }
 
-.number,
-#metric-match {
+.number, #metric-match {
   width: 80px;
 }
 

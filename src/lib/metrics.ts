@@ -44,11 +44,6 @@ interface MetricConfigTypeMap {
 
 export type MetricConfig = MetricConfigTypeMap[MetricType];
 
-export type Metric = {
-  config: MetricConfig;
-  value: any;
-};
-
 export function getMetricDefaultValue(config: MetricConfig) {
   switch (config.type) {
     case "toggle":
@@ -66,8 +61,4 @@ export function getMetricDefaultValue(config: MetricConfig) {
     default:
       return undefined;
   }
-}
-
-export function configToMetric(config: MetricConfig): Metric {
-  return { config, value: getMetricDefaultValue(config) };
 }
