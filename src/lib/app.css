@@ -41,7 +41,7 @@ html {
   touch-action: pan-y;
 }
 
-:focus-visible {
+:is(button, input, select):focus-visible {
   outline: var(--text-color) solid 2px;
 }
 
@@ -64,6 +64,8 @@ path {
   color: var(--theme-color);
 }
 
+header,
+footer,
 button,
 input,
 select,
@@ -82,6 +84,17 @@ select,
 h1 {
   margin: 0;
   padding: var(--inner-gap) 0;
+}
+
+header,
+footer {
+  gap: var(--outer-gap);
+  margin: 0 calc(50% - 50vw);
+  padding: var(--outer-gap) calc(50vw - 50% + var(--outer-gap));
+}
+
+footer {
+  margin-top: auto;
 }
 
 button {
@@ -109,12 +122,16 @@ svg,
   flex-grow: 0;
 }
 
+header,
+footer,
 .flex {
   align-items: center;
   display: flex;
   flex-wrap: wrap;
 }
 
+header,
+footer,
 .space-between {
   justify-content: space-between;
 }
@@ -126,17 +143,6 @@ svg,
 
 .spaced-inner {
   gap: var(--outer-gap);
-}
-
-.extend-down {
-  margin-top: auto;
-}
-
-.extend-bg {
-  margin-left: calc(50% - 50vw);
-  margin-right: calc(50% - 50vw);
-  padding-left: calc(50vw - 50% + var(--outer-gap));
-  padding-right: calc(50vw - 50% + var(--outer-gap));
 }
 
 .baseline {

@@ -23,6 +23,7 @@
   </div>
   <MetricEditor config={{ name: "Absent", type: "toggle" }} bind:value={entry.isAbsent} />
 </div>
+
 <div class="flex spaced baseline" class:hide={entry.isAbsent}>
   {#each survey.configs as config, i}
     <MetricEditor {config} bind:value={entry.metrics[i]} />

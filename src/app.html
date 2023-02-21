@@ -16,10 +16,15 @@
     <link rel="icon" href="%sveltekit.assets%/logo.png" />
     <link rel="apple-touch-icon" href="%sveltekit.assets%/logo.png" />
     <link rel="manifest" href="%sveltekit.assets%/app.webmanifest" />
+    <style>
+      html {
+        background-color: #000;
+      }
+    </style>
 
     %sveltekit.head%
   </head>
-  <body data-sveltekit-preload-data="hover" class="hide">
+  <body data-sveltekit-preload-data="hover">
     <div style="display: contents">%sveltekit.body%</div>
   </body>
 </html>
