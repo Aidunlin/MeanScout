@@ -8,25 +8,6 @@ export type Entry = {
   metrics: any[];
 };
 
-export function newEntry(survey: Survey, match?: number): Entry {
-  return {
-    team: "",
-    match: match ?? 1,
-    isAbsent: false,
-    metrics: survey.configs.map(getMetricDefaultValue),
-  };
-}
-
-export function resetCustom(survey: Survey, entry?: Entry): Entry {
-  if (!entry) return newEntry(survey);
-  return {
-    team: entry.team,
-    match: entry.match,
-    isAbsent: entry.isAbsent,
-    metrics: survey.configs.map(getMetricDefaultValue),
-  };
-}
-
 export function validateEntry(survey: Survey, entry: Entry) {
   if (!/^\d{1,4}[A-Z]?$/.test(entry.team)) {
     return "Invalid value for team";

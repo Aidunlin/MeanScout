@@ -1,5 +1,5 @@
 import { browser } from "$app/environment";
-import { derived, writable } from "svelte/store";
+import { writable } from "svelte/store";
 import type { Entry } from "./entries";
 import type { Survey } from "./surveys";
 
@@ -21,11 +21,10 @@ export function localStorageStore<T>(key: string, start: T, subscriber?: (val: T
 }
 
 export const surveys = localStorageStore<Survey[]>("surveys", []);
-export const currentSurveyName = localStorageStore<string>("currentSurvey", "");
 
-export const currentSurveyIndex = derived([surveys, currentSurveyName], ([$surveys, $surveyName]) => {
-  return $surveys.map((survey) => survey.name).indexOf($surveyName);
-});
+export const surveyIndex = localStorageStore<number | undefined>("surveyIndex", undefined);
+
+export const entryIndex = localStorageStore<number | undefined>("entryIndex", undefined);
 
 export const currentEntry = localStorageStore<Entry>("currentEntry", {
   team: "",

@@ -1,7 +1,7 @@
 <script lang="ts">
+  import Button from "$lib/Button.svelte";
   import type { MetricConfig } from "$lib/metrics";
   import { createEventDispatcher } from "svelte";
-  import IconButton from "./IconButton.svelte";
 
   const dispatch = createEventDispatcher();
 
@@ -59,11 +59,11 @@
 
   <div class="flex">
     {#if config.type == "toggle"}
-      <IconButton on:click={() => (value = !value)} icon={value ? "check" : "nocheck"} text={config.name} />
+      <Button on:click={() => (value = !value)} icon={value ? "check" : "nocheck"} text={config.name} />
     {:else if config.type == "number"}
-      <IconButton on:click={() => value++} icon="plus" />
+      <Button on:click={() => value++} icon="plus" />
       <span class="number">{value}</span>
-      <IconButton on:click={() => value--} icon="minus" />
+      <Button on:click={() => value--} icon="minus" />
     {:else if config.type == "select"}
       <select bind:value>
         {#each config.values as val}
@@ -74,12 +74,12 @@
       <input placeholder={config.tip} bind:value />
     {:else if config.type == "rating"}
       {#each [...Array(5).keys()] as i}
-        <IconButton on:click={() => rate(i)} icon={value > i ? "star" : "nostar"} />
+        <Button on:click={() => rate(i)} icon={value > i ? "star" : "nostar"} />
       {/each}
     {:else if config.type == "timer"}
-      <IconButton on:click={running ? pause : start} icon={running ? "pause" : "play"} />
+      <Button on:click={running ? pause : start} icon={running ? "pause" : "play"} />
       <span class="number">{value}</span>
-      <IconButton on:click={stop} icon="stop" />
+      <Button on:click={stop} icon="stop" />
     {/if}
   </div>
 </div>

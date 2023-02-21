@@ -86,6 +86,8 @@ h1 {
 
 button {
   cursor: pointer;
+  display: inline-flex;
+  gap: var(--inner-gap);
   text-decoration: none;
 }
 
@@ -99,10 +101,6 @@ select {
 
 select {
   cursor: pointer;
-}
-
-svg {
-  vertical-align: bottom;
 }
 
 svg,
@@ -130,10 +128,6 @@ svg,
   gap: var(--outer-gap);
 }
 
-.spaced-within {
-  padding: var(--inner-gap);
-}
-
 .extend-down {
   margin-top: auto;
 }
@@ -143,6 +137,10 @@ svg,
   margin-right: calc(50% - 50vw);
   padding-left: calc(50vw - 50% + var(--outer-gap));
   padding-right: calc(50vw - 50% + var(--outer-gap));
+}
+
+.baseline {
+  align-items: flex-end;
 }
 
 .hide {
@@ -162,12 +160,6 @@ svg,
   padding-top: var(--outer-gap);
 }
 
-.list-button-main {
-  color: var(--theme-color);
-  flex-grow: 1;
-  text-align: left;
-}
-
 .number,
 #metric-match {
   width: 80px;
@@ -177,12 +169,8 @@ svg,
   text-align: center;
 }
 
-.text-icon {
-  padding-right: 8px;
-}
-
 .star {
-  padding: 8px 6px;
+  padding: var(--inner-gap) 6px;
 }
 
 #metric-team {
