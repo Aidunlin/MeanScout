@@ -1,20 +1,3 @@
-@media (max-width: 360px) {
-  * {
-    text-align: center;
-  }
-
-  .spaced > *,
-  #metric-team,
-  #metric-match,
-  .flex button:only-child {
-    width: 100% !important;
-  }
-
-  .spaced .flex > * {
-    flex: auto;
-  }
-}
-
 * {
   border-radius: 0 !important;
   border: none;
@@ -82,8 +65,17 @@ select,
 }
 
 h1 {
+  font-size: 30px;
   margin: 0;
-  padding: var(--inner-gap) 0;
+}
+
+h2 {
+  margin: 0;
+  text-decoration: underline;
+}
+
+h2:not(:first-child) {
+  padding-top: var(--outer-gap);
 }
 
 header,
@@ -153,17 +145,8 @@ footer,
   display: none !important;
 }
 
-.group,
 .max-width {
   width: 100%;
-}
-
-.group {
-  text-decoration: underline;
-}
-
-.group:not(:first-child) {
-  padding-top: var(--outer-gap);
 }
 
 .number,

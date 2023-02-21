@@ -49,7 +49,7 @@
 </script>
 
 {#if config.group}
-  <span class="group">{config.group}</span>
+  <h2>{config.group}</h2>
 {/if}
 
 <div class:max-width={config.type == "text"}>

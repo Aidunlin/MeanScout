@@ -11,35 +11,35 @@
   export let data: PageData;
   let { surveyIndex, entryIndex } = data;
 
-  function newEntryClicked(match?: number) {
-    let newEntry: Entry = {
-      team: "",
-      match: match ?? 1,
-      isAbsent: false,
-      metrics: $surveys[surveyIndex].configs.map(getMetricDefaultValue),
-    };
-    $surveys[surveyIndex].entries = [newEntry, ...$surveys[surveyIndex].entries];
-    editEntryClicked(0);
-  }
-
   function editEntryClicked(i: number) {
     goto(`/${surveyIndex}/${i}`);
   }
 
-  function saveEntryClicked(i: number) {
-    let error = validateEntry($surveys[surveyIndex], $surveys[surveyIndex].entries[i]);
+  function saveEntryClicked() {
+    let error = validateEntry($surveys[surveyIndex], $surveys[surveyIndex].entries[entryIndex]);
+
     if (error) {
       alert(`Could not save entry! ${error}`);
-    } else if (confirm("Confirm save?")) {
-      newEntryClicked($surveys[surveyIndex].entries[i].match);
+      return;
     }
+
+    if (!confirm("Confirm save?")) return;
+
+    let entry: Entry = {
+      team: "",
+      match: $surveys[surveyIndex].entries[entryIndex].match + 1,
+      isAbsent: false,
+      metrics: $surveys[surveyIndex].configs.map(getMetricDefaultValue),
+    };
+    $surveys[surveyIndex].entries = [entry, ...$surveys[surveyIndex].entries];
+    editEntryClicked(0);
   }
 
-  function resetEntryClicked(i: number) {
+  function resetEntryClicked() {
     if (!confirm("Confirm reset?")) return;
 
-    $surveys[surveyIndex].entries[i].isAbsent = false;
-    $surveys[surveyIndex].entries[i].metrics = $surveys[surveyIndex].configs.map(getMetricDefaultValue);
+    $surveys[surveyIndex].entries[entryIndex].isAbsent = false;
+    $surveys[surveyIndex].entries[entryIndex].metrics = $surveys[surveyIndex].configs.map(getMetricDefaultValue);
   }
 </script>
 
@@ -52,12 +52,9 @@
   <h1>{$surveys[surveyIndex].name}</h1>
 </Header>
 
-<EntryEditor
-  bind:survey={$surveys[surveyIndex]}
-  bind:entry={$surveys[surveyIndex].entries[entryIndex]}
-/>
+<EntryEditor bind:survey={$surveys[surveyIndex]} bind:entry={$surveys[surveyIndex].entries[entryIndex]} />
 
 <footer>
-  <Button icon="save" title="Save entry" on:click={() => saveEntryClicked(entryIndex)} />
-  <Button icon="reset" title="reset entry" on:click={() => resetEntryClicked(entryIndex)} />
+  <Button icon="save" title="Save entry" on:click={saveEntryClicked} />
+  <Button icon="reset" title="reset entry" on:click={resetEntryClicked} />
 </footer>

@@ -11,19 +11,19 @@
   export let data: PageData;
   let { surveyIndex } = data;
 
-  function editEntryClicked(i: number) {
-    goto(`/${surveyIndex}/${i}`);
+  function editEntryClicked(entryIndex: number) {
+    goto(`/${surveyIndex}/${entryIndex}`);
   }
 
-  function deleteEntryClicked(i: number) {
-    if (typeof surveyIndex == "undefined") return;
+  function deleteEntryClicked(entryIndex: number) {
     if (!confirm("Confirm delete?")) return;
 
-    $surveys[surveyIndex].entries = $surveys[surveyIndex].entries.filter((_, idx) => idx != i);
+    $surveys[surveyIndex].entries = $surveys[surveyIndex].entries.filter((_, i) => i != entryIndex);
   }
 
-  function copySurveyClicked(i: number) {
-    let surveyString = JSON.stringify($surveys[i]);
+  function copySurveyClicked() {
+    let surveyString = JSON.stringify($surveys[surveyIndex]);
+
     if ("clipboard" in navigator) {
       navigator.clipboard.writeText(surveyString);
       alert("Copied survey");
@@ -32,23 +32,20 @@
     }
   }
 
-  function downloadEntriesClicked(i: number) {
+  function downloadEntriesClicked() {
     if (!confirm("Confirm download?")) return;
 
-    downloadSurveyEntries($surveys[i]);
+    downloadSurveyEntries($surveys[surveyIndex]);
   }
 
-  function newEntryClicked(match?: number) {
-    if (typeof surveyIndex == "undefined") return;
-
-    let newEntry: Entry = {
+  function newEntryClicked() {
+    let entry: Entry = {
       team: "",
-      match: match ?? 1,
+      match: $surveys[surveyIndex].entries.map(entry => entry.match).reduce((prev, curr) => curr > prev ? curr : prev) + 1,
       isAbsent: false,
       metrics: $surveys[surveyIndex].configs.map(getMetricDefaultValue),
     };
-    $surveys[surveyIndex].entries = [newEntry, ...$surveys[surveyIndex].entries];
-    editEntryClicked(0);
+    $surveys[surveyIndex].entries = [entry, ...$surveys[surveyIndex].entries];
   }
 </script>
 
@@ -62,22 +59,22 @@
 </Header>
 
 <div class="flex spaced">
-  <span class="group">Entries</span>
-  {#each $surveys[surveyIndex].entries as entry, i (entry)}
+  <h2>Entries</h2>
+  {#each $surveys[surveyIndex].entries as entry, entryIndex (entry)}
     <div class="flex spaced-inner space-between max-width">
-      <span>Team {entry.team} Match {entry.match}</span>
-      <div>
-        <Button icon="pen" title="Edit entry" on:click={() => editEntryClicked(i)} />
-        <Button icon="delete" title="Delete entry" on:click={() => deleteEntryClicked(i)} />
+      <div class="flex spaced-inner">
+        <Button icon="pen" title="Edit entry" on:click={() => editEntryClicked(entryIndex)} />
+        <span>Team {entry.team} Match {entry.match}</span>
       </div>
+      <Button icon="delete" title="Delete entry" on:click={() => deleteEntryClicked(entryIndex)} />
     </div>
   {/each}
 </div>
 
 <footer>
-  <Button icon="plus" title="New entry" on:click={() => newEntryClicked()} />
+  <Button icon="plus" title="New entry" on:click={newEntryClicked} />
   <div>
-    <Button icon="copy" title="Copy survey" on:click={() => copySurveyClicked(surveyIndex)} />
-    <Button icon="download" title="Download entries" on:click={() => downloadEntriesClicked(surveyIndex)} />
+    <Button icon="copy" title="Copy survey" on:click={copySurveyClicked} />
+    <Button icon="download" title="Download entries" on:click={downloadEntriesClicked} />
   </div>
 </footer>

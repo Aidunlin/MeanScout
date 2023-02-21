@@ -3,16 +3,16 @@
   import Button from "$lib/Button.svelte";
   import Header from "$lib/Header.svelte";
   import { surveys } from "$lib/stores";
-  import { downloadSurveyEntries, parseSurvey, type Survey } from "$lib/surveys";
+  import { parseSurvey, type Survey } from "$lib/surveys";
 
-  function editSurveyClicked(i: number) {
-    goto(`/${i}`);
+  function editSurveyClicked(surveyIndex: number) {
+    goto(`/${surveyIndex}`);
   }
 
   function newSurveyClicked() {
     let name = prompt("Enter new survey name:");
-
     if (!name) return;
+
     if ($surveys.map((survey) => survey.name).includes(name)) {
       alert("That name is already used!");
       return;
@@ -25,46 +25,31 @@
       entries: [],
     };
     $surveys = [survey, ...$surveys];
-    editSurveyClicked(0);
   }
 
   function pasteSurveyClicked() {
-    const newPrompt = prompt("Paste new survey:");
-    if (newPrompt) {
-      let result = parseSurvey(newPrompt);
-      if (typeof result == "string") {
-        alert(`Could not set survey! ${result}`);
-      } else {
-        if ($surveys.map((survey) => survey.name).includes(result.name)) {
-          alert(`Could not set survey! ${result.name} already exists`);
-        } else {
-          $surveys = [result, ...$surveys];
-          editSurveyClicked(0);
-        }
-      }
+    const surveyString = prompt("Paste new survey:");
+    if (!surveyString) return;
+
+    let result = parseSurvey(surveyString);
+
+    if (typeof result == "string") {
+      alert(`Could not set survey! ${result}`);
+      return;
     }
-  }
 
-  function copySurveyClicked(i: number) {
-    let surveyString = JSON.stringify($surveys[i]);
-    if ("clipboard" in navigator) {
-      navigator.clipboard.writeText(surveyString);
-      alert("Copied survey");
-    } else {
-      prompt("Copy the survey below", surveyString);
+    if ($surveys.map((survey) => survey.name).includes(result.name)) {
+      alert(`Could not set survey! ${result.name} already exists`);
+      return;
     }
+
+    $surveys = [result, ...$surveys];
   }
 
-  function downloadEntriesClicked(i: number) {
-    if (!confirm("Confirm download?")) return;
-
-    downloadSurveyEntries($surveys[i]);
-  }
-
-  function deleteSurveyClicked(i: number) {
+  function deleteSurveyClicked(surveyIndex: number) {
     if (!confirm("Confirm delete?")) return;
 
-    $surveys = $surveys.filter((_, idx) => idx != i);
+    $surveys = $surveys.filter((_, idx) => idx != surveyIndex);
   }
 </script>
 
@@ -75,19 +60,15 @@
 <Header />
 
 <div class="flex spaced">
-  <span class="group">Surveys</span>
-  {#each $surveys as survey, i (survey)}
+  <h2>Surveys</h2>
+  {#each $surveys as survey, surveyIndex (survey)}
     <div class="flex spaced-inner space-between max-width">
-      <span>{survey.name}</span>
-      <div>
-        <Button icon="pen" title="Edit survey" on:click={() => editSurveyClicked(i)} />
-        <Button icon="copy" title="Copy survey" on:click={() => copySurveyClicked(i)} />
-        <Button icon="download" title="Download entries" on:click={() => downloadEntriesClicked(i)} />
-        <Button icon="delete" title="Delete survey" on:click={() => deleteSurveyClicked(i)} />
+      <div class="flex spaced-inner">
+        <Button icon="pen" title="Edit survey" on:click={() => editSurveyClicked(surveyIndex)} />
+        <span>{survey.name}</span>
       </div>
+      <Button icon="delete" title="Delete survey" on:click={() => deleteSurveyClicked(surveyIndex)} />
     </div>
-  {:else}
-    <span class="flex max-width">Create or paste in a survey to get started!</span>
   {/each}
 </div>
 
