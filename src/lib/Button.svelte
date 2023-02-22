@@ -11,7 +11,5 @@
   {#if icon}
     <Icon {icon} />
   {/if}
-  {#if text}
-    <span>{text}</span>
-  {/if}
+  {text}
 </button>

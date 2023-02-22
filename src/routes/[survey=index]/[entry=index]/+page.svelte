@@ -1,6 +1,7 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import Button from "$lib/Button.svelte";
+  import Container from "$lib/Container.svelte";
   import { validateEntry, type Entry } from "$lib/entries";
   import Header from "$lib/Header.svelte";
   import { getMetricDefaultValue } from "$lib/metrics";
@@ -47,8 +48,8 @@
   <Button icon="back" title="Back to survey" on:click={() => goto(`/${surveyIndex}`)} />
 </Header>
 
-<div class="flex-row padding align-end">
-  <div>
+<Container padding alignEnd>
+  <Container column noGap>
     Team
     <input
       id="metric-team"
@@ -61,8 +62,8 @@
         <option value={team} />
       {/each}
     </datalist>
-  </div>
-  <div>
+  </Container>
+  <Container column noGap>
     Match
     <input
       id="metric-match"
@@ -70,18 +71,20 @@
       pattern="[0-9]*"
       bind:value={$surveys[surveyIndex].entries[entryIndex].match}
     />
-  </div>
+  </Container>
   <MetricEditor
     config={{ name: "Absent", type: "toggle" }}
     bind:value={$surveys[surveyIndex].entries[entryIndex].isAbsent}
   />
-</div>
+</Container>
 
-<div class="flex-row padding align-end" class:hide={$surveys[surveyIndex].entries[entryIndex].isAbsent}>
+{#if !$surveys[surveyIndex].entries[entryIndex].isAbsent}
+<Container padding alignEnd>
   {#each $surveys[surveyIndex].configs as config, i}
     <MetricEditor {config} bind:value={$surveys[surveyIndex].entries[entryIndex].metrics[i]} />
   {/each}
-</div>
+</Container>
+{/if}
 
 <footer>
   <Button icon="save" title="Save entry" on:click={saveEntryClicked} />

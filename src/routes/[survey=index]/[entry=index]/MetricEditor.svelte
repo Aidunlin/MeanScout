@@ -1,5 +1,6 @@
 <script lang="ts">
   import Button from "$lib/Button.svelte";
+  import Container from "$lib/Container.svelte";
   import type { MetricConfig } from "$lib/metrics";
   import { createEventDispatcher } from "svelte";
 
@@ -52,12 +53,12 @@
   <h2>{config.group}</h2>
 {/if}
 
-<div class:max-width={config.type == "text"}>
+<Container column noGap maxWidth={config.type == "text"}>
   {#if config.type != "toggle"}
     {config.name}
   {/if}
 
-  <div class="flex-row no-gap">
+  <Container noGap>
     {#if config.type == "toggle"}
       <Button on:click={() => (value = !value)} icon={value ? "check" : "nocheck"} text={config.name} />
     {:else if config.type == "number"}
@@ -81,5 +82,5 @@
       <span class="number">{value}</span>
       <Button on:click={stop} icon="stop" />
     {/if}
-  </div>
-</div>
+  </Container>
+</Container>

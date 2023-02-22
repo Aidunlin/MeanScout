@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Container from "./Container.svelte";
   import { location } from "./stores";
 
   export let title = "";
@@ -9,9 +10,9 @@
 </svelte:head>
 
 <header>
-  <div class="flex-row">
+  <Container>
     <slot><img id="logo" src="./logo.svg" alt="" /></slot>
     <h1>{title || "MeanScout"}</h1>
-  </div>
+  </Container>
   <span class="theme-text">{$location}</span>
 </header>

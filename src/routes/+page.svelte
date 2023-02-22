@@ -1,6 +1,7 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import Button from "$lib/Button.svelte";
+  import Container from "$lib/Container.svelte";
   import Header from "$lib/Header.svelte";
   import { location, locations, surveys } from "$lib/stores";
   import { parseSurvey, type Survey } from "$lib/surveys";
@@ -55,29 +56,29 @@
 
 <Header />
 
-<div class="flex-row padding">
-  <div>
+<Container padding>
+  <Container column noGap>
     Location
     <select bind:value={$location} title="Location">
       {#each Object.values(locations) as location}
         <option>{location}</option>
       {/each}
     </select>
-  </div>
-</div>
+  </Container>
+</Container>
 
-<div class="flex-column padding">
+<Container column padding>
   <h2>Surveys</h2>
   {#each $surveys as survey, surveyIndex (survey)}
-    <div class="flex-row space-between">
-      <div class="flex-row">
+    <Container spaceBetween>
+      <Container>
         <Button icon="pen" title="Edit survey" on:click={() => editSurveyClicked(surveyIndex)} />
         <span>{survey.name}</span>
-      </div>
+      </Container>
       <Button icon="delete" title="Delete survey" on:click={() => deleteSurveyClicked(surveyIndex)} />
-    </div>
+    </Container>
   {/each}
-</div>
+</Container>
 
 <footer>
   <Button icon="plus" title="New survey" on:click={newSurveyClicked} />

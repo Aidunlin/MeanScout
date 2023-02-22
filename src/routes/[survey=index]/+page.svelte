@@ -1,6 +1,7 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import Button from "$lib/Button.svelte";
+  import Container from "$lib/Container.svelte";
   import type { Entry } from "$lib/entries";
   import Header from "$lib/Header.svelte";
   import { getMetricDefaultValue } from "$lib/metrics";
@@ -59,23 +60,23 @@
   <Button icon="back" title="Back to surveys" on:click={() => goto("/")} />
 </Header>
 
-<div class="flex-column padding">
+<Container column padding>
   <h2>Entries</h2>
   {#each $surveys[surveyIndex].entries as entry, entryIndex (entry)}
-    <div class="flex-row space-between">
-      <div class="flex-row">
+    <Container spaceBetween>
+      <Container>
         <Button icon="pen" title="Edit entry" on:click={() => editEntryClicked(entryIndex)} />
         <span>Team {entry.team} Match {entry.match}</span>
-      </div>
+      </Container>
       <Button icon="delete" title="Delete entry" on:click={() => deleteEntryClicked(entryIndex)} />
-    </div>
+    </Container>
   {/each}
-</div>
+</Container>
 
 <footer>
   <Button icon="plus" title="New entry" on:click={newEntryClicked} />
-  <div>
+  <Container>
     <Button icon="copy" title="Copy survey" on:click={copySurveyClicked} />
     <Button icon="download" title="Download entries" on:click={downloadEntriesClicked} />
-  </div>
+  </Container>
 </footer>
