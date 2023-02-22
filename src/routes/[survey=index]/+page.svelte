@@ -55,13 +55,8 @@
   }
 </script>
 
-<svelte:head>
-  <title>{$surveys[surveyIndex].name} | MeanScout</title>
-</svelte:head>
-
-<Header>
+<Header title={$surveys[surveyIndex].name}>
   <Button icon="back" title="Back to surveys" on:click={() => goto("/")} />
-  <h1>{$surveys[surveyIndex].name}</h1>
 </Header>
 
 <div class="flex-column padding">

@@ -53,10 +53,6 @@
   }
 </script>
 
-<svelte:head>
-  <title>MeanScout</title>
-</svelte:head>
-
 <Header />
 
 <div class="flex-row padding">
