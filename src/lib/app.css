@@ -24,7 +24,7 @@ html {
   touch-action: pan-y;
 }
 
-:is(button, input, select):focus-visible {
+body :focus-visible {
   outline: var(--text-color) solid 2px;
 }
 
@@ -43,7 +43,8 @@ body {
 input,
 select,
 option,
-path {
+path,
+.theme-text {
   color: var(--theme-color);
 }
 
@@ -82,6 +83,7 @@ header,
 footer {
   gap: var(--outer-gap);
   margin: 0 calc(50% - 50vw);
+  min-height: 70px;
   padding: var(--outer-gap) calc(50vw - 50% + var(--outer-gap));
 }
 
@@ -115,8 +117,7 @@ svg,
 }
 
 header,
-footer,
-.flex {
+footer {
   align-items: center;
   display: flex;
   flex-wrap: wrap;
@@ -128,16 +129,30 @@ footer,
   justify-content: space-between;
 }
 
-.spaced {
+.flex-row {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
   gap: var(--outer-gap);
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  gap: var(--outer-gap);
+}
+
+.no-gap {
+  gap: 0;
+}
+
+.padding {
   padding: var(--outer-gap);
 }
 
-.spaced-inner {
-  gap: var(--outer-gap);
-}
-
-.baseline {
+.align-end {
   align-items: flex-end;
 }
 
@@ -175,7 +190,7 @@ footer,
 }
 
 input[type="number"] {
-  appearance: textfield;
   -moz-appearance: textfield;
   -webkit-appearance: textfield;
+  appearance: textfield;
 }

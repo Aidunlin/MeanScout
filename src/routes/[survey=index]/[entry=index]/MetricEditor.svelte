@@ -57,7 +57,7 @@
     {config.name}
   {/if}
 
-  <div class="flex">
+  <div class="flex-row no-gap">
     {#if config.type == "toggle"}
       <Button on:click={() => (value = !value)} icon={value ? "check" : "nocheck"} text={config.name} />
     {:else if config.type == "number"}

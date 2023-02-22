@@ -39,9 +39,15 @@
   }
 
   function newEntryClicked() {
+    let match = 1;
+    if ($surveys[surveyIndex].entries.length) {
+      let matchValues = $surveys[surveyIndex].entries.map((entry) => entry.match);
+      match = matchValues.reduce((prev, curr) => (curr > prev ? curr : prev)) + 1;
+    }
+
     let entry: Entry = {
       team: "",
-      match: $surveys[surveyIndex].entries.map(entry => entry.match).reduce((prev, curr) => curr > prev ? curr : prev) + 1,
+      match,
       isAbsent: false,
       metrics: $surveys[surveyIndex].configs.map(getMetricDefaultValue),
     };
@@ -58,11 +64,11 @@
   <h1>{$surveys[surveyIndex].name}</h1>
 </Header>
 
-<div class="flex spaced">
+<div class="flex-column padding">
   <h2>Entries</h2>
   {#each $surveys[surveyIndex].entries as entry, entryIndex (entry)}
-    <div class="flex spaced-inner space-between max-width">
-      <div class="flex spaced-inner">
+    <div class="flex-row space-between">
+      <div class="flex-row">
         <Button icon="pen" title="Edit entry" on:click={() => editEntryClicked(entryIndex)} />
         <span>Team {entry.team} Match {entry.match}</span>
       </div>

@@ -2,7 +2,7 @@
   import { goto } from "$app/navigation";
   import Button from "$lib/Button.svelte";
   import Header from "$lib/Header.svelte";
-  import { surveys } from "$lib/stores";
+  import { location, locations, surveys } from "$lib/stores";
   import { parseSurvey, type Survey } from "$lib/surveys";
 
   function editSurveyClicked(surveyIndex: number) {
@@ -59,11 +59,22 @@
 
 <Header />
 
-<div class="flex spaced">
+<div class="flex-row padding">
+  <div>
+    Location
+    <select bind:value={$location} title="Location">
+      {#each Object.values(locations) as location}
+        <option>{location}</option>
+      {/each}
+    </select>
+  </div>
+</div>
+
+<div class="flex-column padding">
   <h2>Surveys</h2>
   {#each $surveys as survey, surveyIndex (survey)}
-    <div class="flex spaced-inner space-between max-width">
-      <div class="flex spaced-inner">
+    <div class="flex-row space-between">
+      <div class="flex-row">
         <Button icon="pen" title="Edit survey" on:click={() => editSurveyClicked(surveyIndex)} />
         <span>{survey.name}</span>
       </div>

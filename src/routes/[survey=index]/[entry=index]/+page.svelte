@@ -6,7 +6,7 @@
   import { getMetricDefaultValue } from "$lib/metrics";
   import { surveys } from "$lib/stores";
   import type { PageData } from "./$types";
-  import EntryEditor from "./EntryEditor.svelte";
+  import MetricEditor from "./MetricEditor.svelte";
 
   export let data: PageData;
   let { surveyIndex, entryIndex } = data;
@@ -44,15 +44,49 @@
 </script>
 
 <svelte:head>
-  <title>{$surveys[surveyIndex].name} | MeanScout</title>
+  <title>Entry ({$surveys[surveyIndex].name}) | MeanScout</title>
 </svelte:head>
 
 <Header>
   <Button icon="back" title="Back to survey" on:click={() => goto(`/${surveyIndex}`)} />
-  <h1>{$surveys[surveyIndex].name}</h1>
+  <h1>Entry ({$surveys[surveyIndex].name})</h1>
 </Header>
 
-<EntryEditor bind:survey={$surveys[surveyIndex]} bind:entry={$surveys[surveyIndex].entries[entryIndex]} />
+<div class="flex-row padding align-end">
+  <div>
+    Team
+    <input
+      id="metric-team"
+      list="teams-list"
+      maxlength="5"
+      bind:value={$surveys[surveyIndex].entries[entryIndex].team}
+    />
+    <datalist id="teams-list">
+      {#each $surveys[surveyIndex].teams as team}
+        <option value={team} />
+      {/each}
+    </datalist>
+  </div>
+  <div>
+    Match
+    <input
+      id="metric-match"
+      type="number"
+      pattern="[0-9]*"
+      bind:value={$surveys[surveyIndex].entries[entryIndex].match}
+    />
+  </div>
+  <MetricEditor
+    config={{ name: "Absent", type: "toggle" }}
+    bind:value={$surveys[surveyIndex].entries[entryIndex].isAbsent}
+  />
+</div>
+
+<div class="flex-row padding align-end" class:hide={$surveys[surveyIndex].entries[entryIndex].isAbsent}>
+  {#each $surveys[surveyIndex].configs as config, i}
+    <MetricEditor {config} bind:value={$surveys[surveyIndex].entries[entryIndex].metrics[i]} />
+  {/each}
+</div>
 
 <footer>
   <Button icon="save" title="Save entry" on:click={saveEntryClicked} />
