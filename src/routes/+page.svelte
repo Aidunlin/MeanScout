@@ -72,15 +72,15 @@
   {#each $surveys as survey, surveyIndex (survey)}
     <Container spaceBetween>
       <Container>
-        <Button icon="pen" title="Edit survey" on:click={() => editSurveyClicked(surveyIndex)} />
+        <Button iconName="pen" title="Edit survey" on:click={() => editSurveyClicked(surveyIndex)} />
         <span>{survey.name}</span>
       </Container>
-      <Button icon="delete" title="Delete survey" on:click={() => deleteSurveyClicked(surveyIndex)} />
+      <Button iconName="trash" on:click={() => deleteSurveyClicked(surveyIndex)} />
     </Container>
   {/each}
 </Container>
 
 <footer>
-  <Button icon="plus" title="New survey" on:click={newSurveyClicked} />
-  <Button icon="paste" title="New from JSON" on:click={pasteSurveyClicked} />
+  <Button iconName="plus" title="New survey" on:click={newSurveyClicked} />
+  <Button iconName="paste" title="New from JSON" on:click={pasteSurveyClicked} />
 </footer>

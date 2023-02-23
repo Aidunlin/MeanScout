@@ -45,7 +45,7 @@
 </script>
 
 <Header title="Entry ({$surveys[surveyIndex].name})">
-  <Button icon="back" title="Back to survey" on:click={() => goto(`/${surveyIndex}`)} />
+  <Button iconName="arrow-left" title="Back to survey" on:click={() => goto(`/${surveyIndex}`)} />
 </Header>
 
 <Container padding alignEnd>
@@ -87,6 +87,6 @@
 {/if}
 
 <footer>
-  <Button icon="save" title="Save entry" on:click={saveEntryClicked} />
-  <Button icon="reset" title="reset entry" on:click={resetEntryClicked} />
+  <Button iconName="floppy-disk" title="Save entry" on:click={saveEntryClicked} />
+  <Button iconName="arrow-rotate-left" title="reset entry" on:click={resetEntryClicked} />
 </footer>

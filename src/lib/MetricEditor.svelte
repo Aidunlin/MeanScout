@@ -60,11 +60,16 @@
 
   <Container noGap>
     {#if config.type == "toggle"}
-      <Button on:click={() => (value = !value)} icon={value ? "check" : "nocheck"} text={config.name} />
+      <Button
+        on:click={() => (value = !value)}
+        iconStyle={value ? "solid" : "regular"}
+        iconName={value ? "square-check" : "square"}
+        text={config.name}
+      />
     {:else if config.type == "number"}
-      <Button on:click={() => value++} icon="plus" />
+      <Button on:click={() => value--} iconName="minus" />
       <span class="number">{value}</span>
-      <Button on:click={() => value--} icon="minus" />
+      <Button on:click={() => value++} iconName="plus" />
     {:else if config.type == "select"}
       <select bind:value>
         {#each config.values as val}
@@ -75,12 +80,12 @@
       <input placeholder={config.tip} bind:value />
     {:else if config.type == "rating"}
       {#each [...Array(5).keys()] as i}
-        <Button on:click={() => rate(i)} icon={value > i ? "star" : "nostar"} />
+        <Button on:click={() => rate(i)} iconStyle={value ? "solid" : "regular"} iconName="star" />
       {/each}
     {:else if config.type == "timer"}
-      <Button on:click={running ? pause : start} icon={running ? "pause" : "play"} />
+      <Button on:click={running ? pause : start} iconName={running ? "pause" : "play"} />
       <span class="number">{value}</span>
-      <Button on:click={stop} icon="stop" />
+      <Button on:click={stop} iconName="stop" />
     {/if}
   </Container>
 </Container>

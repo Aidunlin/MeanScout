@@ -57,7 +57,7 @@
 </script>
 
 <Header title={$surveys[surveyIndex].name}>
-  <Button icon="back" title="Back to surveys" on:click={() => goto("/")} />
+  <Button iconName="arrow-left" title="Back to surveys" on:click={() => goto("/")} />
 </Header>
 
 <Container column padding>
@@ -65,18 +65,18 @@
   {#each $surveys[surveyIndex].entries as entry, entryIndex (entry)}
     <Container spaceBetween>
       <Container>
-        <Button icon="pen" title="Edit entry" on:click={() => editEntryClicked(entryIndex)} />
+        <Button iconName="pen" title="Edit entry" on:click={() => editEntryClicked(entryIndex)} />
         <span>Team {entry.team} Match {entry.match}</span>
       </Container>
-      <Button icon="delete" title="Delete entry" on:click={() => deleteEntryClicked(entryIndex)} />
+      <Button iconName="trash" title="Delete entry" on:click={() => deleteEntryClicked(entryIndex)} />
     </Container>
   {/each}
 </Container>
 
 <footer>
-  <Button icon="plus" title="New entry" on:click={newEntryClicked} />
+  <Button iconName="plus" title="New entry" on:click={newEntryClicked} />
   <Container>
-    <Button icon="copy" title="Copy survey" on:click={copySurveyClicked} />
-    <Button icon="download" title="Download entries" on:click={downloadEntriesClicked} />
+    <Button iconName="copy" title="Copy survey" on:click={copySurveyClicked} />
+    <Button iconName="download" title="Download entries" on:click={downloadEntriesClicked} />
   </Container>
 </footer>

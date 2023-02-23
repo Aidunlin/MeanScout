@@ -1,15 +1,13 @@
 <script lang="ts">
-  import Icon from "./Icon.svelte";
-  import type icons from "./icons";
-
-  export let icon: typeof icons[number]["name"] | undefined = undefined;
+  export let iconStyle = "solid";
+  export let iconName = "";
   export let text = "";
   export let title = text;
 </script>
 
-<button on:click class:star={icon?.includes("star")} {title}>
-  {#if icon}
-    <Icon {icon} />
+<button on:click class:star={iconName.includes("star")} {title}>
+  {#if iconStyle && iconName}
+    <i class="fa-{iconStyle} fa-{iconName} fa-fw" />
   {/if}
   {text}
 </button>
