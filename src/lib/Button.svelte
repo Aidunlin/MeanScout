@@ -1,6 +1,6 @@
 <script lang="ts">
-  import type icons from "$lib/icons";
   import Icon from "./Icon.svelte";
+  import type icons from "./icons";
 
   export let icon: typeof icons[number]["name"] | undefined = undefined;
   export let text = "";

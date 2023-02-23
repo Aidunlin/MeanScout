@@ -4,10 +4,10 @@
   import Container from "$lib/Container.svelte";
   import { validateEntry, type Entry } from "$lib/entries";
   import Header from "$lib/Header.svelte";
+  import MetricEditor from "$lib/MetricEditor.svelte";
   import { getMetricDefaultValue } from "$lib/metrics";
   import { surveys } from "$lib/stores";
   import type { PageData } from "./$types";
-  import MetricEditor from "./MetricEditor.svelte";
 
   export let data: PageData;
   let { surveyIndex, entryIndex } = data;
@@ -79,11 +79,11 @@
 </Container>
 
 {#if !$surveys[surveyIndex].entries[entryIndex].isAbsent}
-<Container padding alignEnd>
-  {#each $surveys[surveyIndex].configs as config, i}
-    <MetricEditor {config} bind:value={$surveys[surveyIndex].entries[entryIndex].metrics[i]} />
-  {/each}
-</Container>
+  <Container padding alignEnd>
+    {#each $surveys[surveyIndex].configs as config, i}
+      <MetricEditor {config} bind:value={$surveys[surveyIndex].entries[entryIndex].metrics[i]} />
+    {/each}
+  </Container>
 {/if}
 
 <footer>

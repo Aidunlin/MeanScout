@@ -1,8 +1,8 @@
 <script lang="ts">
-  import Button from "$lib/Button.svelte";
-  import Container from "$lib/Container.svelte";
-  import type { MetricConfig } from "$lib/metrics";
   import { createEventDispatcher } from "svelte";
+  import Button from "./Button.svelte";
+  import Container from "./Container.svelte";
+  import type { MetricConfig } from "./metrics";
 
   const dispatch = createEventDispatcher();
 

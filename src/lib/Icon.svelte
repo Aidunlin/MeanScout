@@ -1,5 +1,5 @@
 <script lang="ts">
-  import icons from "$lib/icons";
+  import icons from "./icons";
 
   export let icon: typeof icons[number]["name"];
 
