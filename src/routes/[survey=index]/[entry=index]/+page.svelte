@@ -1,11 +1,11 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
-  import Button from "$lib/Button.svelte";
-  import Container from "$lib/Container.svelte";
-  import Dialog from "$lib/Dialog.svelte";
+  import Button from "$lib/components/Button.svelte";
+  import Container from "$lib/components/Container.svelte";
+  import Dialog from "$lib/components/Dialog.svelte";
+  import Header from "$lib/components/Header.svelte";
+  import MetricEditor from "$lib/components/MetricEditor.svelte";
   import { validateEntry, type Entry } from "$lib/entries";
-  import Header from "$lib/Header.svelte";
-  import MetricEditor from "$lib/MetricEditor.svelte";
   import { getMetricDefaultValue } from "$lib/metrics";
   import { surveys } from "$lib/stores";
   import type { PageData } from "./$types";

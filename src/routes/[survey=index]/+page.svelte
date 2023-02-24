@@ -1,10 +1,10 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
-  import Button from "$lib/Button.svelte";
-  import Container from "$lib/Container.svelte";
-  import Dialog from "$lib/Dialog.svelte";
+  import Button from "$lib/components/Button.svelte";
+  import Container from "$lib/components/Container.svelte";
+  import Dialog from "$lib/components/Dialog.svelte";
+  import Header from "$lib/components/Header.svelte";
   import type { Entry } from "$lib/entries";
-  import Header from "$lib/Header.svelte";
   import { getMetricDefaultValue } from "$lib/metrics";
   import { surveys } from "$lib/stores";
   import { downloadSurveyEntries } from "$lib/surveys";
@@ -16,7 +16,7 @@
   let dialogCopySurvey = { text: "", visible: false };
   let dialogDownloadEntries = { visible: false };
   let dialogDeleteEntry = { entryIndex: 0, visible: false };
-  
+
   function setCopyText(text: string) {
     dialogCopySurvey.text = text;
   }
@@ -54,7 +54,7 @@
 
 <Dialog title="Select and copy the survey:" bind:visible={dialogCopySurvey.visible}>
   <Container maxWidth>
-    <textarea readonly bind:value={dialogCopySurvey.text}></textarea>
+    <textarea readonly bind:value={dialogCopySurvey.text} />
   </Container>
 </Dialog>
 

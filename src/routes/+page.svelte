@@ -1,9 +1,9 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
-  import Button from "$lib/Button.svelte";
-  import Container from "$lib/Container.svelte";
-  import Dialog from "$lib/Dialog.svelte";
-  import Header from "$lib/Header.svelte";
+  import Button from "$lib/components/Button.svelte";
+  import Container from "$lib/components/Container.svelte";
+  import Dialog from "$lib/components/Dialog.svelte";
+  import Header from "$lib/components/Header.svelte";
   import { location, locations, surveys } from "$lib/stores";
   import { parseSurvey, type Survey } from "$lib/surveys";
 

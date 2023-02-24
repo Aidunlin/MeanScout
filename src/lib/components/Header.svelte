@@ -1,6 +1,6 @@
 <script lang="ts">
+  import { location } from "../stores";
   import Container from "./Container.svelte";
-  import { location } from "./stores";
 
   export let title = "";
 </script>
