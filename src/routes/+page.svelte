@@ -2,37 +2,38 @@
   import { goto } from "$app/navigation";
   import Button from "$lib/Button.svelte";
   import Container from "$lib/Container.svelte";
+  import Dialog from "$lib/Dialog.svelte";
   import Header from "$lib/Header.svelte";
   import { location, locations, surveys } from "$lib/stores";
   import { parseSurvey, type Survey } from "$lib/surveys";
 
-  function editSurveyClicked(surveyIndex: number) {
-    goto(`/${surveyIndex}`);
-  }
+  let dialogNewSurvey = { name: "", visible: false };
+  let dialogPasteSurvey = { input: "", visible: false };
+  let dialogDeleteSurvey = { surveyIndex: 0, visible: false };
 
-  function newSurveyClicked() {
-    let name = prompt("Enter new survey name:");
-    if (!name) return;
+  function newSurvey() {
+    if (!dialogNewSurvey.name) return;
 
-    if ($surveys.map((survey) => survey.name).includes(name)) {
+    if ($surveys.map((survey) => survey.name).includes(dialogNewSurvey.name)) {
       alert("That name is already used!");
       return;
     }
 
     let survey: Survey = {
-      name,
+      name: dialogNewSurvey.name,
       configs: [],
       teams: [],
       entries: [],
     };
     $surveys = [survey, ...$surveys];
+
+    dialogNewSurvey = { name: "", visible: false };
   }
 
-  function pasteSurveyClicked() {
-    const surveyString = prompt("Paste new survey:");
-    if (!surveyString) return;
+  function pasteSurvey() {
+    if (!dialogPasteSurvey.input) return;
 
-    let result = parseSurvey(surveyString);
+    let result = parseSurvey(dialogPasteSurvey.input);
 
     if (typeof result == "string") {
       alert(`Could not set survey! ${result}`);
@@ -45,14 +46,33 @@
     }
 
     $surveys = [result, ...$surveys];
+
+    dialogPasteSurvey = { input: "", visible: false };
   }
 
-  function deleteSurveyClicked(surveyIndex: number) {
-    if (!confirm("Confirm delete?")) return;
+  function deleteSurvey() {
+    $surveys = $surveys.filter((_, idx) => idx != dialogDeleteSurvey.surveyIndex);
 
-    $surveys = $surveys.filter((_, idx) => idx != surveyIndex);
+    dialogDeleteSurvey = { surveyIndex: 0, visible: false };
   }
 </script>
+
+<Dialog title="Enter name for new survey:" bind:visible={dialogNewSurvey.visible}>
+  <input bind:value={dialogNewSurvey.name} />
+  <Button slot="buttons" iconName="check" title="Confirm" on:click={newSurvey} />
+</Dialog>
+
+<Dialog title="Paste new survey:" bind:visible={dialogPasteSurvey.visible}>
+  <Container maxWidth>
+    <textarea bind:value={dialogPasteSurvey.input} />
+  </Container>
+  <Button slot="buttons" iconName="check" title="Confirm" on:click={pasteSurvey} />
+</Dialog>
+
+<Dialog title="Delete this survey?" bind:visible={dialogDeleteSurvey.visible}>
+  <span>Everything in "{$surveys[dialogDeleteSurvey.surveyIndex].name}" will be lost!</span>
+  <Button slot="buttons" iconName="check" title="Confirm" on:click={deleteSurvey} />
+</Dialog>
 
 <Header />
 
@@ -72,15 +92,18 @@
   {#each $surveys as survey, surveyIndex (survey)}
     <Container spaceBetween>
       <Container>
-        <Button iconName="pen" title="Edit survey" on:click={() => editSurveyClicked(surveyIndex)} />
+        <Button iconName="pen" title="Edit survey" on:click={() => goto(`/${surveyIndex}`)} />
         <span>{survey.name}</span>
+        {#if survey.entries.length}
+          <span>({survey.entries.length} {survey.entries.length == 1 ? "entry" : "entries"})</span>
+        {/if}
       </Container>
-      <Button iconName="trash" on:click={() => deleteSurveyClicked(surveyIndex)} />
+      <Button iconName="trash" on:click={() => (dialogDeleteSurvey = { surveyIndex, visible: true })} />
     </Container>
   {/each}
 </Container>
 
 <footer>
-  <Button iconName="plus" title="New survey" on:click={newSurveyClicked} />
-  <Button iconName="paste" title="New from JSON" on:click={pasteSurveyClicked} />
+  <Button iconName="plus" title="New survey" on:click={() => (dialogNewSurvey = { name: "", visible: true })} />
+  <Button iconName="paste" title="Paste survey" on:click={() => (dialogPasteSurvey = { input: "", visible: true })} />
 </footer>

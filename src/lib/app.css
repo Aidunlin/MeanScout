@@ -44,6 +44,7 @@ i,
 input,
 select,
 option,
+textarea,
 .theme-text {
   color: var(--theme-color);
 }
@@ -53,6 +54,7 @@ footer,
 button,
 input,
 select,
+textarea,
 .number,
 .bg {
   background: var(--fg-color);
@@ -61,6 +63,7 @@ select,
 button,
 input,
 select,
+textarea,
 .number {
   padding: var(--inner-gap);
 }
@@ -89,6 +92,11 @@ footer {
 
 footer {
   margin-top: auto;
+}
+
+textarea {
+  height: 300px;
+  width: 720px;
 }
 
 button {
@@ -171,7 +179,6 @@ footer,
   height: 100%;
   justify-content: center;
   left: 0;
-  overflow: auto;
   position: fixed;
   top: 0;
   width: 100%;
@@ -180,8 +187,10 @@ footer,
 
 .dialog > * {
   background: rgba(25, 25, 25, 1);
-  margin: var(--outer-gap);
+  max-height: 100vh;
   max-width: 720px;
+  margin: var(--outer-gap);
+  overflow: auto;
 }
 
 .number,

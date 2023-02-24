@@ -14,7 +14,7 @@
         <slot />
         <Container spaceBetween>
           <slot name="buttons" />
-          <Button icon="close" title="Close" on:click={() => (visible = false)} />
+          <Button iconName="xmark" title="Close" on:click={() => (visible = false)} />
         </Container>
       </Container>
     </div>

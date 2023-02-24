@@ -2,6 +2,7 @@
   import { goto } from "$app/navigation";
   import Button from "$lib/Button.svelte";
   import Container from "$lib/Container.svelte";
+  import Dialog from "$lib/Dialog.svelte";
   import { validateEntry, type Entry } from "$lib/entries";
   import Header from "$lib/Header.svelte";
   import MetricEditor from "$lib/MetricEditor.svelte";
@@ -12,19 +13,16 @@
   export let data: PageData;
   let { surveyIndex, entryIndex } = data;
 
-  function editEntryClicked(i: number) {
-    goto(`/${surveyIndex}/${i}`);
-  }
+  let dialogSaveEntry = { visible: false };
+  let dialogResetEntry = { visible: false };
 
-  function saveEntryClicked() {
+  function saveEntry() {
     let error = validateEntry($surveys[surveyIndex], $surveys[surveyIndex].entries[entryIndex]);
 
     if (error) {
       alert(`Could not save entry! ${error}`);
       return;
     }
-
-    if (!confirm("Confirm save?")) return;
 
     let entry: Entry = {
       team: "",
@@ -33,16 +31,27 @@
       metrics: $surveys[surveyIndex].configs.map(getMetricDefaultValue),
     };
     $surveys[surveyIndex].entries = [entry, ...$surveys[surveyIndex].entries];
-    editEntryClicked(0);
+
+    dialogSaveEntry = { visible: false };
+
+    goto(`/${surveyIndex}/0`);
   }
 
-  function resetEntryClicked() {
-    if (!confirm("Confirm reset?")) return;
-
+  function resetSurvey() {
     $surveys[surveyIndex].entries[entryIndex].isAbsent = false;
     $surveys[surveyIndex].entries[entryIndex].metrics = $surveys[surveyIndex].configs.map(getMetricDefaultValue);
+
+    dialogSaveEntry = { visible: false };
   }
 </script>
+
+<Dialog title="Save this entry and start a new one?" bind:visible={dialogSaveEntry.visible}>
+  <Button slot="buttons" iconName="check" title="Confirm" on:click={saveEntry} />
+</Dialog>
+
+<Dialog title="Reset this entry?" bind:visible={dialogResetEntry.visible}>
+  <Button slot="buttons" iconName="check" title="Confirm" on:click={resetSurvey} />
+</Dialog>
 
 <Header title="Entry ({$surveys[surveyIndex].name})">
   <Button iconName="arrow-left" title="Back to survey" on:click={() => goto(`/${surveyIndex}`)} />
@@ -87,6 +96,6 @@
 {/if}
 
 <footer>
-  <Button iconName="floppy-disk" title="Save entry" on:click={saveEntryClicked} />
-  <Button iconName="arrow-rotate-left" title="reset entry" on:click={resetEntryClicked} />
+  <Button iconName="floppy-disk" title="Save entry" on:click={() => (dialogSaveEntry = { visible: true })} />
+  <Button iconName="arrow-rotate-left" title="reset entry" on:click={() => (dialogResetEntry = { visible: true })} />
 </footer>

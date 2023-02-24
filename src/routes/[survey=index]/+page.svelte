@@ -2,6 +2,7 @@
   import { goto } from "$app/navigation";
   import Button from "$lib/Button.svelte";
   import Container from "$lib/Container.svelte";
+  import Dialog from "$lib/Dialog.svelte";
   import type { Entry } from "$lib/entries";
   import Header from "$lib/Header.svelte";
   import { getMetricDefaultValue } from "$lib/metrics";
@@ -12,31 +13,26 @@
   export let data: PageData;
   let { surveyIndex } = data;
 
-  function editEntryClicked(entryIndex: number) {
-    goto(`/${surveyIndex}/${entryIndex}`);
+  let dialogCopySurvey = { text: "", visible: false };
+  let dialogDownloadEntries = { visible: false };
+  let dialogDeleteEntry = { entryIndex: 0, visible: false };
+  
+  function setCopyText(text: string) {
+    dialogCopySurvey.text = text;
   }
 
-  function deleteEntryClicked(entryIndex: number) {
-    if (!confirm("Confirm delete?")) return;
+  $: setCopyText(JSON.stringify($surveys[surveyIndex], undefined, "  "));
 
-    $surveys[surveyIndex].entries = $surveys[surveyIndex].entries.filter((_, i) => i != entryIndex);
-  }
-
-  function copySurveyClicked() {
-    let surveyString = JSON.stringify($surveys[surveyIndex]);
-
-    if ("clipboard" in navigator) {
-      navigator.clipboard.writeText(surveyString);
-      alert("Copied survey");
-    } else {
-      prompt("Copy the survey below", surveyString);
-    }
-  }
-
-  function downloadEntriesClicked() {
-    if (!confirm("Confirm download?")) return;
-
+  function downloadEntries() {
     downloadSurveyEntries($surveys[surveyIndex]);
+
+    dialogDownloadEntries = { visible: false };
+  }
+
+  function deleteEntry() {
+    $surveys[surveyIndex].entries = $surveys[surveyIndex].entries.filter((_, i) => i != dialogDeleteEntry.entryIndex);
+
+    dialogDeleteEntry = { entryIndex: 0, visible: false };
   }
 
   function newEntryClicked() {
@@ -56,6 +52,24 @@
   }
 </script>
 
+<Dialog title="Select and copy the survey:" bind:visible={dialogCopySurvey.visible}>
+  <Container maxWidth>
+    <textarea readonly bind:value={dialogCopySurvey.text}></textarea>
+  </Container>
+</Dialog>
+
+<Dialog title="Download entries as CSV?" bind:visible={dialogDownloadEntries.visible}>
+  <Button slot="buttons" iconName="check" title="Confirm" on:click={downloadEntries} />
+</Dialog>
+
+<Dialog title="Delete this entry?" bind:visible={dialogDeleteEntry.visible}>
+  <span>
+    Team: {$surveys[surveyIndex].entries[dialogDeleteEntry.entryIndex].team}
+    | Match: {$surveys[surveyIndex].entries[dialogDeleteEntry.entryIndex].match}
+  </span>
+  <Button slot="buttons" iconName="check" title="Confirm" on:click={deleteEntry} />
+</Dialog>
+
 <Header title={$surveys[surveyIndex].name}>
   <Button iconName="arrow-left" title="Back to surveys" on:click={() => goto("/")} />
 </Header>
@@ -65,10 +79,14 @@
   {#each $surveys[surveyIndex].entries as entry, entryIndex (entry)}
     <Container spaceBetween>
       <Container>
-        <Button iconName="pen" title="Edit entry" on:click={() => editEntryClicked(entryIndex)} />
-        <span>Team {entry.team} Match {entry.match}</span>
+        <Button iconName="pen" title="Edit entry" on:click={() => goto(`/${surveyIndex}/${entryIndex}`)} />
+        <span>Team: {entry.team} | Match: {entry.match}</span>
       </Container>
-      <Button iconName="trash" title="Delete entry" on:click={() => deleteEntryClicked(entryIndex)} />
+      <Button
+        iconName="trash"
+        title="Delete entry"
+        on:click={() => (dialogDeleteEntry = { entryIndex, visible: true })}
+      />
     </Container>
   {/each}
 </Container>
@@ -76,7 +94,7 @@
 <footer>
   <Button iconName="plus" title="New entry" on:click={newEntryClicked} />
   <Container>
-    <Button iconName="copy" title="Copy survey" on:click={copySurveyClicked} />
-    <Button iconName="download" title="Download entries" on:click={downloadEntriesClicked} />
+    <Button iconName="copy" title="Copy survey" on:click={() => (dialogCopySurvey.visible = true)} />
+    <Button iconName="download" title="Download entries" on:click={() => (dialogDownloadEntries.visible = true)} />
   </Container>
 </footer>
