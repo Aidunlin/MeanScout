@@ -3,9 +3,17 @@
   border: none;
   box-sizing: border-box;
   color: var(--text-color);
-  font-family: monospace;
+  font-family: "Fira Code", monospace;
+  font-feature-settings: "calt" 1;
   font-size: 24px;
   line-height: 1.25 !important;
+  text-rendering: optimizeLegibility;
+}
+
+@supports (font-variation-settings: normal) {
+  * {
+    font-family: "Fira Code VF", monospace;
+  }
 }
 
 html {
@@ -75,7 +83,6 @@ h1 {
 
 h2 {
   margin: 0;
-  text-decoration: underline;
 }
 
 h2:not(:first-child) {
