@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { location } from "../stores";
+  import { location } from "../app";
   import Container from "./Container.svelte";
 
   export let title = "";

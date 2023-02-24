@@ -1,13 +1,11 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
+  import type { Entry } from "$lib/app";
+  import { downloadSurveyEntries, getMetricDefaultValue, surveys } from "$lib/app";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import Header from "$lib/components/Header.svelte";
-  import type { Entry } from "$lib/entries";
-  import { getMetricDefaultValue } from "$lib/metrics";
-  import { surveys } from "$lib/stores";
-  import { downloadSurveyEntries } from "$lib/surveys";
   import type { PageData } from "./$types";
 
   export let data: PageData;

@@ -1,11 +1,10 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
+  import { location, locations, parseSurvey, surveys, type Survey } from "$lib/app";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import Header from "$lib/components/Header.svelte";
-  import { location, locations, surveys } from "$lib/stores";
-  import { parseSurvey, type Survey } from "$lib/surveys";
 
   let dialogNewSurvey = { name: "", visible: false };
   let dialogPasteSurvey = { input: "", visible: false };

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
-  import type { MetricConfig } from "../metrics";
+  import type { MetricConfig } from "../app";
   import Button from "./Button.svelte";
   import Container from "./Container.svelte";
 
