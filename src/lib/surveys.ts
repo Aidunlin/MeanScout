@@ -46,10 +46,13 @@ export function parseSurvey(surveyString: string): string | Survey {
 function surveyEntriesToCSV(survey: Survey) {
   let csv = "Team,Match,Absent";
   survey.configs.forEach((config) => {
-    csv += `,${config.name}\n`;
+    csv += `,${config.name}`;
   });
+  csv += "\n";
   survey.entries.forEach((entry) => {
-    csv += `${entryToCSV(entry)}\n`;
+    if (entry.team && entry.match) {
+      csv += `${entryToCSV(entry)}\n`;
+    }
   });
   return csv;
 }
