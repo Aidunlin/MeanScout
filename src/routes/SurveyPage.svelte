@@ -1,15 +1,12 @@
 <script lang="ts">
-  import { goto } from "$app/navigation";
   import type { Entry } from "$lib/app";
-  import { downloadSurveyEntries, getMetricDefaultValue, surveys } from "$lib/app";
+  import { downloadSurveyEntries, getMetricDefaultValue, indexes, surveys } from "$lib/app";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import Header from "$lib/components/Header.svelte";
-  import type { PageData } from "./$types";
 
-  export let data: PageData;
-  let { surveyIndex } = data;
+  export let surveyIndex: number;
 
   let dialogCopySurvey = { text: "", visible: false };
   let dialogDownloadEntries = { visible: false };
@@ -69,7 +66,7 @@
 </Dialog>
 
 <Header title={$surveys[surveyIndex].name}>
-  <Button iconName="arrow-left" title="Back to surveys" on:click={() => goto("/")} />
+  <Button iconName="arrow-left" title="Back to surveys" on:click={() => ($indexes.survey = undefined)} />
 </Header>
 
 <Container column padding>
@@ -77,7 +74,7 @@
   {#each $surveys[surveyIndex].entries as entry, entryIndex (entry)}
     <Container spaceBetween>
       <Container>
-        <Button iconName="pen" title="Edit entry" on:click={() => goto(`/${surveyIndex}/${entryIndex}`)} />
+        <Button iconName="pen" title="Edit entry" on:click={() => ($indexes.entry = entryIndex)} />
         <span>Team: {entry.team} | Match: {entry.match}</span>
       </Container>
       <Button

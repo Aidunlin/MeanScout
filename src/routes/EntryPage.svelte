@@ -1,15 +1,13 @@
 <script lang="ts">
-  import { goto } from "$app/navigation";
-  import { getMetricDefaultValue, surveys, validateEntry, type Entry } from "$lib/app";
+  import { getMetricDefaultValue, indexes, surveys, validateEntry, type Entry } from "$lib/app";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import Header from "$lib/components/Header.svelte";
   import MetricEditor from "$lib/components/MetricEditor.svelte";
-  import type { PageData } from "./$types";
 
-  export let data: PageData;
-  let { surveyIndex, entryIndex } = data;
+  export let surveyIndex: number;
+  export let entryIndex: number;
 
   let dialogSaveEntry = { visible: false };
   let dialogResetEntry = { visible: false };
@@ -31,8 +29,6 @@
     $surveys[surveyIndex].entries = [entry, ...$surveys[surveyIndex].entries];
 
     dialogSaveEntry = { visible: false };
-
-    goto(`/${surveyIndex}/0`);
   }
 
   function resetSurvey() {
@@ -52,7 +48,7 @@
 </Dialog>
 
 <Header title="Entry ({$surveys[surveyIndex].name})">
-  <Button iconName="arrow-left" title="Back to survey" on:click={() => goto(`/${surveyIndex}`)} />
+  <Button iconName="arrow-left" title="Back to survey" on:click={() => ($indexes.entry = undefined)} />
 </Header>
 
 <Container padding alignEnd>

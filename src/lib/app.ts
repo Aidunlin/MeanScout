@@ -63,6 +63,33 @@ export type Survey = {
   entries: Entry[];
 };
 
+class Indexes {
+  private value: { survey?: number; entry: undefined } | { survey: number; entry: number } = {
+    survey: undefined,
+    entry: undefined,
+  };
+
+  get survey() {
+    return this.value.survey;
+  }
+
+  set survey(index) {
+    this.value = { survey: index, entry: undefined };
+  }
+
+  get entry() {
+    return this.value.entry;
+  }
+
+  set entry(index) {
+    if (this.value.survey != undefined) {
+      this.value.entry = index;
+    } else {
+      this.value.entry = undefined;
+    }
+  }
+}
+
 function localStorageStore<T>(key: string, start: T, subscriber?: (val: T) => void) {
   try {
     start = JSON.parse(localStorage[key]);
@@ -78,6 +105,7 @@ function localStorageStore<T>(key: string, start: T, subscriber?: (val: T) => vo
 }
 
 export const surveys = localStorageStore<Survey[]>("surveys", []);
+export const indexes = localStorageStore<Indexes>("indexes", new Indexes());
 export const location = localStorageStore<Location>("location", "Red Near", (location) => {
   let newTheme = location.split(" ")[0].toLowerCase();
   document.documentElement.style.setProperty("--theme-color", `var(--${newTheme})`);
