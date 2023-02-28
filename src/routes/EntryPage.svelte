@@ -9,14 +9,14 @@
   export let surveyIndex: number;
   export let entryIndex: number;
 
-  let dialogSaveEntry = { visible: false };
+  let dialogSaveEntry = { error: "", visible: false };
   let dialogResetEntry = { visible: false };
 
   function saveEntry() {
     let error = validateEntry($surveys[surveyIndex], $surveys[surveyIndex].entries[entryIndex]);
 
     if (error) {
-      alert(`Could not save entry! ${error}`);
+      dialogSaveEntry.error = `Could not save entry! ${error}`;
       return;
     }
 
@@ -28,18 +28,21 @@
     };
     $surveys[surveyIndex].entries = [entry, ...$surveys[surveyIndex].entries];
 
-    dialogSaveEntry = { visible: false };
+    dialogSaveEntry = { error: "", visible: false };
   }
 
   function resetSurvey() {
     $surveys[surveyIndex].entries[entryIndex].isAbsent = false;
     $surveys[surveyIndex].entries[entryIndex].metrics = $surveys[surveyIndex].configs.map(getMetricDefaultValue);
 
-    dialogSaveEntry = { visible: false };
+    dialogResetEntry = { visible: false };
   }
 </script>
 
 <Dialog title="Save this entry and start a new one?" bind:visible={dialogSaveEntry.visible}>
+  {#if dialogSaveEntry.error}
+    <span>{dialogSaveEntry.error}</span>
+  {/if}
   <Button slot="buttons" iconName="check" title="Confirm" on:click={saveEntry} />
 </Dialog>
 
@@ -90,6 +93,6 @@
 {/if}
 
 <footer>
-  <Button iconName="floppy-disk" title="Save entry" on:click={() => (dialogSaveEntry = { visible: true })} />
+  <Button iconName="floppy-disk" title="Save entry" on:click={() => (dialogSaveEntry = { error: "", visible: true })} />
   <Button iconName="arrow-rotate-left" title="reset entry" on:click={() => (dialogResetEntry = { visible: true })} />
 </footer>

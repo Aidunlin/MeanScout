@@ -5,15 +5,15 @@
   import Dialog from "$lib/components/Dialog.svelte";
   import Header from "$lib/components/Header.svelte";
 
-  let dialogNewSurvey = { name: "", visible: false };
-  let dialogPasteSurvey = { input: "", visible: false };
+  let dialogNewSurvey = { name: "", error: "", visible: false };
+  let dialogPasteSurvey = { input: "", error: "", visible: false };
   let dialogDeleteSurvey = { surveyIndex: 0, visible: false };
 
   function newSurvey() {
     if (!dialogNewSurvey.name) return;
 
     if ($surveys.map((survey) => survey.name).includes(dialogNewSurvey.name)) {
-      alert("That name is already used!");
+      dialogNewSurvey.error = "That name is already used!";
       return;
     }
 
@@ -25,7 +25,7 @@
     };
     $surveys = [survey, ...$surveys];
 
-    dialogNewSurvey = { name: "", visible: false };
+    dialogNewSurvey = { name: "", error: "", visible: false };
   }
 
   function pasteSurvey() {
@@ -34,18 +34,18 @@
     let result = parseSurvey(dialogPasteSurvey.input);
 
     if (typeof result == "string") {
-      alert(`Could not set survey! ${result}`);
+      dialogPasteSurvey.error = `Could not set survey! ${result}`;
       return;
     }
 
     if ($surveys.map((survey) => survey.name).includes(result.name)) {
-      alert(`Could not set survey! ${result.name} already exists`);
+      dialogPasteSurvey.error = `Could not set survey! ${result.name} already exists`;
       return;
     }
 
     $surveys = [result, ...$surveys];
 
-    dialogPasteSurvey = { input: "", visible: false };
+    dialogPasteSurvey = { input: "", error: "", visible: false };
   }
 
   function deleteSurvey() {
@@ -57,6 +57,9 @@
 
 <Dialog title="Enter name for new survey:" bind:visible={dialogNewSurvey.visible}>
   <input bind:value={dialogNewSurvey.name} />
+  {#if dialogNewSurvey.error}
+    <span>{dialogNewSurvey.error}</span>
+  {/if}
   <Button slot="buttons" iconName="check" title="Confirm" on:click={newSurvey} />
 </Dialog>
 
@@ -64,6 +67,9 @@
   <Container maxWidth>
     <textarea bind:value={dialogPasteSurvey.input} />
   </Container>
+  {#if dialogPasteSurvey.error}
+    <span>{dialogPasteSurvey.error}</span>
+  {/if}
   <Button slot="buttons" iconName="check" title="Confirm" on:click={pasteSurvey} />
 </Dialog>
 
@@ -102,6 +108,14 @@
 </Container>
 
 <footer>
-  <Button iconName="plus" title="New survey" on:click={() => (dialogNewSurvey = { name: "", visible: true })} />
-  <Button iconName="paste" title="Paste survey" on:click={() => (dialogPasteSurvey = { input: "", visible: true })} />
+  <Button
+    iconName="plus"
+    title="New survey"
+    on:click={() => (dialogNewSurvey = { name: "", error: "", visible: true })}
+  />
+  <Button
+    iconName="paste"
+    title="Paste survey"
+    on:click={() => (dialogPasteSurvey = { input: "", error: "", visible: true })}
+  />
 </footer>
