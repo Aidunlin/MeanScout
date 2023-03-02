@@ -80,7 +80,7 @@
       <input placeholder={config.tip} bind:value />
     {:else if config.type == "rating"}
       {#each [...Array(5).keys()] as i}
-        <Button on:click={() => rate(i)} iconStyle={value ? "solid" : "regular"} iconName="star" />
+        <Button on:click={() => rate(i)} iconStyle={value > i ? "solid" : "regular"} iconName="star" />
       {/each}
     {:else if config.type == "timer"}
       <Button on:click={running ? pause : start} iconName={running ? "pause" : "play"} />
