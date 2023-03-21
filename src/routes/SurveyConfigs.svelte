@@ -6,14 +6,14 @@
 
   export let surveyIndex: number;
 
-  
   let dialogCopySurvey = { text: "", visible: false };
 
-  function setCopyText(text: string) {
-    dialogCopySurvey.text = text;
+  function moveConfig(index: number, by: number) {
+    let configToMove = $surveys[surveyIndex].configs[index];
+    $surveys[surveyIndex].configs.splice(index, 1);
+    $surveys[surveyIndex].configs.splice(index + by, 0, configToMove);
+    $surveys = $surveys;
   }
-
-  $: setCopyText(JSON.stringify($surveys[surveyIndex], undefined, "  "));
 </script>
 
 <Dialog title="Select and copy the survey:" bind:visible={dialogCopySurvey.visible}>
@@ -88,13 +88,21 @@
           </Container>
         {/if}
       </Container>
-      <Button
-        iconName="trash"
-        title="Delete config"
-        on:click={() => {
-          $surveys[surveyIndex].configs = $surveys[surveyIndex].configs.filter((_, i) => i != configIndex);
-        }}
-      />
+      <Container>
+        {#if configIndex > 0}
+          <Button iconName="arrow-up" title="Move up" on:click={() => moveConfig(configIndex, -1)} />
+        {/if}
+        {#if configIndex < $surveys[surveyIndex].configs.length - 1}
+          <Button iconName="arrow-down" title="Move down" on:click={() => moveConfig(configIndex, 1)} />
+        {/if}
+        <Button
+          iconName="trash"
+          title="Delete config"
+          on:click={() => {
+            $surveys[surveyIndex].configs = $surveys[surveyIndex].configs.filter((_, i) => i != configIndex);
+          }}
+        />
+      </Container>
     </Container>
   {/each}
 </Container>
@@ -103,8 +111,15 @@
   <Button
     iconName="plus"
     title="New config"
-    on:click={() =>
-      ($surveys[surveyIndex].configs = [...$surveys[surveyIndex].configs, { name: "", type: "toggle" }])}
+    on:click={() => ($surveys[surveyIndex].configs = [...$surveys[surveyIndex].configs, { name: "", type: "toggle" }])}
   />
-  <Button iconName="copy" title="Copy survey" on:click={() => (dialogCopySurvey.visible = true)} />
+  <Button
+    iconName="copy"
+    title="Copy survey"
+    on:click={() =>
+      (dialogCopySurvey = {
+        text: JSON.stringify($surveys[surveyIndex], undefined, "  "),
+        visible: true,
+      })}
+  />
 </footer>

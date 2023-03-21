@@ -28,7 +28,7 @@ html {
   background: var(--bg-color);
   color-scheme: dark;
   margin: auto;
-  max-width: 720px;
+  max-width: 1000px;
   touch-action: pan-y;
 }
 
