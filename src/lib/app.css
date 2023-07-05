@@ -103,6 +103,10 @@ footer {
 
 textarea {
   height: 300px;
+  width: 100%;
+}
+
+.dialog textarea {
   width: 720px;
 }
 

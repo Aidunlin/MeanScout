@@ -1,10 +1,10 @@
 import { writable } from "svelte/store";
 
 export const locations = ["Red Near", "Red Mid", "Red Far", "Blue Near", "Blue Mid", "Blue Far"] as const;
-type Location = typeof locations[number];
+type Location = (typeof locations)[number];
 
 export const metricTypes = ["toggle", "number", "select", "text", "rating", "timer"] as const;
-export type MetricType = typeof metricTypes[number];
+export type MetricType = (typeof metricTypes)[number];
 
 type BaseConfig = {
   name: string;
@@ -27,6 +27,7 @@ interface SelectConfig extends BaseConfig {
 
 interface TextConfig extends BaseConfig {
   type: "text";
+  long?: boolean;
   tip?: string;
 }
 
@@ -150,7 +151,7 @@ function entryToCSV(entry: Entry) {
   let csv = `${entry.team},${entry.match},${entry.isAbsent}`;
   entry.metrics.forEach((value) => {
     if (typeof value == "string") {
-      csv += `,${value.replace(",", "")}`;
+      csv += `,${value.replace(",", "").replace("\n", ". ")}`;
     } else {
       csv += `,${value}`;
     }

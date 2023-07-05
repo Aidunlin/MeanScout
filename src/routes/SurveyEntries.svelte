@@ -6,7 +6,6 @@
 
   export let surveyIndex: number;
 
-
   let dialogDownloadEntries = { visible: false };
 
   function newEntryClicked() {
@@ -24,7 +23,7 @@
     };
     $surveys[surveyIndex].entries = [entry, ...$surveys[surveyIndex].entries];
   }
-  
+
   function downloadEntries() {
     downloadSurveyEntries($surveys[surveyIndex]);
 

@@ -23,7 +23,7 @@
   }
 
   let running = false;
-  let interval: NodeJS.Timer;
+  let interval: number;
 
   function start() {
     running = true;
@@ -77,7 +77,11 @@
         {/each}
       </select>
     {:else if config.type == "text"}
-      <input placeholder={config.tip} bind:value />
+      {#if config.long}
+        <textarea placeholder={config.tip} bind:value />
+      {:else}
+        <input placeholder={config.tip} bind:value />
+      {/if}
     {:else if config.type == "rating"}
       {#each [...Array(5).keys()] as i}
         <Button on:click={() => rate(i)} iconStyle={value > i ? "solid" : "regular"} iconName="star" />

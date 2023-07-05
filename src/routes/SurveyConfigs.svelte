@@ -82,6 +82,16 @@
             </Container>
           </Container>
         {:else if config.type == "text"}
+          <Container>
+            <Button
+              iconStyle={config.long ? "solid" : "regular"}
+              iconName={config.long ? "square-check" : "square"}
+              text="Long"
+              on:click={() => {
+                if (config.type == "text") config.long = !config.long;
+              }}
+            />
+          </Container>
           <Container column noGap>
             Tip
             <input bind:value={config.tip} />
