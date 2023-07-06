@@ -5,27 +5,37 @@
   import Header from "$lib/components/Header.svelte";
   import SurveyConfigs from "./SurveyConfigs.svelte";
   import SurveyEntries from "./SurveyEntries.svelte";
+  import SurveyOptions from "./SurveyOptions.svelte";
 
   export let surveyIndex: number;
 
-  let editing: "entries" | "configs" = "entries";
+  let editing: "entries" | "configs" | "options" = "entries";
 </script>
 
 <Header title={$surveys[surveyIndex].name}>
   <Button iconName="arrow-left" title="Back to surveys" on:click={() => ($indexes.survey = undefined)} />
 </Header>
 
-<Container padding>
+<Container padding noGap>
   <Button
-    iconName="pen"
-    title="Edit {editing == 'entries' ? 'Configs' : 'Entries'}"
-    text={editing == "entries" ? "Configs" : "Entries"}
-    on:click={() => (editing = editing == "entries" ? "configs" : "entries")}
+    iconName="list-ol"
+    title="Entries"
+    disableTheme={editing != "entries"}
+    on:click={() => (editing = "entries")}
+  />
+  <Button iconName="gears" title="Configs" disableTheme={editing != "configs"} on:click={() => (editing = "configs")} />
+  <Button
+    iconName="ellipsis-vertical"
+    title="Options"
+    disableTheme={editing != "options"}
+    on:click={() => (editing = "options")}
   />
 </Container>
 
 {#if editing == "entries"}
   <SurveyEntries {surveyIndex} />
-{:else}
+{:else if editing == "configs"}
   <SurveyConfigs {surveyIndex} />
+{:else}
+  <SurveyOptions {surveyIndex} />
 {/if}

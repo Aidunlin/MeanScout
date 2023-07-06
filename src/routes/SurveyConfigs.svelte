@@ -25,7 +25,7 @@
 <Container column padding>
   <h2>Configs</h2>
   {#each $surveys[surveyIndex].configs as config, configIndex (config)}
-    <Container padding spaceBetween alignEnd>
+    <Container spaceBetween alignEnd>
       <Container alignEnd>
         <Container column noGap>
           Name

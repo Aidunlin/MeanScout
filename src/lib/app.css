@@ -48,6 +48,11 @@ body {
   min-height: 100vh;
 }
 
+.disable-theme,
+.disable-theme * {
+  color: var(--text-color) !important;
+}
+
 i,
 input,
 select,

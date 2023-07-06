@@ -5,6 +5,7 @@
   export let alignEnd = false;
   export let noGap = false;
   export let maxWidth = false;
+  export let bg = false;
 </script>
 
 <div
@@ -15,6 +16,7 @@
   class:align-end={alignEnd}
   class:no-gap={noGap}
   class:max-width={maxWidth}
+  class:bg
 >
   <slot />
 </div>

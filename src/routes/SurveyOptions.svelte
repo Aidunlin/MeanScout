@@ -1,0 +1,50 @@
+<script lang="ts">
+  import { surveys } from "$lib/app";
+  import Button from "$lib/components/Button.svelte";
+  import Container from "$lib/components/Container.svelte";
+
+  export let surveyIndex: number;
+
+  let teamInput = "";
+
+  function addTeam() {
+    if (teamInput.trim() && !$surveys[surveyIndex].teams.includes(teamInput.trim())) {
+      $surveys[surveyIndex].teams = [...$surveys[surveyIndex].teams, teamInput.trim()];
+      teamInput = "";
+    }
+  }
+
+  function sortTeams(teams: string[]) {
+    return teams.sort((a, b) => a.localeCompare(b, "en", { numeric: true }));
+  }
+
+  function deleteTeam(team: string) {
+    $surveys[surveyIndex].teams = $surveys[surveyIndex].teams.filter((t) => t.trim() != team.trim());
+  }
+</script>
+
+<Container column padding>
+  <h2>Options</h2>
+  <Container column>
+    <Container column noGap>
+      Add team
+      <input
+        style="width:200px"
+        bind:value={teamInput}
+        on:keydown={(e) => {
+          if (e.key == "Enter") addTeam();
+        }}
+      />
+    </Container>
+    {#if $surveys[surveyIndex].teams.length}
+      Teams
+    {:else}
+      No teams added
+    {/if}
+    <Container>
+      {#each sortTeams($surveys[surveyIndex].teams) as team}
+        <Button text={team} title="Delete {team}" on:click={() => deleteTeam(team)} />
+      {/each}
+    </Container>
+  </Container>
+</Container>
