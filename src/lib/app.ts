@@ -151,7 +151,7 @@ function entryToCSV(entry: Entry) {
   let csv = `${entry.team},${entry.match},${entry.isAbsent}`;
   entry.metrics.forEach((value) => {
     if (typeof value == "string") {
-      csv += `,${value.replace(",", "").replace("\n", ". ")}`;
+      csv += `,${value.replaceAll(",", "").replaceAll("\n", ". ")}`;
     } else {
       csv += `,${value}`;
     }
