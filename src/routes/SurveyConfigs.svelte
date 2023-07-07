@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { metricTypes, surveys } from "$lib/app";
+  import { metricTypes, surveys, type MetricConfig } from "$lib/app";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
@@ -7,6 +7,12 @@
   export let surveyIndex: number;
 
   let dialogCopySurvey = { text: "", visible: false };
+
+  let dialogEditConfig: { config: MetricConfig | undefined; configIndex: number | undefined; visible: boolean } = {
+    config: undefined,
+    configIndex: undefined,
+    visible: false,
+  };
 
   function moveConfig(index: number, by: number) {
     let configToMove = $surveys[surveyIndex].configs[index];
@@ -21,6 +27,70 @@
     <textarea readonly bind:value={dialogCopySurvey.text} />
   </Container>
 </Dialog>
+
+{#if dialogEditConfig.config && dialogEditConfig.configIndex != undefined}
+  <Dialog title="Edit {dialogEditConfig.config.name}:" bind:visible={dialogEditConfig.visible}>
+    <Container column noGap>
+      Group
+      <input bind:value={dialogEditConfig.config.group} />
+    </Container>
+    {#if dialogEditConfig.config.type == "select"}
+      <Container column maxWidth>
+        Values
+        {#each dialogEditConfig.config.values as value, valueIndex}
+          <Container>
+            <input bind:value style="width:200px" />
+            <Button
+              iconName="trash"
+              title="Delete value"
+              on:click={() => {
+                if (dialogEditConfig.config?.type == "select")
+                  dialogEditConfig.config.values = dialogEditConfig.config.values.filter((_, i) => i != valueIndex);
+              }}
+            />
+          </Container>
+        {/each}
+        <Container>
+          <Button
+            iconName="plus"
+            title="New value"
+            on:click={() => {
+              if (dialogEditConfig.config?.type == "select")
+                dialogEditConfig.config.values = [...dialogEditConfig.config.values, ""];
+            }}
+          />
+        </Container>
+      </Container>
+    {:else if dialogEditConfig.config.type == "text"}
+      <Container>
+        <Button
+          iconStyle={dialogEditConfig.config.long ? "solid" : "regular"}
+          iconName={dialogEditConfig.config.long ? "square-check" : "square"}
+          text="Long"
+          on:click={() => {
+            if (dialogEditConfig.config?.type == "text") dialogEditConfig.config.long = !dialogEditConfig.config.long;
+          }}
+        />
+      </Container>
+      <Container column noGap>
+        Tip
+        <input bind:value={dialogEditConfig.config.tip} />
+      </Container>
+    {/if}
+
+    <Button
+      slot="buttons"
+      iconName="check"
+      title="Confirm"
+      on:click={() => {
+        if (dialogEditConfig.config && dialogEditConfig.configIndex != undefined) {
+          $surveys[surveyIndex].configs[dialogEditConfig.configIndex] = dialogEditConfig.config;
+          dialogEditConfig = { config: undefined, configIndex: undefined, visible: false };
+        }
+      }}
+    />
+  </Dialog>
+{/if}
 
 <Container column padding>
   <h2>Configs</h2>
@@ -56,47 +126,13 @@
             {/each}
           </select>
         </Container>
-        {#if config.type == "select"}
-          <Container column maxWidth>
-            Values
-            {#each config.values as value, valueIndex}
-              <Container>
-                <input bind:value style="width:200px" />
-                <Button
-                  iconName="trash"
-                  title="Delete value"
-                  on:click={() => {
-                    if ("values" in config) config.values = config.values.filter((_, i) => i != valueIndex);
-                  }}
-                />
-              </Container>
-            {/each}
-            <Container>
-              <Button
-                iconName="plus"
-                title="New value"
-                on:click={() => {
-                  if ("values" in config) config.values = [...config.values, ""];
-                }}
-              />
-            </Container>
-          </Container>
-        {:else if config.type == "text"}
-          <Container>
-            <Button
-              iconStyle={config.long ? "solid" : "regular"}
-              iconName={config.long ? "square-check" : "square"}
-              text="Long"
-              on:click={() => {
-                if (config.type == "text") config.long = !config.long;
-              }}
-            />
-          </Container>
-          <Container column noGap>
-            Tip
-            <input bind:value={config.tip} />
-          </Container>
-        {/if}
+        <Container>
+          <Button
+            iconName="pen"
+            text="Edit"
+            on:click={() => (dialogEditConfig = { config, configIndex, visible: true })}
+          />
+        </Container>
       </Container>
       <Container>
         {#if configIndex > 0}
