@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { indexes, surveys } from "$lib/app";
+  import { indexes, surveys, surveySubPage } from "$lib/app";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Header from "$lib/components/Header.svelte";
@@ -8,8 +8,6 @@
   import SurveyOptions from "./SurveyOptions.svelte";
 
   export let surveyIndex: number;
-
-  let editing: "entries" | "configs" | "options" = "entries";
 </script>
 
 <Header title={$surveys[surveyIndex].name}>
@@ -20,21 +18,26 @@
   <Button
     iconName="list-ol"
     title="Entries"
-    disableTheme={editing != "entries"}
-    on:click={() => (editing = "entries")}
+    disableTheme={$surveySubPage != "entries"}
+    on:click={() => ($surveySubPage = "entries")}
   />
-  <Button iconName="gears" title="Configs" disableTheme={editing != "configs"} on:click={() => (editing = "configs")} />
+  <Button
+    iconName="gears"
+    title="Configs"
+    disableTheme={$surveySubPage != "configs"}
+    on:click={() => ($surveySubPage = "configs")}
+  />
   <Button
     iconName="ellipsis-vertical"
     title="Options"
-    disableTheme={editing != "options"}
-    on:click={() => (editing = "options")}
+    disableTheme={$surveySubPage != "options"}
+    on:click={() => ($surveySubPage = "options")}
   />
 </Container>
 
-{#if editing == "entries"}
+{#if $surveySubPage == "entries"}
   <SurveyEntries {surveyIndex} />
-{:else if editing == "configs"}
+{:else if $surveySubPage == "configs"}
   <SurveyConfigs {surveyIndex} />
 {:else}
   <SurveyOptions {surveyIndex} />

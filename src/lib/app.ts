@@ -94,19 +94,19 @@ class Indexes {
 function localStorageStore<T>(key: string, start: T, subscriber?: (val: T) => void) {
   try {
     start = JSON.parse(localStorage[key]);
-  } catch (error) {
-    console.log(`Could not get value from localStorage.${key}, using default`);
+  } finally {
+    let store = writable(start);
+    store.subscribe((value) => {
+      localStorage[key] = JSON.stringify(value);
+      if (subscriber) subscriber(value);
+    });
+    return store;
   }
-  let store = writable(start);
-  store.subscribe((value) => {
-    localStorage[key] = JSON.stringify(value);
-    if (subscriber) subscriber(value);
-  });
-  return store;
 }
 
 export const surveys = localStorageStore<Survey[]>("surveys", []);
 export const indexes = localStorageStore<Indexes>("indexes", new Indexes());
+export const surveySubPage = localStorageStore<"entries" | "configs" | "options">("surveySubPage", "entries");
 export const location = localStorageStore<Location>("location", "Red Near", (location) => {
   let newTheme = location.split(" ")[0].toLowerCase();
   document.documentElement.style.setProperty("--theme-color", `var(--${newTheme})`);

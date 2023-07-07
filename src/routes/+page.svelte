@@ -1,6 +1,6 @@
 <script lang="ts">
-  import "$lib/app.css";
   import { indexes } from "$lib/app";
+  import "$lib/app.css";
   import EntryPage from "./EntryPage.svelte";
   import MainPage from "./MainPage.svelte";
   import SurveyPage from "./SurveyPage.svelte";
