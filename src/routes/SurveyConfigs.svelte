@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { metricTypes, surveys, type MetricConfig, getMetricDefaultValue } from "$lib/app";
+  import { getMetricDefaultValue, metricTypes, surveys, type MetricConfig } from "$lib/app";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";

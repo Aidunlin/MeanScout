@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { indexes, location, locations, parseSurvey, surveys, type Survey } from "$lib/app";
+  import { indexes, location, locations, mainSubPage, parseSurvey, surveys, type Survey } from "$lib/app";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
@@ -80,42 +80,62 @@
 
 <Header />
 
-<Container padding>
-  <Container column noGap>
-    Location
-    <select bind:value={$location} title="Location">
-      {#each Object.values(locations) as location}
-        <option>{location}</option>
-      {/each}
-    </select>
-  </Container>
+<Container padding noGap>
+  <Button
+    iconName="list-ul"
+    title="Surveys"
+    disableTheme={$mainSubPage != "surveys"}
+    on:click={() => ($mainSubPage = "surveys")}
+  />
+  <Button
+    iconName="ellipsis-vertical"
+    title="Options"
+    disableTheme={$mainSubPage != "options"}
+    on:click={() => ($mainSubPage = "options")}
+  />
 </Container>
 
-<Container column padding>
-  <h2>Surveys</h2>
-  {#each $surveys as survey, surveyIndex (survey)}
-    <Container spaceBetween>
-      <Container>
-        <Button iconName="pen" title="Edit survey" on:click={() => ($indexes.survey = surveyIndex)} />
-        <span>{survey.name}</span>
-        {#if survey.entries.length}
-          <span>({survey.entries.length} {survey.entries.length == 1 ? "entry" : "entries"})</span>
-        {/if}
+{#if $mainSubPage == "surveys"}
+  <Container column padding>
+    <h2>Surveys</h2>
+    {#each $surveys as survey, surveyIndex (survey)}
+      <Container spaceBetween>
+        <Container>
+          <Button iconName="pen" title="Edit survey" on:click={() => ($indexes.survey = surveyIndex)} />
+          <span>{survey.name}</span>
+          {#if survey.entries.length}
+            <span>({survey.entries.length} {survey.entries.length == 1 ? "entry" : "entries"})</span>
+          {/if}
+        </Container>
+        <Button iconName="trash" on:click={() => (dialogDeleteSurvey = { surveyIndex, visible: true })} />
       </Container>
-      <Button iconName="trash" on:click={() => (dialogDeleteSurvey = { surveyIndex, visible: true })} />
-    </Container>
-  {/each}
-</Container>
+    {/each}
+  </Container>
 
-<footer>
-  <Button
-    iconName="plus"
-    title="New survey"
-    on:click={() => (dialogNewSurvey = { name: "", error: "", visible: true })}
-  />
-  <Button
-    iconName="paste"
-    title="Paste survey"
-    on:click={() => (dialogPasteSurvey = { input: "", error: "", visible: true })}
-  />
-</footer>
+  <footer>
+    <Button
+      iconName="plus"
+      title="New survey"
+      on:click={() => (dialogNewSurvey = { name: "", error: "", visible: true })}
+    />
+    <Button
+      iconName="paste"
+      title="Paste survey"
+      on:click={() => (dialogPasteSurvey = { input: "", error: "", visible: true })}
+    />
+  </footer>
+{:else}
+  <Container column padding>
+    <h2>Options</h2>
+    <Container>
+      <Container column noGap>
+        Location
+        <select bind:value={$location} title="Location">
+          {#each Object.values(locations) as location}
+            <option>{location}</option>
+          {/each}
+        </select>
+      </Container>
+    </Container>
+  </Container>
+{/if}

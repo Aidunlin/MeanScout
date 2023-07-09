@@ -106,6 +106,7 @@ function localStorageStore<T>(key: string, start: T, subscriber?: (val: T) => vo
 
 export const surveys = localStorageStore<Survey[]>("surveys", []);
 export const indexes = localStorageStore<Indexes>("indexes", new Indexes());
+export const mainSubPage = localStorageStore<"surveys" | "options">("mainSubPage", "surveys");
 export const surveySubPage = localStorageStore<"entries" | "configs" | "options">("surveySubPage", "entries");
 export const location = localStorageStore<Location>("location", "Red 1", (location) => {
   let newTheme = location.split(" ")[0].toLowerCase();
