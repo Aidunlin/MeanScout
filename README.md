@@ -1,6 +1,6 @@
 # MeanScout
 
-A lightweight FRC scouting web app, built with Svelte.
+A lightweight FRC scouting web app, built with SvelteKit.
 
 ## Features
 
@@ -10,86 +10,30 @@ A lightweight FRC scouting web app, built with Svelte.
 - Customizable metrics: toggles, numbers, selectors, textfields, ratings, and timers
 - Optional team whitelisting
 - Uses browser storage to store surveys
-- Different export methods (CSV, JSON)
+- Exoprt entries as CSV
 
 ## Frameworks/Libraries
 
-- [Svelte](https://svelte.dev/) - Front end compiler
-- [FontAwesome](https://fontawesome.com/) - Icons
-- [Workbox](https://developers.google.com/web/tools/workbox) - Offline service worker
+- [SvelteKit](https://kit.svelte.dev/)
+- [FontAwesome](https://fontawesome.com/)
 
 ## Location
 
-The location selector is used to remind your scouts which robot they should scout based on the robot's starting position.
+The location selector is used to remind your scouts which robot they should scout.
 
 ## Customization
 
-It can be annoying to reprogram your scouting app every year to change scouting metrics. To make things easier, metrics in MeanScout can be customized with templates.
+It can be annoying to reprogram your scouting app every year to change scouting metrics. To make things easier, metrics in MeanScout can be customized!
 
-To change the metrics present, simply copy and paste JSON-based templates into MeanScout. MeanScout comes with an example template to get you started. Here is its JSON:
+Simply create a new survey and give it a good name (e.g. District Champs 2023). Then, in the configs page, set up whatever metrics you need. Give each a short, descriptive name, select the right type, and configure any additional settings for each metric. If you fill out the `Group` field for a metric, it will add a group label above that particular metric. For selectors, make sure to add some values in the additional settings.
 
-```json
-{
-  "metrics": [
-    { "name": "Toggle", "type": "toggle", "group": "Group" },
-    { "name": "Number", "type": "number" },
-    { "name": "Select", "type": "select", "values": ["Value 1", "Value 2", "Value 3"] },
-    { "name": "Text", "type": "text", "tip": "Tip" },
-    { "name": "Rating", "type": "rating" },
-    { "name": "Timer", "type": "timer" }
-  ]
-}
-```
+In the options page, you can add teams to the survey's whitelist to prevent entering any teams not in the particular event.
 
-The only metrics that can't be changed are team, match, and absent.
-
-Each template should have an array of `metrics`. Optionally, a whitelist of `teams` can be included to help scouts correctly identify teams.
-
-Each metric must have a `name` and a `type`. Use short/concise names for metrics to save space.
-
-Types:
-
-- `toggle`: A toggleable button. Value is a boolean.
-- `number`: A number input with increment/decrement buttons. Value is an integer.
-- `select`: A dropdown selector. Value is a string (selected option). There also must be an array of string `values` to create options for the selector.
-- `text`: A text input. Value is a string. Setting a `tip` value will add a placeholder within the input field.
-- `rating`: A star rating bar. Value is a number (0-4).
-- `timer`: A number input with timing controls. Value is a decimal.
-
-Setting `group` with a string adds a label before the metric and moves the metric to a new line. Metrics after will appear to be grouped together.
+You can also copy/paste surveys as JSON for setting up multiple devices.
 
 ## Exporting
 
-Surveys are stored in a JSON array. Each survey is also an array containing metric objects with names and values.
-
-Currently, you can export surveys either as CSV or JSON. Here are some samples:
-
-CSV:
-
-```csv
-2471,1,false,true,3,"Value 1","MeanScout is cool",5,4.2, ... metrics
-... surveys
-```
-
-JSON:
-
-```json
-[
-  [
-    { "name": "Team", "value": "2471" },
-    { "name": "Match", "value": 1 },
-    { "name": "Absent", "value": false },
-    { "name": "Toggle", "value": true },
-    { "name": "Number", "value": 3 },
-    { "name": "Select", "value": "Value 1" },
-    { "name": "Text", "value": "MeanScout is cool" },
-    { "name": "Rating", "value": 5 },
-    { "name": "Timer", "value": 4.2 }
-    // ... metrics
-  ]
-  // ... surveys
-]
-```
+In the entries list page, you can download all entries from one survey as a CSV file.
 
 ## Contributing
 
@@ -97,8 +41,6 @@ Find a problem? Make an issue!
 
 Fix a problem? Make a pull request!
 
-To develop MeanScout (or a fork), you will need Node.js/npm, a text editor, and a browser. After cloning, use `npm install` in the root folder to build your `node_modules`. The `public` folder contains everything your browser needs to run the app, so deploy with it set as your publish directory.
+To develop MeanScout (or a fork), you will need Node.js/npm, a text editor, a terminal, and a browser. After cloning, use `npm install` in the root folder to build `node_modules` and `.svelte-kit` folders.
 
-`npm run build`: builds minified script files to the `public/build` folder, should be used for deployment
-
-`npm run dev`: runs a local web server that refreshes and builds MeanScout as you go
+[View the SvelteKit docs](https://kit.svelte.dev/docs/building-your-app) to learn how to build and deploy MeanScout.
