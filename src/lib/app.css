@@ -1,0 +1,247 @@
+* {
+  border-radius: 0 !important;
+  border: none;
+  box-sizing: border-box;
+  color: var(--text-color);
+  font-family: "Fira Code", monospace;
+  font-feature-settings: "calt" 1;
+  font-size: 24px;
+  line-height: 1.25 !important;
+  text-rendering: optimizeLegibility;
+}
+
+@supports (font-variation-settings: normal) {
+  * {
+    font-family: "Fira Code VF", monospace;
+  }
+}
+
+html {
+  --bg-color: #000;
+  --blue: #2196f3;
+  --fg-color: rgba(127, 127, 127, 0.2);
+  --red: #f44336;
+  --text-color: #fff;
+  --theme-color: var(--red);
+  --outer-gap: 12px;
+  --inner-gap: 8px;
+  background: var(--bg-color);
+  color-scheme: dark;
+  margin: auto;
+  max-width: 1000px;
+  touch-action: pan-y;
+}
+
+body :focus-visible {
+  outline: var(--text-color) solid 2px;
+}
+
+::selection {
+  color: var(--text-color);
+  background-color: var(--theme-color);
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  min-height: 100vh;
+}
+
+.disable-theme,
+.disable-theme * {
+  color: var(--text-color) !important;
+}
+
+i,
+input,
+select,
+option,
+textarea,
+.theme-text {
+  color: var(--theme-color);
+}
+
+header,
+footer,
+button,
+input,
+select,
+textarea,
+.number,
+.bg {
+  background: var(--fg-color);
+}
+
+button,
+input,
+select,
+textarea,
+.number {
+  padding: var(--inner-gap);
+}
+
+h1 {
+  font-size: 30px;
+  margin: 0;
+}
+
+h2 {
+  margin: 0;
+}
+
+h2:not(:first-child) {
+  padding-top: var(--outer-gap);
+}
+
+header,
+footer {
+  gap: var(--outer-gap);
+  margin: 0 calc(50% - 50vw);
+  min-height: 70px;
+  padding: var(--outer-gap) calc(50vw - 50% + var(--outer-gap));
+}
+
+footer {
+  margin-top: auto;
+}
+
+:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+textarea {
+  height: 300px;
+  width: 100%;
+}
+
+.dialog textarea {
+  width: 720px;
+}
+
+button {
+  cursor: pointer;
+  display: inline-flex;
+  gap: var(--inner-gap);
+  justify-content: center;
+  text-decoration: none;
+}
+
+input,
+select {
+  -webkit-appearance: none;
+  appearance: none;
+  display: block;
+  width: 100%;
+}
+
+select {
+  cursor: pointer;
+  text-transform: capitalize;
+}
+
+#logo {
+  height: 30px;
+  flex-grow: 0;
+}
+
+header,
+footer {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+header,
+footer,
+.space-between {
+  justify-content: space-between;
+}
+
+.flex-row {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: var(--outer-gap);
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  gap: var(--outer-gap);
+}
+
+.no-gap {
+  gap: 0;
+}
+
+.padding {
+  padding: var(--outer-gap);
+}
+
+.align-end {
+  align-items: flex-end;
+}
+
+.hide {
+  display: none !important;
+}
+
+.max-width {
+  width: 100%;
+}
+
+.dialog {
+  align-items: center;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  height: 100%;
+  justify-content: center;
+  left: 0;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1;
+}
+
+.dialog > * {
+  background: rgba(25, 25, 25, 1);
+  max-height: 100vh;
+  max-width: 720px;
+  margin: var(--outer-gap);
+  overflow: auto;
+}
+
+.number,
+#metric-match {
+  width: 80px;
+}
+
+.number {
+  text-align: center;
+}
+
+.star {
+  padding: var(--inner-gap) 6px;
+}
+
+#metric-team {
+  width: 100px;
+}
+
+/* ::-webkit-outer-spin-button,
+::-webkit-inner-spin-button,
+::-webkit-calendar-picker-indicator {
+  -webkit-appearance: none;
+  display: none !important;
+  margin: 0;
+} */
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  -webkit-appearance: textfield;
+  appearance: textfield;
+}
