@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { metricTypes, surveys, type MetricConfig } from "$lib/app";
+  import { metricTypes, surveys, type MetricConfig, getMetricDefaultValue } from "$lib/app";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
@@ -14,10 +14,21 @@
     visible: false,
   };
 
+  let dialogDeleteConfig: { config: MetricConfig | undefined; configIndex: number | undefined; visible: boolean } = {
+    config: undefined,
+    configIndex: undefined,
+    visible: false,
+  };
+
   function moveConfig(index: number, by: number) {
     let configToMove = $surveys[surveyIndex].configs[index];
     $surveys[surveyIndex].configs.splice(index, 1);
     $surveys[surveyIndex].configs.splice(index + by, 0, configToMove);
+    for (let i = 0; i < $surveys[surveyIndex].entries.length; i++) {
+      let metricToMove = $surveys[surveyIndex].entries[i].metrics[index];
+      $surveys[surveyIndex].entries[i].metrics.splice(index, 1);
+      $surveys[surveyIndex].entries[i].metrics.splice(index + by, 0, metricToMove);
+    }
     $surveys = $surveys;
   }
 </script>
@@ -92,6 +103,30 @@
   </Dialog>
 {/if}
 
+{#if dialogDeleteConfig.config && dialogDeleteConfig.configIndex != undefined}
+  <Dialog title="Delete {dialogDeleteConfig.config.name}?" bind:visible={dialogDeleteConfig.visible}>
+    <span>Entry data corresponding to this config may be deleted!</span>
+    <Button
+      slot="buttons"
+      iconName="check"
+      title="Confirm"
+      on:click={() => {
+        if (dialogDeleteConfig.config && dialogDeleteConfig.configIndex != undefined) {
+          for (let entryIndex = 0; entryIndex < $surveys[surveyIndex].entries.length; entryIndex++) {
+            $surveys[surveyIndex].entries[entryIndex].metrics = $surveys[surveyIndex].entries[
+              entryIndex
+            ].metrics.filter((_, i) => i != dialogDeleteConfig.configIndex);
+          }
+          $surveys[surveyIndex].configs = $surveys[surveyIndex].configs.filter(
+            (_, i) => i != dialogDeleteConfig.configIndex
+          );
+          dialogDeleteConfig = { config: undefined, configIndex: undefined, visible: false };
+        }
+      }}
+    />
+  </Dialog>
+{/if}
+
 <Container column padding>
   <h2>Configs</h2>
   {#each $surveys[surveyIndex].configs as config, configIndex (config)}
@@ -119,6 +154,9 @@
               } else if (e.currentTarget.value == "timer") {
                 config = { name: config.name, type: "timer" };
               }
+              for (let i = 0; i < $surveys[surveyIndex].entries.length; i++) {
+                $surveys[surveyIndex].entries[i].metrics[configIndex] = getMetricDefaultValue(config);
+              }
             }}
           >
             {#each Object.values(metricTypes) as metricType}
@@ -135,18 +173,22 @@
         </Container>
       </Container>
       <Container>
-        {#if configIndex > 0}
-          <Button iconName="arrow-up" title="Move up" on:click={() => moveConfig(configIndex, -1)} />
-        {/if}
-        {#if configIndex < $surveys[surveyIndex].configs.length - 1}
-          <Button iconName="arrow-down" title="Move down" on:click={() => moveConfig(configIndex, 1)} />
-        {/if}
+        <Button
+          iconName="arrow-up"
+          title="Move up"
+          disabled={configIndex == 0}
+          on:click={() => moveConfig(configIndex, -1)}
+        />
+        <Button
+          iconName="arrow-down"
+          title="Move down"
+          disabled={configIndex == $surveys[surveyIndex].configs.length - 1}
+          on:click={() => moveConfig(configIndex, 1)}
+        />
         <Button
           iconName="trash"
           title="Delete config"
-          on:click={() => {
-            $surveys[surveyIndex].configs = $surveys[surveyIndex].configs.filter((_, i) => i != configIndex);
-          }}
+          on:click={() => (dialogDeleteConfig = { config, configIndex, visible: true })}
         />
       </Container>
     </Container>
@@ -157,15 +199,21 @@
   <Button
     iconName="plus"
     title="New config"
-    on:click={() => ($surveys[surveyIndex].configs = [...$surveys[surveyIndex].configs, { name: "", type: "toggle" }])}
+    on:click={() => {
+      $surveys[surveyIndex].configs = [...$surveys[surveyIndex].configs, { name: "", type: "toggle" }];
+      for (let i = 0; i < $surveys[surveyIndex].entries.length; i++) {
+        $surveys[surveyIndex].entries[i].metrics = [...$surveys[surveyIndex].entries[i].metrics, false];
+      }
+    }}
   />
   <Button
     iconName="copy"
     title="Copy survey"
-    on:click={() =>
-      (dialogCopySurvey = {
+    on:click={() => {
+      dialogCopySurvey = {
         text: JSON.stringify($surveys[surveyIndex], undefined, "  "),
         visible: true,
-      })}
+      };
+    }}
   />
 </footer>
