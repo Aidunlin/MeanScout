@@ -1,6 +1,6 @@
 import { writable } from "svelte/store";
 
-export const locations = ["Red Near", "Red Mid", "Red Far", "Blue Near", "Blue Mid", "Blue Far"] as const;
+export const locations = ["Red 1", "Red 2", "Red 3", "Blue 1", "Blue 2", "Blue 3"] as const;
 type Location = (typeof locations)[number];
 
 export const metricTypes = ["toggle", "number", "select", "text", "rating", "timer"] as const;
@@ -107,7 +107,7 @@ function localStorageStore<T>(key: string, start: T, subscriber?: (val: T) => vo
 export const surveys = localStorageStore<Survey[]>("surveys", []);
 export const indexes = localStorageStore<Indexes>("indexes", new Indexes());
 export const surveySubPage = localStorageStore<"entries" | "configs" | "options">("surveySubPage", "entries");
-export const location = localStorageStore<Location>("location", "Red Near", (location) => {
+export const location = localStorageStore<Location>("location", "Red 1", (location) => {
   let newTheme = location.split(" ")[0].toLowerCase();
   document.documentElement.style.setProperty("--theme-color", `var(--${newTheme})`);
 });
