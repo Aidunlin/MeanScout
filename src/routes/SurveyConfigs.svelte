@@ -1,23 +1,65 @@
 <script lang="ts">
-  import { getMetricDefaultValue, metricTypes, surveys, type MetricConfig } from "$lib/app";
+  import { getMetricDefaultValue, metricTypes, surveys, type DialogData, type MetricConfig } from "$lib/app";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
-  import Dialog from "$lib/components/Dialog.svelte";
 
   export let surveyIndex: number;
 
-  let dialogCopySurvey = { text: "", visible: false };
-
-  let dialogEditConfig: { config: MetricConfig | undefined; configIndex: number | undefined; visible: boolean } = {
-    config: undefined,
-    configIndex: undefined,
-    visible: false,
+  let copySurveyDialog: DialogData & { text: string } = {
+    element: undefined,
+    text: "",
+    show() {
+      this.element?.showModal();
+    },
+    confirm() {},
+    close() {
+      this.element?.close();
+    },
   };
 
-  let dialogDeleteConfig: { config: MetricConfig | undefined; configIndex: number | undefined; visible: boolean } = {
+  let editConfigDialog: DialogData & { config: MetricConfig | undefined; configIndex: number | undefined } = {
+    element: undefined,
     config: undefined,
     configIndex: undefined,
-    visible: false,
+    show() {
+      this.element?.showModal();
+    },
+    confirm() {
+      if (this.config && this.configIndex != undefined) {
+        $surveys[surveyIndex].configs[this.configIndex] = this.config;
+        this.config = undefined;
+        this.configIndex = undefined;
+        this.close();
+      }
+    },
+    close() {
+      this.element?.close();
+    },
+  };
+
+  let deleteConfigDialog: DialogData & { config: MetricConfig | undefined; configIndex: number | undefined } = {
+    element: undefined,
+    config: undefined,
+    configIndex: undefined,
+    show() {
+      this.element?.showModal();
+    },
+    confirm() {
+      if (this.config && this.configIndex != undefined) {
+        for (let entryIndex = 0; entryIndex < $surveys[surveyIndex].entries.length; entryIndex++) {
+          $surveys[surveyIndex].entries[entryIndex].metrics = $surveys[surveyIndex].entries[entryIndex].metrics.filter(
+            (_, i) => i != this.configIndex
+          );
+        }
+        $surveys[surveyIndex].configs = $surveys[surveyIndex].configs.filter((_, i) => i != this.configIndex);
+        this.config = undefined;
+        this.configIndex = undefined;
+        this.close();
+      }
+    },
+    close() {
+      this.element?.close();
+    },
   };
 
   function moveConfig(index: number, by: number) {
@@ -33,30 +75,33 @@
   }
 </script>
 
-<Dialog title="Select and copy the survey:" bind:visible={dialogCopySurvey.visible}>
+<dialog bind:this={copySurveyDialog.element}>
+  <span>Select and copy the survey:</span>
   <Container maxWidth>
-    <textarea readonly bind:value={dialogCopySurvey.text} />
+    <textarea readonly bind:value={copySurveyDialog.text} />
   </Container>
-</Dialog>
+  <Button iconName="xmark" title="Close" on:click={() => copySurveyDialog.close()} />
+</dialog>
 
-{#if dialogEditConfig.config && dialogEditConfig.configIndex != undefined}
-  <Dialog title="Edit {dialogEditConfig.config.name}:" bind:visible={dialogEditConfig.visible}>
+<dialog bind:this={editConfigDialog.element}>
+  {#if editConfigDialog.config && editConfigDialog.configIndex != undefined}
+    <span>Edit {editConfigDialog.config.name}:</span>
     <Container column noGap>
       Group
-      <input bind:value={dialogEditConfig.config.group} />
+      <input bind:value={editConfigDialog.config.group} />
     </Container>
-    {#if dialogEditConfig.config.type == "select"}
+    {#if editConfigDialog.config.type == "select"}
       <Container column maxWidth>
         Values
-        {#each dialogEditConfig.config.values as value, valueIndex}
+        {#each editConfigDialog.config.values as value, valueIndex}
           <Container>
             <input bind:value style="width:200px" />
             <Button
               iconName="trash"
               title="Delete value"
               on:click={() => {
-                if (dialogEditConfig.config?.type == "select")
-                  dialogEditConfig.config.values = dialogEditConfig.config.values.filter((_, i) => i != valueIndex);
+                if (editConfigDialog.config?.type == "select")
+                  editConfigDialog.config.values = editConfigDialog.config.values.filter((_, i) => i != valueIndex);
               }}
             />
           </Container>
@@ -66,66 +111,45 @@
             iconName="plus"
             title="New value"
             on:click={() => {
-              if (dialogEditConfig.config?.type == "select")
-                dialogEditConfig.config.values = [...dialogEditConfig.config.values, ""];
+              if (editConfigDialog.config?.type == "select")
+                editConfigDialog.config.values = [...editConfigDialog.config.values, ""];
             }}
           />
         </Container>
       </Container>
-    {:else if dialogEditConfig.config.type == "text"}
+    {:else if editConfigDialog.config.type == "text"}
       <Container>
         <Button
-          iconStyle={dialogEditConfig.config.long ? "solid" : "regular"}
-          iconName={dialogEditConfig.config.long ? "square-check" : "square"}
+          iconStyle={editConfigDialog.config.long ? "solid" : "regular"}
+          iconName={editConfigDialog.config.long ? "square-check" : "square"}
           text="Long"
           on:click={() => {
-            if (dialogEditConfig.config?.type == "text") dialogEditConfig.config.long = !dialogEditConfig.config.long;
+            if (editConfigDialog.config?.type == "text") editConfigDialog.config.long = !editConfigDialog.config.long;
           }}
         />
       </Container>
       <Container column noGap>
         Tip
-        <input bind:value={dialogEditConfig.config.tip} />
+        <input bind:value={editConfigDialog.config.tip} />
       </Container>
     {/if}
+    <Container spaceBetween>
+      <Button iconName="check" title="Confirm" on:click={() => editConfigDialog.confirm()} />
+      <Button iconName="xmark" title="Close" on:click={() => editConfigDialog.close()} />
+    </Container>
+  {/if}
+</dialog>
 
-    <Button
-      slot="buttons"
-      iconName="check"
-      title="Confirm"
-      on:click={() => {
-        if (dialogEditConfig.config && dialogEditConfig.configIndex != undefined) {
-          $surveys[surveyIndex].configs[dialogEditConfig.configIndex] = dialogEditConfig.config;
-          dialogEditConfig = { config: undefined, configIndex: undefined, visible: false };
-        }
-      }}
-    />
-  </Dialog>
-{/if}
-
-{#if dialogDeleteConfig.config && dialogDeleteConfig.configIndex != undefined}
-  <Dialog title="Delete {dialogDeleteConfig.config.name}?" bind:visible={dialogDeleteConfig.visible}>
+<dialog bind:this={deleteConfigDialog.element}>
+  {#if deleteConfigDialog.config && deleteConfigDialog.configIndex != undefined}
+    <span>Delete {deleteConfigDialog.config.name}?</span>
     <span>Entry data corresponding to this config may be deleted!</span>
-    <Button
-      slot="buttons"
-      iconName="check"
-      title="Confirm"
-      on:click={() => {
-        if (dialogDeleteConfig.config && dialogDeleteConfig.configIndex != undefined) {
-          for (let entryIndex = 0; entryIndex < $surveys[surveyIndex].entries.length; entryIndex++) {
-            $surveys[surveyIndex].entries[entryIndex].metrics = $surveys[surveyIndex].entries[
-              entryIndex
-            ].metrics.filter((_, i) => i != dialogDeleteConfig.configIndex);
-          }
-          $surveys[surveyIndex].configs = $surveys[surveyIndex].configs.filter(
-            (_, i) => i != dialogDeleteConfig.configIndex
-          );
-          dialogDeleteConfig = { config: undefined, configIndex: undefined, visible: false };
-        }
-      }}
-    />
-  </Dialog>
-{/if}
+    <Container spaceBetween>
+      <Button iconName="check" title="Confirm" on:click={() => deleteConfigDialog.confirm()} />
+      <Button iconName="xmark" title="Close" on:click={() => deleteConfigDialog.close()} />
+    </Container>
+  {/if}
+</dialog>
 
 <Container column padding>
   <h2>Configs</h2>
@@ -168,7 +192,11 @@
           <Button
             iconName="pen"
             text="Edit"
-            on:click={() => (dialogEditConfig = { config, configIndex, visible: true })}
+            on:click={() => {
+              editConfigDialog.config = config;
+              editConfigDialog.configIndex = configIndex;
+              editConfigDialog.show();
+            }}
           />
         </Container>
       </Container>
@@ -188,7 +216,11 @@
         <Button
           iconName="trash"
           title="Delete config"
-          on:click={() => (dialogDeleteConfig = { config, configIndex, visible: true })}
+          on:click={() => {
+            deleteConfigDialog.config = config;
+            deleteConfigDialog.configIndex = configIndex;
+            deleteConfigDialog.show();
+          }}
         />
       </Container>
     </Container>
@@ -210,10 +242,8 @@
     iconName="copy"
     title="Copy survey"
     on:click={() => {
-      dialogCopySurvey = {
-        text: JSON.stringify($surveys[surveyIndex], undefined, "  "),
-        visible: true,
-      };
+      copySurveyDialog.text = JSON.stringify($surveys[surveyIndex], undefined, "  ");
+      copySurveyDialog.show();
     }}
   />
 </footer>

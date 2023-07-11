@@ -1,12 +1,46 @@
 <script lang="ts">
-  import { downloadSurveyEntries, getMetricDefaultValue, indexes, surveys, type Entry } from "$lib/app";
+  import {
+    downloadSurveyEntries,
+    getMetricDefaultValue,
+    indexes,
+    surveys,
+    type DialogData,
+    type Entry,
+  } from "$lib/app";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
-  import Dialog from "$lib/components/Dialog.svelte";
 
   export let surveyIndex: number;
 
-  let dialogDownloadEntries = { visible: false };
+  let downloadEntriesDialog: DialogData = {
+    element: undefined,
+    show() {
+      this.element?.showModal();
+    },
+    confirm() {
+      downloadSurveyEntries($surveys[surveyIndex]);
+      this.close();
+    },
+    close() {
+      this.element?.close();
+    },
+  };
+
+  let deleteEntryDialog: DialogData & { entryIndex: number | undefined } = {
+    element: undefined,
+    entryIndex: undefined,
+    show() {
+      this.element?.showModal();
+    },
+    confirm() {
+      $surveys[surveyIndex].entries = $surveys[surveyIndex].entries.filter((_, i) => i != this.entryIndex);
+      this.close();
+    },
+    close() {
+      this.entryIndex = undefined;
+      this.element?.close();
+    },
+  };
 
   function newEntryClicked() {
     let match = 1;
@@ -23,33 +57,29 @@
     };
     $surveys[surveyIndex].entries = [entry, ...$surveys[surveyIndex].entries];
   }
-
-  function downloadEntries() {
-    downloadSurveyEntries($surveys[surveyIndex]);
-
-    dialogDownloadEntries = { visible: false };
-  }
-
-  let dialogDeleteEntry = { entryIndex: 0, visible: false };
-
-  function deleteEntry() {
-    $surveys[surveyIndex].entries = $surveys[surveyIndex].entries.filter((_, i) => i != dialogDeleteEntry.entryIndex);
-
-    dialogDeleteEntry = { entryIndex: 0, visible: false };
-  }
 </script>
 
-<Dialog title="Download entries as CSV?" bind:visible={dialogDownloadEntries.visible}>
-  <Button slot="buttons" iconName="check" title="Confirm" on:click={downloadEntries} />
-</Dialog>
+<dialog bind:this={downloadEntriesDialog.element}>
+  <span>Download entries as CSV?</span>
+  <Container spaceBetween>
+    <Button iconName="check" title="Confirm" on:click={() => downloadEntriesDialog.confirm()} />
+    <Button iconName="xmark" title="Close" on:click={() => downloadEntriesDialog.close()} />
+  </Container>
+</dialog>
 
-<Dialog title="Delete this entry?" bind:visible={dialogDeleteEntry.visible}>
-  <span>
-    Team: {$surveys[surveyIndex].entries[dialogDeleteEntry.entryIndex].team}
-    | Match: {$surveys[surveyIndex].entries[dialogDeleteEntry.entryIndex].match}
-  </span>
-  <Button slot="buttons" iconName="check" title="Confirm" on:click={deleteEntry} />
-</Dialog>
+<dialog bind:this={deleteEntryDialog.element}>
+  {#if deleteEntryDialog.entryIndex != undefined}
+    <span>Delete this entry?</span>
+    <span>
+      Team: {$surveys[surveyIndex].entries[deleteEntryDialog.entryIndex].team}
+      | Match: {$surveys[surveyIndex].entries[deleteEntryDialog.entryIndex].match}
+    </span>
+    <Container spaceBetween>
+      <Button iconName="check" title="Confirm" on:click={() => deleteEntryDialog.confirm()} />
+      <Button iconName="xmark" title="Close" on:click={() => deleteEntryDialog.close()} />
+    </Container>
+  {/if}
+</dialog>
 
 <Container column padding>
   <h2>Entries</h2>
@@ -62,7 +92,10 @@
       <Button
         iconName="trash"
         title="Delete entry"
-        on:click={() => (dialogDeleteEntry = { entryIndex, visible: true })}
+        on:click={() => {
+          deleteEntryDialog.entryIndex = entryIndex;
+          deleteEntryDialog.show();
+        }}
       />
     </Container>
   {/each}
@@ -70,5 +103,5 @@
 
 <footer>
   <Button iconName="plus" title="New entry" on:click={newEntryClicked} />
-  <Button iconName="download" title="Download entries" on:click={() => (dialogDownloadEntries.visible = true)} />
+  <Button iconName="download" title="Download entries" on:click={() => downloadEntriesDialog.show()} />
 </footer>

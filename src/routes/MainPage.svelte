@@ -1,82 +1,132 @@
 <script lang="ts">
-  import { indexes, location, locations, mainSubPage, parseSurvey, surveys, type Survey } from "$lib/app";
+  import {
+    indexes,
+    location,
+    locations,
+    mainSubPage,
+    parseSurvey,
+    surveys,
+    type DialogData,
+    type Survey,
+  } from "$lib/app";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
-  import Dialog from "$lib/components/Dialog.svelte";
   import Header from "$lib/components/Header.svelte";
 
-  let dialogNewSurvey = { name: "", error: "", visible: false };
-  let dialogPasteSurvey = { input: "", error: "", visible: false };
-  let dialogDeleteSurvey = { surveyIndex: 0, visible: false };
+  let newSurveyDialog: DialogData & { name: string; error: string } = {
+    element: undefined,
+    name: "",
+    error: "",
+    show() {
+      this.name = "";
+      this.error = "";
+      this.element?.showModal();
+    },
+    confirm() {
+      if (!this.name) return;
+      if ($surveys.map((survey) => survey.name).includes(this.name)) {
+        this.error = "That name is already used!";
+        return;
+      }
+      let survey: Survey = {
+        name: this.name,
+        configs: [],
+        teams: [],
+        entries: [],
+      };
+      $surveys = [survey, ...$surveys];
+      this.close();
+    },
+    close() {
+      this.name = "";
+      this.error = "";
+      this.element?.close();
+    },
+  };
 
-  function newSurvey() {
-    if (!dialogNewSurvey.name) return;
+  let pasteSurveyDialog: DialogData & { input: string; error: string } = {
+    element: undefined,
+    input: "",
+    error: "",
+    show() {
+      this.input = "";
+      this.error = "";
+      this.element?.showModal();
+    },
+    confirm() {
+      if (!this.input) return;
+      let result = parseSurvey(this.input);
+      if (typeof result == "string") {
+        this.error = `Could not set survey! ${result}`;
+        return;
+      }
+      if ($surveys.map((survey) => survey.name).includes(result.name)) {
+        this.error = `Could not set survey! ${result.name} already exists`;
+        return;
+      }
+      $surveys = [result, ...$surveys];
+      this.close();
+    },
+    close() {
+      this.input = "";
+      this.error = "";
+      this.element?.close();
+    },
+  };
 
-    if ($surveys.map((survey) => survey.name).includes(dialogNewSurvey.name)) {
-      dialogNewSurvey.error = "That name is already used!";
-      return;
-    }
-
-    let survey: Survey = {
-      name: dialogNewSurvey.name,
-      configs: [],
-      teams: [],
-      entries: [],
-    };
-    $surveys = [survey, ...$surveys];
-
-    dialogNewSurvey = { name: "", error: "", visible: false };
-  }
-
-  function pasteSurvey() {
-    if (!dialogPasteSurvey.input) return;
-
-    let result = parseSurvey(dialogPasteSurvey.input);
-
-    if (typeof result == "string") {
-      dialogPasteSurvey.error = `Could not set survey! ${result}`;
-      return;
-    }
-
-    if ($surveys.map((survey) => survey.name).includes(result.name)) {
-      dialogPasteSurvey.error = `Could not set survey! ${result.name} already exists`;
-      return;
-    }
-
-    $surveys = [result, ...$surveys];
-
-    dialogPasteSurvey = { input: "", error: "", visible: false };
-  }
-
-  function deleteSurvey() {
-    $surveys = $surveys.filter((_, idx) => idx != dialogDeleteSurvey.surveyIndex);
-
-    dialogDeleteSurvey = { surveyIndex: 0, visible: false };
-  }
+  let deleteSurveyDialog: DialogData & { surveyIndex: number | undefined } = {
+    element: undefined,
+    surveyIndex: undefined,
+    show() {
+      this.element?.showModal();
+    },
+    confirm() {
+      $surveys = $surveys.filter((_, idx) => idx != this.surveyIndex);
+      this.close();
+    },
+    close() {
+      this.surveyIndex = undefined;
+      this.element?.close();
+    },
+  };
 </script>
 
-<Dialog title="Enter name for new survey:" bind:visible={dialogNewSurvey.visible}>
-  <input bind:value={dialogNewSurvey.name} />
-  {#if dialogNewSurvey.error}
-    <span>{dialogNewSurvey.error}</span>
+<dialog bind:this={newSurveyDialog.element}>
+  <span>Enter name for new survey:</span>
+  <input bind:value={newSurveyDialog.name} />
+  {#if newSurveyDialog.error}
+    <span>{newSurveyDialog.error}</span>
   {/if}
-  <Button slot="buttons" iconName="check" title="Confirm" on:click={newSurvey} />
-</Dialog>
-
-<Dialog title="Paste new survey:" bind:visible={dialogPasteSurvey.visible}>
-  <Container maxWidth>
-    <textarea bind:value={dialogPasteSurvey.input} />
+  <Container spaceBetween>
+    <Button iconName="check" title="Confirm" on:click={() => newSurveyDialog.confirm()} />
+    <Button iconName="xmark" title="Close" on:click={() => newSurveyDialog.close()} />
   </Container>
-  {#if dialogPasteSurvey.error}
-    <span>{dialogPasteSurvey.error}</span>
-  {/if}
-  <Button slot="buttons" iconName="check" title="Confirm" on:click={pasteSurvey} />
-</Dialog>
+</dialog>
 
-<Dialog title="Delete this survey?" bind:visible={dialogDeleteSurvey.visible}>
-  <span>Everything in "{$surveys[dialogDeleteSurvey.surveyIndex].name}" will be lost!</span>
-  <Button slot="buttons" iconName="check" title="Confirm" on:click={deleteSurvey} />
-</Dialog>
+<dialog bind:this={pasteSurveyDialog.element}>
+  <span>Paste new survey:</span>
+  <Container maxWidth>
+    <textarea bind:value={pasteSurveyDialog.input} />
+  </Container>
+  {#if pasteSurveyDialog.error}
+    <span>{pasteSurveyDialog.error}</span>
+  {/if}
+  <Container spaceBetween>
+    <Button iconName="check" title="Confirm" on:click={() => pasteSurveyDialog.confirm()} />
+    <Button iconName="xmark" title="Close" on:click={() => pasteSurveyDialog.close()} />
+  </Container>
+</dialog>
+
+<dialog bind:this={deleteSurveyDialog.element}>
+  {#if deleteSurveyDialog.surveyIndex != undefined}
+    <span>Delete this survey?</span>
+    <span>Everything in "{$surveys[deleteSurveyDialog.surveyIndex].name}" will be lost!</span>
+    <Container spaceBetween>
+      <Button iconName="check" title="Confirm" on:click={() => deleteSurveyDialog.confirm()} />
+      <Button iconName="xmark" title="Close" on:click={() => deleteSurveyDialog.close()} />
+    </Container>
+  {/if}
+</dialog>
 
 <Header />
 
@@ -107,22 +157,20 @@
             <span>({survey.entries.length} {survey.entries.length == 1 ? "entry" : "entries"})</span>
           {/if}
         </Container>
-        <Button iconName="trash" on:click={() => (dialogDeleteSurvey = { surveyIndex, visible: true })} />
+        <Button
+          iconName="trash"
+          on:click={() => {
+            deleteSurveyDialog.surveyIndex = surveyIndex;
+            deleteSurveyDialog.show();
+          }}
+        />
       </Container>
     {/each}
   </Container>
 
   <footer>
-    <Button
-      iconName="plus"
-      title="New survey"
-      on:click={() => (dialogNewSurvey = { name: "", error: "", visible: true })}
-    />
-    <Button
-      iconName="paste"
-      title="Paste survey"
-      on:click={() => (dialogPasteSurvey = { input: "", error: "", visible: true })}
-    />
+    <Button iconName="plus" title="New survey" on:click={() => newSurveyDialog.show()} />
+    <Button iconName="paste" title="Paste survey" on:click={() => pasteSurveyDialog.show()} />
   </footer>
 {:else}
   <Container column padding>
