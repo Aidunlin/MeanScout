@@ -1,84 +1,16 @@
 <script lang="ts">
-  import {
-    getMetricDefaultValue,
-    indexes,
-    surveys,
-    validateEntry,
-    type DialogData,
-    type Entry,
-    mainPage,
-    surveyPage,
-  } from "$lib/app";
+  import { getMetricDefaultValue, indexes, mainPage, surveyPage, surveys, validateEntry } from "$lib/app";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
+  import Dialog from "$lib/components/Dialog.svelte";
   import Header from "$lib/components/Header.svelte";
   import MetricEditor from "$lib/components/MetricEditor.svelte";
 
   export let surveyIndex: number;
   export let entryIndex: number;
 
-  let saveEntryDialog: DialogData & { error: string } = {
-    element: undefined,
-    error: "",
-    show() {
-      this.error = "";
-      this.element?.showModal();
-    },
-    confirm() {
-      let error = validateEntry($surveys[surveyIndex], $surveys[surveyIndex].entries[entryIndex]);
-      if (error) {
-        this.error = `Could not save entry! ${error}`;
-        return;
-      }
-      let entry: Entry = {
-        team: "",
-        match: $surveys[surveyIndex].entries[entryIndex].match + 1,
-        isAbsent: false,
-        metrics: $surveys[surveyIndex].configs.map(getMetricDefaultValue),
-      };
-      $surveys[surveyIndex].entries = [entry, ...$surveys[surveyIndex].entries];
-      this.close();
-    },
-    close() {
-      this.error = "";
-      this.element?.close();
-    },
-  };
-
-  let resetEntryDialog: DialogData = {
-    element: undefined,
-    show() {
-      this.element?.showModal();
-    },
-    confirm() {
-      $surveys[surveyIndex].entries[entryIndex].isAbsent = false;
-      $surveys[surveyIndex].entries[entryIndex].metrics = $surveys[surveyIndex].configs.map(getMetricDefaultValue);
-      this.close();
-    },
-    close() {
-      this.element?.close();
-    },
-  };
+  let saveEntryDialog = { error: "" };
 </script>
-
-<dialog bind:this={saveEntryDialog.element}>
-  <span>Save this entry and start a new one?</span>
-  {#if saveEntryDialog.error}
-    <span>{saveEntryDialog.error}</span>
-  {/if}
-  <Container spaceBetween>
-    <Button iconName="check" title="Confirm" on:click={() => saveEntryDialog.confirm()} />
-    <Button iconName="xmark" title="Close" on:click={() => saveEntryDialog.close()} />
-  </Container>
-</dialog>
-
-<dialog bind:this={resetEntryDialog.element}>
-  <span>Reset this entry?</span>
-  <Container spaceBetween>
-    <Button iconName="check" title="Confirm" on:click={() => resetEntryDialog.confirm()} />
-    <Button iconName="xmark" title="Close" on:click={() => resetEntryDialog.close()} />
-  </Container>
-</dialog>
 
 <Header title="Entry ({$surveys[surveyIndex].name})">
   <Button
@@ -131,6 +63,41 @@
 {/if}
 
 <footer>
-  <Button iconName="floppy-disk" title="Save entry" on:click={() => saveEntryDialog.show()} />
-  <Button iconName="arrow-rotate-left" title="Reset entry" on:click={() => resetEntryDialog.show()} />
+  <Dialog
+    openButton={{ iconName: "floppy-disk", title: "Save entry" }}
+    onConfirm={() => {
+      let error = validateEntry($surveys[surveyIndex], $surveys[surveyIndex].entries[entryIndex]);
+      if (error) {
+        saveEntryDialog.error = `Could not save entry! ${error}`;
+        return false;
+      }
+      $surveys[surveyIndex].entries = [
+        {
+          team: "",
+          match: $surveys[surveyIndex].entries[entryIndex].match + 1,
+          isAbsent: false,
+          metrics: $surveys[surveyIndex].configs.map(getMetricDefaultValue),
+        },
+        ...$surveys[surveyIndex].entries,
+      ];
+      return true;
+    }}
+    on:close={() => (saveEntryDialog = { error: "" })}
+  >
+    <span>Save this entry and start a new one?</span>
+    {#if saveEntryDialog.error}
+      <span>{saveEntryDialog.error}</span>
+    {/if}
+  </Dialog>
+
+  <Dialog
+    openButton={{ iconName: "arrow-rotate-left", title: "Reset entry" }}
+    onConfirm={() => {
+      $surveys[surveyIndex].entries[entryIndex].isAbsent = false;
+      $surveys[surveyIndex].entries[entryIndex].metrics = $surveys[surveyIndex].configs.map(getMetricDefaultValue);
+      return true;
+    }}
+  >
+    <span>Reset this entry?</span>
+  </Dialog>
 </footer>

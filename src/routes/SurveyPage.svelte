@@ -3,47 +3,17 @@
     downloadSurveyEntries,
     getMetricDefaultValue,
     indexes,
+    mainPage,
     surveyPage,
     surveys,
-    type DialogData,
     type Entry,
-    mainPage,
   } from "$lib/app";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
+  import Dialog from "$lib/components/Dialog.svelte";
   import Header from "$lib/components/Header.svelte";
 
   export let surveyIndex: number;
-
-  let downloadEntriesDialog: DialogData = {
-    element: undefined,
-    show() {
-      this.element?.showModal();
-    },
-    confirm() {
-      downloadSurveyEntries($surveys[surveyIndex]);
-      this.close();
-    },
-    close() {
-      this.element?.close();
-    },
-  };
-
-  let deleteEntryDialog: DialogData & { entryIndex: number | undefined } = {
-    element: undefined,
-    entryIndex: undefined,
-    show() {
-      this.element?.showModal();
-    },
-    confirm() {
-      $surveys[surveyIndex].entries = $surveys[surveyIndex].entries.filter((_, i) => i != this.entryIndex);
-      this.close();
-    },
-    close() {
-      this.entryIndex = undefined;
-      this.element?.close();
-    },
-  };
 
   function newEntryClicked() {
     let match = 1;
@@ -95,41 +65,34 @@
         />
         <span>Team: {entry.team} | Match: {entry.match}</span>
       </Container>
-      <Button
-        iconName="trash"
-        title="Delete entry"
-        on:click={() => {
-          deleteEntryDialog.entryIndex = entryIndex;
-          deleteEntryDialog.show();
+
+      <Dialog
+        openButton={{ iconName: "trash", title: "Delete entry" }}
+        onConfirm={() => {
+          $surveys[surveyIndex].entries = $surveys[surveyIndex].entries.filter((_, i) => i != entryIndex);
+          return true;
         }}
-      />
+      >
+        <span>Delete this entry?</span>
+        <span>
+          Team: {$surveys[surveyIndex].entries[entryIndex].team}
+          | Match: {$surveys[surveyIndex].entries[entryIndex].match}
+        </span>
+      </Dialog>
     </Container>
   {/each}
-
-  <dialog bind:this={deleteEntryDialog.element}>
-    {#if deleteEntryDialog.entryIndex != undefined}
-      <span>Delete this entry?</span>
-      <span>
-        Team: {$surveys[surveyIndex].entries[deleteEntryDialog.entryIndex].team}
-        | Match: {$surveys[surveyIndex].entries[deleteEntryDialog.entryIndex].match}
-      </span>
-      <Container spaceBetween>
-        <Button iconName="check" title="Confirm" on:click={() => deleteEntryDialog.confirm()} />
-        <Button iconName="xmark" title="Close" on:click={() => deleteEntryDialog.close()} />
-      </Container>
-    {/if}
-  </dialog>
 </Container>
 
 <footer>
   <Button iconName="plus" title="New entry" on:click={newEntryClicked} />
 
-  <Button iconName="download" title="Download entries" on:click={() => downloadEntriesDialog.show()} />
-  <dialog bind:this={downloadEntriesDialog.element}>
+  <Dialog
+    openButton={{ iconName: "download", title: "Download entries" }}
+    onConfirm={() => {
+      downloadSurveyEntries($surveys[surveyIndex]);
+      return true;
+    }}
+  >
     <span>Download entries as CSV?</span>
-    <Container spaceBetween>
-      <Button iconName="check" title="Confirm" on:click={() => downloadEntriesDialog.confirm()} />
-      <Button iconName="xmark" title="Close" on:click={() => downloadEntriesDialog.close()} />
-    </Container>
-  </dialog>
+  </Dialog>
 </footer>

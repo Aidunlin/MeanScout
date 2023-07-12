@@ -64,13 +64,6 @@ export type Survey = {
   entries: Entry[];
 };
 
-export type DialogData = {
-  element: HTMLDialogElement | undefined;
-  show: () => void;
-  confirm: () => void;
-  close: () => void;
-};
-
 class Indexes {
   private value: { survey?: number; entry: undefined } | { survey: number; entry: number } = {
     survey: undefined,
