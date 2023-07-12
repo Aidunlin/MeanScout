@@ -1,7 +1,16 @@
 <script lang="ts">
-  import { getMetricDefaultValue, metricTypes, surveys, type DialogData, type MetricConfig } from "$lib/app";
+  import {
+    getMetricDefaultValue,
+    indexes,
+    metricTypes,
+    surveyPage,
+    surveys,
+    type DialogData,
+    type MetricConfig,
+  } from "$lib/app";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
+  import Header from "$lib/components/Header.svelte";
 
   export let surveyIndex: number;
 
@@ -75,81 +84,15 @@
   }
 </script>
 
-<dialog bind:this={copySurveyDialog.element}>
-  <span>Select and copy the survey:</span>
-  <Container maxWidth>
-    <textarea readonly bind:value={copySurveyDialog.text} />
-  </Container>
-  <Button iconName="xmark" title="Close" on:click={() => copySurveyDialog.close()} />
-</dialog>
+<Header title={$surveys[surveyIndex].name}>
+  <Button iconName="arrow-left" title="Back to surveys" on:click={() => ($indexes.survey = undefined)} />
+</Header>
 
-<dialog bind:this={editConfigDialog.element}>
-  {#if editConfigDialog.config && editConfigDialog.configIndex != undefined}
-    <span>Edit {editConfigDialog.config.name}:</span>
-    <Container column noGap>
-      Group
-      <input bind:value={editConfigDialog.config.group} />
-    </Container>
-    {#if editConfigDialog.config.type == "select"}
-      <Container column maxWidth>
-        Values
-        {#each editConfigDialog.config.values as value, valueIndex}
-          <Container>
-            <input bind:value style="width:200px" />
-            <Button
-              iconName="trash"
-              title="Delete value"
-              on:click={() => {
-                if (editConfigDialog.config?.type == "select")
-                  editConfigDialog.config.values = editConfigDialog.config.values.filter((_, i) => i != valueIndex);
-              }}
-            />
-          </Container>
-        {/each}
-        <Container>
-          <Button
-            iconName="plus"
-            title="New value"
-            on:click={() => {
-              if (editConfigDialog.config?.type == "select")
-                editConfigDialog.config.values = [...editConfigDialog.config.values, ""];
-            }}
-          />
-        </Container>
-      </Container>
-    {:else if editConfigDialog.config.type == "text"}
-      <Container>
-        <Button
-          iconStyle={editConfigDialog.config.long ? "solid" : "regular"}
-          iconName={editConfigDialog.config.long ? "square-check" : "square"}
-          text="Long"
-          on:click={() => {
-            if (editConfigDialog.config?.type == "text") editConfigDialog.config.long = !editConfigDialog.config.long;
-          }}
-        />
-      </Container>
-      <Container column noGap>
-        Tip
-        <input bind:value={editConfigDialog.config.tip} />
-      </Container>
-    {/if}
-    <Container spaceBetween>
-      <Button iconName="check" title="Confirm" on:click={() => editConfigDialog.confirm()} />
-      <Button iconName="xmark" title="Close" on:click={() => editConfigDialog.close()} />
-    </Container>
-  {/if}
-</dialog>
-
-<dialog bind:this={deleteConfigDialog.element}>
-  {#if deleteConfigDialog.config && deleteConfigDialog.configIndex != undefined}
-    <span>Delete {deleteConfigDialog.config.name}?</span>
-    <span>Entry data corresponding to this config may be deleted!</span>
-    <Container spaceBetween>
-      <Button iconName="check" title="Confirm" on:click={() => deleteConfigDialog.confirm()} />
-      <Button iconName="xmark" title="Close" on:click={() => deleteConfigDialog.close()} />
-    </Container>
-  {/if}
-</dialog>
+<Container padding noGap>
+  <Button iconName="list-ol" title="Entries" disableTheme on:click={() => ($surveyPage = "entries")} />
+  <Button iconName="gears" title="Configs" />
+  <Button iconName="ellipsis-vertical" title="Options" disableTheme on:click={() => ($surveyPage = "options")} />
+</Container>
 
 <Container column padding>
   <h2>Configs</h2>
@@ -225,6 +168,74 @@
       </Container>
     </Container>
   {/each}
+
+  <dialog bind:this={editConfigDialog.element}>
+    {#if editConfigDialog.config && editConfigDialog.configIndex != undefined}
+      <span>Edit {editConfigDialog.config.name}:</span>
+      <Container column noGap>
+        Group
+        <input bind:value={editConfigDialog.config.group} />
+      </Container>
+      {#if editConfigDialog.config.type == "select"}
+        <Container column maxWidth>
+          Values
+          {#each editConfigDialog.config.values as value, valueIndex}
+            <Container>
+              <input bind:value style="width:200px" />
+              <Button
+                iconName="trash"
+                title="Delete value"
+                on:click={() => {
+                  if (editConfigDialog.config?.type == "select")
+                    editConfigDialog.config.values = editConfigDialog.config.values.filter((_, i) => i != valueIndex);
+                }}
+              />
+            </Container>
+          {/each}
+          <Container>
+            <Button
+              iconName="plus"
+              title="New value"
+              on:click={() => {
+                if (editConfigDialog.config?.type == "select")
+                  editConfigDialog.config.values = [...editConfigDialog.config.values, ""];
+              }}
+            />
+          </Container>
+        </Container>
+      {:else if editConfigDialog.config.type == "text"}
+        <Container>
+          <Button
+            iconStyle={editConfigDialog.config.long ? "solid" : "regular"}
+            iconName={editConfigDialog.config.long ? "square-check" : "square"}
+            text="Long"
+            on:click={() => {
+              if (editConfigDialog.config?.type == "text") editConfigDialog.config.long = !editConfigDialog.config.long;
+            }}
+          />
+        </Container>
+        <Container column noGap>
+          Tip
+          <input bind:value={editConfigDialog.config.tip} />
+        </Container>
+      {/if}
+      <Container spaceBetween>
+        <Button iconName="check" title="Confirm" on:click={() => editConfigDialog.confirm()} />
+        <Button iconName="xmark" title="Close" on:click={() => editConfigDialog.close()} />
+      </Container>
+    {/if}
+  </dialog>
+
+  <dialog bind:this={deleteConfigDialog.element}>
+    {#if deleteConfigDialog.config && deleteConfigDialog.configIndex != undefined}
+      <span>Delete {deleteConfigDialog.config.name}?</span>
+      <span>Entry data corresponding to this config may be deleted!</span>
+      <Container spaceBetween>
+        <Button iconName="check" title="Confirm" on:click={() => deleteConfigDialog.confirm()} />
+        <Button iconName="xmark" title="Close" on:click={() => deleteConfigDialog.close()} />
+      </Container>
+    {/if}
+  </dialog>
 </Container>
 
 <footer>
@@ -238,6 +249,7 @@
       }
     }}
   />
+
   <Button
     iconName="copy"
     title="Copy survey"
@@ -246,4 +258,11 @@
       copySurveyDialog.show();
     }}
   />
+  <dialog bind:this={copySurveyDialog.element}>
+    <span>Select and copy the survey:</span>
+    <Container maxWidth>
+      <textarea readonly bind:value={copySurveyDialog.text} />
+    </Container>
+    <Button iconName="xmark" title="Close" on:click={() => copySurveyDialog.close()} />
+  </dialog>
 </footer>

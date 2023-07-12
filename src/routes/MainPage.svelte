@@ -1,14 +1,5 @@
 <script lang="ts">
-  import {
-    indexes,
-    location,
-    locations,
-    mainSubPage,
-    parseSurvey,
-    surveys,
-    type DialogData,
-    type Survey,
-  } from "$lib/app";
+  import { indexes, mainPage, parseSurvey, surveys, type DialogData, type Survey, surveyPage } from "$lib/app";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Header from "$lib/components/Header.svelte";
@@ -91,99 +82,79 @@
   };
 </script>
 
-<dialog bind:this={newSurveyDialog.element}>
-  <span>Enter name for new survey:</span>
-  <input bind:value={newSurveyDialog.name} />
-  {#if newSurveyDialog.error}
-    <span>{newSurveyDialog.error}</span>
-  {/if}
-  <Container spaceBetween>
-    <Button iconName="check" title="Confirm" on:click={() => newSurveyDialog.confirm()} />
-    <Button iconName="xmark" title="Close" on:click={() => newSurveyDialog.close()} />
-  </Container>
-</dialog>
-
-<dialog bind:this={pasteSurveyDialog.element}>
-  <span>Paste new survey:</span>
-  <Container maxWidth>
-    <textarea bind:value={pasteSurveyDialog.input} />
-  </Container>
-  {#if pasteSurveyDialog.error}
-    <span>{pasteSurveyDialog.error}</span>
-  {/if}
-  <Container spaceBetween>
-    <Button iconName="check" title="Confirm" on:click={() => pasteSurveyDialog.confirm()} />
-    <Button iconName="xmark" title="Close" on:click={() => pasteSurveyDialog.close()} />
-  </Container>
-</dialog>
-
-<dialog bind:this={deleteSurveyDialog.element}>
-  {#if deleteSurveyDialog.surveyIndex != undefined}
-    <span>Delete this survey?</span>
-    <span>Everything in "{$surveys[deleteSurveyDialog.surveyIndex].name}" will be lost!</span>
-    <Container spaceBetween>
-      <Button iconName="check" title="Confirm" on:click={() => deleteSurveyDialog.confirm()} />
-      <Button iconName="xmark" title="Close" on:click={() => deleteSurveyDialog.close()} />
-    </Container>
-  {/if}
-</dialog>
-
 <Header />
 
 <Container padding noGap>
-  <Button
-    iconName="list-ul"
-    title="Surveys"
-    disableTheme={$mainSubPage != "surveys"}
-    on:click={() => ($mainSubPage = "surveys")}
-  />
-  <Button
-    iconName="ellipsis-vertical"
-    title="Options"
-    disableTheme={$mainSubPage != "options"}
-    on:click={() => ($mainSubPage = "options")}
-  />
+  <Button iconName="list-ul" title="Surveys" />
+  <Button iconName="ellipsis-vertical" title="Options" disableTheme on:click={() => ($mainPage = "options")} />
 </Container>
 
-{#if $mainSubPage == "surveys"}
-  <Container column padding>
-    <h2>Surveys</h2>
-    {#each $surveys as survey, surveyIndex (survey)}
-      <Container spaceBetween>
-        <Container>
-          <Button iconName="pen" title="Edit survey" on:click={() => ($indexes.survey = surveyIndex)} />
-          <span>{survey.name}</span>
-          {#if survey.entries.length}
-            <span>({survey.entries.length} {survey.entries.length == 1 ? "entry" : "entries"})</span>
-          {/if}
-        </Container>
+<Container column padding>
+  <h2>Surveys</h2>
+  {#each $surveys as survey, surveyIndex (survey)}
+    <Container spaceBetween>
+      <Container>
         <Button
-          iconName="trash"
+          iconName="pen"
+          title="Edit survey"
           on:click={() => {
-            deleteSurveyDialog.surveyIndex = surveyIndex;
-            deleteSurveyDialog.show();
+            $surveyPage = "entries";
+            $indexes.survey = surveyIndex;
           }}
         />
+        <span>{survey.name}</span>
+        {#if survey.entries.length}
+          <span>({survey.entries.length} {survey.entries.length == 1 ? "entry" : "entries"})</span>
+        {/if}
       </Container>
-    {/each}
-  </Container>
-
-  <footer>
-    <Button iconName="plus" title="New survey" on:click={() => newSurveyDialog.show()} />
-    <Button iconName="paste" title="Paste survey" on:click={() => pasteSurveyDialog.show()} />
-  </footer>
-{:else}
-  <Container column padding>
-    <h2>Options</h2>
-    <Container>
-      <Container column noGap>
-        Location
-        <select bind:value={$location} title="Location">
-          {#each Object.values(locations) as location}
-            <option>{location}</option>
-          {/each}
-        </select>
-      </Container>
+      <Button
+        iconName="trash"
+        on:click={() => {
+          deleteSurveyDialog.surveyIndex = surveyIndex;
+          deleteSurveyDialog.show();
+        }}
+      />
     </Container>
-  </Container>
-{/if}
+  {/each}
+
+  <dialog bind:this={deleteSurveyDialog.element}>
+    {#if deleteSurveyDialog.surveyIndex != undefined}
+      <span>Delete this survey?</span>
+      <span>Everything in "{$surveys[deleteSurveyDialog.surveyIndex].name}" will be lost!</span>
+      <Container spaceBetween>
+        <Button iconName="check" title="Confirm" on:click={() => deleteSurveyDialog.confirm()} />
+        <Button iconName="xmark" title="Close" on:click={() => deleteSurveyDialog.close()} />
+      </Container>
+    {/if}
+  </dialog>
+</Container>
+
+<footer>
+  <Button iconName="plus" title="New survey" on:click={() => newSurveyDialog.show()} />
+  <dialog bind:this={newSurveyDialog.element}>
+    <span>Enter name for new survey:</span>
+    <input bind:value={newSurveyDialog.name} />
+    {#if newSurveyDialog.error}
+      <span>{newSurveyDialog.error}</span>
+    {/if}
+    <Container spaceBetween>
+      <Button iconName="check" title="Confirm" on:click={() => newSurveyDialog.confirm()} />
+      <Button iconName="xmark" title="Close" on:click={() => newSurveyDialog.close()} />
+    </Container>
+  </dialog>
+
+  <Button iconName="paste" title="Paste survey" on:click={() => pasteSurveyDialog.show()} />
+  <dialog bind:this={pasteSurveyDialog.element}>
+    <span>Paste new survey:</span>
+    <Container maxWidth>
+      <textarea bind:value={pasteSurveyDialog.input} />
+    </Container>
+    {#if pasteSurveyDialog.error}
+      <span>{pasteSurveyDialog.error}</span>
+    {/if}
+    <Container spaceBetween>
+      <Button iconName="check" title="Confirm" on:click={() => pasteSurveyDialog.confirm()} />
+      <Button iconName="xmark" title="Close" on:click={() => pasteSurveyDialog.close()} />
+    </Container>
+  </dialog>
+</footer>

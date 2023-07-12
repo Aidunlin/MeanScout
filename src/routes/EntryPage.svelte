@@ -1,5 +1,14 @@
 <script lang="ts">
-  import { getMetricDefaultValue, indexes, surveys, validateEntry, type DialogData, type Entry } from "$lib/app";
+  import {
+    getMetricDefaultValue,
+    indexes,
+    surveys,
+    validateEntry,
+    type DialogData,
+    type Entry,
+    mainPage,
+    surveyPage,
+  } from "$lib/app";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Header from "$lib/components/Header.svelte";
@@ -72,7 +81,15 @@
 </dialog>
 
 <Header title="Entry ({$surveys[surveyIndex].name})">
-  <Button iconName="arrow-left" title="Back to survey" on:click={() => ($indexes.entry = undefined)} />
+  <Button
+    iconName="arrow-left"
+    title="Back to survey"
+    on:click={() => {
+      $mainPage = "surveys";
+      $surveyPage = "entries";
+      $indexes.entry = undefined;
+    }}
+  />
 </Header>
 
 <Container padding alignEnd>
