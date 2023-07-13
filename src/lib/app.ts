@@ -1,9 +1,9 @@
 import { writable } from "svelte/store";
-import MainPage from "../routes/MainPage.svelte";
 import MainOptions from "../routes/MainOptions.svelte";
-import SurveyPage from "../routes/SurveyPage.svelte";
+import MainPage from "../routes/MainPage.svelte";
 import SurveyConfigs from "../routes/SurveyConfigs.svelte";
 import SurveyOptions from "../routes/SurveyOptions.svelte";
+import SurveyPage from "../routes/SurveyPage.svelte";
 
 export const locations = ["Red 1", "Red 2", "Red 3", "Blue 1", "Blue 2", "Blue 3"] as const;
 type Location = (typeof locations)[number];
@@ -69,33 +69,6 @@ export type Survey = {
   entries: Entry[];
 };
 
-class Indexes {
-  private value: { survey?: number; entry: undefined } | { survey: number; entry: number } = {
-    survey: undefined,
-    entry: undefined,
-  };
-
-  get survey() {
-    return this.value.survey;
-  }
-
-  set survey(index) {
-    this.value = { survey: index, entry: undefined };
-  }
-
-  get entry() {
-    return this.value.entry;
-  }
-
-  set entry(index) {
-    if (this.value.survey != undefined) {
-      this.value.entry = index;
-    } else {
-      this.value.entry = undefined;
-    }
-  }
-}
-
 function localStorageStore<T>(key: string, start: T, subscriber?: (val: T) => void) {
   try {
     if (typeof start == "string") {
@@ -128,10 +101,10 @@ export const surveyPages = {
   options: SurveyOptions,
 };
 
+type Routes = [keyof typeof mainPages] | [number, keyof typeof surveyPages | number];
+
+export const routes = localStorageStore<Routes>("routes", ["surveys"]);
 export const surveys = localStorageStore<Survey[]>("surveys", []);
-export const indexes = localStorageStore<Indexes>("indexes", new Indexes());
-export const mainPage = localStorageStore<keyof typeof mainPages>("mainPage", "surveys");
-export const surveyPage = localStorageStore<keyof typeof surveyPages>("surveyPage", "entries");
 export const location = localStorageStore<Location>("location", "Red 1", (location) => {
   let newTheme = location.split(" ")[0].toLowerCase();
   document.documentElement.style.setProperty("--theme-color", `var(--${newTheme})`);

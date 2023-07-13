@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getMetricDefaultValue, indexes, metricTypes, surveyPage, surveys, type MetricConfig } from "$lib/app";
+  import { getMetricDefaultValue, metricTypes, routes, surveys, type MetricConfig } from "$lib/app";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
@@ -25,13 +25,13 @@
 </script>
 
 <Header title={$surveys[surveyIndex].name}>
-  <Button iconName="arrow-left" title="Back to surveys" on:click={() => ($indexes.survey = undefined)} />
+  <Button iconName="arrow-left" title="Back to surveys" on:click={() => ($routes = ["surveys"])} />
 </Header>
 
 <Container padding noGap>
-  <Button iconName="list-ol" title="Entries" disableTheme on:click={() => ($surveyPage = "entries")} />
+  <Button iconName="list-ol" title="Entries" disableTheme on:click={() => ($routes[1] = "entries")} />
   <Button iconName="gears" title="Configs" />
-  <Button iconName="ellipsis-vertical" title="Options" disableTheme on:click={() => ($surveyPage = "options")} />
+  <Button iconName="ellipsis-vertical" title="Options" disableTheme on:click={() => ($routes[1] = "options")} />
 </Container>
 
 <Container column padding>

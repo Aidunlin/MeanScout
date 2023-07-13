@@ -1,13 +1,13 @@
 <script lang="ts">
-  import { indexes, mainPage, mainPages, surveyPage, surveyPages } from "$lib/app";
+  import { mainPages, routes, surveyPages } from "$lib/app";
   import "$lib/app.css";
   import EntryPage from "./EntryPage.svelte";
 </script>
 
-{#if $indexes.survey == undefined}
-  <svelte:component this={mainPages[$mainPage]} />
-{:else if $indexes.entry == undefined}
-  <svelte:component this={surveyPages[$surveyPage]} surveyIndex={$indexes.survey} />
+{#if typeof $routes[0] == "string"}
+  <svelte:component this={mainPages[$routes[0]]} />
+{:else if typeof $routes[1] == "string"}
+  <svelte:component this={surveyPages[$routes[1]]} surveyIndex={$routes[0]} />
 {:else}
-  <EntryPage surveyIndex={$indexes.survey} entryIndex={$indexes.entry} />
+  <EntryPage surveyIndex={$routes[0]} entryIndex={$routes[1]} />
 {/if}
