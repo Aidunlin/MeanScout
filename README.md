@@ -10,7 +10,7 @@ A lightweight FRC scouting web app, built with SvelteKit.
 - Customizable metrics: toggles, numbers, selectors, textfields, ratings, and timers
 - Optional team whitelisting
 - Uses browser storage to store surveys
-- Exoprt entries as CSV
+- Export entries as CSV
 
 ## Frameworks/Libraries
 

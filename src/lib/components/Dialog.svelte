@@ -1,11 +1,11 @@
 <script lang="ts">
-  import Button from "$lib/components/Button.svelte";
-  import Container from "$lib/components/Container.svelte";
   import type { ComponentProps } from "svelte";
+  import Button from "./Button.svelte";
+  import Container from "./Container.svelte";
 
-  let element: HTMLDialogElement | undefined;
+  let element: HTMLDialogElement;
 
-  export let openButton: ComponentProps<Button> = {};
+  export let openButton: ComponentProps<Button>;
   export let onOpen: (() => void) | undefined = undefined;
   export let onConfirm: (() => boolean) | undefined = undefined;
 </script>
@@ -14,7 +14,7 @@
   {...openButton}
   on:click={() => {
     if (onOpen) onOpen();
-    element?.showModal();
+    element.showModal();
   }}
 />
 <dialog bind:this={element} on:close>
@@ -25,10 +25,10 @@
         iconName="check"
         title="Confirm"
         on:click={() => {
-          if (onConfirm && onConfirm()) element?.close();
+          if (onConfirm && onConfirm()) element.close();
         }}
       />
     {/if}
-    <Button iconName="xmark" title="Close" on:click={() => element?.close()} />
+    <Button iconName="xmark" title="Close" on:click={() => element.close()} />
   </Container>
 </dialog>

@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { location, locations, mainPage } from "$lib/app";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
