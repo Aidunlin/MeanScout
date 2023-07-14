@@ -8,18 +8,7 @@
   export let surveyIndex: number;
 
   function newEntryClicked() {
-    let match = 1;
-    if ($surveys[surveyIndex].entries.length) {
-      let matchValues = $surveys[surveyIndex].entries.map((entry) => entry.match);
-      match = matchValues.reduce((prev, curr) => (curr > prev ? curr : prev)) + 1;
-    }
-
-    let entry: Entry = {
-      team: "",
-      match,
-      isAbsent: false,
-      metrics: $surveys[surveyIndex].configs.map(getMetricDefaultValue),
-    };
+    let entry: Entry = $surveys[surveyIndex].configs.map(getMetricDefaultValue);
     $surveys[surveyIndex].entries = [entry, ...$surveys[surveyIndex].entries];
   }
 </script>
@@ -40,7 +29,10 @@
     <Container spaceBetween>
       <Container>
         <Button iconName="pen" title="Edit entry" on:click={() => ($routes[1] = entryIndex)} />
-        <span>Team: {entry.team} | Match: {entry.match}</span>
+        {#each $surveys[surveyIndex].configs.slice(0, 2) as config, i}
+          <span>{config.name}: {entry[i]}, </span>
+        {/each}
+        ...
       </Container>
 
       <Dialog
@@ -51,10 +43,9 @@
         }}
       >
         <span>Delete this entry?</span>
-        <span>
-          Team: {$surveys[surveyIndex].entries[entryIndex].team}
-          | Match: {$surveys[surveyIndex].entries[entryIndex].match}
-        </span>
+        {#each $surveys[surveyIndex].configs.slice(0, 2) as config, i}
+          <span>{config.name}: {entry[i]}</span>
+        {/each}
       </Dialog>
     </Container>
   {/each}

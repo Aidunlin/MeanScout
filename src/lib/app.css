@@ -212,7 +212,7 @@ footer,
 }
 
 .number,
-#metric-match {
+.metric-match {
   width: 80px;
 }
 
@@ -224,7 +224,7 @@ footer,
   padding: var(--inner-gap) 6px;
 }
 
-#metric-team {
+.metric-team {
   width: 100px;
 }
 

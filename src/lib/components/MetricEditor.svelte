@@ -1,18 +1,10 @@
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
   import type { MetricConfig } from "../app";
   import Button from "./Button.svelte";
   import Container from "./Container.svelte";
 
-  const dispatch = createEventDispatcher();
-
   export let config: MetricConfig;
   export let value: any;
-
-  $: {
-    value;
-    dispatch("update");
-  }
 
   function rate(i: number) {
     if (value == i + 1) {
@@ -59,7 +51,11 @@
   {/if}
 
   <Container noGap>
-    {#if config.type == "toggle"}
+    {#if config.type == "team"}
+      <input class="metric-team" list="teams-list" maxlength="5" bind:value required={config.required} />
+    {:else if config.type == "match"}
+      <input class="metric-match" type="number" pattern="[0-9]*" bind:value required={config.required} />
+    {:else if config.type == "toggle"}
       <Button
         on:click={() => (value = !value)}
         iconStyle={value ? "solid" : "regular"}
@@ -78,9 +74,9 @@
       </select>
     {:else if config.type == "text"}
       {#if config.long}
-        <textarea placeholder={config.tip} bind:value />
+        <textarea placeholder={config.tip} bind:value required={config.required} />
       {:else}
-        <input placeholder={config.tip} bind:value />
+        <input placeholder={config.tip} bind:value required={config.required} />
       {/if}
     {:else if config.type == "rating"}
       {#each [...Array(5).keys()] as i}

@@ -55,7 +55,31 @@
         newSurveyDialog.error = "That name is already used!";
         return false;
       }
-      $surveys = [{ name, configs: [], teams: [], entries: [] }, ...$surveys];
+      $surveys = [
+        {
+          name,
+          configs: [
+            {
+              name: "Team",
+              type: "team",
+              required: true,
+            },
+            {
+              name: "Match",
+              type: "match",
+              required: true,
+            },
+            {
+              name: "Absent",
+              type: "toggle",
+              required: true,
+            },
+          ],
+          teams: [],
+          entries: [],
+        },
+        ...$surveys,
+      ];
       return true;
     }}
     on:close={() => (newSurveyDialog = { name: "", error: "" })}

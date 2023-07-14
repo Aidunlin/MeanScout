@@ -16,43 +16,17 @@
   <Button iconName="arrow-left" title="Back to survey" on:click={() => ($routes[1] = "entries")} />
 </Header>
 
-<Container padding alignEnd>
-  <Container column noGap>
-    Team
-    <input
-      id="metric-team"
-      list="teams-list"
-      maxlength="5"
-      bind:value={$surveys[surveyIndex].entries[entryIndex].team}
-    />
-    <datalist id="teams-list">
-      {#each $surveys[surveyIndex].teams as team}
-        <option value={team} />
-      {/each}
-    </datalist>
-  </Container>
-  <Container column noGap>
-    Match
-    <input
-      id="metric-match"
-      type="number"
-      pattern="[0-9]*"
-      bind:value={$surveys[surveyIndex].entries[entryIndex].match}
-    />
-  </Container>
-  <MetricEditor
-    config={{ name: "Absent", type: "toggle" }}
-    bind:value={$surveys[surveyIndex].entries[entryIndex].isAbsent}
-  />
-</Container>
+<datalist id="teams-list">
+  {#each $surveys[surveyIndex].teams as team}
+    <option value={team} />
+  {/each}
+</datalist>
 
-{#if !$surveys[surveyIndex].entries[entryIndex].isAbsent}
-  <Container padding alignEnd>
-    {#each $surveys[surveyIndex].configs as config, i}
-      <MetricEditor {config} bind:value={$surveys[surveyIndex].entries[entryIndex].metrics[i]} />
-    {/each}
-  </Container>
-{/if}
+<Container padding alignEnd>
+  {#each $surveys[surveyIndex].configs as config, i}
+    <MetricEditor {config} bind:value={$surveys[surveyIndex].entries[entryIndex][i]} />
+  {/each}
+</Container>
 
 <footer>
   <Dialog
@@ -64,12 +38,7 @@
         return false;
       }
       $surveys[surveyIndex].entries = [
-        {
-          team: "",
-          match: $surveys[surveyIndex].entries[entryIndex].match + 1,
-          isAbsent: false,
-          metrics: $surveys[surveyIndex].configs.map(getMetricDefaultValue),
-        },
+        $surveys[surveyIndex].configs.map(getMetricDefaultValue),
         ...$surveys[surveyIndex].entries,
       ];
       return true;
@@ -85,8 +54,11 @@
   <Dialog
     openButton={{ iconName: "arrow-rotate-left", title: "Reset entry" }}
     onConfirm={() => {
-      $surveys[surveyIndex].entries[entryIndex].isAbsent = false;
-      $surveys[surveyIndex].entries[entryIndex].metrics = $surveys[surveyIndex].configs.map(getMetricDefaultValue);
+      for (let i = 0; i < $surveys[surveyIndex].entries[entryIndex].length; i++) {
+        if (!["team", "match"].includes($surveys[surveyIndex].configs[i].type)) {
+          $surveys[surveyIndex].entries[entryIndex][i] = getMetricDefaultValue($surveys[surveyIndex].configs[i]);
+        }
+      }
       return true;
     }}
   >

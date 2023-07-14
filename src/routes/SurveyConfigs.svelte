@@ -16,9 +16,9 @@
     $surveys[surveyIndex].configs.splice(index, 1);
     $surveys[surveyIndex].configs.splice(index + by, 0, configToMove);
     for (let i = 0; i < $surveys[surveyIndex].entries.length; i++) {
-      let metricToMove = $surveys[surveyIndex].entries[i].metrics[index];
-      $surveys[surveyIndex].entries[i].metrics.splice(index, 1);
-      $surveys[surveyIndex].entries[i].metrics.splice(index + by, 0, metricToMove);
+      let metricToMove = $surveys[surveyIndex].entries[i][index];
+      $surveys[surveyIndex].entries[i].splice(index, 1);
+      $surveys[surveyIndex].entries[i].splice(index + by, 0, metricToMove);
     }
     $surveys = $surveys;
   }
@@ -48,21 +48,34 @@
           <select
             value={config.type}
             on:change={(e) => {
-              if (e.currentTarget.value == "toggle") {
-                config = { name: config.name, type: "toggle" };
-              } else if (e.currentTarget.value == "number") {
-                config = { name: config.name, type: "number" };
-              } else if (e.currentTarget.value == "select") {
-                config = { name: config.name, type: "select", values: [] };
-              } else if (e.currentTarget.value == "text") {
-                config = { name: config.name, type: "text" };
-              } else if (e.currentTarget.value == "rating") {
-                config = { name: config.name, type: "rating" };
-              } else if (e.currentTarget.value == "timer") {
-                config = { name: config.name, type: "timer" };
+              switch (e.currentTarget.value) {
+                case "team":
+                  config = { name: config.name, type: "team" };
+                  break;
+                case "match":
+                  config = { name: config.name, type: "match" };
+                  break;
+                case "toggle":
+                  config = { name: config.name, type: "toggle" };
+                  break;
+                case "number":
+                  config = { name: config.name, type: "number" };
+                  break;
+                case "select":
+                  config = { name: config.name, type: "select", values: [] };
+                  break;
+                case "text":
+                  config = { name: config.name, type: "text" };
+                  break;
+                case "rating":
+                  config = { name: config.name, type: "rating" };
+                  break;
+                case "timer":
+                  config = { name: config.name, type: "timer" };
+                  break;
               }
               for (let i = 0; i < $surveys[surveyIndex].entries.length; i++) {
-                $surveys[surveyIndex].entries[i].metrics[configIndex] = getMetricDefaultValue(config);
+                $surveys[surveyIndex].entries[i][configIndex] = getMetricDefaultValue(config);
               }
             }}
           >
@@ -88,6 +101,16 @@
               <Container column noGap>
                 Group
                 <input bind:value={editConfigDialog.group} />
+              </Container>
+              <Container column noGap>
+                <Button
+                  iconName={editConfigDialog.required ? "square-check" : "square"}
+                  iconStyle={editConfigDialog.required ? "solid" : "regular"}
+                  text="Required"
+                  on:click={() => {
+                    if (editConfigDialog) editConfigDialog.required = !editConfigDialog.required;
+                  }}
+                />
               </Container>
               {#if editConfigDialog.type == "select"}
                 <Container column maxWidth>
@@ -154,9 +177,9 @@
           openButton={{ iconName: "trash", title: "Delete config" }}
           onConfirm={() => {
             for (let entryIndex = 0; entryIndex < $surveys[surveyIndex].entries.length; entryIndex++) {
-              $surveys[surveyIndex].entries[entryIndex].metrics = $surveys[surveyIndex].entries[
-                entryIndex
-              ].metrics.filter((_, i) => i != configIndex);
+              $surveys[surveyIndex].entries[entryIndex] = $surveys[surveyIndex].entries[entryIndex].filter(
+                (_, i) => i != configIndex
+              );
             }
             $surveys[surveyIndex].configs = $surveys[surveyIndex].configs.filter((_, i) => i != configIndex);
             return true;
@@ -177,7 +200,7 @@
     on:click={() => {
       $surveys[surveyIndex].configs = [...$surveys[surveyIndex].configs, { name: "", type: "toggle" }];
       for (let i = 0; i < $surveys[surveyIndex].entries.length; i++) {
-        $surveys[surveyIndex].entries[i].metrics = [...$surveys[surveyIndex].entries[i].metrics, false];
+        $surveys[surveyIndex].entries[i] = [...$surveys[surveyIndex].entries[i], false];
       }
     }}
   />
