@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { parseSurvey, routes, surveys } from "$lib/app";
+  import { parseSurvey, surveys } from "$lib/app";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
@@ -13,7 +13,12 @@
 
 <Container padding noGap>
   <Button iconName="list-ul" title="Surveys" />
-  <Button iconName="ellipsis-vertical" title="Options" disableTheme on:click={() => ($routes = ["options"])} />
+  <Button
+    iconName="ellipsis-vertical"
+    title="Options"
+    disableTheme
+    on:click={() => (window.location.hash = "options")}
+  />
 </Container>
 
 <Container column padding>
@@ -21,7 +26,7 @@
   {#each $surveys as survey, surveyIndex (survey)}
     <Container spaceBetween>
       <Container>
-        <Button iconName="pen" title="Edit survey" on:click={() => ($routes = [surveyIndex, "entries"])} />
+        <Button iconName="pen" title="Edit survey" on:click={() => (window.location.hash = `${surveyIndex}`)} />
         <span>{survey.name}</span>
         {#if survey.entries.length}
           <span>({survey.entries.length} {survey.entries.length == 1 ? "entry" : "entries"})</span>

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getMetricDefaultValue, routes, surveys, validateEntry } from "$lib/app";
+  import { getMetricDefaultValue, surveys, validateEntry } from "$lib/app";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
@@ -13,7 +13,7 @@
 </script>
 
 <Header title="Entry ({$surveys[surveyIndex].name})">
-  <Button iconName="arrow-left" title="Back to survey" on:click={() => ($routes[1] = "entries")} />
+  <Button iconName="arrow-left" title="Back to survey" on:click={() => (window.location.hash = `${surveyIndex}`)} />
 </Header>
 
 <datalist id="teams-list">

@@ -96,20 +96,6 @@ function localStorageStore<T>(key: string, start: T, subscriber?: (val: T) => vo
   }
 }
 
-export const mainPages = {
-  surveys: MainPage,
-  options: MainOptions,
-};
-
-export const surveyPages = {
-  entries: SurveyPage,
-  configs: SurveyConfigs,
-  options: SurveyOptions,
-};
-
-type Routes = [keyof typeof mainPages] | [number, keyof typeof surveyPages | number];
-
-export const routes = localStorageStore<Routes>("routes", ["surveys"]);
 export const surveys = localStorageStore<Survey[]>("surveys", []);
 export const location = localStorageStore<Location>("location", "Red 1", (location) => {
   let newTheme = location.split(" ")[0].toLowerCase();
