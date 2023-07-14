@@ -3,7 +3,6 @@
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
-  import Header from "$lib/components/Header.svelte";
 
   export let surveyIndex: number;
 
@@ -24,14 +23,15 @@
   }
 </script>
 
-<Header title={$surveys[surveyIndex].name}>
-  <Button iconName="arrow-left" title="Back to surveys" on:click={() => (window.location.hash = "")} />
-</Header>
-
 <Container padding noGap>
   <Button iconName="list-ol" title="Entries" disableTheme on:click={() => (window.location.hash = `${surveyIndex}`)} />
   <Button iconName="gears" title="Configs" />
-  <Button iconName="ellipsis-vertical" title="Options" disableTheme on:click={() => (window.location.hash = `${surveyIndex}/options`)} />
+  <Button
+    iconName="ellipsis-vertical"
+    title="Options"
+    disableTheme
+    on:click={() => (window.location.hash = `${surveyIndex}/options`)}
+  />
 </Container>
 
 <Container column padding>

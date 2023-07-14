@@ -3,13 +3,10 @@
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
-  import Header from "$lib/components/Header.svelte";
 
   let newSurveyDialog = { name: "", error: "" };
   let pasteSurveyDialog = { input: "", error: "" };
 </script>
-
-<Header />
 
 <Container padding noGap>
   <Button iconName="list-ul" title="Surveys" />

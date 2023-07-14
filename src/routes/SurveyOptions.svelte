@@ -2,7 +2,6 @@
   import { surveys } from "$lib/app";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
-  import Header from "$lib/components/Header.svelte";
 
   export let surveyIndex: number;
 
@@ -24,13 +23,14 @@
   }
 </script>
 
-<Header title={$surveys[surveyIndex].name}>
-  <Button iconName="arrow-left" title="Back to surveys" on:click={() => (window.location.hash = "")} />
-</Header>
-
 <Container padding noGap>
   <Button iconName="list-ol" title="Entries" disableTheme on:click={() => (window.location.hash = `${surveyIndex}`)} />
-  <Button iconName="gears" title="Configs" disableTheme on:click={() => (window.location.hash = `${surveyIndex}/configs`)} />
+  <Button
+    iconName="gears"
+    title="Configs"
+    disableTheme
+    on:click={() => (window.location.hash = `${surveyIndex}/configs`)}
+  />
   <Button iconName="ellipsis-vertical" title="Options" />
 </Container>
 

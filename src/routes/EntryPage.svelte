@@ -1,9 +1,7 @@
 <script lang="ts">
   import { getMetricDefaultValue, surveys, validateEntry } from "$lib/app";
-  import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
-  import Header from "$lib/components/Header.svelte";
   import MetricEditor from "$lib/components/MetricEditor.svelte";
 
   export let surveyIndex: number;
@@ -11,10 +9,6 @@
 
   let saveEntryDialog = { error: "" };
 </script>
-
-<Header title="Entry ({$surveys[surveyIndex].name})">
-  <Button iconName="arrow-left" title="Back to survey" on:click={() => (window.location.hash = `${surveyIndex}`)} />
-</Header>
 
 <datalist id="teams-list">
   {#each $surveys[surveyIndex].teams as team}

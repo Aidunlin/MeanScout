@@ -1,5 +1,7 @@
 <script lang="ts">
+  import { surveys } from "$lib/app";
   import "$lib/app.css";
+  import Header from "$lib/components/Header.svelte";
   import EntryPage from "./EntryPage.svelte";
   import MainOptions from "./MainOptions.svelte";
   import MainPage from "./MainPage.svelte";
@@ -18,29 +20,32 @@
     options: SurveyOptions,
   };
 
-  type HashParams = [keyof typeof mainPages] | [number, keyof typeof surveyPages | number];
+  type HashRoute = [keyof typeof mainPages] | [number, keyof typeof surveyPages | number];
 
-  let hashParams: HashParams = [""];
+  let hashRoute: HashRoute = [""];
 
-  function getHashParams() {
-    hashParams = window.location.hash
+  function getHashRoute() {
+    hashRoute = window.location.hash
       .replace("#", "")
       .split("/")
       .map((value) => {
         let parsed = parseInt(value);
         if (!Number.isNaN(parsed)) return parsed;
         return value;
-      }) as HashParams;
+      }) as HashRoute;
   }
 
-  window.onhashchange = getHashParams;
-  getHashParams();
+  window.onhashchange = getHashRoute;
+  getHashRoute();
 </script>
 
-{#if typeof hashParams[0] == "string"}
-  <svelte:component this={mainPages[hashParams[0]]} />
-{:else if typeof hashParams[0] == "number" && typeof hashParams[1] != "number"}
-  <svelte:component this={surveyPages[hashParams[1] ?? ""]} surveyIndex={hashParams[0]} />
-{:else if typeof hashParams[1] == "number"}
-  <EntryPage surveyIndex={hashParams[0]} entryIndex={hashParams[1]} />
+{#if typeof hashRoute[0] == "string"}
+  <Header />
+  <svelte:component this={mainPages[hashRoute[0]]} />
+{:else if typeof hashRoute[0] == "number" && typeof hashRoute[1] != "number"}
+  <Header title={$surveys[hashRoute[0]].name} backLink={""} />
+  <svelte:component this={surveyPages[hashRoute[1] ?? ""]} surveyIndex={hashRoute[0]} />
+{:else if typeof hashRoute[1] == "number"}
+  <Header title="Entry ({$surveys[hashRoute[1]].name})" backLink={`${hashRoute[0]}`} />
+  <EntryPage surveyIndex={hashRoute[0]} entryIndex={hashRoute[1]} />
 {/if}
