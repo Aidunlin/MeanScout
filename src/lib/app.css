@@ -159,8 +159,9 @@ select {
 }
 
 #logo {
-  height: 30px;
   flex-grow: 0;
+  height: 46px;
+  padding: calc(4px * 1.25);
 }
 
 header,
