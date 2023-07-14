@@ -11,13 +11,11 @@
   let editConfigDialog: MetricConfig | undefined = undefined;
 
   function moveConfig(index: number, by: number) {
-    let configToMove = $surveys[surveyIndex].configs[index];
-    $surveys[surveyIndex].configs.splice(index, 1);
-    $surveys[surveyIndex].configs.splice(index + by, 0, configToMove);
+    let config = $surveys[surveyIndex].configs.splice(index, 1);
+    $surveys[surveyIndex].configs.splice(index + by, 0, ...config);
     for (let i = 0; i < $surveys[surveyIndex].entries.length; i++) {
-      let metricToMove = $surveys[surveyIndex].entries[i][index];
-      $surveys[surveyIndex].entries[i].splice(index, 1);
-      $surveys[surveyIndex].entries[i].splice(index + by, 0, metricToMove);
+      let value = $surveys[surveyIndex].entries[i].splice(index, 1);
+      $surveys[surveyIndex].entries[i].splice(index + by, 0, value);
     }
     $surveys = $surveys;
   }
@@ -38,126 +36,124 @@
   <h2>Configs</h2>
   {#each $surveys[surveyIndex].configs as config, configIndex (config)}
     <Container spaceBetween alignEnd>
-      <Container alignEnd>
-        <Container column noGap>
-          Name
-          <input bind:value={config.name} style="width:200px" />
-        </Container>
-        <Container column noGap>
-          Type
-          <select
-            value={config.type}
-            on:change={(e) => {
-              switch (e.currentTarget.value) {
-                case "team":
-                  config = { name: config.name, type: "team" };
-                  break;
-                case "match":
-                  config = { name: config.name, type: "match" };
-                  break;
-                case "toggle":
-                  config = { name: config.name, type: "toggle" };
-                  break;
-                case "number":
-                  config = { name: config.name, type: "number" };
-                  break;
-                case "select":
-                  config = { name: config.name, type: "select", values: [] };
-                  break;
-                case "text":
-                  config = { name: config.name, type: "text" };
-                  break;
-                case "rating":
-                  config = { name: config.name, type: "rating" };
-                  break;
-                case "timer":
-                  config = { name: config.name, type: "timer" };
-                  break;
-              }
+      <Container>
+        <Dialog
+          openButton={{ iconName: "pen", title: "Edit" }}
+          onOpen={() => (editConfigDialog = JSON.parse(JSON.stringify(config)))}
+          onConfirm={() => {
+            if (editConfigDialog) {
+              $surveys[surveyIndex].configs[configIndex] = editConfigDialog;
               for (let i = 0; i < $surveys[surveyIndex].entries.length; i++) {
-                $surveys[surveyIndex].entries[i][configIndex] = getMetricDefaultValue(config);
+                $surveys[surveyIndex].entries[i][configIndex] = getMetricDefaultValue(editConfigDialog);
               }
-            }}
-          >
-            {#each Object.values(metricTypes) as metricType}
-              <option>{metricType}</option>
-            {/each}
-          </select>
-        </Container>
-        <Container>
-          <Dialog
-            openButton={{ iconName: "pen", text: "Edit" }}
-            onOpen={() => (editConfigDialog = JSON.parse(JSON.stringify(config)))}
-            onConfirm={() => {
-              if (editConfigDialog) {
-                $surveys[surveyIndex].configs[configIndex] = editConfigDialog;
-              }
-              return true;
-            }}
-            on:close={() => (editConfigDialog = { name: "", type: "toggle" })}
-          >
-            {#if editConfigDialog}
-              <span>Edit {editConfigDialog.name}:</span>
-              <Container column noGap>
-                Group
-                <input bind:value={editConfigDialog.group} />
-              </Container>
-              <Container column noGap>
-                <Button
-                  iconName={editConfigDialog.required ? "square-check" : "square"}
-                  iconStyle={editConfigDialog.required ? "solid" : "regular"}
-                  text="Required"
-                  on:click={() => {
-                    if (editConfigDialog) editConfigDialog.required = !editConfigDialog.required;
-                  }}
-                />
-              </Container>
-              {#if editConfigDialog.type == "select"}
-                <Container column maxWidth>
-                  Values
-                  {#each editConfigDialog.values as value, valueIndex}
-                    <Container>
-                      <input bind:value style="width:200px" />
-                      <Button
-                        iconName="trash"
-                        title="Delete value"
-                        on:click={() => {
-                          if (editConfigDialog?.type == "select")
-                            editConfigDialog.values = editConfigDialog.values.filter((_, i) => i != valueIndex);
-                        }}
-                      />
-                    </Container>
-                  {/each}
+            }
+            return true;
+          }}
+          on:close={() => (editConfigDialog = { name: "", type: "toggle" })}
+        >
+          {#if editConfigDialog}
+            <Container column noGap>
+              Name
+              <input bind:value={editConfigDialog.name} />
+            </Container>
+            <Container column noGap>
+              Type
+              <select
+                value={editConfigDialog.type}
+                on:change={(e) => {
+                  if (editConfigDialog == undefined) return;
+                  switch (e.currentTarget.value) {
+                    case "team":
+                    case "match":
+                    case "toggle":
+                    case "number":
+                    case "text":
+                    case "rating":
+                    case "timer":
+                      editConfigDialog = {
+                        name: editConfigDialog.name,
+                        type: e.currentTarget.value,
+                        group: editConfigDialog.group,
+                        required: editConfigDialog.required,
+                      };
+                      break;
+                    case "select":
+                      editConfigDialog = {
+                        name: editConfigDialog.name,
+                        type: e.currentTarget.value,
+                        group: editConfigDialog.group,
+                        required: editConfigDialog.required,
+                        values: [],
+                      };
+                      break;
+                  }
+                }}
+              >
+                {#each Object.values(metricTypes) as metricType}
+                  <option>{metricType}</option>
+                {/each}
+              </select>
+            </Container>
+            <Container column noGap>
+              Group
+              <input bind:value={editConfigDialog.group} />
+            </Container>
+            <Container>
+              <Button
+                iconName={editConfigDialog.required ? "square-check" : "square"}
+                iconStyle={editConfigDialog.required ? "solid" : "regular"}
+                text="Required"
+                on:click={() => {
+                  if (editConfigDialog) editConfigDialog.required = !editConfigDialog.required;
+                }}
+              />
+            </Container>
+            {#if editConfigDialog.type == "select"}
+              <Container column maxWidth>
+                Values
+                {#each editConfigDialog.values as value, valueIndex}
                   <Container>
+                    <input bind:value style="width:200px" />
                     <Button
-                      iconName="plus"
-                      title="New value"
+                      iconName="trash"
+                      title="Delete value"
                       on:click={() => {
                         if (editConfigDialog?.type == "select")
-                          editConfigDialog.values = [...editConfigDialog.values, ""];
+                          editConfigDialog.values = editConfigDialog.values.filter((_, i) => i != valueIndex);
                       }}
                     />
                   </Container>
-                </Container>
-              {:else if editConfigDialog.type == "text"}
+                {/each}
                 <Container>
                   <Button
-                    iconStyle={editConfigDialog.long ? "solid" : "regular"}
-                    iconName={editConfigDialog.long ? "square-check" : "square"}
-                    text="Long"
+                    iconName="plus"
+                    title="New value"
                     on:click={() => {
-                      if (editConfigDialog?.type == "text") editConfigDialog.long = !editConfigDialog.long;
+                      if (editConfigDialog?.type == "select")
+                        editConfigDialog.values = [...editConfigDialog.values, ""];
                     }}
                   />
                 </Container>
-                <Container column noGap>
-                  Tip
-                  <input bind:value={editConfigDialog.tip} />
-                </Container>
-              {/if}
+              </Container>
+            {:else if editConfigDialog.type == "text"}
+              <Container>
+                <Button
+                  iconStyle={editConfigDialog.long ? "solid" : "regular"}
+                  iconName={editConfigDialog.long ? "square-check" : "square"}
+                  text="Long"
+                  on:click={() => {
+                    if (editConfigDialog?.type == "text") editConfigDialog.long = !editConfigDialog.long;
+                  }}
+                />
+              </Container>
+              <Container column noGap>
+                Tip
+                <input bind:value={editConfigDialog.tip} />
+              </Container>
             {/if}
-          </Dialog>
-        </Container>
+          {/if}
+        </Dialog>
+        <span>{config.name}: {config.type}</span>
       </Container>
       <Container>
         <Button
@@ -186,8 +182,8 @@
           }}
         >
           <span>Delete {$surveys[surveyIndex].configs[configIndex].name}?</span>
-          <span>Entry data corresponding to this config may be deleted!</span></Dialog
-        >
+          <span>Entry data corresponding to this config may be deleted!</span>
+        </Dialog>
       </Container>
     </Container>
   {/each}
