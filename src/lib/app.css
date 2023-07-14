@@ -45,7 +45,7 @@ body {
   display: flex;
   flex-direction: column;
   margin: 0;
-  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 .disable-theme,
@@ -110,7 +110,7 @@ dialog {
   background: rgb(25, 25, 25);
   flex-direction: column;
   max-width: 720px;
-  max-height: 100vh;
+  max-height: 100dvh;
   gap: var(--outer-gap);
   padding: var(--outer-gap);
 }
