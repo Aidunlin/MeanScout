@@ -98,9 +98,9 @@ h2:not(:first-child) {
 header,
 footer {
   gap: var(--outer-gap);
-  margin: 0 calc(50% - 50vw);
+  margin: 0 calc(50% - 50dvw);
   min-height: 70px;
-  padding: var(--outer-gap) calc(50vw - 50% + var(--outer-gap));
+  padding: var(--outer-gap) calc(50dvw - 50% + var(--outer-gap));
 }
 
 footer {
@@ -110,9 +110,9 @@ footer {
 dialog {
   background: rgb(25, 25, 25);
   flex-direction: column;
-  max-width: 720px;
-  max-height: 100dvh;
   gap: var(--outer-gap);
+  max-height: 100dvh;
+  max-width: 100dvw;
   padding: var(--outer-gap);
 }
 
@@ -131,11 +131,13 @@ dialog[open] {
 
 textarea {
   height: 300px;
+  resize: none;
   width: 100%;
 }
 
 dialog textarea {
-  width: 720px;
+  max-width: 720px;
+  width: 100dvw;
 }
 
 button {
