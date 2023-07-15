@@ -46,6 +46,6 @@
   <Header title={$surveys[hashRoute[0]].name} backLink={""} />
   <svelte:component this={surveyPages[hashRoute[1] ?? ""]} surveyIndex={hashRoute[0]} />
 {:else if typeof hashRoute[1] == "number"}
-  <Header title="Entry ({$surveys[hashRoute[1]].name})" backLink={`${hashRoute[0]}`} />
+  <Header title="Entry ({$surveys[hashRoute[0]].name})" backLink={`${hashRoute[0]}`} />
   <EntryPage surveyIndex={hashRoute[0]} entryIndex={hashRoute[1]} />
 {/if}
