@@ -8,7 +8,7 @@ A lightweight FRC scouting web app, built with SvelteKit.
 - Lightweight mobile-first design
 - Red/blue color theme variants
 - Customizable metrics: toggles, numbers, selectors, textfields, ratings, and timers
-- Optional team whitelisting
+- Optional team allowlisting
 - Uses browser storage to store surveys
 - Export entries as CSV
 
@@ -17,17 +17,19 @@ A lightweight FRC scouting web app, built with SvelteKit.
 - [SvelteKit](https://kit.svelte.dev/)
 - [FontAwesome](https://fontawesome.com/)
 
-## Location
+## Target
 
-The location selector is used to remind your scouts which robot they should scout.
+The target selector is used to remind your scouts which team/alliance they should scout.
 
 ## Customization
 
 It can be annoying to reprogram your scouting app every year to change scouting metrics. To make things easier, metrics in MeanScout can be customized!
 
-Simply create a new survey and give it a good name (e.g. District Champs 2023). Then, in the configs page, set up whatever metrics you need. Give each a short, descriptive name, select the right type, and configure any additional settings for each metric. If you fill out the `Group` field for a metric, it will add a group label above that particular metric. For selectors, make sure to add some values in the additional settings.
+Simply create a new survey and give it a good name (e.g. District Champs 2023). Then, in the configs page, set up whatever metrics you need. Give each a short, descriptive name, select the right type, and configure any additional settings for each metric. For selectors, make sure to add some values in the additional settings.
 
-In the options page, you can add teams to the survey's whitelist to prevent entering any teams not in the particular event.
+If you fill out the `Group` field for a metric, it will add a group label above that particular metric. You can also require metrics to be filled out (e.g. textfields).
+
+In the options page, you can add teams to the survey's allowlist to prevent entering any teams not in the particular event.
 
 You can also copy/paste surveys as JSON for setting up multiple devices.
 

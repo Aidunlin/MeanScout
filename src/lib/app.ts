@@ -1,12 +1,19 @@
 import { writable } from "svelte/store";
-import MainOptions from "../routes/MainOptions.svelte";
-import MainPage from "../routes/MainPage.svelte";
-import SurveyConfigs from "../routes/SurveyConfigs.svelte";
-import SurveyOptions from "../routes/SurveyOptions.svelte";
-import SurveyPage from "../routes/SurveyPage.svelte";
 
-export const locations = ["Red 1", "Red 2", "Red 3", "Blue 1", "Blue 2", "Blue 3"] as const;
-type Location = (typeof locations)[number];
+export const allianceTargets = ["red", "blue"] as const;
+export type AllianceTarget = (typeof allianceTargets)[number];
+
+export const redTeamTargets = ["red 1", "red 2", "red 3"] as const;
+export type RedTeamTarget = (typeof redTeamTargets)[number];
+
+export const blueTeamTargets = ["blue 1", "blue 2", "blue 3"] as const;
+export type BlueTeam = (typeof blueTeamTargets)[number];
+
+export const otherTargets = ["pit"] as const;
+export type OtherTarget = (typeof otherTargets)[number];
+
+export const targets = [...allianceTargets, ...redTeamTargets, ...blueTeamTargets, ...otherTargets] as const;
+export type Target = (typeof targets)[number];
 
 export const metricTypes = ["team", "match", "toggle", "number", "select", "text", "rating", "timer"] as const;
 export type MetricType = (typeof metricTypes)[number];
@@ -97,8 +104,9 @@ function localStorageStore<T>(key: string, start: T, subscriber?: (val: T) => vo
 }
 
 export const surveys = localStorageStore<Survey[]>("surveys", []);
-export const location = localStorageStore<Location>("location", "Red 1", (location) => {
-  let newTheme = location.split(" ")[0].toLowerCase();
+export const target = localStorageStore<Target>("target", "red", (target) => {
+  let newTheme = target.split(" ")[0];
+  if (target == "pit") newTheme = "yellow";
   document.documentElement.style.setProperty("--theme-color", `var(--${newTheme})`);
 });
 
@@ -202,7 +210,7 @@ export function validateEntry(survey: Survey, entry: Entry) {
           error = `Invalid value for ${survey.configs[i].name}`;
         }
         if (survey.teams.length && !survey.teams.includes(value)) {
-          error = `Invalid value for ${survey.configs[i].name} (team not whitelisted)`;
+          error = `Invalid value for ${survey.configs[i].name} (team not allowlisted)`;
         }
         break;
       case "match":

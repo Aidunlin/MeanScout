@@ -18,9 +18,10 @@
 
 html {
   --bg-color: #000;
-  --blue: #2196f3;
   --fg-color: rgba(127, 127, 127, 0.2);
+  --blue: #2196f3;
   --red: #f44336;
+  --yellow: #ff9800;
   --text-color: #fff;
   --theme-color: var(--red);
   --outer-gap: 12px;

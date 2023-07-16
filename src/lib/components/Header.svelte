@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { location } from "../app";
+  import { target } from "../app";
   import Button from "./Button.svelte";
   import Container from "./Container.svelte";
 
@@ -26,5 +26,5 @@
     {/if}
     <h1>{title || "MeanScout"}</h1>
   </Container>
-  <span class="theme-text">{$location}</span>
+  <span class="theme-text" style="text-transform:capitalize">{$target}</span>
 </header>
