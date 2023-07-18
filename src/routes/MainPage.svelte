@@ -1,11 +1,46 @@
 <script lang="ts">
-  import { parseSurvey, surveys } from "$lib/app";
+  import { metricTypes, surveys, type Survey } from "$lib/app";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
 
   let newSurveyDialog = { name: "", error: "" };
   let pasteSurveyDialog = { input: "", error: "" };
+
+  function parseSurvey(surveyString: string): string | Survey {
+    let result: Survey;
+    let error = "";
+    try {
+      result = JSON.parse(surveyString) as Survey;
+    } catch (e) {
+      return "\nInvalid survey string";
+    }
+    if (!result.name) {
+      error += "\nSurvey has no name";
+    }
+    if (!Array.isArray(result.teams ?? [])) {
+      error += "\nSurvey has invalid teams";
+    }
+    if (!result.configs) {
+      error += "\nSurvey has no metrics";
+    } else {
+      result.configs.forEach((metric, i) => {
+        if (!metric.name) {
+          error += `\nMetric ${i + 1} has no name`;
+        }
+        if (metric.type == "select" && !Array.isArray(metric.values ?? [])) {
+          error += `\nMetric ${metric.name ?? i + 1} has invalid values`;
+        }
+        if (!metricTypes.includes(metric.type)) {
+          error += `\nMetric ${metric.name ?? i + 1} has invalid type`;
+        }
+      });
+    }
+    if (error) {
+      return error;
+    }
+    return result;
+  }
 </script>
 
 <Container padding noGap>

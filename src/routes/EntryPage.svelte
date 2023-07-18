@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getMetricDefaultValue, surveys, validateEntry } from "$lib/app";
+  import { getMetricDefaultValue, surveys, type Entry, type Survey } from "$lib/app";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import MetricEditor from "$lib/components/MetricEditor.svelte";
@@ -8,6 +8,36 @@
   export let entryIndex: number;
 
   let saveEntryDialog = { error: "" };
+
+  function validateEntry(survey: Survey, entry: Entry) {
+    let error = "";
+    entry.forEach((value, i) => {
+      switch (survey.configs[i].type) {
+        case "team":
+          if (!/^\d{1,4}[A-Z]?$/.test(value)) {
+            error = `Invalid value for ${survey.configs[i].name}`;
+          }
+          if (survey.teams.length && !survey.teams.includes(value)) {
+            error = `Invalid value for ${survey.configs[i].name} (team not allowlisted)`;
+          }
+          break;
+        case "match":
+          if (!/\d{1,3}/.test(`${value}`)) {
+            error = `Invalid value for ${survey.configs[i].name}`;
+          }
+          break;
+        case "text":
+          if (survey.configs[i].required && !value.trim()) {
+            error = `Invalid value for ${survey.configs[i].name}`;
+          }
+          break;
+      }
+      if (value == undefined || typeof value !== typeof getMetricDefaultValue(survey.configs[i])) {
+        error = `Invalid value for ${survey.configs[i].name}`;
+      }
+    });
+    return error;
+  }
 </script>
 
 <datalist id="teams-list">

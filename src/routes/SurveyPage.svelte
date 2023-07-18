@@ -1,14 +1,58 @@
 <script lang="ts">
-  import { downloadSurveyEntries, getMetricDefaultValue, surveys, type Entry } from "$lib/app";
+  import { surveys, target, type Entry, type Survey } from "$lib/app";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
 
   export let surveyIndex: number;
 
+  function getHighestMatchValue() {
+    let value = 0;
+    $surveys[surveyIndex].entries.forEach((entry, i) => {
+      if ($surveys[surveyIndex].configs[i].type == "match") {
+        const match = parseInt(entry[i]);
+        if (match > value) {
+          value = match;
+        }
+      }
+    });
+    return value;
+  }
+
   function newEntryClicked() {
-    let entry: Entry = $surveys[surveyIndex].configs.map(getMetricDefaultValue);
+    const newValue = {
+      team: "",
+      match: getHighestMatchValue() + 1,
+      toggle: false,
+      number: 0,
+      text: "",
+      rating: 0,
+      timer: 0,
+    };
+
+    const entry: Entry = $surveys[surveyIndex].configs.map((config) => {
+      return config.type == "select" ? config.values[0] : newValue[config.type];
+    });
+
     $surveys[surveyIndex].entries = [entry, ...$surveys[surveyIndex].entries];
+  }
+
+  function valueToCSV(value: any) {
+    return `${value}`.replaceAll(",", "").replaceAll("\n", ". ").trim();
+  }
+
+  function entryToCSV(entry: Entry) {
+    return entry.map(valueToCSV).join(",");
+  }
+
+  function downloadSurveyEntries(survey: Survey) {
+    const csv = [survey.configs.map((config) => config.name).join(","), ...survey.entries.map(entryToCSV)].join("\n");
+    const anchor = document.createElement("a");
+    anchor.download = `${survey.name}-${$target}.csv`.replaceAll(" ", "_");
+    anchor.href = `data:text/plain;charset=utf-8,${encodeURIComponent(csv)}`;
+    document.body.append(anchor);
+    anchor.click();
+    anchor.remove();
   }
 </script>
 

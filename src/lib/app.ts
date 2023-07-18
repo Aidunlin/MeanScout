@@ -110,74 +110,6 @@ export const target = localStorageStore<Target>("target", "red", (target) => {
   document.documentElement.style.setProperty("--theme-color", `var(--${newTheme})`);
 });
 
-export function parseSurvey(surveyString: string): string | Survey {
-  let result: Survey;
-  let error = "";
-  try {
-    result = JSON.parse(surveyString) as Survey;
-  } catch (e) {
-    return "\nInvalid survey string";
-  }
-  if (!result.name) {
-    error += "\nSurvey has no name";
-  }
-  if (!Array.isArray(result.teams ?? [])) {
-    error += "\nSurvey has invalid teams";
-  }
-  if (!result.configs) {
-    error += "\nSurvey has no metrics";
-  } else {
-    result.configs.forEach((metric, i) => {
-      if (!metric.name) {
-        error += `\nMetric ${i + 1} has no name`;
-      }
-      if (metric.type == "select" && !Array.isArray(metric.values ?? [])) {
-        error += `\nMetric ${metric.name ?? i + 1} has invalid values`;
-      }
-      if (!metricTypes.includes(metric.type)) {
-        error += `\nMetric ${metric.name ?? i + 1} has invalid type`;
-      }
-    });
-  }
-  if (error) {
-    return error;
-  }
-  return result;
-}
-
-function entryToCSV(values: Entry) {
-  let csv = "";
-  values.forEach((value) => {
-    if (typeof value == "string") {
-      csv += `,${value.replaceAll(",", "").replaceAll("\n", ". ").trim()}`;
-    } else {
-      csv += `,${value}`;
-    }
-  });
-  return csv;
-}
-
-function surveyToCSV(survey: Survey) {
-  let csv = "";
-  survey.configs.forEach((config) => {
-    csv += `,${config.name}`;
-  });
-  csv += "\n";
-  survey.entries.forEach((entry) => {
-    csv += `${entryToCSV(entry)}\n`;
-  });
-  return csv;
-}
-
-export function downloadSurveyEntries(survey: Survey) {
-  const anchor = document.createElement("a");
-  anchor.download = "surveys.csv";
-  anchor.href = "data:text/plain;charset=utf-8," + encodeURIComponent(surveyToCSV(survey));
-  document.body.append(anchor);
-  anchor.click();
-  anchor.remove();
-}
-
 export function getMetricDefaultValue(config: MetricConfig) {
   switch (config.type) {
     case "team":
@@ -199,32 +131,4 @@ export function getMetricDefaultValue(config: MetricConfig) {
     default:
       return undefined;
   }
-}
-
-export function validateEntry(survey: Survey, entry: Entry) {
-  let error = "";
-  entry.forEach((value, i) => {
-    switch (survey.configs[i].type) {
-      case "team":
-        if (!/^\d{1,4}[A-Z]?$/.test(value)) {
-          error = `Invalid value for ${survey.configs[i].name}`;
-        }
-        if (survey.teams.length && !survey.teams.includes(value)) {
-          error = `Invalid value for ${survey.configs[i].name} (team not allowlisted)`;
-        }
-        break;
-      case "match":
-        if (!/\d{1,3}/.test(`${value}`)) {
-          error = `Invalid value for ${survey.configs[i].name}`;
-        }
-        break;
-      case "text":
-        if (!value.trim()) error = `Invalid value for ${survey.configs[i].name}`;
-        break;
-    }
-    if (typeof value == "undefined" || typeof value !== typeof getMetricDefaultValue(survey.configs[i])) {
-      error = `Invalid value for ${survey.configs[i].name}`;
-    }
-  });
-  return error;
 }
