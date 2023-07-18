@@ -34,7 +34,6 @@
         openButton={{ iconName: "trash", title: "Delete entry" }}
         onConfirm={() => {
           $surveys = $surveys.filter((_, idx) => idx != surveyIndex);
-          return true;
         }}
       >
         <span>Delete this survey?</span>
@@ -61,28 +60,15 @@
         {
           name,
           configs: [
-            {
-              name: "Team",
-              type: "team",
-              required: true,
-            },
-            {
-              name: "Match",
-              type: "match",
-              required: true,
-            },
-            {
-              name: "Absent",
-              type: "toggle",
-              required: true,
-            },
+            { name: "Team", type: "team", required: true },
+            { name: "Match", type: "match", required: true },
+            { name: "Absent", type: "toggle", required: true },
           ],
           teams: [],
           entries: [],
         },
         ...$surveys,
       ];
-      return true;
     }}
     on:close={() => (newSurveyDialog = { name: "", error: "" })}
   >
@@ -107,7 +93,6 @@
         return false;
       }
       $surveys = [result, ...$surveys];
-      return true;
     }}
     on:close={() => (pasteSurveyDialog = { input: "", error: "" })}
   >

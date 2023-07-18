@@ -35,7 +35,6 @@
         $surveys[surveyIndex].configs.map(getMetricDefaultValue),
         ...$surveys[surveyIndex].entries,
       ];
-      return true;
     }}
     on:close={() => (saveEntryDialog = { error: "" })}
   >
@@ -53,7 +52,6 @@
           $surveys[surveyIndex].entries[entryIndex][i] = getMetricDefaultValue($surveys[surveyIndex].configs[i]);
         }
       }
-      return true;
     }}
   >
     <span>Reset this entry?</span>

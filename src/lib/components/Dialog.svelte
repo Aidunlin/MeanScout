@@ -7,7 +7,7 @@
 
   export let openButton: ComponentProps<Button>;
   export let onOpen: (() => void) | undefined = undefined;
-  export let onConfirm: (() => boolean) | undefined = undefined;
+  export let onConfirm: (() => boolean | void) | undefined = undefined;
 </script>
 
 <Button
@@ -25,7 +25,7 @@
         iconName="check"
         title="Confirm"
         on:click={() => {
-          if (onConfirm && onConfirm()) element.close();
+          if (onConfirm && onConfirm() !== false) element.close();
         }}
       />
     {/if}

@@ -47,7 +47,6 @@
                 $surveys[surveyIndex].entries[i][configIndex] = getMetricDefaultValue(editConfigDialog);
               }
             }
-            return true;
           }}
           on:close={() => (editConfigDialog = { name: "", type: "toggle" })}
         >
@@ -178,7 +177,6 @@
               );
             }
             $surveys[surveyIndex].configs = $surveys[surveyIndex].configs.filter((_, i) => i != configIndex);
-            return true;
           }}
         >
           <span>Delete {$surveys[surveyIndex].configs[configIndex].name}?</span>

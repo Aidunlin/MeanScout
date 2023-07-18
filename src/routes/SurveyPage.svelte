@@ -48,7 +48,6 @@
         openButton={{ iconName: "trash", title: "Delete entry" }}
         onConfirm={() => {
           $surveys[surveyIndex].entries = $surveys[surveyIndex].entries.filter((_, i) => i != entryIndex);
-          return true;
         }}
       >
         <span>Delete this entry?</span>
@@ -67,7 +66,6 @@
     openButton={{ iconName: "download", title: "Download entries" }}
     onConfirm={() => {
       downloadSurveyEntries($surveys[surveyIndex]);
-      return true;
     }}
   >
     <span>Download entries as CSV?</span>
