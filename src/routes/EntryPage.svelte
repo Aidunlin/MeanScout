@@ -1,39 +1,45 @@
 <script lang="ts">
-  import { getMetricDefaultValue, surveys, type Entry, type Survey } from "$lib/app";
+  import { getMetricDefaultValue, surveys } from "$lib/app";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import MetricEditor from "$lib/components/MetricEditor.svelte";
+  import { writable } from "svelte/store";
 
   export let surveyIndex: number;
   export let entryIndex: number;
 
+  const survey = writable($surveys[surveyIndex]);
+  survey.subscribe((survey) => {
+    $surveys[surveyIndex] = survey;
+  });
+
   let saveEntryDialog = { error: "" };
 
-  function validateEntry(survey: Survey, entry: Entry) {
+  function validateEntry() {
     let error = "";
-    entry.forEach((value, i) => {
-      switch (survey.configs[i].type) {
+    $survey.entries[entryIndex].forEach((value, i) => {
+      switch ($survey.configs[i].type) {
         case "team":
           if (!/^\d{1,4}[A-Z]?$/.test(value)) {
-            error = `Invalid value for ${survey.configs[i].name}`;
+            error = `Invalid value for ${$survey.configs[i].name}`;
           }
-          if (survey.teams.length && !survey.teams.includes(value)) {
-            error = `Invalid value for ${survey.configs[i].name} (team not allowlisted)`;
+          if ($survey.teams.length && !$survey.teams.includes(value)) {
+            error = `Invalid value for ${$survey.configs[i].name} (team not allowlisted)`;
           }
           break;
         case "match":
           if (!/\d{1,3}/.test(`${value}`)) {
-            error = `Invalid value for ${survey.configs[i].name}`;
+            error = `Invalid value for ${$survey.configs[i].name}`;
           }
           break;
         case "text":
-          if (survey.configs[i].required && !value.trim()) {
-            error = `Invalid value for ${survey.configs[i].name}`;
+          if ($survey.configs[i].required && !value.trim()) {
+            error = `Invalid value for ${$survey.configs[i].name}`;
           }
           break;
       }
-      if (value == undefined || typeof value !== typeof getMetricDefaultValue(survey.configs[i])) {
-        error = `Invalid value for ${survey.configs[i].name}`;
+      if (value == undefined || typeof value !== typeof getMetricDefaultValue($survey.configs[i])) {
+        error = `Invalid value for ${$survey.configs[i].name}`;
       }
     });
     return error;
@@ -41,14 +47,14 @@
 </script>
 
 <datalist id="teams-list">
-  {#each $surveys[surveyIndex].teams as team}
+  {#each $survey.teams as team}
     <option value={team} />
   {/each}
 </datalist>
 
 <Container padding alignEnd>
-  {#each $surveys[surveyIndex].configs as config, i}
-    <MetricEditor {config} bind:value={$surveys[surveyIndex].entries[entryIndex][i]} />
+  {#each $survey.configs as config, i}
+    <MetricEditor {config} bind:value={$survey.entries[entryIndex][i]} />
   {/each}
 </Container>
 
@@ -56,15 +62,12 @@
   <Dialog
     openButton={{ iconName: "floppy-disk", title: "Save entry" }}
     onConfirm={() => {
-      let error = validateEntry($surveys[surveyIndex], $surveys[surveyIndex].entries[entryIndex]);
+      let error = validateEntry();
       if (error) {
         saveEntryDialog.error = `Could not save entry! ${error}`;
         return false;
       }
-      $surveys[surveyIndex].entries = [
-        $surveys[surveyIndex].configs.map(getMetricDefaultValue),
-        ...$surveys[surveyIndex].entries,
-      ];
+      $survey.entries = [$survey.configs.map(getMetricDefaultValue), ...$survey.entries];
     }}
     on:close={() => (saveEntryDialog = { error: "" })}
   >
@@ -77,9 +80,9 @@
   <Dialog
     openButton={{ iconName: "arrow-rotate-left", title: "Reset entry" }}
     onConfirm={() => {
-      for (let i = 0; i < $surveys[surveyIndex].entries[entryIndex].length; i++) {
-        if (!["team", "match"].includes($surveys[surveyIndex].configs[i].type)) {
-          $surveys[surveyIndex].entries[entryIndex][i] = getMetricDefaultValue($surveys[surveyIndex].configs[i]);
+      for (let i = 0; i < $survey.entries[entryIndex].length; i++) {
+        if (!["team", "match"].includes($survey.configs[i].type)) {
+          $survey.entries[entryIndex][i] = getMetricDefaultValue($survey.configs[i]);
         }
       }
     }}

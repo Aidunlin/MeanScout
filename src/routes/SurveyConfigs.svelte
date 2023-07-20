@@ -3,21 +3,27 @@
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
+  import { writable } from "svelte/store";
 
   export let surveyIndex: number;
+
+  const survey = writable($surveys[surveyIndex]);
+  survey.subscribe((survey) => {
+    $surveys[surveyIndex] = survey;
+  });
 
   let copySurveyDialog = { text: "" };
 
   let editConfigDialog: MetricConfig | undefined = undefined;
 
   function moveConfig(index: number, by: number) {
-    let config = $surveys[surveyIndex].configs.splice(index, 1);
-    $surveys[surveyIndex].configs.splice(index + by, 0, ...config);
-    for (let i = 0; i < $surveys[surveyIndex].entries.length; i++) {
-      let value = $surveys[surveyIndex].entries[i].splice(index, 1);
-      $surveys[surveyIndex].entries[i].splice(index + by, 0, value);
+    let config = $survey.configs.splice(index, 1);
+    $survey.configs.splice(index + by, 0, ...config);
+    for (let i = 0; i < $survey.entries.length; i++) {
+      let value = $survey.entries[i].splice(index, 1);
+      $survey.entries[i].splice(index + by, 0, ...value);
     }
-    $surveys = $surveys;
+    $survey = $survey;
   }
 </script>
 
@@ -34,7 +40,7 @@
 
 <Container column padding>
   <h2>Configs</h2>
-  {#each $surveys[surveyIndex].configs as config, configIndex (config)}
+  {#each $survey.configs as config, configIndex (config)}
     <Container spaceBetween alignEnd>
       <Container>
         <Dialog
@@ -42,9 +48,9 @@
           onOpen={() => (editConfigDialog = JSON.parse(JSON.stringify(config)))}
           onConfirm={() => {
             if (editConfigDialog) {
-              $surveys[surveyIndex].configs[configIndex] = editConfigDialog;
-              for (let i = 0; i < $surveys[surveyIndex].entries.length; i++) {
-                $surveys[surveyIndex].entries[i][configIndex] = getMetricDefaultValue(editConfigDialog);
+              $survey.configs[configIndex] = editConfigDialog;
+              for (let i = 0; i < $survey.entries.length; i++) {
+                $survey.entries[i][configIndex] = getMetricDefaultValue(editConfigDialog);
               }
             }
           }}
@@ -164,22 +170,20 @@
         <Button
           iconName="arrow-down"
           title="Move down"
-          disabled={configIndex == $surveys[surveyIndex].configs.length - 1}
+          disabled={configIndex == $survey.configs.length - 1}
           on:click={() => moveConfig(configIndex, 1)}
         />
 
         <Dialog
           openButton={{ iconName: "trash", title: "Delete config" }}
           onConfirm={() => {
-            for (let entryIndex = 0; entryIndex < $surveys[surveyIndex].entries.length; entryIndex++) {
-              $surveys[surveyIndex].entries[entryIndex] = $surveys[surveyIndex].entries[entryIndex].filter(
-                (_, i) => i != configIndex
-              );
+            for (let entryIndex = 0; entryIndex < $survey.entries.length; entryIndex++) {
+              $survey.entries[entryIndex] = $survey.entries[entryIndex].filter((_, i) => i != configIndex);
             }
-            $surveys[surveyIndex].configs = $surveys[surveyIndex].configs.filter((_, i) => i != configIndex);
+            $survey.configs = $survey.configs.filter((_, i) => i != configIndex);
           }}
         >
-          <span>Delete {$surveys[surveyIndex].configs[configIndex].name}?</span>
+          <span>Delete {$survey.configs[configIndex].name}?</span>
           <span>Entry data corresponding to this config may be deleted!</span>
         </Dialog>
       </Container>
@@ -192,16 +196,16 @@
     iconName="plus"
     title="New config"
     on:click={() => {
-      $surveys[surveyIndex].configs = [...$surveys[surveyIndex].configs, { name: "", type: "toggle" }];
-      for (let i = 0; i < $surveys[surveyIndex].entries.length; i++) {
-        $surveys[surveyIndex].entries[i] = [...$surveys[surveyIndex].entries[i], false];
+      $survey.configs = [...$survey.configs, { name: "", type: "toggle" }];
+      for (let i = 0; i < $survey.entries.length; i++) {
+        $survey.entries[i] = [...$survey.entries[i], false];
       }
     }}
   />
 
   <Dialog
     openButton={{ iconName: "copy", title: "Copy survey" }}
-    onOpen={() => (copySurveyDialog.text = JSON.stringify($surveys[surveyIndex], undefined, "  "))}
+    onOpen={() => (copySurveyDialog.text = JSON.stringify($survey, undefined, "  "))}
   >
     <span>Select and copy the survey:</span>
     <Container maxWidth>

@@ -2,14 +2,20 @@
   import { surveys } from "$lib/app";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
+  import { writable } from "svelte/store";
 
   export let surveyIndex: number;
+
+  const survey = writable($surveys[surveyIndex]);
+  survey.subscribe((survey) => {
+    $surveys[surveyIndex] = survey;
+  });
 
   let teamInput = "";
 
   function addTeam() {
-    if (teamInput.trim() && !$surveys[surveyIndex].teams.includes(teamInput.trim())) {
-      $surveys[surveyIndex].teams = [...$surveys[surveyIndex].teams, teamInput.trim()];
+    if (teamInput.trim() && !$survey.teams.includes(teamInput.trim())) {
+      $survey.teams = [...$survey.teams, teamInput.trim()];
       teamInput = "";
     }
   }
@@ -19,7 +25,7 @@
   }
 
   function deleteTeam(team: string) {
-    $surveys[surveyIndex].teams = $surveys[surveyIndex].teams.filter((t) => t.trim() != team.trim());
+    $survey.teams = $survey.teams.filter((t) => t.trim() != team.trim());
   }
 </script>
 
@@ -47,13 +53,13 @@
         }}
       />
     </Container>
-    {#if $surveys[surveyIndex].teams.length}
+    {#if $survey.teams.length}
       Teams
     {:else}
       No teams added
     {/if}
     <Container>
-      {#each sortTeams($surveys[surveyIndex].teams) as team}
+      {#each sortTeams($survey.teams) as team}
         <Button text={team} title="Delete {team}" on:click={() => deleteTeam(team)} />
       {/each}
     </Container>
