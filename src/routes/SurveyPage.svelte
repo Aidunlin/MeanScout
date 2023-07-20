@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { surveys, target, type Entry, type Survey } from "$lib/app";
+  import { surveys, target, type Entry } from "$lib/app";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
@@ -7,16 +7,17 @@
   export let surveyIndex: number;
 
   function getHighestMatchValue() {
-    let value = 0;
-    $surveys[surveyIndex].entries.forEach((entry, i) => {
-      if ($surveys[surveyIndex].configs[i].type == "match") {
-        const match = parseInt(entry[i]);
-        if (match > value) {
-          value = match;
+    let highest = 0;
+
+    $surveys[surveyIndex].entries.forEach((entry) => {
+      entry.forEach((value, i) => {
+        if ($surveys[surveyIndex].configs[i].type == "match") {
+          highest = Math.max(value, highest);
         }
-      }
+      });
     });
-    return value;
+
+    return highest;
   }
 
   function newEntryClicked() {
@@ -45,10 +46,14 @@
     return entry.map(valueToCSV).join(",");
   }
 
-  function downloadSurveyEntries(survey: Survey) {
-    const csv = [survey.configs.map((config) => config.name).join(","), ...survey.entries.map(entryToCSV)].join("\n");
+  function downloadEntries() {
+    const csv = [
+      $surveys[surveyIndex].configs.map((config) => config.name).join(","),
+      ...$surveys[surveyIndex].entries.map(entryToCSV),
+    ].join("\n");
+
     const anchor = document.createElement("a");
-    anchor.download = `${survey.name}-${$target}.csv`.replaceAll(" ", "_");
+    anchor.download = `${$surveys[surveyIndex].name}-${$target}.csv`.replaceAll(" ", "_");
     anchor.href = `data:text/plain;charset=utf-8,${encodeURIComponent(csv)}`;
     document.body.append(anchor);
     anchor.click();
@@ -105,13 +110,5 @@
 
 <footer>
   <Button iconName="plus" title="New entry" on:click={newEntryClicked} />
-
-  <Dialog
-    openButton={{ iconName: "download", title: "Download entries" }}
-    onConfirm={() => {
-      downloadSurveyEntries($surveys[surveyIndex]);
-    }}
-  >
-    <span>Download entries as CSV?</span>
-  </Dialog>
+  <Button iconName="download" title="Download entries" on:click={downloadEntries} />
 </footer>
