@@ -113,8 +113,8 @@ dialog {
   flex-direction: column;
   gap: var(--outer-gap);
   max-height: 100dvh;
-  max-width: 100dvw;
   padding: var(--outer-gap);
+  width: min(100dvw, 540px);
 }
 
 dialog::backdrop {
@@ -123,6 +123,10 @@ dialog::backdrop {
 
 dialog[open] {
   display: flex;
+}
+
+ul {
+  margin: 0;
 }
 
 :disabled {
@@ -134,11 +138,6 @@ textarea {
   height: 300px;
   resize: none;
   width: 100%;
-}
-
-dialog textarea {
-  max-width: 720px;
-  width: 100dvw;
 }
 
 button {

@@ -5,41 +5,74 @@
   import Dialog from "$lib/components/Dialog.svelte";
 
   let newSurveyDialog = { name: "", error: "" };
-  let pasteSurveyDialog = { input: "", error: "" };
+  let pasteSurveyDialog: { input: string; errors: string[] } = { input: "", errors: [] };
 
-  function parseSurvey(surveyString: string): string | Survey {
-    let result: Survey;
-    let error = "";
-    try {
-      result = JSON.parse(surveyString) as Survey;
-    } catch (e) {
-      return "\nInvalid survey string";
+  function newSurvey() {
+    let name = newSurveyDialog.name.trim();
+    if (!name) {
+      newSurveyDialog.error = "Name can't be blank!";
+      return false;
     }
-    if (!result.name) {
-      error += "\nSurvey has no name";
+    if ($surveys.map((survey) => survey.name).includes(name)) {
+      newSurveyDialog.error = "That name is already used!";
+      return false;
     }
-    if (!Array.isArray(result.teams ?? [])) {
-      error += "\nSurvey has invalid teams";
+    let survey: Survey = { name, configs: [], teams: [], entries: [] };
+    survey.configs = [
+      { name: "Team", type: "team", required: true },
+      { name: "Match", type: "match", required: true },
+      { name: "Absent", type: "toggle", required: true },
+    ];
+    $surveys = [survey, ...$surveys];
+  }
+
+  function validateSurvey(survey: Survey) {
+    let errors: string[] = [];
+    if (!survey.name || !survey.name.trim()) {
+      errors.push("Survey has no name");
+    } else if ($surveys.map((survey) => survey.name).includes(survey.name)) {
+      errors.push(`"${survey.name}" already exists`);
     }
-    if (!result.configs) {
-      error += "\nSurvey has no metrics";
+    if (survey.teams && !Array.isArray(survey.teams)) {
+      errors.push("Survey has invalid teams");
+    }
+    if (!survey.configs) {
+      errors.push("Survey has no configs");
     } else {
-      result.configs.forEach((metric, i) => {
-        if (!metric.name) {
-          error += `\nMetric ${i + 1} has no name`;
+      survey.configs.forEach((config, i) => {
+        if (!config.name || !config.name.trim()) {
+          errors.push(`Config ${i + 1} has no name`);
         }
-        if (metric.type == "select" && !Array.isArray(metric.values ?? [])) {
-          error += `\nMetric ${metric.name ?? i + 1} has invalid values`;
+        if (config.type == "select" && !Array.isArray(config.values ?? [])) {
+          errors.push(`Config ${config.name ?? i + 1} has invalid values`);
         }
-        if (!metricTypes.includes(metric.type)) {
-          error += `\nMetric ${metric.name ?? i + 1} has invalid type`;
+        if (!metricTypes.includes(config.type)) {
+          errors.push(`Config ${config.name ?? i + 1} has invalid type`);
         }
       });
     }
-    if (error) {
-      return error;
+    return { errors };
+  }
+
+  function parseSurvey() {
+    let survey: Survey;
+    try {
+      survey = JSON.parse(pasteSurveyDialog.input.trim()) as Survey;
+    } catch (e) {
+      pasteSurveyDialog.errors = ["Invalid input"];
+      return false;
     }
-    return result;
+    survey.name ??= `Survey ${new Date().toLocaleString(undefined, { dateStyle: "short", timeStyle: "short" })}`;
+    survey.configs ??= [];
+    survey.entries ??= [];
+    survey.teams ??= [];
+    pasteSurveyDialog.errors = validateSurvey(survey).errors;
+    if (pasteSurveyDialog.errors.length) return false;
+    $surveys = [survey, ...$surveys];
+  }
+
+  function deleteSurvey(surveyIndex: number) {
+    $surveys = $surveys.filter((_, idx) => idx != surveyIndex);
   }
 </script>
 
@@ -60,19 +93,12 @@
       <Container>
         <Button iconName="pen" title="Edit survey" on:click={() => (window.location.hash = `${surveyIndex}`)} />
         <span>{survey.name}</span>
-        {#if survey.entries.length}
-          <span>({survey.entries.length} {survey.entries.length == 1 ? "entry" : "entries"})</span>
-        {/if}
       </Container>
-
-      <Dialog
-        openButton={{ iconName: "trash", title: "Delete entry" }}
-        onConfirm={() => {
-          $surveys = $surveys.filter((_, idx) => idx != surveyIndex);
-        }}
-      >
-        <span>Delete this survey?</span>
-        <span>Everything in "{$surveys[surveyIndex].name}" will be lost!</span>
+      <Dialog openButton={{ iconName: "trash", title: "Delete entry" }} onConfirm={() => deleteSurvey(surveyIndex)}>
+        <span>Delete "{survey.name}"?</span>
+        {#if survey.entries.length}
+          <span>{survey.entries.length} {survey.entries.length == 1 ? "entry" : "entries"} will be lost!</span>
+        {/if}
       </Dialog>
     </Container>
   {/each}
@@ -81,30 +107,7 @@
 <footer>
   <Dialog
     openButton={{ iconName: "plus", title: "New survey" }}
-    onConfirm={() => {
-      let name = newSurveyDialog.name.trim();
-      if (!name) {
-        newSurveyDialog.error = "Name can't be blank!";
-        return false;
-      }
-      if ($surveys.map((survey) => survey.name).includes(name)) {
-        newSurveyDialog.error = "That name is already used!";
-        return false;
-      }
-      $surveys = [
-        {
-          name,
-          configs: [
-            { name: "Team", type: "team", required: true },
-            { name: "Match", type: "match", required: true },
-            { name: "Absent", type: "toggle", required: true },
-          ],
-          teams: [],
-          entries: [],
-        },
-        ...$surveys,
-      ];
-    }}
+    onConfirm={newSurvey}
     on:close={() => (newSurveyDialog = { name: "", error: "" })}
   >
     <span>Enter name for new survey:</span>
@@ -113,30 +116,20 @@
       <span>{newSurveyDialog.error}</span>
     {/if}
   </Dialog>
-
   <Dialog
     openButton={{ iconName: "paste", title: "Import survey" }}
-    onConfirm={() => {
-      if (!pasteSurveyDialog.input) return false;
-      let result = parseSurvey(pasteSurveyDialog.input);
-      if (typeof result == "string") {
-        pasteSurveyDialog.error = `Could not import survey! ${result}`;
-        return false;
-      }
-      if ($surveys.map((survey) => survey.name).includes(result.name)) {
-        pasteSurveyDialog.error = `Could not import survey! ${result.name} already exists`;
-        return false;
-      }
-      $surveys = [result, ...$surveys];
-    }}
-    on:close={() => (pasteSurveyDialog = { input: "", error: "" })}
+    onConfirm={parseSurvey}
+    on:close={() => (pasteSurveyDialog = { input: "", errors: [] })}
   >
     <span>Paste new survey:</span>
-    <Container maxWidth>
-      <textarea bind:value={pasteSurveyDialog.input} />
-    </Container>
-    {#if pasteSurveyDialog.error}
-      <span>{pasteSurveyDialog.error}</span>
+    <textarea bind:value={pasteSurveyDialog.input} />
+    {#if pasteSurveyDialog.errors.length}
+      <span>Could not import survey!</span>
+      <ul>
+        {#each pasteSurveyDialog.errors as error}
+          <li>{error}</li>
+        {/each}
+      </ul>
     {/if}
   </Dialog>
 </footer>
