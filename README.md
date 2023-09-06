@@ -1,6 +1,6 @@
 # MeanScout
 
-A lightweight FRC scouting web app, built with SvelteKit.
+A lightweight FRC scouting web app built with SvelteKit.
 
 ## Features
 

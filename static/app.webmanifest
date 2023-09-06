@@ -1,7 +1,7 @@
 {
   "name": "MeanScout",
   "short_name": "MeanScout",
-  "description": "A lightweight FRC scouting web app.",
+  "description": "A lightweight FRC scouting web app built with SvelteKit.",
   "start_url": "./",
   "display": "standalone",
   "theme_color": "#000000",
