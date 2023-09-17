@@ -3,6 +3,7 @@
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
+  import Header from "$lib/components/Header.svelte";
   import { writable } from "svelte/store";
 
   export let surveyIndex: number;
@@ -26,6 +27,8 @@
     $survey = $survey;
   }
 </script>
+
+<Header title={$survey.name} backLink={"/surveys"} />
 
 <Container padding noGap>
   <Button

@@ -2,6 +2,7 @@
   import { surveys } from "$lib/app";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
+  import Header from "$lib/components/Header.svelte";
   import { writable } from "svelte/store";
 
   export let surveyIndex: number;
@@ -28,6 +29,8 @@
     $survey.teams = $survey.teams.filter((t) => t.trim() != team.trim());
   }
 </script>
+
+<Header title={$survey.name} backLink={"/surveys"} />
 
 <Container padding noGap>
   <Button

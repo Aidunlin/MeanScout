@@ -2,6 +2,7 @@
   import { getMetricDefaultValue, surveys } from "$lib/app";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
+  import Header from "$lib/components/Header.svelte";
   import MetricEditor from "$lib/components/MetricEditor.svelte";
   import { writable } from "svelte/store";
 
@@ -45,6 +46,8 @@
     return error;
   }
 </script>
+
+<Header title="Entry ({$survey.name})" backLink={`/survey/${surveyIndex}/entries`} />
 
 <datalist id="teams-list">
   {#each $survey.teams as team}

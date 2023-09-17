@@ -2,7 +2,10 @@
   import { allianceTargets, blueTeamTargets, otherTargets, redTeamTargets, target } from "$lib/app";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
+  import Header from "$lib/components/Header.svelte";
 </script>
+
+<Header />
 
 <Container padding noGap>
   <Button iconName="list-ul" title="Surveys" disableTheme on:click={() => (location.hash = "/surveys")} />

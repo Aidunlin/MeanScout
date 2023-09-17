@@ -3,6 +3,7 @@
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
+  import Header from "$lib/components/Header.svelte";
 
   let newSurveyDialog = { name: "", error: "" };
   let pasteSurveyDialog: { input: string; errors: string[] } = { input: "", errors: [] };
@@ -75,6 +76,8 @@
     $surveys = $surveys.filter((_, idx) => idx != surveyIndex);
   }
 </script>
+
+<Header />
 
 <Container padding noGap>
   <Button iconName="list-ul" title="Surveys" />
