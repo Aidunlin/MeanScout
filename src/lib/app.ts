@@ -82,31 +82,33 @@ export type Survey = {
   entries: Entry[];
 };
 
-function localStorageStore<T>(key: string, start: T, subscriber?: (val: T) => void) {
+const idb = await new Promise<IDBDatabase>((resolve, reject) => {
+  const openRequest = indexedDB.open("MeanScout");
+  openRequest.onerror = (event: any) => reject(event.target.error);
+  openRequest.onsuccess = () => resolve(openRequest.result);
+  openRequest.onupgradeneeded = () => openRequest.result.createObjectStore("MeanScout");
+});
+
+async function idbStore<T>(key: string, start: T, subscriber?: (val: T) => void) {
   try {
-    if (typeof start == "string") {
-      start = localStorage[key] ?? start;
-    } else {
-      start = JSON.parse(localStorage[key]);
-    }
+    start = await new Promise<T>((resolve, reject) => {
+      const thing = idb.transaction("MeanScout").objectStore("MeanScout").get(key);
+      thing.onsuccess = () => resolve(thing.result ?? start);
+      thing.onerror = (event: any) => reject(event.target.error);
+    });
   } finally {
-    let store = writable(start);
-    store.subscribe((value) => {
-      if (typeof value == "string") {
-        localStorage[key] = value;
-      } else {
-        localStorage[key] = JSON.stringify(value);
-      }
+    const store = writable(start);
+    store.subscribe(async (value) => {
+      idb.transaction("MeanScout", "readwrite").objectStore("MeanScout").put(value, key);
       if (subscriber) subscriber(value);
     });
     return store;
   }
 }
 
-export const surveys = localStorageStore<Survey[]>("surveys", []);
-export const target = localStorageStore<Target>("target", "red", (target) => {
-  let newTheme = target.split(" ")[0];
-  if (target == "pit") newTheme = "yellow";
+export const surveys = await idbStore<Survey[]>("surveys", []);
+export const target = await idbStore<Target>("target", "red", (target) => {
+  let newTheme = target == "pit" ? "yellow" : target.split(" ")[0];
   document.documentElement.style.setProperty("--theme-color", `var(--${newTheme})`);
 });
 
