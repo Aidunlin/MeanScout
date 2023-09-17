@@ -69,13 +69,13 @@
     iconName="gears"
     title="Configs"
     disableTheme
-    on:click={() => (window.location.hash = `${surveyIndex}/configs`)}
+    on:click={() => (location.hash = `/survey/${surveyIndex}/configs`)}
   />
   <Button
     iconName="ellipsis-vertical"
     title="Options"
     disableTheme
-    on:click={() => (window.location.hash = `${surveyIndex}/options`)}
+    on:click={() => (location.hash = `/survey/${surveyIndex}/options`)}
   />
 </Container>
 
@@ -87,7 +87,7 @@
         <Button
           iconName="pen"
           title="Edit entry"
-          on:click={() => (window.location.hash = `${surveyIndex}/${entryIndex}`)}
+          on:click={() => (location.hash = `/survey/${surveyIndex}/entry/${entryIndex}`)}
         />
         {#each $survey.configs.slice(0, 2) as config, i}
           <span>{config.name}: {entry[i]}, </span>

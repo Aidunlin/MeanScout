@@ -5,7 +5,7 @@
 </script>
 
 <Container padding noGap>
-  <Button iconName="list-ul" title="Surveys" disableTheme on:click={() => (window.location.hash = "")} />
+  <Button iconName="list-ul" title="Surveys" disableTheme on:click={() => (location.hash = "/surveys")} />
   <Button iconName="ellipsis-vertical" title="Options" />
 </Container>
 

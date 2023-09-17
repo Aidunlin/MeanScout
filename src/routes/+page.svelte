@@ -2,50 +2,58 @@
   import { surveys } from "$lib/app";
   import "$lib/app.css";
   import Header from "$lib/components/Header.svelte";
-  import EntryPage from "./EntryPage.svelte";
-  import MainOptions from "./MainOptions.svelte";
-  import MainPage from "./MainPage.svelte";
-  import SurveyConfigs from "./SurveyConfigs.svelte";
-  import SurveyOptions from "./SurveyOptions.svelte";
-  import SurveyPage from "./SurveyPage.svelte";
+  import EntryView from "$lib/views/EntryView.svelte";
+  import OptionsView from "$lib/views/OptionsView.svelte";
+  import SurveyConfigsView from "$lib/views/SurveyConfigsView.svelte";
+  import SurveyEntriesView from "$lib/views/SurveyEntriesView.svelte";
+  import SurveyOptionsView from "$lib/views/SurveyOptionsView.svelte";
+  import SurveysView from "$lib/views/SurveysView.svelte";
 
-  export const mainPages = {
-    "": MainPage,
-    options: MainOptions,
+  const mainViews = {
+    surveys: SurveysView,
+    options: OptionsView,
   };
 
-  export const surveyPages = {
-    "": SurveyPage,
-    configs: SurveyConfigs,
-    options: SurveyOptions,
+  const surveyViews = {
+    entries: SurveyEntriesView,
+    configs: SurveyConfigsView,
+    options: SurveyOptionsView,
   };
 
-  type HashRoute = [keyof typeof mainPages] | [number, keyof typeof surveyPages | number];
-
-  let hashRoute: HashRoute = [""];
+  let [mainView, surveyIndex, surveyView, entryIndex] = getHashRoute();
+  onhashchange = () => ([mainView, surveyIndex, surveyView, entryIndex] = getHashRoute());
 
   function getHashRoute() {
-    hashRoute = window.location.hash
-      .replace("#", "")
+    return location.hash
+      .replaceAll("#/", "")
+      .replaceAll("#", "")
       .split("/")
       .map((value) => {
         let parsed = parseInt(value);
         if (!Number.isNaN(parsed)) return parsed;
         return value;
-      }) as HashRoute;
+      });
   }
-
-  window.onhashchange = getHashRoute;
-  getHashRoute();
 </script>
 
-{#if typeof hashRoute[0] == "string"}
+{#if mainView == "surveys" || mainView == "options"}
   <Header />
-  <svelte:component this={mainPages[hashRoute[0]]} />
-{:else if typeof hashRoute[0] == "number" && typeof hashRoute[1] != "number"}
-  <Header title={$surveys[hashRoute[0]].name} backLink={""} />
-  <svelte:component this={surveyPages[hashRoute[1] ?? ""]} surveyIndex={hashRoute[0]} />
-{:else if typeof hashRoute[1] == "number"}
-  <Header title="Entry ({$surveys[hashRoute[0]].name})" backLink={`${hashRoute[0]}`} />
-  <EntryPage surveyIndex={hashRoute[0]} entryIndex={hashRoute[1]} />
+  <svelte:component this={mainViews[mainView]} />
+{:else if mainView == "survey" && typeof surveyIndex == "number" && surveyIndex >= 0 && surveyIndex < $surveys.length}
+  {@const survey = $surveys[surveyIndex]}
+  {#if surveyView == "entries" || surveyView == "configs" || surveyView == "options"}
+    <Header title={survey.name} backLink={"/surveys"} />
+    <svelte:component this={surveyViews[surveyView]} {surveyIndex} />
+  {:else if surveyView == "entry" && typeof entryIndex == "number" && entryIndex >= 0 && entryIndex < survey.entries.length}
+    <Header title="Entry ({survey.name})" backLink={`/survey/${surveyIndex}/entries`} />
+    <EntryView {surveyIndex} {entryIndex} />
+  {:else}
+    <!-- Fallback -->
+    <Header title={survey.name} backLink={"/surveys"} />
+    <SurveyEntriesView {surveyIndex} />
+  {/if}
+{:else}
+  <!-- Fallback -->
+  <Header />
+  <SurveysView />
 {/if}

@@ -78,12 +78,7 @@
 
 <Container padding noGap>
   <Button iconName="list-ul" title="Surveys" />
-  <Button
-    iconName="ellipsis-vertical"
-    title="Options"
-    disableTheme
-    on:click={() => (window.location.hash = "options")}
-  />
+  <Button iconName="ellipsis-vertical" title="Options" disableTheme on:click={() => (location.hash = "/options")} />
 </Container>
 
 <Container column padding>
@@ -91,7 +86,11 @@
   {#each $surveys as survey, surveyIndex (survey)}
     <Container spaceBetween>
       <Container>
-        <Button iconName="pen" title="Edit survey" on:click={() => (window.location.hash = `${surveyIndex}`)} />
+        <Button
+          iconName="pen"
+          title="Edit survey"
+          on:click={() => (location.hash = `/survey/${surveyIndex}/entries`)}
+        />
         <span>{survey.name}</span>
       </Container>
       <Dialog openButton={{ iconName: "trash", title: "Delete entry" }} onConfirm={() => deleteSurvey(surveyIndex)}>

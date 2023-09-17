@@ -18,7 +18,7 @@
         iconName="arrow-left"
         title="Go back"
         on:click={() => {
-          if (backLink != undefined) window.location.hash = backLink;
+          if (backLink != undefined) location.hash = backLink;
         }}
       />
     {:else}

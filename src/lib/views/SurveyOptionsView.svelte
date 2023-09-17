@@ -30,12 +30,17 @@
 </script>
 
 <Container padding noGap>
-  <Button iconName="list-ol" title="Entries" disableTheme on:click={() => (window.location.hash = `${surveyIndex}`)} />
+  <Button
+    iconName="list-ol"
+    title="Entries"
+    disableTheme
+    on:click={() => (location.hash = `/survey/${surveyIndex}/entries`)}
+  />
   <Button
     iconName="gears"
     title="Configs"
     disableTheme
-    on:click={() => (window.location.hash = `${surveyIndex}/configs`)}
+    on:click={() => (location.hash = `/survey/${surveyIndex}/configs`)}
   />
   <Button iconName="ellipsis-vertical" title="Options" />
 </Container>
