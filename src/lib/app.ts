@@ -1,4 +1,4 @@
-import { writable } from "svelte/store";
+import { writable, type Writable } from "svelte/store";
 
 export const allianceTargets = ["red", "blue"] as const;
 export type AllianceTarget = (typeof allianceTargets)[number];
@@ -82,35 +82,59 @@ export type Survey = {
   entries: Entry[];
 };
 
-const idb = await new Promise<IDBDatabase>((resolve, reject) => {
-  const openRequest = indexedDB.open("MeanScout");
-  openRequest.onerror = (event: any) => reject(event.target.error);
-  openRequest.onsuccess = () => resolve(openRequest.result);
-  openRequest.onupgradeneeded = () => openRequest.result.createObjectStore("MeanScout");
-});
+export const surveys = writable<Survey[]>([]);
+export const target = writable<Target>("red");
 
-async function idbStore<T>(key: string, start: T, subscriber?: (val: T) => void) {
-  try {
-    start = await new Promise<T>((resolve, reject) => {
-      const thing = idb.transaction("MeanScout").objectStore("MeanScout").get(key);
-      thing.onsuccess = () => resolve(thing.result ?? start);
-      thing.onerror = (event: any) => reject(event.target.error);
-    });
-  } finally {
-    const store = writable(start);
-    store.subscribe(async (value) => {
-      idb.transaction("MeanScout", "readwrite").objectStore("MeanScout").put(value, key);
-      if (subscriber) subscriber(value);
-    });
-    return store;
-  }
+function getObjectStore(idb: IDBDatabase) {
+  return idb.transaction("MeanScout", "readwrite").objectStore("MeanScout");
 }
 
-export const surveys = await idbStore<Survey[]>("surveys", []);
-export const target = await idbStore<Target>("target", "red", (target) => {
-  let newTheme = target == "pit" ? "yellow" : target.split(" ")[0];
-  document.documentElement.style.setProperty("--theme-color", `var(--${newTheme})`);
-});
+function setupIDBStore<T>(
+  svelteStore: Writable<T>,
+  name: string,
+  start: T,
+  objectStore: IDBObjectStore,
+  subscriber?: (value: T) => void
+) {
+  const idb = objectStore.transaction.db;
+  const getData = objectStore.get(name);
+
+  function addSubscriber() {
+    svelteStore.subscribe((value) => {
+      getObjectStore(idb).put(value, name);
+      if (subscriber) subscriber(value);
+    });
+  }
+
+  getData.onerror = () => {
+    getObjectStore(idb).add(start, name);
+    addSubscriber();
+  };
+
+  getData.onsuccess = () => {
+    if (getData.result == undefined) {
+      getObjectStore(idb).put(start, name);
+    } else {
+      svelteStore.set(getData.result);
+    }
+    addSubscriber();
+  };
+}
+
+const openIDBRequest = indexedDB.open("MeanScout");
+openIDBRequest.onerror = (event: any) => console.error(event.target.error);
+openIDBRequest.onupgradeneeded = () => openIDBRequest.result.createObjectStore("MeanScout");
+
+openIDBRequest.onsuccess = () => {
+  const idb = openIDBRequest.result;
+  const objectStore = getObjectStore(idb);
+
+  setupIDBStore(surveys, "surveys", [], objectStore);
+  setupIDBStore(target, "target", "red", objectStore, (target) => {
+    let newTheme = target == "pit" ? "yellow" : target.split(" ")[0];
+    document.documentElement.style.setProperty("--theme-color", `var(--${newTheme})`);
+  });
+};
 
 export function getMetricDefaultValue(config: MetricConfig) {
   switch (config.type) {
