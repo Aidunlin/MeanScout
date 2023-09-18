@@ -11,6 +11,7 @@
   const survey = writable($surveys[surveyIndex]);
   survey.subscribe((survey) => {
     $surveys[surveyIndex] = survey;
+    $surveys[surveyIndex].modified = new Date();
   });
 
   let copySurveyDialog = { text: "" };
@@ -18,11 +19,11 @@
   let editConfigDialog: MetricConfig | undefined = undefined;
 
   function moveConfig(index: number, by: number) {
-    let config = $survey.configs.splice(index, 1);
+    const config = $survey.configs.splice(index, 1);
     $survey.configs.splice(index + by, 0, ...config);
     for (let i = 0; i < $survey.entries.length; i++) {
-      let value = $survey.entries[i].splice(index, 1);
-      $survey.entries[i].splice(index + by, 0, ...value);
+      const value = $survey.entries[i].values.splice(index, 1);
+      $survey.entries[i].values.splice(index + by, 0, ...value);
     }
     $survey = $survey;
   }
@@ -58,7 +59,7 @@
             if (editConfigDialog) {
               $survey.configs[configIndex] = editConfigDialog;
               for (let i = 0; i < $survey.entries.length; i++) {
-                $survey.entries[i][configIndex] = getMetricDefaultValue(editConfigDialog);
+                $survey.entries[i].values[configIndex] = getMetricDefaultValue(editConfigDialog);
               }
             }
           }}
@@ -186,7 +187,9 @@
           openButton={{ iconName: "trash", title: "Delete config" }}
           onConfirm={() => {
             for (let entryIndex = 0; entryIndex < $survey.entries.length; entryIndex++) {
-              $survey.entries[entryIndex] = $survey.entries[entryIndex].filter((_, i) => i != configIndex);
+              $survey.entries[entryIndex].values = $survey.entries[entryIndex].values.filter(
+                (_, i) => i != configIndex
+              );
             }
             $survey.configs = $survey.configs.filter((_, i) => i != configIndex);
           }}
@@ -206,7 +209,7 @@
     on:click={() => {
       $survey.configs = [...$survey.configs, { name: "", type: "toggle" }];
       for (let i = 0; i < $survey.entries.length; i++) {
-        $survey.entries[i] = [...$survey.entries[i], false];
+        $survey.entries[i].values = [...$survey.entries[i].values, false];
       }
     }}
   />

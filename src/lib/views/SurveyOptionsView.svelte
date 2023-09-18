@@ -10,6 +10,7 @@
   const survey = writable($surveys[surveyIndex]);
   survey.subscribe((survey) => {
     $surveys[surveyIndex] = survey;
+    $surveys[surveyIndex].modified = new Date();
   });
 
   let teamInput = "";

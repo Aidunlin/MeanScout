@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getMetricDefaultValue, surveys } from "$lib/app";
+  import { getHighestMatchValue, getMetricDefaultValue, surveys } from "$lib/app";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import Header from "$lib/components/Header.svelte";
@@ -12,13 +12,15 @@
   const survey = writable($surveys[surveyIndex]);
   survey.subscribe((survey) => {
     $surveys[surveyIndex] = survey;
+    $surveys[surveyIndex].modified = new Date();
+    $surveys[surveyIndex].entries[entryIndex].modified = new Date();
   });
 
   let saveEntryDialog = { error: "" };
 
   function validateEntry() {
     let error = "";
-    $survey.entries[entryIndex].forEach((value, i) => {
+    $survey.entries[entryIndex].values.forEach((value, i) => {
       switch ($survey.configs[i].type) {
         case "team":
           if (!/^\d{1,4}[A-Z]?$/.test(value)) {
@@ -57,7 +59,7 @@
 
 <Container padding alignEnd>
   {#each $survey.configs as config, i}
-    <MetricEditor {config} bind:value={$survey.entries[entryIndex][i]} />
+    <MetricEditor {config} bind:value={$survey.entries[entryIndex].values[i]} />
   {/each}
 </Container>
 
@@ -65,12 +67,22 @@
   <Dialog
     openButton={{ iconName: "floppy-disk", title: "Save entry" }}
     onConfirm={() => {
-      let error = validateEntry();
+      const error = validateEntry();
       if (error) {
         saveEntryDialog.error = `Could not save entry! ${error}`;
         return false;
       }
-      $survey.entries = [$survey.configs.map(getMetricDefaultValue), ...$survey.entries];
+      const newEntry = {
+        values: $survey.configs.map((config) => {
+          if (config.type == "match") {
+            return getHighestMatchValue($survey) + 1;
+          }
+          return getMetricDefaultValue(config);
+        }),
+        created: new Date(),
+        modified: new Date(),
+      };
+      $survey.entries = [newEntry, ...$survey.entries];
     }}
     on:close={() => (saveEntryDialog = { error: "" })}
   >
@@ -83,9 +95,9 @@
   <Dialog
     openButton={{ iconName: "arrow-rotate-left", title: "Reset entry" }}
     onConfirm={() => {
-      for (let i = 0; i < $survey.entries[entryIndex].length; i++) {
+      for (let i = 0; i < $survey.entries[entryIndex].values.length; i++) {
         if (!["team", "match"].includes($survey.configs[i].type)) {
-          $survey.entries[entryIndex][i] = getMetricDefaultValue($survey.configs[i]);
+          $survey.entries[entryIndex].values[i] = getMetricDefaultValue($survey.configs[i]);
         }
       }
     }}

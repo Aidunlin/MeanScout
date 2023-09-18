@@ -73,13 +73,19 @@ interface MetricConfigTypeMap {
 
 export type MetricConfig = MetricConfigTypeMap[MetricType];
 
-export type Entry = any[];
+export type Entry = {
+  values: any[];
+  created: Date;
+  modified: Date;
+};
 
 export type Survey = {
   name: string;
   configs: MetricConfig[];
   teams: string[];
   entries: Entry[];
+  created: Date;
+  modified: Date;
 };
 
 export const surveys = writable<Survey[]>([]);
@@ -131,7 +137,7 @@ openIDBRequest.onsuccess = () => {
 
   setupIDBStore(surveys, "surveys", [], objectStore);
   setupIDBStore(target, "target", "red", objectStore, (target) => {
-    let newTheme = target == "pit" ? "yellow" : target.split(" ")[0];
+    const newTheme = target == "pit" ? "yellow" : target.split(" ")[0];
     document.documentElement.style.setProperty("--theme-color", `var(--${newTheme})`);
   });
 };
@@ -157,4 +163,18 @@ export function getMetricDefaultValue(config: MetricConfig) {
     default:
       return undefined;
   }
+}
+
+export function getHighestMatchValue(survey: Survey) {
+  let highest = 0;
+
+  survey.entries.forEach((entry) => {
+    entry.values.forEach((value, i) => {
+      if (survey.configs[i].type == "match") {
+        highest = Math.max(value, highest);
+      }
+    });
+  });
+
+  return highest;
 }

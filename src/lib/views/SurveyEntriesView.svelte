@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { surveys, target, type Entry } from "$lib/app";
+  import { getHighestMatchValue, surveys, target, type Entry } from "$lib/app";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
@@ -11,26 +11,13 @@
   const survey = writable($surveys[surveyIndex]);
   survey.subscribe((survey) => {
     $surveys[surveyIndex] = survey;
+    $surveys[surveyIndex].modified = new Date();
   });
-
-  function getHighestMatchValue() {
-    let highest = 0;
-
-    $survey.entries.forEach((entry) => {
-      entry.forEach((value, i) => {
-        if ($survey.configs[i].type == "match") {
-          highest = Math.max(value, highest);
-        }
-      });
-    });
-
-    return highest;
-  }
 
   function newEntryClicked() {
     const newValue = {
       team: "",
-      match: getHighestMatchValue() + 1,
+      match: getHighestMatchValue($survey) + 1,
       toggle: false,
       number: 0,
       text: "",
@@ -38,9 +25,13 @@
       timer: 0,
     };
 
-    const entry: Entry = $survey.configs.map((config) => {
-      return config.type == "select" ? config.values[0] : newValue[config.type];
-    });
+    const entry: Entry = {
+      values: $survey.configs.map((config) => {
+        return config.type == "select" ? config.values[0] : newValue[config.type];
+      }),
+      created: new Date(),
+      modified: new Date(),
+    };
 
     $survey.entries = [entry, ...$survey.entries];
   }
@@ -52,7 +43,7 @@
   function downloadEntries() {
     const csv = [
       $survey.configs.map((config) => config.name).join(","),
-      ...$survey.entries.map((entry) => entry.map(valueToCSV).join(",")),
+      ...$survey.entries.map((entry) => entry.values.map(valueToCSV).join(",")),
     ].join("\n");
 
     const anchor = document.createElement("a");
@@ -93,7 +84,7 @@
           on:click={() => (location.hash = `/survey/${surveyIndex}/entry/${entryIndex}`)}
         />
         {#each $survey.configs.slice(0, 2) as config, i}
-          <span>{config.name}: {entry[i]}, </span>
+          <span>{config.name}: {entry.values[i]}, </span>
         {/each}
         ...
       </Container>
@@ -106,7 +97,7 @@
       >
         <span>Delete this entry?</span>
         {#each $survey.configs.slice(0, 2) as config, i}
-          <span>{config.name}: {entry[i]}</span>
+          <span>{config.name}: {entry.values[i]}</span>
         {/each}
       </Dialog>
     </Container>

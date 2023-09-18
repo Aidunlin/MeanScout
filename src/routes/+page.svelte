@@ -17,7 +17,7 @@
       .replaceAll("#", "")
       .split("/")
       .map((value) => {
-        let parsed = parseInt(value);
+        const parsed = parseInt(value);
         if (!Number.isNaN(parsed)) return parsed;
         return value;
       });

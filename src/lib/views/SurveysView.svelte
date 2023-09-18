@@ -9,7 +9,7 @@
   let pasteSurveyDialog: { input: string; errors: string[] } = { input: "", errors: [] };
 
   function newSurvey() {
-    let name = newSurveyDialog.name.trim();
+    const name = newSurveyDialog.name.trim();
     if (!name) {
       newSurveyDialog.error = "Name can't be blank!";
       return false;
@@ -18,13 +18,19 @@
       newSurveyDialog.error = "That name is already used!";
       return false;
     }
-    let survey: Survey = { name, configs: [], teams: [], entries: [] };
-    survey.configs = [
-      { name: "Team", type: "team", required: true },
-      { name: "Match", type: "match", required: true },
-      { name: "Absent", type: "toggle", required: true },
-    ];
-    $surveys = [survey, ...$surveys];
+    const survey: Survey = {
+      name,
+      configs: [
+        { name: "Team", type: "team", required: true },
+        { name: "Match", type: "match", required: true },
+        { name: "Absent", type: "toggle", required: true },
+      ],
+      teams: [],
+      entries: [],
+      created: new Date(),
+      modified: new Date(),
+    };
+    $surveys = [...$surveys, survey];
   }
 
   function validateSurvey(survey: Survey) {
@@ -67,9 +73,11 @@
     survey.configs ??= [];
     survey.entries ??= [];
     survey.teams ??= [];
+    survey.created ??= new Date();
+    survey.modified ??= new Date();
     pasteSurveyDialog.errors = validateSurvey(survey).errors;
     if (pasteSurveyDialog.errors.length) return false;
-    $surveys = [survey, ...$surveys];
+    $surveys = [...$surveys, survey];
   }
 
   function deleteSurvey(surveyIndex: number) {
