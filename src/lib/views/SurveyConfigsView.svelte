@@ -1,55 +1,51 @@
 <script lang="ts">
-  import { getMetricDefaultValue, metricTypes, surveys, type MetricConfig } from "$lib/app";
+  import { getMetricDefaultValue, metricTypes, type MetricConfig, SurveyStore, type Survey } from "$lib/app";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import Header from "$lib/components/Header.svelte";
-  import { writable } from "svelte/store";
 
-  export let surveyIndex: number;
+  export let surveyStore: SurveyStore;
+  export let survey: Survey;
 
-  const survey = writable($surveys[surveyIndex]);
-  survey.subscribe((survey) => {
-    $surveys[surveyIndex] = survey;
-    $surveys[surveyIndex].modified = new Date();
-  });
+  $: surveyStore.put(survey);
 
   let copySurveyDialog = { text: "" };
 
   let editConfigDialog: MetricConfig | undefined = undefined;
 
   function moveConfig(index: number, by: number) {
-    const config = $survey.configs.splice(index, 1);
-    $survey.configs.splice(index + by, 0, ...config);
-    for (let i = 0; i < $survey.entries.length; i++) {
-      const value = $survey.entries[i].values.splice(index, 1);
-      $survey.entries[i].values.splice(index + by, 0, ...value);
+    const config = survey.configs.splice(index, 1);
+    survey.configs.splice(index + by, 0, ...config);
+    for (let i = 0; i < survey.entries.length; i++) {
+      const value = survey.entries[i].values.splice(index, 1);
+      survey.entries[i].values.splice(index + by, 0, ...value);
     }
-    $survey = $survey;
+    survey = survey;
   }
 </script>
 
-<Header title={$survey.name} backLink={"/surveys"} />
+<Header title={survey.name} backLink={"/surveys"} />
 
 <Container padding noGap>
   <Button
     iconName="list-ol"
     title="Entries"
     disableTheme
-    on:click={() => (location.hash = `/survey/${surveyIndex}/entries`)}
+    on:click={() => (location.hash = `/survey/${survey.id}/entries`)}
   />
   <Button iconName="gears" title="Configs" />
   <Button
     iconName="ellipsis-vertical"
     title="Options"
     disableTheme
-    on:click={() => (location.hash = `/survey/${surveyIndex}/options`)}
+    on:click={() => (location.hash = `/survey/${survey.id}/options`)}
   />
 </Container>
 
 <Container column padding>
   <h2>Configs</h2>
-  {#each $survey.configs as config, configIndex (config)}
+  {#each survey.configs as config, configIndex (config)}
     <Container spaceBetween alignEnd>
       <Container>
         <Dialog
@@ -57,9 +53,9 @@
           onOpen={() => (editConfigDialog = JSON.parse(JSON.stringify(config)))}
           onConfirm={() => {
             if (editConfigDialog) {
-              $survey.configs[configIndex] = editConfigDialog;
-              for (let i = 0; i < $survey.entries.length; i++) {
-                $survey.entries[i].values[configIndex] = getMetricDefaultValue(editConfigDialog);
+              survey.configs[configIndex] = editConfigDialog;
+              for (let i = 0; i < survey.entries.length; i++) {
+                survey.entries[i].values[configIndex] = getMetricDefaultValue(editConfigDialog);
               }
             }
           }}
@@ -179,22 +175,22 @@
         <Button
           iconName="arrow-down"
           title="Move down"
-          disabled={configIndex == $survey.configs.length - 1}
+          disabled={configIndex == survey.configs.length - 1}
           on:click={() => moveConfig(configIndex, 1)}
         />
 
         <Dialog
           openButton={{ iconName: "trash", title: "Delete config" }}
           onConfirm={() => {
-            for (let entryIndex = 0; entryIndex < $survey.entries.length; entryIndex++) {
-              $survey.entries[entryIndex].values = $survey.entries[entryIndex].values.filter(
+            for (let entryIndex = 0; entryIndex < survey.entries.length; entryIndex++) {
+              survey.entries[entryIndex].values = survey.entries[entryIndex].values.filter(
                 (_, i) => i != configIndex
               );
             }
-            $survey.configs = $survey.configs.filter((_, i) => i != configIndex);
+            survey.configs = survey.configs.filter((_, i) => i != configIndex);
           }}
         >
-          <span>Delete {$survey.configs[configIndex].name}?</span>
+          <span>Delete {survey.configs[configIndex].name}?</span>
           <span>Entry data corresponding to this config may be deleted!</span>
         </Dialog>
       </Container>
@@ -207,16 +203,16 @@
     iconName="plus"
     title="New config"
     on:click={() => {
-      $survey.configs = [...$survey.configs, { name: "", type: "toggle" }];
-      for (let i = 0; i < $survey.entries.length; i++) {
-        $survey.entries[i].values = [...$survey.entries[i].values, false];
+      survey.configs = [...survey.configs, { name: "", type: "toggle" }];
+      for (let i = 0; i < survey.entries.length; i++) {
+        survey.entries[i].values = [...survey.entries[i].values, false];
       }
     }}
   />
 
   <Dialog
     openButton={{ iconName: "copy", title: "Copy survey" }}
-    onOpen={() => (copySurveyDialog.text = JSON.stringify($survey, undefined, "  "))}
+    onOpen={() => (copySurveyDialog.text = JSON.stringify(survey, undefined, "  "))}
   >
     <span>Select and copy the survey:</span>
     <Container maxWidth>

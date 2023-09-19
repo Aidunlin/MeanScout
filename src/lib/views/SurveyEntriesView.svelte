@@ -1,23 +1,19 @@
 <script lang="ts">
-  import { getHighestMatchValue, surveys, target, type Entry } from "$lib/app";
+  import { getHighestMatchValue, target, type Entry, SurveyStore, type Survey } from "$lib/app";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import Header from "$lib/components/Header.svelte";
-  import { writable } from "svelte/store";
 
-  export let surveyIndex: number;
+  export let surveyStore: SurveyStore;
+  export let survey: Survey;
 
-  const survey = writable($surveys[surveyIndex]);
-  survey.subscribe((survey) => {
-    $surveys[surveyIndex] = survey;
-    $surveys[surveyIndex].modified = new Date();
-  });
+  $: surveyStore.put(survey);
 
   function newEntryClicked() {
     const newValue = {
       team: "",
-      match: getHighestMatchValue($survey) + 1,
+      match: getHighestMatchValue(survey) + 1,
       toggle: false,
       number: 0,
       text: "",
@@ -26,14 +22,14 @@
     };
 
     const entry: Entry = {
-      values: $survey.configs.map((config) => {
+      values: survey.configs.map((config) => {
         return config.type == "select" ? config.values[0] : newValue[config.type];
       }),
       created: new Date(),
       modified: new Date(),
     };
 
-    $survey.entries = [entry, ...$survey.entries];
+    survey.entries = [entry, ...survey.entries];
   }
 
   function valueToCSV(value: any) {
@@ -42,12 +38,12 @@
 
   function downloadEntries() {
     const csv = [
-      $survey.configs.map((config) => config.name).join(","),
-      ...$survey.entries.map((entry) => entry.values.map(valueToCSV).join(",")),
+      survey.configs.map((config) => config.name).join(","),
+      ...survey.entries.map((entry) => entry.values.map(valueToCSV).join(",")),
     ].join("\n");
 
     const anchor = document.createElement("a");
-    anchor.download = `${$survey.name}-${$target}.csv`.replaceAll(" ", "_");
+    anchor.download = `${survey.name}-${$target}.csv`.replaceAll(" ", "_");
     anchor.href = `data:text/plain;charset=utf-8,${encodeURIComponent(csv)}`;
     document.body.append(anchor);
     anchor.click();
@@ -55,7 +51,7 @@
   }
 </script>
 
-<Header title={$survey.name} backLink={"/surveys"} />
+<Header title={survey.name} backLink={"/surveys"} />
 
 <Container padding noGap>
   <Button iconName="list-ol" title="Entries" />
@@ -63,27 +59,27 @@
     iconName="gears"
     title="Configs"
     disableTheme
-    on:click={() => (location.hash = `/survey/${surveyIndex}/configs`)}
+    on:click={() => (location.hash = `/survey/${survey.id}/configs`)}
   />
   <Button
     iconName="ellipsis-vertical"
     title="Options"
     disableTheme
-    on:click={() => (location.hash = `/survey/${surveyIndex}/options`)}
+    on:click={() => (location.hash = `/survey/${survey.id}/options`)}
   />
 </Container>
 
 <Container column padding>
   <h2>Entries</h2>
-  {#each $survey.entries as entry, entryIndex (entry)}
+  {#each survey.entries as entry, entryId (entry)}
     <Container spaceBetween>
       <Container>
         <Button
           iconName="pen"
           title="Edit entry"
-          on:click={() => (location.hash = `/survey/${surveyIndex}/entry/${entryIndex}`)}
+          on:click={() => (location.hash = `/survey/${survey.id}/entry/${entryId}`)}
         />
-        {#each $survey.configs.slice(0, 2) as config, i}
+        {#each survey.configs.slice(0, 2) as config, i}
           <span>{config.name}: {entry.values[i]}, </span>
         {/each}
         ...
@@ -92,11 +88,11 @@
       <Dialog
         openButton={{ iconName: "trash", title: "Delete entry" }}
         onConfirm={() => {
-          $survey.entries = $survey.entries.filter((_, i) => i != entryIndex);
+          survey.entries = survey.entries.filter((_, i) => i != entryId);
         }}
       >
         <span>Delete this entry?</span>
-        {#each $survey.configs.slice(0, 2) as config, i}
+        {#each survey.configs.slice(0, 2) as config, i}
           <span>{config.name}: {entry.values[i]}</span>
         {/each}
       </Dialog>

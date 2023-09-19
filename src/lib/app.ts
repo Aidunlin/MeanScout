@@ -1,4 +1,4 @@
-import { writable, type Writable } from "svelte/store";
+import { writable } from "svelte/store";
 
 export const allianceTargets = ["red", "blue"] as const;
 export type AllianceTarget = (typeof allianceTargets)[number];
@@ -80,6 +80,7 @@ export type Entry = {
 };
 
 export type Survey = {
+  id?: number;
   name: string;
   configs: MetricConfig[];
   teams: string[];
@@ -88,59 +89,80 @@ export type Survey = {
   modified: Date;
 };
 
-export const surveys = writable<Survey[]>([]);
-export const target = writable<Target>("red");
-
-function getObjectStore(idb: IDBDatabase) {
-  return idb.transaction("MeanScout", "readwrite").objectStore("MeanScout");
+export function openIDB() {
+  return new Promise<IDBDatabase>((resolve, reject) => {
+    const request = indexedDB.open("MeanScout");
+    request.onerror = (event: any) => reject(event.target.error);
+    request.onupgradeneeded = () => {
+      request.result.createObjectStore("surveys", { keyPath: "id", autoIncrement: true });
+    };
+    request.onsuccess = () => {
+      if (request.result) resolve(request.result);
+      else reject("Could not open IDB");
+    };
+  });
 }
 
-function setupIDBStore<T>(
-  svelteStore: Writable<T>,
-  name: string,
-  start: T,
-  objectStore: IDBObjectStore,
-  subscriber?: (value: T) => void
-) {
-  const idb = objectStore.transaction.db;
-  const getData = objectStore.get(name);
+type SurveyStoreAdapterOptions = {
+  rejectMessage: string;
+  shouldResultUndefined?: boolean;
+};
 
-  function addSubscriber() {
-    svelteStore.subscribe((value) => {
-      getObjectStore(idb).put(value, name);
-      if (subscriber) subscriber(value);
+export class SurveyStore {
+  idb: IDBDatabase;
+
+  constructor(idb: IDBDatabase) {
+    this.idb = idb;
+  }
+
+  idbStore() {
+    return this.idb.transaction("surveys", "readwrite").objectStore("surveys");
+  }
+
+  adapter<T>(request: IDBRequest<T>, options: SurveyStoreAdapterOptions) {
+    return new Promise<T>((resolve, reject) => {
+      request.onerror = (event: any) => reject(event.target.error);
+      request.onsuccess = () => {
+        if (!options.shouldResultUndefined && request.result == undefined) reject(options.rejectMessage);
+        else resolve(request.result);
+      };
     });
   }
 
-  getData.onerror = () => {
-    getObjectStore(idb).add(start, name);
-    addSubscriber();
-  };
+  getAll() {
+    return this.adapter<Survey[]>(this.idbStore().getAll(), {
+      rejectMessage: "Could not get surveys",
+    });
+  }
 
-  getData.onsuccess = () => {
-    if (getData.result == undefined) {
-      getObjectStore(idb).put(start, name);
-    } else {
-      svelteStore.set(getData.result);
-    }
-    addSubscriber();
-  };
+  get(surveyId: number) {
+    return this.adapter<Survey>(this.idbStore().get(surveyId), {
+      rejectMessage: `Could not get survey ${surveyId}`,
+    });
+  }
+
+  add(survey: Survey) {
+    return this.adapter(this.idbStore().add(survey), { rejectMessage: `Could not add survey ${survey.name}` });
+  }
+
+  put(survey: Survey) {
+    return this.adapter(this.idbStore().put(survey), { rejectMessage: `Could not put survey ${survey.name}` });
+  }
+
+  delete(surveyId: number) {
+    return this.adapter(this.idbStore().delete(surveyId), {
+      rejectMessage: `Could not delete survey ${surveyId}`,
+      shouldResultUndefined: true,
+    });
+  }
 }
 
-const openIDBRequest = indexedDB.open("MeanScout");
-openIDBRequest.onerror = (event: any) => console.error(event.target.error);
-openIDBRequest.onupgradeneeded = () => openIDBRequest.result.createObjectStore("MeanScout");
-
-openIDBRequest.onsuccess = () => {
-  const idb = openIDBRequest.result;
-  const objectStore = getObjectStore(idb);
-
-  setupIDBStore(surveys, "surveys", [], objectStore);
-  setupIDBStore(target, "target", "red", objectStore, (target) => {
-    const newTheme = target == "pit" ? "yellow" : target.split(" ")[0];
-    document.documentElement.style.setProperty("--theme-color", `var(--${newTheme})`);
-  });
-};
+export const target = writable<Target>(localStorage.getItem("target") as Target || "red");
+target.subscribe((value) => {
+  localStorage.setItem("target", value);
+  const newTheme = value == "pit" ? "yellow" : value.split(" ")[0];
+  document.documentElement.style.setProperty("--theme-color", `var(--${newTheme})`);
+});
 
 export function getMetricDefaultValue(config: MetricConfig) {
   switch (config.type) {

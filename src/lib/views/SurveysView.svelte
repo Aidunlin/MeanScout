@@ -1,9 +1,17 @@
 <script lang="ts">
-  import { metricTypes, surveys, type Survey } from "$lib/app";
+  import { metricTypes, type Survey, SurveyStore } from "$lib/app";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import Header from "$lib/components/Header.svelte";
+
+  export let surveyStore: SurveyStore;
+
+  let surveysPromise = surveyStore.getAll();
+
+  function loadSurveys() {
+    surveysPromise = surveyStore.getAll();
+  }
 
   let newSurveyDialog = { name: "", error: "" };
   let pasteSurveyDialog: { input: string; errors: string[] } = { input: "", errors: [] };
@@ -12,10 +20,6 @@
     const name = newSurveyDialog.name.trim();
     if (!name) {
       newSurveyDialog.error = "Name can't be blank!";
-      return false;
-    }
-    if ($surveys.map((survey) => survey.name).includes(name)) {
-      newSurveyDialog.error = "That name is already used!";
       return false;
     }
     const survey: Survey = {
@@ -30,15 +34,13 @@
       created: new Date(),
       modified: new Date(),
     };
-    $surveys = [...$surveys, survey];
+    surveyStore.add(survey).then(loadSurveys);
   }
 
   function validateSurvey(survey: Survey) {
     let errors: string[] = [];
     if (!survey.name || !survey.name.trim()) {
       errors.push("Survey has no name");
-    } else if ($surveys.map((survey) => survey.name).includes(survey.name)) {
-      errors.push(`"${survey.name}" already exists`);
     }
     if (survey.teams && !Array.isArray(survey.teams)) {
       errors.push("Survey has invalid teams");
@@ -69,6 +71,7 @@
       pasteSurveyDialog.errors = ["Invalid input"];
       return false;
     }
+    survey.id = undefined;
     survey.name ??= `Survey ${new Date().toLocaleString(undefined, { dateStyle: "short", timeStyle: "short" })}`;
     survey.configs ??= [];
     survey.entries ??= [];
@@ -77,11 +80,12 @@
     survey.modified ??= new Date();
     pasteSurveyDialog.errors = validateSurvey(survey).errors;
     if (pasteSurveyDialog.errors.length) return false;
-    $surveys = [...$surveys, survey];
+    surveyStore.add(survey).then(loadSurveys);
   }
 
-  function deleteSurvey(surveyIndex: number) {
-    $surveys = $surveys.filter((_, idx) => idx != surveyIndex);
+  function deleteSurvey(surveyId?: number) {
+    if (surveyId == undefined) return;
+    surveyStore.delete(surveyId).then(loadSurveys);
   }
 </script>
 
@@ -94,24 +98,26 @@
 
 <Container column padding>
   <h2>Surveys</h2>
-  {#each $surveys as survey, surveyIndex (survey)}
-    <Container spaceBetween>
-      <Container>
-        <Button
-          iconName="pen"
-          title="Edit survey"
-          on:click={() => (location.hash = `/survey/${surveyIndex}/entries`)}
-        />
-        <span>{survey.name}</span>
+  {#await surveysPromise then surveys}
+    {#each surveys as survey (survey.id)}
+      <Container spaceBetween>
+        <Container>
+          <Button
+            iconName="pen"
+            title="Edit survey"
+            on:click={() => (location.hash = `/survey/${survey.id}/entries`)}
+          />
+          <span>{survey.name}</span>
+        </Container>
+        <Dialog openButton={{ iconName: "trash", title: "Delete entry" }} onConfirm={() => deleteSurvey(survey.id)}>
+          <span>Delete "{survey.name}"?</span>
+          {#if survey.entries.length}
+            <span>{survey.entries.length} {survey.entries.length == 1 ? "entry" : "entries"} will be lost!</span>
+          {/if}
+        </Dialog>
       </Container>
-      <Dialog openButton={{ iconName: "trash", title: "Delete entry" }} onConfirm={() => deleteSurvey(surveyIndex)}>
-        <span>Delete "{survey.name}"?</span>
-        {#if survey.entries.length}
-          <span>{survey.entries.length} {survey.entries.length == 1 ? "entry" : "entries"} will be lost!</span>
-        {/if}
-      </Dialog>
-    </Container>
-  {/each}
+    {/each}
+  {/await}
 </Container>
 
 <footer>

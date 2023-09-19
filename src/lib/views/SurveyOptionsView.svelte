@@ -1,23 +1,19 @@
 <script lang="ts">
-  import { surveys } from "$lib/app";
+  import type { SurveyStore, Survey } from "$lib/app";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Header from "$lib/components/Header.svelte";
-  import { writable } from "svelte/store";
 
-  export let surveyIndex: number;
+  export let surveyStore: SurveyStore;
+  export let survey: Survey;
 
-  const survey = writable($surveys[surveyIndex]);
-  survey.subscribe((survey) => {
-    $surveys[surveyIndex] = survey;
-    $surveys[surveyIndex].modified = new Date();
-  });
+  $: surveyStore.put(survey);
 
   let teamInput = "";
 
   function addTeam() {
-    if (teamInput.trim() && !$survey.teams.includes(teamInput.trim())) {
-      $survey.teams = [...$survey.teams, teamInput.trim()];
+    if (teamInput.trim() && !survey.teams.includes(teamInput.trim())) {
+      survey.teams = [...survey.teams, teamInput.trim()];
       teamInput = "";
     }
   }
@@ -27,24 +23,24 @@
   }
 
   function deleteTeam(team: string) {
-    $survey.teams = $survey.teams.filter((t) => t.trim() != team.trim());
+    survey.teams = survey.teams.filter((t) => t.trim() != team.trim());
   }
 </script>
 
-<Header title={$survey.name} backLink={"/surveys"} />
+<Header title={survey.name} backLink={"/surveys"} />
 
 <Container padding noGap>
   <Button
     iconName="list-ol"
     title="Entries"
     disableTheme
-    on:click={() => (location.hash = `/survey/${surveyIndex}/entries`)}
+    on:click={() => (location.hash = `/survey/${survey.id}/entries`)}
   />
   <Button
     iconName="gears"
     title="Configs"
     disableTheme
-    on:click={() => (location.hash = `/survey/${surveyIndex}/configs`)}
+    on:click={() => (location.hash = `/survey/${survey.id}/configs`)}
   />
   <Button iconName="ellipsis-vertical" title="Options" />
 </Container>
@@ -62,13 +58,13 @@
         }}
       />
     </Container>
-    {#if $survey.teams.length}
+    {#if survey.teams.length}
       Teams
     {:else}
       No teams added
     {/if}
     <Container>
-      {#each sortTeams($survey.teams) as team}
+      {#each sortTeams(survey.teams) as team}
         <Button text={team} title="Delete {team}" on:click={() => deleteTeam(team)} />
       {/each}
     </Container>

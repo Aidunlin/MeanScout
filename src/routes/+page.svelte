@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { surveys } from "$lib/app";
+  import { SurveyStore, openIDB } from "$lib/app";
   import "$lib/app.css";
   import EntryView from "$lib/views/EntryView.svelte";
   import OptionsView from "$lib/views/OptionsView.svelte";
@@ -8,8 +8,8 @@
   import SurveyOptionsView from "$lib/views/SurveyOptionsView.svelte";
   import SurveysView from "$lib/views/SurveysView.svelte";
 
-  let [mainView, surveyIndex, surveyView, entryIndex] = getHashRoute();
-  onhashchange = () => ([mainView, surveyIndex, surveyView, entryIndex] = getHashRoute());
+  let [mainView, surveyId, surveyView, entryId] = getHashRoute();
+  onhashchange = () => ([mainView, surveyId, surveyView, entryId] = getHashRoute());
 
   function getHashRoute() {
     return location.hash
@@ -17,29 +17,37 @@
       .replaceAll("#", "")
       .split("/")
       .map((value) => {
-        const parsed = parseInt(value);
+        const parsed = Number(value);
         if (!Number.isNaN(parsed)) return parsed;
         return value;
       });
   }
+
+  async function getSurveyStore() {
+    return new SurveyStore(await openIDB());
+  }
 </script>
 
-{#if mainView == "surveys"}
-  <SurveysView />
-{:else if mainView == "options"}
-  <OptionsView />
-{:else if mainView == "survey" && typeof surveyIndex == "number" && surveyIndex >= 0 && surveyIndex < $surveys.length}
-  {#if surveyView == "entries"}
-    <SurveyEntriesView {surveyIndex} />
-  {:else if surveyView == "configs"}
-    <SurveyConfigsView {surveyIndex} />
-  {:else if surveyView == "options"}
-    <SurveyOptionsView {surveyIndex} />
-  {:else if surveyView == "entry" && typeof entryIndex == "number" && entryIndex >= 0 && entryIndex < $surveys[surveyIndex].entries.length}
-    <EntryView {surveyIndex} {entryIndex} />
+{#await getSurveyStore() then surveyStore}
+  {#if mainView == "surveys"}
+    <SurveysView {surveyStore} />
+  {:else if mainView == "options"}
+    <OptionsView />
+  {:else if mainView == "survey" && typeof surveyId == "number"}
+    {#await surveyStore.get(surveyId) then survey}
+      {#if surveyView == "entries"}
+        <SurveyEntriesView {surveyStore} {survey} />
+      {:else if surveyView == "configs"}
+        <SurveyConfigsView {surveyStore} {survey} />
+      {:else if surveyView == "options"}
+        <SurveyOptionsView {surveyStore} {survey} />
+      {:else if surveyView == "entry" && typeof entryId == "number"}
+        <EntryView {surveyStore} {survey} {entryId} />
+      {:else}
+        <SurveyEntriesView {surveyStore} {survey} />
+      {/if}
+    {/await}
   {:else}
-    <SurveyEntriesView {surveyIndex} />
+    <SurveysView {surveyStore} />
   {/if}
-{:else}
-  <SurveysView />
-{/if}
+{/await}
