@@ -13,7 +13,7 @@
 <Button
   {...openButton}
   on:click={() => {
-    if (onOpen) onOpen();
+    onOpen && onOpen();
     element.showModal();
   }}
 />
@@ -21,13 +21,7 @@
   <slot />
   <Container spaceBetween>
     {#if onConfirm}
-      <Button
-        iconName="check"
-        title="Confirm"
-        on:click={() => {
-          if (onConfirm && onConfirm() !== false) element.close();
-        }}
-      />
+      <Button iconName="check" title="Confirm" on:click={() => onConfirm && onConfirm() !== false && element.close()} />
     {/if}
     <Button iconName="xmark" title="Close" on:click={() => element.close()} />
   </Container>

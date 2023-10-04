@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { SurveyStore, Survey } from "$lib/app";
+  import type { Survey, SurveyStore } from "$lib/app";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Header from "$lib/components/Header.svelte";
@@ -50,19 +50,9 @@
   <Container column>
     <Container column noGap>
       Add team
-      <input
-        style="width:200px"
-        bind:value={teamInput}
-        on:keydown={(e) => {
-          if (e.key == "Enter") addTeam();
-        }}
-      />
+      <input style="width:200px" bind:value={teamInput} on:keydown={(e) => e.key == "Enter" && addTeam()} />
     </Container>
-    {#if survey.teams.length}
-      Teams
-    {:else}
-      No teams added
-    {/if}
+    <span>{survey.teams.length ? "Teams" : "No teams added"}</span>
     <Container>
       {#each sortTeams(survey.teams) as team}
         <Button text={team} title="Delete {team}" on:click={() => deleteTeam(team)} />

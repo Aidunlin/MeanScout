@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { metricTypes, type Survey, SurveyStore } from "$lib/app";
+  import { SurveyStore, metricTypes, type Survey } from "$lib/app";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";

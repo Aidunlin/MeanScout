@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getHighestMatchValue, target, type Entry, SurveyStore, type Survey } from "$lib/app";
+  import { SurveyStore, getHighestMatchValue, target, type Entry, type Survey } from "$lib/app";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
@@ -49,6 +49,10 @@
     anchor.click();
     anchor.remove();
   }
+
+  function deleteEntry(id: number) {
+    survey.entries = survey.entries.filter((_, i) => i != id);
+  }
 </script>
 
 <Header title={survey.name} backLink={"/surveys"} />
@@ -85,12 +89,7 @@
         ...
       </Container>
 
-      <Dialog
-        openButton={{ iconName: "trash", title: "Delete entry" }}
-        onConfirm={() => {
-          survey.entries = survey.entries.filter((_, i) => i != entryId);
-        }}
-      >
+      <Dialog openButton={{ iconName: "trash", title: "Delete entry" }} onConfirm={() => deleteEntry(entryId)}>
         <span>Delete this entry?</span>
         {#each survey.configs.slice(0, 2) as config, i}
           <span>{config.name}: {entry.values[i]}</span>

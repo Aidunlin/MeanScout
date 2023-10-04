@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getMetricDefaultValue, metricTypes, type MetricConfig, SurveyStore, type Survey } from "$lib/app";
+  import { SurveyStore, getMetricDefaultValue, metricTypes, type MetricConfig, type Survey } from "$lib/app";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
@@ -22,6 +22,58 @@
       survey.entries[i].values.splice(index + by, 0, ...value);
     }
     survey = survey;
+  }
+
+  function applyConfigEdits(index: number) {
+    if (editConfigDialog) {
+      survey.configs[index] = editConfigDialog;
+      for (let i = 0; i < survey.entries.length; i++) {
+        survey.entries[i].values[index] = getMetricDefaultValue(editConfigDialog);
+      }
+    }
+  }
+
+  function onConfigTypeChanged(value: string) {
+    if (editConfigDialog == undefined) return;
+    switch (value) {
+      case "team":
+      case "match":
+      case "toggle":
+      case "number":
+      case "text":
+      case "rating":
+      case "timer":
+        editConfigDialog = {
+          name: editConfigDialog.name,
+          type: value,
+          group: editConfigDialog.group,
+          required: editConfigDialog.required,
+        };
+        break;
+      case "select":
+        editConfigDialog = {
+          name: editConfigDialog.name,
+          type: value,
+          group: editConfigDialog.group,
+          required: editConfigDialog.required,
+          values: [],
+        };
+        break;
+    }
+  }
+
+  function deleteConfig(index: number) {
+    for (let entryIndex = 0; entryIndex < survey.entries.length; entryIndex++) {
+      survey.entries[entryIndex].values = survey.entries[entryIndex].values.filter((_, i) => i != index);
+    }
+    survey.configs = survey.configs.filter((_, i) => i != index);
+  }
+
+  function newConfig() {
+    survey.configs = [...survey.configs, { name: "", type: "toggle" }];
+    for (let i = 0; i < survey.entries.length; i++) {
+      survey.entries[i].values = [...survey.entries[i].values, false];
+    }
   }
 </script>
 
@@ -51,14 +103,7 @@
         <Dialog
           openButton={{ iconName: "pen", title: "Edit" }}
           onOpen={() => (editConfigDialog = JSON.parse(JSON.stringify(config)))}
-          onConfirm={() => {
-            if (editConfigDialog) {
-              survey.configs[configIndex] = editConfigDialog;
-              for (let i = 0; i < survey.entries.length; i++) {
-                survey.entries[i].values[configIndex] = getMetricDefaultValue(editConfigDialog);
-              }
-            }
-          }}
+          onConfirm={() => applyConfigEdits(configIndex)}
           on:close={() => (editConfigDialog = { name: "", type: "toggle" })}
         >
           {#if editConfigDialog}
@@ -68,37 +113,7 @@
             </Container>
             <Container column noGap>
               Type
-              <select
-                value={editConfigDialog.type}
-                on:change={(e) => {
-                  if (editConfigDialog == undefined) return;
-                  switch (e.currentTarget.value) {
-                    case "team":
-                    case "match":
-                    case "toggle":
-                    case "number":
-                    case "text":
-                    case "rating":
-                    case "timer":
-                      editConfigDialog = {
-                        name: editConfigDialog.name,
-                        type: e.currentTarget.value,
-                        group: editConfigDialog.group,
-                        required: editConfigDialog.required,
-                      };
-                      break;
-                    case "select":
-                      editConfigDialog = {
-                        name: editConfigDialog.name,
-                        type: e.currentTarget.value,
-                        group: editConfigDialog.group,
-                        required: editConfigDialog.required,
-                        values: [],
-                      };
-                      break;
-                  }
-                }}
-              >
+              <select value={editConfigDialog.type} on:change={(e) => onConfigTypeChanged(e.currentTarget.value)}>
                 {#each Object.values(metricTypes) as metricType}
                   <option>{metricType}</option>
                 {/each}
@@ -128,8 +143,9 @@
                       iconName="trash"
                       title="Delete value"
                       on:click={() => {
-                        if (editConfigDialog?.type == "select")
+                        if (editConfigDialog?.type == "select") {
                           editConfigDialog.values = editConfigDialog.values.filter((_, i) => i != valueIndex);
+                        }
                       }}
                     />
                   </Container>
@@ -139,8 +155,9 @@
                     iconName="plus"
                     title="New value"
                     on:click={() => {
-                      if (editConfigDialog?.type == "select")
+                      if (editConfigDialog?.type == "select") {
                         editConfigDialog.values = [...editConfigDialog.values, ""];
+                      }
                     }}
                   />
                 </Container>
@@ -152,7 +169,9 @@
                   iconName={editConfigDialog.long ? "square-check" : "square"}
                   text="Long"
                   on:click={() => {
-                    if (editConfigDialog?.type == "text") editConfigDialog.long = !editConfigDialog.long;
+                    if (editConfigDialog?.type == "text") {
+                      editConfigDialog.long = !editConfigDialog.long;
+                    }
                   }}
                 />
               </Container>
@@ -179,17 +198,7 @@
           on:click={() => moveConfig(configIndex, 1)}
         />
 
-        <Dialog
-          openButton={{ iconName: "trash", title: "Delete config" }}
-          onConfirm={() => {
-            for (let entryIndex = 0; entryIndex < survey.entries.length; entryIndex++) {
-              survey.entries[entryIndex].values = survey.entries[entryIndex].values.filter(
-                (_, i) => i != configIndex
-              );
-            }
-            survey.configs = survey.configs.filter((_, i) => i != configIndex);
-          }}
-        >
+        <Dialog openButton={{ iconName: "trash", title: "Delete config" }} onConfirm={() => deleteConfig(configIndex)}>
           <span>Delete {survey.configs[configIndex].name}?</span>
           <span>Entry data corresponding to this config may be deleted!</span>
         </Dialog>
@@ -199,16 +208,7 @@
 </Container>
 
 <footer>
-  <Button
-    iconName="plus"
-    title="New config"
-    on:click={() => {
-      survey.configs = [...survey.configs, { name: "", type: "toggle" }];
-      for (let i = 0; i < survey.entries.length; i++) {
-        survey.entries[i].values = [...survey.entries[i].values, false];
-      }
-    }}
-  />
+  <Button iconName="plus" title="New config" on:click={newConfig} />
 
   <Dialog
     openButton={{ iconName: "copy", title: "Copy survey" }}

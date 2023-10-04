@@ -91,10 +91,17 @@ export type Survey = {
 
 export function openIDB() {
   return new Promise<IDBDatabase>((resolve, reject) => {
-    const request = indexedDB.open("MeanScout");
+    const request = indexedDB.open("MeanScout", 3);
     request.onerror = (event: any) => reject(event.target.error);
     request.onupgradeneeded = () => {
-      request.result.createObjectStore("surveys", { keyPath: "id", autoIncrement: true });
+      const idb = request.result;
+      const storeNames = idb.objectStoreNames;
+      if (storeNames.contains("MeanScout")) {
+        idb.deleteObjectStore("MeanScout");
+      }
+      if (!storeNames.contains("surveys")) {
+        idb.createObjectStore("surveys", { keyPath: "id", autoIncrement: true });
+      }
     };
     request.onsuccess = () => {
       if (request.result) resolve(request.result);
@@ -157,10 +164,10 @@ export class SurveyStore {
   }
 }
 
-export const target = writable<Target>(localStorage.getItem("target") as Target || "red");
+export const target = writable<Target>((localStorage.getItem("target") as Target) || "red");
 target.subscribe((value) => {
   localStorage.setItem("target", value);
-  const newTheme = value == "pit" ? "yellow" : value.split(" ")[0];
+  const newTheme = value == "pit" ? "orange" : value.split(" ")[0];
   document.documentElement.style.setProperty("--theme-color", `var(--${newTheme})`);
 });
 

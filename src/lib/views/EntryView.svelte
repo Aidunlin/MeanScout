@@ -42,6 +42,33 @@
     });
     return error;
   }
+
+  function saveAndStartNewEntry() {
+    const error = validateEntry();
+    if (error) {
+      saveEntryDialog.error = `Could not save entry! ${error}`;
+      return false;
+    }
+    const newEntry = {
+      values: survey.configs.map((config) => {
+        if (config.type == "match") {
+          return getHighestMatchValue(survey) + 1;
+        }
+        return getMetricDefaultValue(config);
+      }),
+      created: new Date(),
+      modified: new Date(),
+    };
+    survey.entries = [newEntry, ...survey.entries];
+  }
+
+  function resetEntry() {
+    for (let i = 0; i < survey.entries[entryId].values.length; i++) {
+      if (!["team", "match"].includes(survey.configs[i].type)) {
+        survey.entries[entryId].values[i] = getMetricDefaultValue(survey.configs[i]);
+      }
+    }
+  }
 </script>
 
 <Header title="Entry ({survey.name})" backLink={`/survey/${survey.id}/entries`} />
@@ -61,24 +88,7 @@
 <footer>
   <Dialog
     openButton={{ iconName: "floppy-disk", title: "Save entry" }}
-    onConfirm={() => {
-      const error = validateEntry();
-      if (error) {
-        saveEntryDialog.error = `Could not save entry! ${error}`;
-        return false;
-      }
-      const newEntry = {
-        values: survey.configs.map((config) => {
-          if (config.type == "match") {
-            return getHighestMatchValue(survey) + 1;
-          }
-          return getMetricDefaultValue(config);
-        }),
-        created: new Date(),
-        modified: new Date(),
-      };
-      survey.entries = [newEntry, ...survey.entries];
-    }}
+    onConfirm={saveAndStartNewEntry}
     on:close={() => (saveEntryDialog = { error: "" })}
   >
     <span>Save this entry and start a new one?</span>
@@ -87,16 +97,7 @@
     {/if}
   </Dialog>
 
-  <Dialog
-    openButton={{ iconName: "arrow-rotate-left", title: "Reset entry" }}
-    onConfirm={() => {
-      for (let i = 0; i < survey.entries[entryId].values.length; i++) {
-        if (!["team", "match"].includes(survey.configs[i].type)) {
-          survey.entries[entryId].values[i] = getMetricDefaultValue(survey.configs[i]);
-        }
-      }
-    }}
-  >
+  <Dialog openButton={{ iconName: "arrow-rotate-left", title: "Reset entry" }} onConfirm={resetEntry}>
     <span>Reset this entry?</span>
   </Dialog>
 </footer>

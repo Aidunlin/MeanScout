@@ -17,9 +17,7 @@
       <Button
         iconName="arrow-left"
         title="Go back"
-        on:click={() => {
-          if (backLink != undefined) location.hash = backLink;
-        }}
+        on:click={() => backLink != undefined && (location.hash = backLink)}
       />
     {:else}
       <img id="logo" src="./logo.svg" alt="" />
