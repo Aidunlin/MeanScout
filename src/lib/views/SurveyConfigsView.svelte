@@ -75,6 +75,17 @@
       survey.entries[i].values = [...survey.entries[i].values, false];
     }
   }
+
+  function surveyToString() {
+    const exportableSurvey = {
+      name: survey.name,
+      configs: survey.configs,
+      teams: survey.teams,
+      created: survey.created,
+      modified: survey.modified,
+    };
+    return JSON.stringify(exportableSurvey, undefined, "  ");
+  }
 </script>
 
 <Header title={survey.name} backLink={"/surveys"} />
@@ -212,7 +223,7 @@
 
   <Dialog
     openButton={{ iconName: "copy", title: "Copy survey" }}
-    onOpen={() => (copySurveyDialog.text = JSON.stringify(survey, undefined, "  "))}
+    onOpen={() => (copySurveyDialog = { text: surveyToString() })}
   >
     <span>Select and copy the survey:</span>
     <Container maxWidth>

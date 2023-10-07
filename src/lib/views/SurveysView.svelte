@@ -14,7 +14,7 @@
   }
 
   let newSurveyDialog = { name: "", error: "" };
-  let pasteSurveyDialog: { input: string; errors: string[] } = { input: "", errors: [] };
+  let pasteSurveyDialog: { input: string; error: string } = { input: "", error: "" };
 
   function newSurvey() {
     const name = newSurveyDialog.name.trim();
@@ -37,49 +37,59 @@
     surveyStore.add(survey).then(loadSurveys);
   }
 
-  function validateSurvey(survey: Survey) {
-    let errors: string[] = [];
-    if (!survey.name || !survey.name.trim()) {
-      errors.push("Survey has no name");
-    }
-    if (survey.teams && !Array.isArray(survey.teams)) {
-      errors.push("Survey has invalid teams");
-    }
-    if (!survey.configs) {
-      errors.push("Survey has no configs");
-    } else {
-      survey.configs.forEach((config, i) => {
-        if (!config.name || !config.name.trim()) {
-          errors.push(`Config ${i + 1} has no name`);
-        }
-        if (config.type == "select" && !Array.isArray(config.values ?? [])) {
-          errors.push(`Config ${config.name ?? i + 1} has invalid values`);
-        }
-        if (!metricTypes.includes(config.type)) {
-          errors.push(`Config ${config.name ?? i + 1} has invalid type`);
-        }
-      });
-    }
-    return { errors };
-  }
-
   function parseSurvey() {
-    let survey: Survey;
+    let survey;
+
     try {
-      survey = JSON.parse(pasteSurveyDialog.input.trim()) as Survey;
+      survey = JSON.parse(pasteSurveyDialog.input.trim(), (key, value) => {
+        if (key == "created" || key == "modified") {
+          if (Number.isNaN(Date.parse(value))) {
+            return new Date();
+          } else {
+            return new Date(value);
+          }
+        }
+        return value;
+      });
     } catch (e) {
-      pasteSurveyDialog.errors = ["Invalid input"];
+      pasteSurveyDialog.error = "Invalid input";
       return false;
     }
-    survey.id = undefined;
-    survey.name ??= `Survey ${new Date().toLocaleString(undefined, { dateStyle: "short", timeStyle: "short" })}`;
-    survey.configs ??= [];
-    survey.entries ??= [];
-    survey.teams ??= [];
-    survey.created ??= new Date();
-    survey.modified ??= new Date();
-    pasteSurveyDialog.errors = validateSurvey(survey).errors;
-    if (pasteSurveyDialog.errors.length) return false;
+
+    delete survey.id;
+
+    if (typeof survey.name != "string" || !survey.name.trim()) {
+      const currentDate = new Date().toLocaleString(undefined, { dateStyle: "short", timeStyle: "short" });
+      survey.name = `Survey ${currentDate}`;
+    }
+
+    if (!Array.isArray(survey.configs)) {
+      survey.configs = [];
+    } else {
+      survey.configs = (survey.configs as any[])
+        .map((config, i) => {
+          if (typeof config.name != "string" || !config.name.trim()) {
+            config.name = `Config ${i + 1}`;
+          }
+          if (config.type == "select" && !Array.isArray(config.values)) {
+            return undefined;
+          }
+          if (!metricTypes.includes(config.type)) {
+            return undefined;
+          }
+          return config;
+        })
+        .filter((config) => config);
+    }
+
+    if (!Array.isArray(survey.teams)) {
+      survey.teams = [];
+    } else {
+      survey.teams = survey.teams.map((team: any) => team.toString());
+    }
+
+    survey.entries = [];
+
     surveyStore.add(survey).then(loadSurveys);
   }
 
@@ -135,17 +145,13 @@
   <Dialog
     openButton={{ iconName: "paste", title: "Import survey" }}
     onConfirm={parseSurvey}
-    on:close={() => (pasteSurveyDialog = { input: "", errors: [] })}
+    on:close={() => (pasteSurveyDialog = { input: "", error: "" })}
   >
     <span>Paste new survey:</span>
     <textarea bind:value={pasteSurveyDialog.input} />
-    {#if pasteSurveyDialog.errors.length}
+    {#if pasteSurveyDialog.error}
       <span>Could not import survey!</span>
-      <ul>
-        {#each pasteSurveyDialog.errors as error}
-          <li>{error}</li>
-        {/each}
-      </ul>
+      <span>{pasteSurveyDialog.error}</span>
     {/if}
   </Dialog>
 </footer>
