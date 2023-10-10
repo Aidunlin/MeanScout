@@ -18,64 +18,31 @@ export type Target = (typeof targets)[number];
 export const metricTypes = ["team", "match", "toggle", "number", "select", "text", "rating", "timer", "group"] as const;
 export type MetricType = (typeof metricTypes)[number];
 
-type BaseConfig = {
+type BaseConfig<T extends MetricType> = {
   name: string;
-  type: MetricType;
+  type: T;
 };
 
-interface TeamConfig extends BaseConfig {
-  type: "team";
-}
+type TeamConfig = BaseConfig<"team">;
+type MatchConfig = BaseConfig<"match">;
+type ToggleConfig = BaseConfig<"toggle">;
+type NumberConfig = BaseConfig<"number">;
+type SelectConfig = BaseConfig<"select"> & { values: string[] };
+type TextConfig = BaseConfig<"text"> & { long?: boolean; tip?: string };
+type RatingConfig = BaseConfig<"rating">;
+type TimerConfig = BaseConfig<"timer">;
+type GroupConfig = BaseConfig<"group"> & { configs: Exclude<MetricConfig, GroupConfig>[] };
 
-interface MatchConfig extends BaseConfig {
-  type: "match";
-}
-
-interface ToggleConfig extends BaseConfig {
-  type: "toggle";
-}
-
-interface NumberConfig extends BaseConfig {
-  type: "number";
-}
-
-interface SelectConfig extends BaseConfig {
-  type: "select";
-  values: string[];
-}
-
-interface TextConfig extends BaseConfig {
-  type: "text";
-  long?: boolean;
-  tip?: string;
-}
-
-interface RatingConfig extends BaseConfig {
-  type: "rating";
-}
-
-interface TimerConfig extends BaseConfig {
-  type: "timer";
-}
-
-interface GroupConfig extends BaseConfig {
-  type: "group";
-  configs: Exclude<MetricConfig, GroupConfig>[];
-}
-
-interface MetricConfigTypeMap {
-  team: TeamConfig;
-  match: MatchConfig;
-  toggle: ToggleConfig;
-  number: NumberConfig;
-  select: SelectConfig;
-  text: TextConfig;
-  rating: RatingConfig;
-  timer: TimerConfig;
-  group: GroupConfig;
-}
-
-export type MetricConfig = MetricConfigTypeMap[MetricType];
+export type MetricConfig =
+  | TeamConfig
+  | MatchConfig
+  | ToggleConfig
+  | NumberConfig
+  | SelectConfig
+  | TextConfig
+  | RatingConfig
+  | TimerConfig
+  | GroupConfig;
 
 export type Entry = {
   values: any[];
