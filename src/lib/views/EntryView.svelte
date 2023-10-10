@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { SurveyStore, getHighestMatchValue, getMetricDefaultValue, type Survey } from "$lib/app";
+  import { SurveyStore, flattenConfigs, getHighestMatchValue, getMetricDefaultValue, type Survey } from "$lib/app";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import Header from "$lib/components/Header.svelte";
@@ -15,31 +15,30 @@
 
   function validateEntry() {
     let error = "";
+    const configs = flattenConfigs(survey.configs);
+
     survey.entries[entryId].values.forEach((value, i) => {
-      switch (survey.configs[i].type) {
+      switch (configs[i].type) {
         case "team":
           if (!/^\d{1,4}[A-Z]?$/.test(value)) {
-            error = `Invalid value for ${survey.configs[i].name}`;
+            error = `Invalid value for ${configs[i].name}`;
           }
           if (survey.teams.length && !survey.teams.includes(value)) {
-            error = `Invalid value for ${survey.configs[i].name} (team not allowlisted)`;
+            error = `Invalid value for ${configs[i].name} (team not allowlisted)`;
           }
           break;
         case "match":
           if (!/\d{1,3}/.test(`${value}`)) {
-            error = `Invalid value for ${survey.configs[i].name}`;
-          }
-          break;
-        case "text":
-          if (survey.configs[i].required && !value.trim()) {
-            error = `Invalid value for ${survey.configs[i].name}`;
+            error = `Invalid value for ${configs[i].name}`;
           }
           break;
       }
-      if (value == undefined || typeof value !== typeof getMetricDefaultValue(survey.configs[i])) {
-        error = `Invalid value for ${survey.configs[i].name}`;
+
+      if (value == undefined || typeof value !== typeof getMetricDefaultValue(configs[i])) {
+        error = `Invalid value for ${configs[i].name}`;
       }
     });
+
     return error;
   }
 
@@ -49,25 +48,27 @@
       saveEntryDialog.error = `Could not save entry! ${error}`;
       return false;
     }
+
+    const configs = flattenConfigs(survey.configs);
+
     const newEntry = {
-      values: survey.configs.map((config) => {
-        if (config.type == "match") {
-          return getHighestMatchValue(survey) + 1;
+      values: configs.map((config) => {
+        switch (config.type) {
+          case "match":
+            return getHighestMatchValue(survey) + 1;
+          default:
+            return getMetricDefaultValue(config);
         }
-        return getMetricDefaultValue(config);
       }),
       created: new Date(),
       modified: new Date(),
     };
+
     survey.entries = [newEntry, ...survey.entries];
   }
 
-  function resetEntry() {
-    for (let i = 0; i < survey.entries[entryId].values.length; i++) {
-      if (!["team", "match"].includes(survey.configs[i].type)) {
-        survey.entries[entryId].values[i] = getMetricDefaultValue(survey.configs[i]);
-      }
-    }
+  function countPreviousConfigs(index: number) {
+    return flattenConfigs(survey.configs.slice(0, index)).length;
   }
 </script>
 
@@ -80,8 +81,19 @@
 </datalist>
 
 <Container padding alignEnd>
-  {#each survey.configs as config, i}
-    <MetricEditor {config} bind:value={survey.entries[entryId].values[i]} />
+  {#each survey.configs as config, i (config)}
+    {#if config.type == "group"}
+      <h2>{config.name}</h2>
+      {#each config.configs as innerConfig, innerConfigIndex (innerConfig)}
+        <MetricEditor
+          config={innerConfig}
+          bind:value={survey.entries[entryId].values[innerConfigIndex + countPreviousConfigs(i)]}
+        />
+      {/each}
+      <div style="width: 100%" />
+    {:else}
+      <MetricEditor {config} bind:value={survey.entries[entryId].values[countPreviousConfigs(i)]} />
+    {/if}
   {/each}
 </Container>
 
@@ -95,9 +107,5 @@
     {#if saveEntryDialog.error}
       <span>{saveEntryDialog.error}</span>
     {/if}
-  </Dialog>
-
-  <Dialog openButton={{ iconName: "arrow-rotate-left", title: "Reset entry" }} onConfirm={resetEntry}>
-    <span>Reset this entry?</span>
   </Dialog>
 </footer>

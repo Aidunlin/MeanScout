@@ -15,14 +15,12 @@ export type OtherTarget = (typeof otherTargets)[number];
 export const targets = [...allianceTargets, ...redTeamTargets, ...blueTeamTargets, ...otherTargets] as const;
 export type Target = (typeof targets)[number];
 
-export const metricTypes = ["team", "match", "toggle", "number", "select", "text", "rating", "timer"] as const;
+export const metricTypes = ["team", "match", "toggle", "number", "select", "text", "rating", "timer", "group"] as const;
 export type MetricType = (typeof metricTypes)[number];
 
 type BaseConfig = {
   name: string;
   type: MetricType;
-  group?: string;
-  required?: boolean;
 };
 
 interface TeamConfig extends BaseConfig {
@@ -60,6 +58,11 @@ interface TimerConfig extends BaseConfig {
   type: "timer";
 }
 
+interface GroupConfig extends BaseConfig {
+  type: "group";
+  configs: Exclude<MetricConfig, GroupConfig>[];
+}
+
 interface MetricConfigTypeMap {
   team: TeamConfig;
   match: MatchConfig;
@@ -69,6 +72,7 @@ interface MetricConfigTypeMap {
   text: TextConfig;
   rating: RatingConfig;
   timer: TimerConfig;
+  group: GroupConfig;
 }
 
 export type MetricConfig = MetricConfigTypeMap[MetricType];
@@ -171,7 +175,7 @@ target.subscribe((value) => {
   document.documentElement.style.setProperty("--theme-color", `var(--${newTheme})`);
 });
 
-export function getMetricDefaultValue(config: MetricConfig) {
+export function getMetricDefaultValue(config: MetricConfig): any {
   switch (config.type) {
     case "team":
       return "";
@@ -189,17 +193,32 @@ export function getMetricDefaultValue(config: MetricConfig) {
       return 0;
     case "timer":
       return 0;
+    case "group":
+      return config.configs.map(getMetricDefaultValue);
     default:
       return undefined;
   }
 }
 
+export function flattenConfigs(configs: MetricConfig[]) {
+  return configs
+    .map((config) => {
+      if (config.type == "group") {
+        return config.configs;
+      } else {
+        return config;
+      }
+    })
+    .flat();
+}
+
 export function getHighestMatchValue(survey: Survey) {
   let highest = 0;
+  const flattenedConfigs = flattenConfigs(survey.configs);
 
   survey.entries.forEach((entry) => {
     entry.values.forEach((value, i) => {
-      if (survey.configs[i].type == "match") {
+      if (flattenedConfigs[i].type == "match") {
         highest = Math.max(value, highest);
       }
     });

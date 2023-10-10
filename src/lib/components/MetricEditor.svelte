@@ -41,10 +41,6 @@
   }
 </script>
 
-{#if config.group}
-  <h2>{config.group}</h2>
-{/if}
-
 <Container column noGap maxWidth={config.type == "text"}>
   {#if config.type != "toggle"}
     {config.name}
@@ -52,9 +48,9 @@
 
   <Container noGap>
     {#if config.type == "team"}
-      <input class="metric-team" list="teams-list" maxlength="5" bind:value required={config.required} />
+      <input class="metric-team" list="teams-list" maxlength="5" bind:value required />
     {:else if config.type == "match"}
-      <input class="metric-match" type="number" pattern="[0-9]*" bind:value required={config.required} />
+      <input class="metric-match" type="number" pattern="[0-9]*" bind:value required />
     {:else if config.type == "toggle"}
       <Button
         on:click={() => (value = !value)}
@@ -74,9 +70,9 @@
       </select>
     {:else if config.type == "text"}
       {#if config.long}
-        <textarea placeholder={config.tip} bind:value required={config.required} />
+        <textarea placeholder={config.tip} bind:value />
       {:else}
-        <input placeholder={config.tip} bind:value required={config.required} />
+        <input placeholder={config.tip} bind:value />
       {/if}
     {:else if config.type == "rating"}
       {#each [...Array(5).keys()] as i}

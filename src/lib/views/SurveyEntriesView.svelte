@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { SurveyStore, getHighestMatchValue, target, type Entry, type Survey } from "$lib/app";
+  import { SurveyStore, flattenConfigs, getHighestMatchValue, target, type Entry, type Survey } from "$lib/app";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
@@ -22,8 +22,13 @@
     };
 
     const entry: Entry = {
-      values: survey.configs.map((config) => {
-        return config.type == "select" ? config.values[0] : newValue[config.type];
+      values: flattenConfigs(survey.configs).map((config) => {
+        switch (config.type) {
+          case "select":
+            return config.values[0];
+          default:
+            return newValue[config.type];
+        }
       }),
       created: new Date(),
       modified: new Date(),
@@ -38,7 +43,9 @@
 
   function downloadEntries() {
     const csv = [
-      survey.configs.map((config) => config.name).join(","),
+      flattenConfigs(survey.configs)
+        .map((config) => config.name)
+        .join(","),
       ...survey.entries.map((entry) => entry.values.map(valueToCSV).join(",")),
     ].join("\n");
 
@@ -83,7 +90,7 @@
           title="Edit entry"
           on:click={() => (location.hash = `/survey/${survey.id}/entry/${entryId}`)}
         />
-        {#each survey.configs.slice(0, 2) as config, i}
+        {#each flattenConfigs(survey.configs).slice(0, 2) as config, i}
           <span>{config.name}: {entry.values[i]}, </span>
         {/each}
         ...
@@ -91,7 +98,7 @@
 
       <Dialog openButton={{ iconName: "trash", title: "Delete entry" }} onConfirm={() => deleteEntry(entryId)}>
         <span>Delete this entry?</span>
-        {#each survey.configs.slice(0, 2) as config, i}
+        {#each flattenConfigs(survey.configs).slice(0, 2) as config, i}
           <span>{config.name}: {entry.values[i]}</span>
         {/each}
       </Dialog>

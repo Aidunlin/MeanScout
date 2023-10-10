@@ -25,9 +25,9 @@
     const survey: Survey = {
       name,
       configs: [
-        { name: "Team", type: "team", required: true },
-        { name: "Match", type: "match", required: true },
-        { name: "Absent", type: "toggle", required: true },
+        { name: "Team", type: "team" },
+        { name: "Match", type: "match" },
+        { name: "Absent", type: "toggle" },
       ],
       teams: [],
       entries: [],
@@ -72,6 +72,9 @@
             config.name = `Config ${i + 1}`;
           }
           if (config.type == "select" && !Array.isArray(config.values)) {
+            return undefined;
+          }
+          if (config.type == "group" && !Array.isArray(config.configs)) {
             return undefined;
           }
           if (!metricTypes.includes(config.type)) {

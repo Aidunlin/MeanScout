@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { SurveyStore, getMetricDefaultValue, metricTypes, type MetricConfig, type Survey } from "$lib/app";
+  import { SurveyStore, metricTypes, type MetricConfig, type Survey } from "$lib/app";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
@@ -17,19 +17,12 @@
   function moveConfig(index: number, by: number) {
     const config = survey.configs.splice(index, 1);
     survey.configs.splice(index + by, 0, ...config);
-    for (let i = 0; i < survey.entries.length; i++) {
-      const value = survey.entries[i].values.splice(index, 1);
-      survey.entries[i].values.splice(index + by, 0, ...value);
-    }
     survey = survey;
   }
 
   function applyConfigEdits(index: number) {
     if (editConfigDialog) {
       survey.configs[index] = editConfigDialog;
-      for (let i = 0; i < survey.entries.length; i++) {
-        survey.entries[i].values[index] = getMetricDefaultValue(editConfigDialog);
-      }
     }
   }
 
@@ -46,34 +39,31 @@
         editConfigDialog = {
           name: editConfigDialog.name,
           type: value,
-          group: editConfigDialog.group,
-          required: editConfigDialog.required,
         };
         break;
       case "select":
         editConfigDialog = {
           name: editConfigDialog.name,
           type: value,
-          group: editConfigDialog.group,
-          required: editConfigDialog.required,
           values: [],
+        };
+        break;
+      case "group":
+        editConfigDialog = {
+          name: editConfigDialog.name,
+          type: value,
+          configs: [],
         };
         break;
     }
   }
 
   function deleteConfig(index: number) {
-    for (let entryIndex = 0; entryIndex < survey.entries.length; entryIndex++) {
-      survey.entries[entryIndex].values = survey.entries[entryIndex].values.filter((_, i) => i != index);
-    }
     survey.configs = survey.configs.filter((_, i) => i != index);
   }
 
   function newConfig() {
     survey.configs = [...survey.configs, { name: "", type: "toggle" }];
-    for (let i = 0; i < survey.entries.length; i++) {
-      survey.entries[i].values = [...survey.entries[i].values, false];
-    }
   }
 
   function surveyToString() {
@@ -108,11 +98,14 @@
 
 <Container column padding>
   <h2>Configs</h2>
+  {#if survey.entries.length}
+    <span>Cannot modify configs with entries present!</span>
+  {/if}
   {#each survey.configs as config, configIndex (config)}
-    <Container spaceBetween alignEnd>
+    <Container spaceBetween alignEnd padding>
       <Container>
         <Dialog
-          openButton={{ iconName: "pen", title: "Edit" }}
+          openButton={{ iconName: "pen", title: "Edit", disabled: survey.entries.length != 0 }}
           onOpen={() => (editConfigDialog = JSON.parse(JSON.stringify(config)))}
           onConfirm={() => applyConfigEdits(configIndex)}
           on:close={() => (editConfigDialog = { name: "", type: "toggle" })}
@@ -129,20 +122,6 @@
                   <option>{metricType}</option>
                 {/each}
               </select>
-            </Container>
-            <Container column noGap>
-              Group
-              <input bind:value={editConfigDialog.group} />
-            </Container>
-            <Container>
-              <Button
-                iconName={editConfigDialog.required ? "square-check" : "square"}
-                iconStyle={editConfigDialog.required ? "solid" : "regular"}
-                text="Required"
-                on:click={() => {
-                  if (editConfigDialog) editConfigDialog.required = !editConfigDialog.required;
-                }}
-              />
             </Container>
             {#if editConfigDialog.type == "select"}
               <Container column maxWidth>
@@ -199,27 +178,175 @@
         <Button
           iconName="arrow-up"
           title="Move up"
-          disabled={configIndex == 0}
+          disabled={configIndex == 0 || survey.entries.length != 0}
           on:click={() => moveConfig(configIndex, -1)}
         />
         <Button
           iconName="arrow-down"
           title="Move down"
-          disabled={configIndex == survey.configs.length - 1}
+          disabled={configIndex == survey.configs.length - 1 || survey.entries.length != 0}
           on:click={() => moveConfig(configIndex, 1)}
         />
 
-        <Dialog openButton={{ iconName: "trash", title: "Delete config" }} onConfirm={() => deleteConfig(configIndex)}>
+        <Dialog
+          openButton={{ iconName: "trash", title: "Delete config", disabled: survey.entries.length != 0 }}
+          onConfirm={() => deleteConfig(configIndex)}
+        >
           <span>Delete {survey.configs[configIndex].name}?</span>
           <span>Entry data corresponding to this config may be deleted!</span>
         </Dialog>
       </Container>
+      {#if config.type == "group" && survey.entries.length == 0}
+        <Container column maxWidth padding>
+          Configs
+          {#each config.configs as innerConfig, innerConfigIndex (innerConfig)}
+            <Container alignEnd spaceBetween>
+              <Container alignEnd>
+                <Container column noGap>
+                  Name
+                  <input bind:value={innerConfig.name} />
+                </Container>
+                <Container column noGap>
+                  Type
+                  <select
+                    value={innerConfig.type}
+                    on:change={(e) => {
+                      const value = e.currentTarget.value;
+                      switch (value) {
+                        case "team":
+                        case "match":
+                        case "toggle":
+                        case "number":
+                        case "text":
+                        case "rating":
+                        case "timer":
+                          innerConfig = {
+                            name: innerConfig.name,
+                            type: value,
+                          };
+                          break;
+                        case "select":
+                          innerConfig = {
+                            name: innerConfig.name,
+                            type: value,
+                            values: [],
+                          };
+                          break;
+                      }
+                    }}
+                  >
+                    {#each ["team", "match", "toggle", "number", "select", "text", "rating", "timer"] as metricType}
+                      <option>{metricType}</option>
+                    {/each}
+                  </select>
+                </Container>
+                {#if innerConfig.type == "select"}
+                  <Container column maxWidth>
+                    Values
+                    {#each innerConfig.values as value, valueIndex}
+                      <Container>
+                        <input bind:value style="width:200px" />
+                        <Button
+                          iconName="trash"
+                          title="Delete value"
+                          on:click={() => {
+                            if (innerConfig?.type == "select") {
+                              innerConfig.values = innerConfig.values.filter((_, i) => i != valueIndex);
+                            }
+                          }}
+                        />
+                      </Container>
+                    {/each}
+                    <Container>
+                      <Button
+                        iconName="plus"
+                        title="New value"
+                        on:click={() => {
+                          if (innerConfig?.type == "select") {
+                            innerConfig.values = [...innerConfig.values, ""];
+                          }
+                        }}
+                      />
+                    </Container>
+                  </Container>
+                {:else if innerConfig.type == "text"}
+                  <Container>
+                    <Button
+                      iconStyle={innerConfig.long ? "solid" : "regular"}
+                      iconName={innerConfig.long ? "square-check" : "square"}
+                      text="Long"
+                      on:click={() => {
+                        if (innerConfig?.type == "text") {
+                          innerConfig.long = !innerConfig.long;
+                        }
+                      }}
+                    />
+                  </Container>
+                  <Container column noGap>
+                    Tip
+                    <input bind:value={innerConfig.tip} />
+                  </Container>
+                {/if}
+              </Container>
+              <Container alignEnd>
+                <Button
+                  iconName="arrow-up"
+                  title="Move up"
+                  disabled={innerConfigIndex == 0}
+                  on:click={() => {
+                    if (config.type == "group") {
+                      const configToMove = config.configs.splice(innerConfigIndex, 1);
+                      config.configs.splice(innerConfigIndex - 1, 0, ...configToMove);
+                      config = config;
+                    }
+                  }}
+                />
+                <Button
+                  iconName="arrow-down"
+                  title="Move down"
+                  disabled={innerConfigIndex == config.configs.length - 1}
+                  on:click={() => {
+                    if (config.type == "group") {
+                      const configToMove = config.configs.splice(innerConfigIndex, 1);
+                      config.configs.splice(innerConfigIndex + 1, 0, ...configToMove);
+                      config = config;
+                    }
+                  }}
+                />
+
+                <Dialog
+                  openButton={{ iconName: "trash", title: "Delete config" }}
+                  onConfirm={() => {
+                    if (config.type == "group") {
+                      config.configs = config.configs.filter((_, i) => i != innerConfigIndex);
+                    }
+                  }}
+                >
+                  <span>Delete {innerConfig.name}?</span>
+                  <span>Entry data corresponding to this config may be deleted!</span>
+                </Dialog>
+              </Container>
+            </Container>
+          {/each}
+          <Container>
+            <Button
+              iconName="plus"
+              title="New config"
+              on:click={() => {
+                if (config.type == "group") {
+                  config.configs = [...config.configs, { name: "", type: "toggle" }];
+                }
+              }}
+            />
+          </Container>
+        </Container>
+      {/if}
     </Container>
   {/each}
 </Container>
 
 <footer>
-  <Button iconName="plus" title="New config" on:click={newConfig} />
+  <Button iconName="plus" title="New config" disabled={survey.entries.length != 0} on:click={newConfig} />
 
   <Dialog
     openButton={{ iconName: "copy", title: "Copy survey" }}
