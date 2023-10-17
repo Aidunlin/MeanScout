@@ -44,36 +44,78 @@ export type MetricConfig =
   | TimerConfig
   | GroupConfig;
 
+export type Survey = {
+  name: string;
+  configs: MetricConfig[];
+  teams: string[];
+  created: Date;
+  modified: Date;
+};
+
 export type Entry = {
+  surveyId: number;
   values: any[];
   created: Date;
   modified: Date;
 };
 
-export type Survey = {
-  id?: number;
-  name: string;
-  configs: MetricConfig[];
-  teams: string[];
-  entries: Entry[];
-  created: Date;
-  modified: Date;
-};
+export type IDBRecord<T> = T & { id: number };
+
+async function migrateEntries(idb: IDBDatabase) {
+  const transaction = idb.transaction(["surveys", "entries"], "readwrite");
+  const surveyStore = transaction.objectStore("surveys");
+  const entryStore = transaction.objectStore("entries");
+
+  const surveys = await new Promise<any[]>((resolve, reject) => {
+    const request = surveyStore.getAll();
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => resolve(request.result);
+  });
+
+  for (const survey of surveys) {
+    if (!Array.isArray(survey.entries)) {
+      continue;
+    }
+
+    for (const entry of survey.entries) {
+      entryStore.add({
+        surveyId: survey.id,
+        values: entry.values,
+        created: entry.created,
+        modified: entry.modified,
+      });
+    }
+
+    delete survey.entries;
+    surveyStore.put(survey);
+  }
+}
 
 export function openIDB() {
   return new Promise<IDBDatabase>((resolve, reject) => {
-    const request = indexedDB.open("MeanScout", 3);
-    request.onerror = (event: any) => reject(event.target.error);
-    request.onupgradeneeded = () => {
+    const request = indexedDB.open("MeanScout", 4);
+    request.onerror = () => reject(request.error);
+
+    request.onupgradeneeded = async () => {
       const idb = request.result;
       const storeNames = idb.objectStoreNames;
-      if (storeNames.contains("MeanScout")) {
-        idb.deleteObjectStore("MeanScout");
-      }
-      if (!storeNames.contains("surveys")) {
+      const alreadySurveys = storeNames.contains("surveys");
+      const alreadyEntries = storeNames.contains("entries");
+
+      if (!alreadySurveys) {
         idb.createObjectStore("surveys", { keyPath: "id", autoIncrement: true });
       }
+
+      if (!alreadyEntries) {
+        const entryStore = idb.createObjectStore("entries", { keyPath: "id", autoIncrement: true });
+        entryStore.createIndex("surveyId", "surveyId", { unique: false });
+      }
+
+      if (alreadySurveys && !alreadyEntries) {
+        await migrateEntries(idb);
+      }
     };
+
     request.onsuccess = () => {
       if (request.result) resolve(request.result);
       else reject("Could not open IDB");
@@ -81,58 +123,112 @@ export function openIDB() {
   });
 }
 
-type SurveyStoreAdapterOptions = {
+type AdapterStoreOptions = {
   rejectMessage: string;
   shouldResultUndefined?: boolean;
 };
 
-export class SurveyStore {
+class AdapterStore<T> {
   idb: IDBDatabase;
+  storeName: string;
 
-  constructor(idb: IDBDatabase) {
+  constructor(idb: IDBDatabase, storeName: string) {
     this.idb = idb;
+    this.storeName = storeName;
   }
 
   idbStore() {
-    return this.idb.transaction("surveys", "readwrite").objectStore("surveys");
+    return this.idb.transaction(this.storeName, "readwrite").objectStore(this.storeName);
   }
 
-  adapter<T>(request: IDBRequest<T>, options: SurveyStoreAdapterOptions) {
-    return new Promise<T>((resolve, reject) => {
-      request.onerror = (event: any) => reject(event.target.error);
+  adapter<U>(request: IDBRequest<U>, options: AdapterStoreOptions) {
+    return new Promise<U>((resolve, reject) => {
+      request.onerror = () => reject(options.rejectMessage || request.error);
       request.onsuccess = () => {
-        if (!options.shouldResultUndefined && request.result == undefined) reject(options.rejectMessage);
-        else resolve(request.result);
+        if (request.result !== undefined || options.shouldResultUndefined) {
+          resolve(request.result);
+        } else {
+          reject(options.rejectMessage);
+        }
       };
     });
   }
 
   getAll() {
-    return this.adapter<Survey[]>(this.idbStore().getAll(), {
-      rejectMessage: "Could not get surveys",
+    return this.adapter<IDBRecord<T>[]>(this.idbStore().getAll(), {
+      rejectMessage: `Could not get all records from ${this.storeName}`,
     });
   }
 
-  get(surveyId: number) {
-    return this.adapter<Survey>(this.idbStore().get(surveyId), {
-      rejectMessage: `Could not get survey ${surveyId}`,
+  get(id: number) {
+    return this.adapter<IDBRecord<T>>(this.idbStore().get(id), {
+      rejectMessage: `Could not get record ${id} from ${this.storeName}`,
     });
   }
 
-  add(survey: Survey) {
-    return this.adapter(this.idbStore().add(survey), { rejectMessage: `Could not add survey ${survey.name}` });
+  add(record: T) {
+    return this.adapter(this.idbStore().add(record) as IDBRequest<number>, {
+      rejectMessage: `Could not add record ${JSON.stringify(record)} to ${this.storeName}`,
+    });
   }
 
-  put(survey: Survey) {
-    return this.adapter(this.idbStore().put(survey), { rejectMessage: `Could not put survey ${survey.name}` });
+  put(record: T | IDBRecord<T>) {
+    return this.adapter(this.idbStore().put(record) as IDBRequest<number>, {
+      rejectMessage: `Could not put record ${JSON.stringify(record)} to ${this.storeName}`,
+    });
   }
 
-  delete(surveyId: number) {
-    return this.adapter(this.idbStore().delete(surveyId), {
-      rejectMessage: `Could not delete survey ${surveyId}`,
+  async delete(id: number) {
+    await this.adapter(this.idbStore().delete(id), {
+      rejectMessage: `Could not delete record ${id} from ${this.storeName}`,
       shouldResultUndefined: true,
     });
   }
+}
+
+export class SurveyStore extends AdapterStore<Survey> {
+  constructor(idb: IDBDatabase) {
+    super(idb, "surveys");
+  }
+}
+
+export class EntryStore extends AdapterStore<Entry> {
+  constructor(idb: IDBDatabase) {
+    super(idb, "entries");
+  }
+
+  getAllWithSurveyId(surveyId: number) {
+    const index = this.idbStore().index("surveyId");
+    return this.adapter<IDBRecord<Entry>[]>(index.getAll(surveyId), {
+      rejectMessage: `Could not get all entries with surveyId ${surveyId}`,
+    });
+  }
+
+  countWithSurveyId(surveyId: number) {
+    const index = this.idbStore().index("surveyId");
+    return this.adapter(index.count(surveyId), {
+      rejectMessage: `Could not get all entries with surveyId ${surveyId}`,
+    });
+  }
+
+  async deleteAllWithSurveyId(surveyId: number) {
+    const entries = await this.getAllWithSurveyId(surveyId);
+    const promises = [];
+
+    for (const entry of entries) {
+      promises.push(this.delete(entry.id));
+    }
+
+    return await Promise.all(promises);
+  }
+}
+
+export async function getStores() {
+  const idb = await openIDB();
+  return {
+    surveyStore: new SurveyStore(idb),
+    entryStore: new EntryStore(idb),
+  };
 }
 
 export const target = writable<Target>((localStorage.getItem("target") as Target) || "red");
@@ -142,7 +238,7 @@ target.subscribe((value) => {
   document.documentElement.style.setProperty("--theme-color", `var(--${newTheme})`);
 });
 
-export function getMetricDefaultValue(config: MetricConfig): any {
+export function getMetricDefaultValue(config: Exclude<MetricConfig, GroupConfig>) {
   switch (config.type) {
     case "team":
       return "";
@@ -160,10 +256,9 @@ export function getMetricDefaultValue(config: MetricConfig): any {
       return 0;
     case "timer":
       return 0;
-    case "group":
-      return config.configs.map(getMetricDefaultValue);
     default:
-      return undefined;
+      const unhandledType: never = config;
+      throw new Error(`Unhandled type for config ${unhandledType}`);
   }
 }
 
@@ -179,13 +274,12 @@ export function flattenConfigs(configs: MetricConfig[]) {
     .flat();
 }
 
-export function getHighestMatchValue(survey: Survey) {
+export function getHighestMatchValue(entries: Entry[], ungroupedConfigs: Exclude<MetricConfig, GroupConfig>[]) {
   let highest = 0;
-  const flattenedConfigs = flattenConfigs(survey.configs);
 
-  survey.entries.forEach((entry) => {
+  entries.forEach((entry) => {
     entry.values.forEach((value, i) => {
-      if (flattenedConfigs[i].type == "match") {
+      if (ungroupedConfigs[i].type == "match") {
         highest = Math.max(value, highest);
       }
     });

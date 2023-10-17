@@ -1,5 +1,14 @@
 <script lang="ts">
-  import { SurveyStore, flattenConfigs, getHighestMatchValue, target, type Entry, type Survey } from "$lib/app";
+  import {
+    EntryStore,
+    SurveyStore,
+    flattenConfigs,
+    getHighestMatchValue,
+    target,
+    type Entry,
+    type IDBRecord,
+    type Survey,
+  } from "$lib/app";
   import Anchor from "$lib/components/Anchor.svelte";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
@@ -7,14 +16,17 @@
   import Header from "$lib/components/Header.svelte";
 
   export let surveyStore: SurveyStore;
-  export let survey: Survey;
+  export let surveyRecord: IDBRecord<Survey>;
+  export let entryStore: EntryStore;
+  export let entryRecords: IDBRecord<Entry>[];
 
-  $: surveyStore.put(survey);
+  $: surveyStore.put(surveyRecord);
 
   function newEntryClicked() {
+    const configs = flattenConfigs(surveyRecord.configs);
     const newValue = {
       team: "",
-      match: getHighestMatchValue(survey) + 1,
+      match: getHighestMatchValue(entryRecords, configs) + 1,
       toggle: false,
       number: 0,
       text: "",
@@ -23,7 +35,8 @@
     };
 
     const entry: Entry = {
-      values: flattenConfigs(survey.configs).map((config) => {
+      surveyId: surveyRecord.id,
+      values: configs.map((config) => {
         switch (config.type) {
           case "select":
             return config.values[0];
@@ -35,7 +48,9 @@
       modified: new Date(),
     };
 
-    survey.entries = [entry, ...survey.entries];
+    entryStore.add(entry).then((id) => {
+      entryRecords = [...entryRecords, { id, ...entry }];
+    });
   }
 
   function valueToCSV(value: any) {
@@ -44,14 +59,14 @@
 
   function downloadEntries() {
     const csv = [
-      flattenConfigs(survey.configs)
+      flattenConfigs(surveyRecord.configs)
         .map((config) => config.name)
         .join(","),
-      ...survey.entries.map((entry) => entry.values.map(valueToCSV).join(",")),
+      ...entryRecords.map((entry) => entry.values.map(valueToCSV).join(",")),
     ].join("\n");
 
     const anchor = document.createElement("a");
-    anchor.download = `${survey.name}-${$target}.csv`.replaceAll(" ", "_");
+    anchor.download = `${surveyRecord.name}-${$target}.csv`.replaceAll(" ", "_");
     anchor.href = `data:text/plain;charset=utf-8,${encodeURIComponent(csv)}`;
     document.body.append(anchor);
     anchor.click();
@@ -59,33 +74,34 @@
   }
 
   function deleteEntry(id: number) {
-    survey.entries = survey.entries.filter((_, i) => i != id);
+    entryRecords = entryRecords.filter((entry) => entry.id !== id);
+    entryStore.delete(id);
   }
 </script>
 
-<Header title={survey.name} backLink="surveys" />
+<Header title={surveyRecord.name} backLink="surveys" />
 
 <Container padding noGap>
-  <Anchor hash="survey/{survey.id}/entries" iconName="list-ol" title="Entries" />
-  <Anchor hash="survey/{survey.id}/configs" iconName="gears" title="Configs" disableTheme />
-  <Anchor hash="survey/{survey.id}/options" iconName="ellipsis-vertical" title="Options" disableTheme />
+  <Anchor hash="survey/{surveyRecord.id}/entries" iconName="list-ol" title="Entries" />
+  <Anchor hash="survey/{surveyRecord.id}/configs" iconName="gears" title="Configs" disableTheme />
+  <Anchor hash="survey/{surveyRecord.id}/options" iconName="ellipsis-vertical" title="Options" disableTheme />
 </Container>
 
 <Container column padding>
   <h2>Entries</h2>
-  {#each survey.entries as entry, entryId (entry)}
+  {#each entryRecords as entry (entry.id)}
     <Container spaceBetween>
       <Container>
-        <Anchor hash="survey/{survey.id}/entry/{entryId}" iconName="pen" title="Edit entry" />
-        {#each flattenConfigs(survey.configs).slice(0, 2) as config, i}
+        <Anchor hash="entry/{entry.id}" iconName="pen" title="Edit entry" />
+        {#each flattenConfigs(surveyRecord.configs).slice(0, 2) as config, i}
           <span>{config.name}: {entry.values[i]}, </span>
         {/each}
         ...
       </Container>
 
-      <Dialog openButton={{ iconName: "trash", title: "Delete entry" }} onConfirm={() => deleteEntry(entryId)}>
+      <Dialog openButton={{ iconName: "trash", title: "Delete entry" }} onConfirm={() => deleteEntry(entry.id)}>
         <span>Delete this entry?</span>
-        {#each flattenConfigs(survey.configs).slice(0, 2) as config, i}
+        {#each flattenConfigs(surveyRecord.configs).slice(0, 2) as config, i}
           <span>{config.name}: {entry.values[i]}</span>
         {/each}
       </Dialog>

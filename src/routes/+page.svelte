@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { SurveyStore, openIDB } from "$lib/app";
+  import { getStores } from "$lib/app";
   import "$lib/app.css";
   import EntryView from "$lib/views/EntryView.svelte";
   import OptionsView from "$lib/views/OptionsView.svelte";
@@ -8,8 +8,8 @@
   import SurveyOptionsView from "$lib/views/SurveyOptionsView.svelte";
   import SurveysView from "$lib/views/SurveysView.svelte";
 
-  let [mainView, surveyId, surveyView, entryId] = getHashRoute();
-  onhashchange = () => ([mainView, surveyId, surveyView, entryId] = getHashRoute());
+  let [mainView, recordId, surveyView] = getHashRoute();
+  onhashchange = () => ([mainView, recordId, surveyView] = getHashRoute());
 
   function getHashRoute() {
     return location.hash
@@ -22,32 +22,38 @@
         return value;
       });
   }
-
-  async function getSurveyStore() {
-    return new SurveyStore(await openIDB());
-  }
 </script>
 
-{#await getSurveyStore() then surveyStore}
+{#await getStores() then { surveyStore, entryStore }}
   {#if mainView == "surveys"}
-    <SurveysView {surveyStore} />
+    {#await surveyStore.getAll() then surveyRecords}
+      <SurveysView {surveyStore} {surveyRecords} {entryStore} />
+    {/await}
   {:else if mainView == "options"}
     <OptionsView />
-  {:else if mainView == "survey" && typeof surveyId == "number"}
-    {#await surveyStore.get(surveyId) then survey}
-      {#if surveyView == "entries"}
-        <SurveyEntriesView {surveyStore} {survey} />
-      {:else if surveyView == "configs"}
-        <SurveyConfigsView {surveyStore} {survey} />
-      {:else if surveyView == "options"}
-        <SurveyOptionsView {surveyStore} {survey} />
-      {:else if surveyView == "entry" && typeof entryId == "number"}
-        <EntryView {surveyStore} {survey} {entryId} />
-      {:else}
-        <SurveyEntriesView {surveyStore} {survey} />
-      {/if}
+  {:else if mainView == "survey" && typeof recordId == "number"}
+    {#await surveyStore.get(recordId) then surveyRecord}
+      {#await entryStore.getAllWithSurveyId(surveyRecord.id) then entryRecords}
+        {#if surveyView == "entries"}
+          <SurveyEntriesView {surveyStore} {surveyRecord} {entryStore} {entryRecords} />
+        {:else if surveyView == "configs"}
+          <SurveyConfigsView {surveyStore} {surveyRecord} disabled={entryRecords.length > 0} />
+        {:else if surveyView == "options"}
+          <SurveyOptionsView {surveyStore} {surveyRecord} />
+        {:else}
+          <SurveyEntriesView {surveyStore} {surveyRecord} {entryStore} {entryRecords} />
+        {/if}
+      {/await}
+    {/await}
+  {:else if mainView == "entry" && typeof recordId == "number"}
+    {#await entryStore.get(recordId) then entryRecord}
+      {#await surveyStore.get(entryRecord.surveyId) then surveyRecord}
+        <EntryView {surveyRecord} {entryStore} {entryRecord} />
+      {/await}
     {/await}
   {:else}
-    <SurveysView {surveyStore} />
+    {#await surveyStore.getAll() then surveyRecords}
+      <SurveysView {surveyStore} {surveyRecords} {entryStore} />
+    {/await}
   {/if}
 {/await}

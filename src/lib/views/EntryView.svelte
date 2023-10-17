@@ -1,29 +1,37 @@
 <script lang="ts">
-  import { SurveyStore, flattenConfigs, getHighestMatchValue, getMetricDefaultValue, type Survey } from "$lib/app";
+  import {
+    EntryStore,
+    flattenConfigs,
+    getHighestMatchValue,
+    getMetricDefaultValue,
+    type Entry,
+    type IDBRecord,
+    type Survey,
+  } from "$lib/app";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import Header from "$lib/components/Header.svelte";
   import MetricEditor from "$lib/components/MetricEditor.svelte";
 
-  export let surveyStore: SurveyStore;
-  export let survey: Survey;
-  export let entryId: number;
+  export let surveyRecord: IDBRecord<Survey>;
+  export let entryStore: EntryStore;
+  export let entryRecord: IDBRecord<Entry>;
 
-  $: surveyStore.put(survey);
+  $: entryStore.put(entryRecord);
 
   let saveEntryDialog = { error: "" };
 
   function validateEntry() {
     let error = "";
-    const configs = flattenConfigs(survey.configs);
+    const configs = flattenConfigs(surveyRecord.configs);
 
-    survey.entries[entryId].values.forEach((value, i) => {
+    entryRecord.values.forEach((value, i) => {
       switch (configs[i].type) {
         case "team":
           if (!/^\d{1,4}[A-Z]?$/.test(value)) {
             error = `Invalid value for ${configs[i].name}`;
           }
-          if (survey.teams.length && !survey.teams.includes(value)) {
+          if (surveyRecord.teams.length && !surveyRecord.teams.includes(value)) {
             error = `Invalid value for ${configs[i].name} (team not allowlisted)`;
           }
           break;
@@ -49,50 +57,59 @@
       return false;
     }
 
-    const configs = flattenConfigs(survey.configs);
+    entryStore
+      .getAllWithSurveyId(entryRecord.surveyId)
+      .then((entries) => {
+        const configs = flattenConfigs(surveyRecord.configs);
+        const matchValue = getHighestMatchValue(entries, configs) + 1;
 
-    const newEntry = {
-      values: configs.map((config) => {
-        switch (config.type) {
-          case "match":
-            return getHighestMatchValue(survey) + 1;
-          default:
-            return getMetricDefaultValue(config);
-        }
-      }),
-      created: new Date(),
-      modified: new Date(),
-    };
+        const newEntry: Entry = {
+          surveyId: entryRecord.surveyId,
+          values: configs.map((config) => {
+            switch (config.type) {
+              case "match":
+                return matchValue;
+              default:
+                return getMetricDefaultValue(config);
+            }
+          }),
+          created: new Date(),
+          modified: new Date(),
+        };
 
-    survey.entries = [newEntry, ...survey.entries];
+        return entryStore.add(newEntry);
+      })
+      .then((id) => {
+        location.hash = `entry/${id}`;
+      });
   }
 
   function countPreviousConfigs(index: number) {
-    return flattenConfigs(survey.configs.slice(0, index)).length;
+    return flattenConfigs(surveyRecord.configs.slice(0, index)).length;
   }
 </script>
 
-<Header title="Entry ({survey.name})" backLink="survey/{survey.id}/entries" />
+<Header title="Entry ({surveyRecord.name})" backLink="survey/{surveyRecord.id}/entries" />
 
 <datalist id="teams-list">
-  {#each survey.teams as team}
+  {#each surveyRecord.teams as team}
     <option value={team} />
   {/each}
 </datalist>
 
 <Container padding alignEnd>
-  {#each survey.configs as config, i (config)}
+  {#each surveyRecord.configs as config, i (config)}
     {#if config.type == "group"}
       <h2>{config.name}</h2>
       {#each config.configs as innerConfig, innerConfigIndex (innerConfig)}
         <MetricEditor
           config={innerConfig}
-          bind:value={survey.entries[entryId].values[innerConfigIndex + countPreviousConfigs(i)]}
+          bind:value={entryRecord.values[innerConfigIndex + countPreviousConfigs(i)]}
         />
       {/each}
       <div style="width: 100%" />
     {:else}
-      <MetricEditor {config} bind:value={survey.entries[entryId].values[countPreviousConfigs(i)]} />
+      <MetricEditor {config} bind:value={entryRecord.values[countPreviousConfigs(i)]} />
     {/if}
   {/each}
 </Container>

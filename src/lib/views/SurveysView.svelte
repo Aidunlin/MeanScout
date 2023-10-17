@@ -1,17 +1,13 @@
 <script lang="ts">
-  import { SurveyStore, metricTypes, type Survey } from "$lib/app";
+  import { EntryStore, SurveyStore, metricTypes, type IDBRecord, type Survey } from "$lib/app";
   import Anchor from "$lib/components/Anchor.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import Header from "$lib/components/Header.svelte";
 
   export let surveyStore: SurveyStore;
-
-  let surveysPromise = surveyStore.getAll();
-
-  function loadSurveys() {
-    surveysPromise = surveyStore.getAll();
-  }
+  export let surveyRecords: IDBRecord<Survey>[];
+  export let entryStore: EntryStore;
 
   let newSurveyDialog = { name: "", error: "" };
   let pasteSurveyDialog: { input: string; error: string } = { input: "", error: "" };
@@ -30,15 +26,17 @@
         { name: "Absent", type: "toggle" },
       ],
       teams: [],
-      entries: [],
       created: new Date(),
       modified: new Date(),
     };
-    surveyStore.add(survey).then(loadSurveys);
+
+    surveyStore.add(survey).then((id) => {
+      surveyRecords = [...surveyRecords, { id, ...survey }];
+    });
   }
 
   function parseSurvey() {
-    let survey;
+    let survey: any;
 
     try {
       survey = JSON.parse(pasteSurveyDialog.input.trim(), (key, value) => {
@@ -91,14 +89,16 @@
       survey.teams = survey.teams.map((team: any) => team.toString());
     }
 
-    survey.entries = [];
-
-    surveyStore.add(survey).then(loadSurveys);
+    surveyStore.add(survey).then((id) => {
+      surveyRecords = [...surveyRecords, { id, ...survey }];
+    });
   }
 
-  function deleteSurvey(surveyId?: number) {
-    if (surveyId == undefined) return;
-    surveyStore.delete(surveyId).then(loadSurveys);
+  function deleteSurvey(id: number) {
+    surveyStore.delete(id).then(() => {
+      surveyRecords = surveyRecords.filter((survey) => survey.id !== id);
+      return entryStore.deleteAllWithSurveyId(id);
+    });
   }
 </script>
 
@@ -111,22 +111,17 @@
 
 <Container column padding>
   <h2>Surveys</h2>
-  {#await surveysPromise then surveys}
-    {#each surveys as survey (survey.id)}
-      <Container spaceBetween>
-        <Container>
-          <Anchor hash="survey/{survey.id}/entries" iconName="pen" title="Edit survey" />
-          <span>{survey.name}</span>
-        </Container>
-        <Dialog openButton={{ iconName: "trash", title: "Delete entry" }} onConfirm={() => deleteSurvey(survey.id)}>
-          <span>Delete "{survey.name}"?</span>
-          {#if survey.entries.length}
-            <span>{survey.entries.length} {survey.entries.length == 1 ? "entry" : "entries"} will be lost!</span>
-          {/if}
-        </Dialog>
+  {#each surveyRecords as survey (survey.id)}
+    <Container spaceBetween>
+      <Container>
+        <Anchor hash="survey/{survey.id}/entries" iconName="pen" title="Edit survey" />
+        <span>{survey.name}</span>
       </Container>
-    {/each}
-  {/await}
+      <Dialog openButton={{ iconName: "trash", title: "Delete entry" }} onConfirm={() => deleteSurvey(survey.id)}>
+        <span>Delete "{survey.name}"?</span>
+      </Dialog>
+    </Container>
+  {/each}
 </Container>
 
 <footer>
