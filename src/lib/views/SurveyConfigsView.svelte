@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Survey, SurveyStore } from "$lib/app";
+  import Anchor from "$lib/components/Anchor.svelte";
   import Button from "$lib/components/Button.svelte";
   import ConfigEditor from "$lib/components/ConfigEditor.svelte";
   import Container from "$lib/components/Container.svelte";
@@ -29,22 +30,12 @@
   }
 </script>
 
-<Header title={survey.name} backLink={"/surveys"} />
+<Header title={survey.name} backLink="surveys" />
 
 <Container padding noGap>
-  <Button
-    iconName="list-ol"
-    title="Entries"
-    disableTheme
-    on:click={() => (location.hash = `/survey/${survey.id}/entries`)}
-  />
-  <Button iconName="gears" title="Configs" />
-  <Button
-    iconName="ellipsis-vertical"
-    title="Options"
-    disableTheme
-    on:click={() => (location.hash = `/survey/${survey.id}/options`)}
-  />
+  <Anchor hash="survey/{survey.id}/entries" iconName="list-ol" title="Entries" disableTheme />
+  <Anchor hash="survey/{survey.id}/configs" iconName="gears" title="Configs" />
+  <Anchor hash="survey/{survey.id}/options" iconName="ellipsis-vertical" title="Options" disableTheme />
 </Container>
 
 <Container column padding>

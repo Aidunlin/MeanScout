@@ -1,6 +1,6 @@
 <script lang="ts">
   import { SurveyStore, metricTypes, type Survey } from "$lib/app";
-  import Button from "$lib/components/Button.svelte";
+  import Anchor from "$lib/components/Anchor.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import Header from "$lib/components/Header.svelte";
@@ -105,8 +105,8 @@
 <Header />
 
 <Container padding noGap>
-  <Button iconName="list-ul" title="Surveys" />
-  <Button iconName="ellipsis-vertical" title="Options" disableTheme on:click={() => (location.hash = "/options")} />
+  <Anchor hash="surveys" iconName="list-ul" title="Surveys" />
+  <Anchor hash="options" iconName="ellipsis-vertical" title="Options" disableTheme />
 </Container>
 
 <Container column padding>
@@ -115,11 +115,7 @@
     {#each surveys as survey (survey.id)}
       <Container spaceBetween>
         <Container>
-          <Button
-            iconName="pen"
-            title="Edit survey"
-            on:click={() => (location.hash = `/survey/${survey.id}/entries`)}
-          />
+          <Anchor hash="survey/{survey.id}/entries" iconName="pen" title="Edit survey" />
           <span>{survey.name}</span>
         </Container>
         <Dialog openButton={{ iconName: "trash", title: "Delete entry" }} onConfirm={() => deleteSurvey(survey.id)}>

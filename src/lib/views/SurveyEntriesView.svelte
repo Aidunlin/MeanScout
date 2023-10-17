@@ -1,5 +1,6 @@
 <script lang="ts">
   import { SurveyStore, flattenConfigs, getHighestMatchValue, target, type Entry, type Survey } from "$lib/app";
+  import Anchor from "$lib/components/Anchor.svelte";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
@@ -62,22 +63,12 @@
   }
 </script>
 
-<Header title={survey.name} backLink={"/surveys"} />
+<Header title={survey.name} backLink="surveys" />
 
 <Container padding noGap>
-  <Button iconName="list-ol" title="Entries" />
-  <Button
-    iconName="gears"
-    title="Configs"
-    disableTheme
-    on:click={() => (location.hash = `/survey/${survey.id}/configs`)}
-  />
-  <Button
-    iconName="ellipsis-vertical"
-    title="Options"
-    disableTheme
-    on:click={() => (location.hash = `/survey/${survey.id}/options`)}
-  />
+  <Anchor hash="survey/{survey.id}/entries" iconName="list-ol" title="Entries" />
+  <Anchor hash="survey/{survey.id}/configs" iconName="gears" title="Configs" disableTheme />
+  <Anchor hash="survey/{survey.id}/options" iconName="ellipsis-vertical" title="Options" disableTheme />
 </Container>
 
 <Container column padding>
@@ -85,11 +76,7 @@
   {#each survey.entries as entry, entryId (entry)}
     <Container spaceBetween>
       <Container>
-        <Button
-          iconName="pen"
-          title="Edit entry"
-          on:click={() => (location.hash = `/survey/${survey.id}/entry/${entryId}`)}
-        />
+        <Anchor hash="survey/{survey.id}/entry/{entryId}" iconName="pen" title="Edit entry" />
         {#each flattenConfigs(survey.configs).slice(0, 2) as config, i}
           <span>{config.name}: {entry.values[i]}, </span>
         {/each}

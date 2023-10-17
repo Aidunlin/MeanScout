@@ -72,7 +72,7 @@
   }
 </script>
 
-<Header title="Entry ({survey.name})" backLink={`/survey/${survey.id}/entries`} />
+<Header title="Entry ({survey.name})" backLink="survey/{survey.id}/entries" />
 
 <datalist id="teams-list">
   {#each survey.teams as team}

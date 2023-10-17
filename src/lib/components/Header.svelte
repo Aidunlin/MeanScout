@@ -1,10 +1,10 @@
 <script lang="ts">
   import { target } from "../app";
-  import Button from "./Button.svelte";
+  import Anchor from "./Anchor.svelte";
   import Container from "./Container.svelte";
 
   export let title = "";
-  export let backLink: string | undefined = undefined;
+  export let backLink = "";
 </script>
 
 <svelte:head>
@@ -13,12 +13,8 @@
 
 <header>
   <Container>
-    {#if backLink != undefined}
-      <Button
-        iconName="arrow-left"
-        title="Go back"
-        on:click={() => backLink != undefined && (location.hash = backLink)}
-      />
+    {#if backLink}
+      <Anchor hash={backLink} iconName="arrow-left" title="Go back" />
     {:else}
       <img id="logo" src="./logo.svg" alt="" />
     {/if}
