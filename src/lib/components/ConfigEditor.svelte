@@ -93,7 +93,7 @@
     <Container column noGap>
       Type
       <select value={config.type} on:change={(e) => switchConfigType(e.currentTarget.value)} {disabled}>
-        {#each Object.values(metricTypes) as metricType}
+        {#each metricTypes as metricType}
           <option>{metricType}</option>
         {/each}
       </select>
@@ -114,9 +114,9 @@
         disabled={configIndex == configs.length - 1 || disabled}
         on:click={() => moveConfig(1)}
       />
-      <Button iconName="clone" title="Duplicate config" {disabled} on:click={() => duplicateConfig()} />
+      <Button iconName="clone" title="Duplicate config" {disabled} on:click={duplicateConfig} />
     </Container>
-    <Button iconName="trash" title="Delete config" {disabled} on:click={() => deleteConfig()} />
+    <Button iconName="trash" title="Delete config" {disabled} on:click={deleteConfig} />
   </Container>
 
   {#if !disabled}
@@ -127,7 +127,7 @@
             iconStyle={config.allowNegative ? "solid" : "regular"}
             iconName={config.allowNegative ? "square-check" : "square"}
             text="Allow Negative"
-            on:click={() => toggleAllowNegative()}
+            on:click={toggleAllowNegative}
           />
         </Container>
       </Container>
@@ -143,7 +143,7 @@
           {/each}
         </Container>
         <Container>
-          <Button iconName="plus" title="New value" on:click={() => newSelectValue()} />
+          <Button iconName="plus" title="New value" on:click={newSelectValue} />
         </Container>
       </Container>
     {:else if config.type == "text"}
@@ -157,7 +157,7 @@
             iconStyle={config.long ? "solid" : "regular"}
             iconName={config.long ? "square-check" : "square"}
             text="Long"
-            on:click={() => toggleLong()}
+            on:click={toggleLong}
           />
         </Container>
       </Container>
@@ -168,7 +168,7 @@
           <svelte:self bind:configs={config.configs} bind:config={innerConfig} configIndex={innerConfigIndex} />
         {/each}
         <Container>
-          <Button iconName="plus" title="New config" on:click={() => newConfig()} />
+          <Button iconName="plus" title="New config" on:click={newConfig} />
         </Container>
       </Container>
     {/if}

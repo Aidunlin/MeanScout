@@ -19,11 +19,7 @@
 
   function start() {
     running = true;
-    interval = setInterval(() => {
-      if (running) {
-        value = (parseFloat(value) + 0.1).toFixed(1);
-      }
-    }, 100);
+    interval = setInterval(() => running && (value += 0.1), 100);
   }
 
   function pause() {
@@ -32,12 +28,10 @@
   }
 
   function stop() {
-    if (config.type == "timer") {
-      if (running) {
-        pause();
-      }
-      value = 0;
+    if (running) {
+      pause();
     }
+    value = 0;
   }
 </script>
 
@@ -75,12 +69,12 @@
         <input placeholder={config.tip} bind:value />
       {/if}
     {:else if config.type == "rating"}
-      {#each [...Array(5).keys()] as i}
+      {#each Array(5) as _, i}
         <Button on:click={() => rate(i)} iconStyle={value > i ? "solid" : "regular"} iconName="star" />
       {/each}
     {:else if config.type == "timer"}
       <Button on:click={running ? pause : start} iconName={running ? "pause" : "play"} />
-      <span class="number">{value}</span>
+      <span class="number">{value.toFixed(1)}</span>
       <Button on:click={stop} iconName="stop" />
     {/if}
   </Container>
