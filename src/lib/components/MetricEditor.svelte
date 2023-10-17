@@ -59,7 +59,7 @@
         text={config.name}
       />
     {:else if config.type == "number"}
-      <Button on:click={() => value--} iconName="minus" />
+      <Button on:click={() => value--} iconName="minus" disabled={config.allowNegative === false && value < 1} />
       <span class="number">{value}</span>
       <Button on:click={() => value++} iconName="plus" />
     {:else if config.type == "select"}

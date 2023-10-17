@@ -53,6 +53,12 @@
     configs = configs.filter((_, i) => i != configIndex);
   }
 
+  function toggleAllowNegative() {
+    if (config.type == "number") {
+      config.allowNegative = !config.allowNegative;
+    }
+  }
+
   function deleteSelectValue(index: number) {
     if (config.type == "select") {
       config.values = config.values.filter((_, i) => i != index);
@@ -114,7 +120,18 @@
   </Container>
 
   {#if !disabled}
-    {#if config.type == "select"}
+    {#if config.type == "number"}
+      <Container column maxWidth padding>
+        <Container>
+          <Button
+            iconStyle={config.allowNegative ? "solid" : "regular"}
+            iconName={config.allowNegative ? "square-check" : "square"}
+            text="Allow Negative"
+            on:click={() => toggleAllowNegative()}
+          />
+        </Container>
+      </Container>
+    {:else if config.type == "select"}
       <Container column maxWidth padding>
         {config.name} Values
         <Container column padding>
@@ -131,8 +148,7 @@
       </Container>
     {:else if config.type == "text"}
       <Container column maxWidth padding>
-        Text
-        <Container alignEnd padding>
+        <Container alignEnd>
           <Container column noGap>
             Tip
             <input bind:value={config.tip} />
