@@ -33,8 +33,24 @@ html {
   touch-action: pan-y;
 }
 
-body :focus-visible {
+body :focus-visible,
+input:hover,
+select:hover,
+option:hover,
+textarea:hover,
+button:hover,
+a:hover,
+input:focus,
+select:focus,
+option:focus,
+textarea:focus,
+button:focus,
+a:focus {
   outline: var(--text-color) solid 2px;
+}
+
+:disabled {
+  outline: none !important;
 }
 
 ::selection {
