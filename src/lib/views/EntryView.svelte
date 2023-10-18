@@ -80,7 +80,7 @@
         return entryStore.add(newEntry);
       })
       .then((id) => {
-        location.hash = `entry/${id}`;
+        location.hash = `/entry/${id}`;
       });
   }
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { EntryStore, SurveyStore, metricTypes, type IDBRecord, type Survey } from "$lib/app";
+  import { EntryStore, SurveyStore, metricTypes, type IDBRecord, type Survey, type MetricConfig } from "$lib/app";
   import Anchor from "$lib/components/Anchor.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
@@ -18,6 +18,7 @@
       newSurveyDialog.error = "Name can't be blank!";
       return false;
     }
+
     const survey: Survey = {
       name,
       configs: [
@@ -35,59 +36,76 @@
     });
   }
 
+  function parseName(name: any) {
+    if (typeof name != "string" || !name.trim()) {
+      const currentDate = new Date().toLocaleString(undefined, { dateStyle: "short", timeStyle: "short" });
+      return `Survey ${currentDate}`;
+    }
+
+    return name;
+  }
+
+  function parseConfigs(configs: any[]): MetricConfig[] {
+    return configs.filter((config) => {
+      if (typeof config != "object") {
+        return false;
+      }
+
+      if (typeof config.name != "string" || !config.name.trim()) {
+        return false;
+      }
+
+      if (!metricTypes.includes(config.type)) {
+        return false;
+      }
+
+      if (config.type == "select" && !Array.isArray(config.values)) {
+        return false;
+      }
+
+      if (config.type == "group" && !Array.isArray(config.configs)) {
+        return false;
+      }
+
+      return true;
+    });
+  }
+
+  function parseTeams(teams: any[]) {
+    return teams
+      .filter((team: any) => typeof team == "number" || typeof team == "string")
+      .map((team: number | string) => team.toString());
+  }
+
+  function parseDate(date: any) {
+    if (typeof date != "string" || Number.isNaN(Date.parse(date))) {
+      return new Date(date);
+    }
+
+    return new Date();
+  }
+
   function parseSurvey() {
+    if (!pasteSurveyDialog.input.trim()) {
+      return false;
+    }
+
     let survey: any;
 
     try {
-      survey = JSON.parse(pasteSurveyDialog.input.trim(), (key, value) => {
-        if (key == "created" || key == "modified") {
-          if (Number.isNaN(Date.parse(value))) {
-            return new Date();
-          } else {
-            return new Date(value);
-          }
-        }
-        return value;
-      });
+      survey = JSON.parse(pasteSurveyDialog.input.trim());
     } catch (e) {
       pasteSurveyDialog.error = "Invalid input";
       return false;
     }
 
     delete survey.id;
-
-    if (typeof survey.name != "string" || !survey.name.trim()) {
-      const currentDate = new Date().toLocaleString(undefined, { dateStyle: "short", timeStyle: "short" });
-      survey.name = `Survey ${currentDate}`;
-    }
-
-    if (!Array.isArray(survey.configs)) {
-      survey.configs = [];
-    } else {
-      survey.configs = (survey.configs as any[])
-        .map((config, i) => {
-          if (typeof config.name != "string" || !config.name.trim()) {
-            config.name = `Config ${i + 1}`;
-          }
-          if (config.type == "select" && !Array.isArray(config.values)) {
-            return undefined;
-          }
-          if (config.type == "group" && !Array.isArray(config.configs)) {
-            return undefined;
-          }
-          if (!metricTypes.includes(config.type)) {
-            return undefined;
-          }
-          return config;
-        })
-        .filter((config) => config);
-    }
-
-    if (!Array.isArray(survey.teams)) {
-      survey.teams = [];
-    } else {
-      survey.teams = survey.teams.map((team: any) => team.toString());
-    }
+    survey.name = parseName(survey.name);
+    survey.configs = Array.isArray(survey.configs) ? parseConfigs(survey.configs) : [];
+    survey.teams = Array.isArray(survey.teams) ? parseTeams(survey.teams) : [];
+    survey.created = parseDate(survey.created);
+    survey.modified = parseDate(survey.modified);
+    delete survey.entries;
 
     surveyStore.add(survey).then((id) => {
       surveyRecords = [...surveyRecords, { id, ...survey }];
@@ -95,9 +113,8 @@
   }
 
   function deleteSurvey(id: number) {
-    surveyStore.delete(id).then(() => {
+    Promise.all([surveyStore.delete(id), entryStore.deleteAllWithSurveyId(id)]).then(() => {
       surveyRecords = surveyRecords.filter((survey) => survey.id !== id);
-      return entryStore.deleteAllWithSurveyId(id);
     });
   }
 </script>

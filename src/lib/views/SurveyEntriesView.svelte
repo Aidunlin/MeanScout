@@ -74,8 +74,9 @@
   }
 
   function deleteEntry(id: number) {
-    entryRecords = entryRecords.filter((entry) => entry.id !== id);
-    entryStore.delete(id);
+    entryStore.delete(id).then(() => {
+      entryRecords = entryRecords.filter((entry) => entry.id !== id);
+    });
   }
 </script>
 
