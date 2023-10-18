@@ -13,7 +13,6 @@
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
-  import Header from "$lib/components/Header.svelte";
 
   export let surveyStore: SurveyStore;
   export let surveyRecord: IDBRecord<Survey>;
@@ -79,14 +78,6 @@
     });
   }
 </script>
-
-<Header title={surveyRecord.name} backLink="surveys" />
-
-<Container padding noGap>
-  <Anchor hash="survey/{surveyRecord.id}/entries" iconName="list-ol" title="Entries" />
-  <Anchor hash="survey/{surveyRecord.id}/configs" iconName="gears" title="Configs" disableTheme />
-  <Anchor hash="survey/{surveyRecord.id}/options" iconName="ellipsis-vertical" title="Options" disableTheme />
-</Container>
 
 <Container column padding>
   <h2>Entries</h2>

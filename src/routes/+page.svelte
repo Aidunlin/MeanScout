@@ -1,6 +1,8 @@
 <script lang="ts">
   import { getStores } from "$lib/app";
   import "$lib/app.css";
+  import Header from "$lib/components/Header.svelte";
+  import NavBar from "$lib/components/NavBar.svelte";
   import EntryView from "$lib/views/EntryView.svelte";
   import OptionsView from "$lib/views/OptionsView.svelte";
   import SurveyConfigsView from "$lib/views/SurveyConfigsView.svelte";
@@ -25,18 +27,21 @@
 </script>
 
 {#await getStores() then { surveyStore, entryStore }}
-  {#if mainView == "surveys"}
-    {#await surveyStore.getAll() then surveyRecords}
-      <SurveysView {surveyStore} {surveyRecords} {entryStore} />
-    {/await}
-  {:else if mainView == "options"}
-    <OptionsView />
-  {:else if mainView == "survey" && typeof recordId == "number"}
+  {#if mainView == "survey" && typeof recordId == "number"}
     {#await surveyStore.get(recordId) then surveyRecord}
+      <Header title={surveyRecord.name} backLink="surveys" />
+      <NavBar
+        currentHash={surveyView}
+        baseHash="survey/{surveyRecord.id}"
+        links={[
+          { hash: "entries", iconName: "list-ol", title: "Entries" },
+          { hash: "configs", iconName: "gears", title: "Configs" },
+          { hash: "options", iconName: "ellipsis-vertical", title: "Options" },
+        ]}
+      />
+
       {#await entryStore.getAllWithSurveyId(surveyRecord.id) then entryRecords}
-        {#if surveyView == "entries"}
-          <SurveyEntriesView {surveyStore} {surveyRecord} {entryStore} {entryRecords} />
-        {:else if surveyView == "configs"}
+        {#if surveyView == "configs"}
           <SurveyConfigsView {surveyStore} {surveyRecord} disabled={entryRecords.length > 0} />
         {:else if surveyView == "options"}
           <SurveyOptionsView {surveyStore} {surveyRecord} />
@@ -52,8 +57,27 @@
       {/await}
     {/await}
   {:else}
-    {#await surveyStore.getAll() then surveyRecords}
-      <SurveysView {surveyStore} {surveyRecords} {entryStore} />
-    {/await}
+    <Header />
+    <NavBar
+      currentHash={mainView}
+      links={[
+        { hash: "surveys", iconName: "list-ul", title: "Surveys" },
+        { hash: "options", iconName: "ellipsis-vertical", title: "Options" },
+      ]}
+    />
+
+    {#if mainView == "options"}
+      <OptionsView />
+    {:else}
+      {#await surveyStore.getAll() then surveyRecords}
+        <SurveysView {surveyStore} {surveyRecords} {entryStore} />
+      {/await}
+    {/if}
   {/if}
+{:catch error}
+  <p>
+    MeanScout was unable to access IndexedDB. Double check that your device/browser supports it, and that you haven't
+    removed the permission to access it.
+  </p>
+  <p>Error: {error}</p>
 {/await}

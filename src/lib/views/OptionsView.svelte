@@ -1,16 +1,7 @@
 <script lang="ts">
   import { allianceTargets, blueTeamTargets, otherTargets, redTeamTargets, target } from "$lib/app";
-  import Anchor from "$lib/components/Anchor.svelte";
   import Container from "$lib/components/Container.svelte";
-  import Header from "$lib/components/Header.svelte";
 </script>
-
-<Header />
-
-<Container padding noGap>
-  <Anchor hash="surveys" iconName="list-ul" title="Surveys" disableTheme />
-  <Anchor hash="options" iconName="ellipsis-vertical" title="Options" />
-</Container>
 
 <Container column padding>
   <h2>Options</h2>

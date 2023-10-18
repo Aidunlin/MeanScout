@@ -94,7 +94,7 @@ async function migrateEntries(idb: IDBDatabase) {
 export function openIDB() {
   return new Promise<IDBDatabase>((resolve, reject) => {
     const request = indexedDB.open("MeanScout", 4);
-    request.onerror = () => reject(request.error);
+    request.onerror = () => reject(request.error?.message);
 
     request.onupgradeneeded = async () => {
       const idb = request.result;

@@ -1,9 +1,8 @@
 <script lang="ts">
-  import { EntryStore, SurveyStore, metricTypes, type IDBRecord, type Survey, type MetricConfig } from "$lib/app";
+  import { EntryStore, SurveyStore, metricTypes, type IDBRecord, type MetricConfig, type Survey } from "$lib/app";
   import Anchor from "$lib/components/Anchor.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
-  import Header from "$lib/components/Header.svelte";
 
   export let surveyStore: SurveyStore;
   export let surveyRecords: IDBRecord<Survey>[];
@@ -118,13 +117,6 @@
     });
   }
 </script>
-
-<Header />
-
-<Container padding noGap>
-  <Anchor hash="surveys" iconName="list-ul" title="Surveys" />
-  <Anchor hash="options" iconName="ellipsis-vertical" title="Options" disableTheme />
-</Container>
 
 <Container column padding>
   <h2>Surveys</h2>

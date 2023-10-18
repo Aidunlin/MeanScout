@@ -1,11 +1,9 @@
 <script lang="ts">
   import type { IDBRecord, Survey, SurveyStore } from "$lib/app";
-  import Anchor from "$lib/components/Anchor.svelte";
   import Button from "$lib/components/Button.svelte";
   import ConfigEditor from "$lib/components/ConfigEditor.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
-  import Header from "$lib/components/Header.svelte";
 
   export let surveyStore: SurveyStore;
   export let surveyRecord: IDBRecord<Survey>;
@@ -30,14 +28,6 @@
     return JSON.stringify(exportableSurvey, undefined, "  ");
   }
 </script>
-
-<Header title={surveyRecord.name} backLink="surveys" />
-
-<Container padding noGap>
-  <Anchor hash="survey/{surveyRecord.id}/entries" iconName="list-ol" title="Entries" disableTheme />
-  <Anchor hash="survey/{surveyRecord.id}/configs" iconName="gears" title="Configs" />
-  <Anchor hash="survey/{surveyRecord.id}/options" iconName="ellipsis-vertical" title="Options" disableTheme />
-</Container>
 
 <Container column padding>
   <h2>Configs</h2>
