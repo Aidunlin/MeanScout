@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { MetricConfig } from "../app";
+  import type { MetricConfig } from "$lib";
   import Button from "./Button.svelte";
   import Container from "./Container.svelte";
 

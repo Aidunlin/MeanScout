@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { target } from "../app";
+  import { target } from "$lib";
   import Anchor from "./Anchor.svelte";
   import Container from "./Container.svelte";
 

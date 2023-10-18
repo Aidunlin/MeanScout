@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { IDBRecord, Survey, SurveyStore } from "$lib/app";
+  import type { IDBRecord, Survey, SurveyStore } from "$lib";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
 

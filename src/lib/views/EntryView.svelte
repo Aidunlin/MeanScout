@@ -7,7 +7,7 @@
     type Entry,
     type IDBRecord,
     type Survey,
-  } from "$lib/app";
+  } from "$lib";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import Header from "$lib/components/Header.svelte";

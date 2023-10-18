@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getStores } from "$lib/app";
+  import { getStores } from "$lib";
   import "$lib/app.css";
   import Header from "$lib/components/Header.svelte";
   import NavBar from "$lib/components/NavBar.svelte";

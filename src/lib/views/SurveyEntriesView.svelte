@@ -8,7 +8,7 @@
     type Entry,
     type IDBRecord,
     type Survey,
-  } from "$lib/app";
+  } from "$lib";
   import Anchor from "$lib/components/Anchor.svelte";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";

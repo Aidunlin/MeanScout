@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { allianceTargets, blueTeamTargets, otherTargets, redTeamTargets, target } from "$lib/app";
+  import { allianceTargets, blueTeamTargets, otherTargets, redTeamTargets, target } from "$lib";
   import Container from "$lib/components/Container.svelte";
 </script>
 
