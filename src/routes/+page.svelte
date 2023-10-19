@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { getStores } from "$lib";
   import "$lib/app.css";
   import Header from "$lib/components/Header.svelte";
   import NavBar from "$lib/components/NavBar.svelte";
+  import { getStores } from "$lib/db";
   import EntryView from "$lib/views/EntryView.svelte";
   import OptionsView from "$lib/views/OptionsView.svelte";
   import SurveyConfigsView from "$lib/views/SurveyConfigsView.svelte";

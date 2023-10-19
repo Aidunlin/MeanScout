@@ -1,17 +1,10 @@
 <script lang="ts">
-  import {
-    EntryStore,
-    flattenConfigs,
-    getHighestMatchValue,
-    getMetricDefaultValue,
-    type Entry,
-    type IDBRecord,
-    type Survey,
-  } from "$lib";
+  import { flattenConfigs, getHighestMatchValue, getMetricDefaultValue, type Entry, type Survey } from "$lib";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import Header from "$lib/components/Header.svelte";
   import MetricEditor from "$lib/components/MetricEditor.svelte";
+  import type { EntryStore, IDBRecord } from "$lib/db";
 
   export let surveyRecord: IDBRecord<Survey>;
   export let entryStore: EntryStore;

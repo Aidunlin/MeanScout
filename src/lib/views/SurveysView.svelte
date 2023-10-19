@@ -1,8 +1,9 @@
 <script lang="ts">
-  import { EntryStore, SurveyStore, metricTypes, type IDBRecord, type MetricConfig, type Survey } from "$lib";
+  import { metricTypes, type MetricConfig, type Survey } from "$lib";
   import Anchor from "$lib/components/Anchor.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
+  import type { EntryStore, IDBRecord, SurveyStore } from "$lib/db";
 
   export let surveyStore: SurveyStore;
   export let surveyRecords: IDBRecord<Survey>[];

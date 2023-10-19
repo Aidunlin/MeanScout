@@ -1,9 +1,10 @@
 <script lang="ts">
-  import type { IDBRecord, Survey, SurveyStore } from "$lib";
+  import type { Survey } from "$lib";
   import Button from "$lib/components/Button.svelte";
   import ConfigEditor from "$lib/components/ConfigEditor.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
+  import type { IDBRecord, SurveyStore } from "$lib/db";
 
   export let surveyStore: SurveyStore;
   export let surveyRecord: IDBRecord<Survey>;
