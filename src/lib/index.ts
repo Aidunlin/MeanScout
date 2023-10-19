@@ -1,20 +1,3 @@
-import { writable } from "svelte/store";
-
-export const allianceTargets = ["red", "blue"] as const;
-export type AllianceTarget = (typeof allianceTargets)[number];
-
-export const redTeamTargets = ["red 1", "red 2", "red 3"] as const;
-export type RedTeamTarget = (typeof redTeamTargets)[number];
-
-export const blueTeamTargets = ["blue 1", "blue 2", "blue 3"] as const;
-export type BlueTeam = (typeof blueTeamTargets)[number];
-
-export const otherTargets = ["pit"] as const;
-export type OtherTarget = (typeof otherTargets)[number];
-
-export const targets = [...allianceTargets, ...redTeamTargets, ...blueTeamTargets, ...otherTargets] as const;
-export type Target = (typeof targets)[number];
-
 export const metricTypes = ["team", "match", "toggle", "number", "select", "text", "rating", "timer", "group"] as const;
 export type MetricType = (typeof metricTypes)[number];
 
@@ -230,13 +213,6 @@ export async function getStores() {
     entryStore: new EntryStore(idb),
   };
 }
-
-export const target = writable<Target>((localStorage.getItem("target") as Target) || "red");
-target.subscribe((value) => {
-  localStorage.setItem("target", value);
-  const newTheme = value == "pit" ? "orange" : value.split(" ")[0];
-  document.documentElement.style.setProperty("--theme-color", `var(--${newTheme})`);
-});
 
 export function getMetricDefaultValue(config: Exclude<MetricConfig, GroupConfig>) {
   switch (config.type) {

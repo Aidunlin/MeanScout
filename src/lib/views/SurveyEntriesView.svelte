@@ -4,7 +4,6 @@
     SurveyStore,
     flattenConfigs,
     getHighestMatchValue,
-    target,
     type Entry,
     type IDBRecord,
     type Survey,
@@ -13,6 +12,7 @@
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
+  import { targetStore } from "$lib/target";
 
   export let surveyStore: SurveyStore;
   export let surveyRecord: IDBRecord<Survey>;
@@ -65,7 +65,7 @@
     ].join("\n");
 
     const anchor = document.createElement("a");
-    anchor.download = `${surveyRecord.name}-${$target}.csv`.replaceAll(" ", "_");
+    anchor.download = `${surveyRecord.name}-${$targetStore}.csv`.replaceAll(" ", "_");
     anchor.href = `data:text/plain;charset=utf-8,${encodeURIComponent(csv)}`;
     document.body.append(anchor);
     anchor.click();

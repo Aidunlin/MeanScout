@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { target } from "$lib";
+  import { targetStore } from "$lib/target";
   import Anchor from "./Anchor.svelte";
   import Container from "./Container.svelte";
 
@@ -20,5 +20,5 @@
     {/if}
     <h1>{title || "MeanScout"}</h1>
   </Container>
-  <span class="theme-text" style="text-transform:capitalize">{$target}</span>
+  <span class="theme-text" style="text-transform:capitalize">{$targetStore}</span>
 </header>
