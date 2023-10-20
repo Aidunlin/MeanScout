@@ -171,3 +171,9 @@ export async function getStores() {
     entryStore: new EntryStore(idb),
   };
 }
+
+export async function getEntryWithSurvey(entryId: number, surveyStore: SurveyStore, entryStore: EntryStore) {
+  const entryRecord = await entryStore.get(entryId);
+  const surveyRecord = await surveyStore.get(entryRecord.id);
+  return { surveyRecord, entryRecord };
+}
