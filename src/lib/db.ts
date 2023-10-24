@@ -174,6 +174,6 @@ export async function getStores() {
 
 export async function getEntryWithSurvey(entryId: number, surveyStore: SurveyStore, entryStore: EntryStore) {
   const entryRecord = await entryStore.get(entryId);
-  const surveyRecord = await surveyStore.get(entryRecord.id);
+  const surveyRecord = await surveyStore.get(entryRecord.surveyId);
   return { surveyRecord, entryRecord };
 }
