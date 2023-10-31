@@ -1,7 +1,7 @@
 <script lang="ts">
   import "$lib/app.css";
   import Header from "$lib/components/Header.svelte";
-  import { getStores, getEntryWithSurvey } from "$lib/db";
+  import { openIDB } from "$lib/db";
   import EntryPage from "$lib/pages/EntryPage.svelte";
   import MainPage from "$lib/pages/MainPage.svelte";
   import SurveyPage from "$lib/pages/SurveyPage.svelte";
@@ -20,7 +20,7 @@
   }
 </script>
 
-{#await getStores() then { surveyStore, entryStore }}
+{#await openIDB() then { surveyStore, entryStore }}
   {#if dir == "survey" && typeof recordId == "number"}
     {#await surveyStore.get(recordId) then surveyRecord}
       <SurveyPage dir={surveyDir} {surveyStore} {surveyRecord} {entryStore} />
@@ -28,7 +28,7 @@
       <MainPage dir="surveys" {surveyStore} {entryStore} />
     {/await}
   {:else if dir == "entry" && typeof recordId == "number"}
-    {#await getEntryWithSurvey(recordId, surveyStore, entryStore) then { surveyRecord, entryRecord }}
+    {#await entryStore.getEntryWithSurvey(recordId, surveyStore) then { surveyRecord, entryRecord }}
       <EntryPage {surveyRecord} {entryStore} {entryRecord} />
     {:catch}
       <MainPage dir="surveys" {surveyStore} {entryStore} />

@@ -28,7 +28,7 @@
   {#if dir == "configs"}
     <SurveyConfigsView {surveyStore} {surveyRecord} disabled={entryRecords.length > 0} />
   {:else if dir == "options"}
-    <SurveyOptionsView {surveyStore} {surveyRecord} />
+    <SurveyOptionsView {surveyStore} {surveyRecord} {entryStore} />
   {:else}
     <SurveyEntriesView {surveyStore} {surveyRecord} {entryStore} {entryRecords} />
   {/if}

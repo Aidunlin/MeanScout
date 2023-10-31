@@ -113,7 +113,7 @@
   }
 
   function deleteSurvey(id: number) {
-    Promise.all([surveyStore.delete(id), entryStore.deleteAllWithSurveyId(id)]).then(() => {
+    Promise.all([entryStore.deleteAllWithSurveyId(id), surveyStore.delete(id)]).then(() => {
       surveyRecords = surveyRecords.filter((survey) => survey.id !== id);
     });
   }

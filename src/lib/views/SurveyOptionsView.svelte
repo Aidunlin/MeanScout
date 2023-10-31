@@ -1,11 +1,12 @@
 <script lang="ts">
-  import type { Survey } from "$lib";
+  import type { Entry, Survey } from "$lib";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
-  import type { IDBRecord, SurveyStore } from "$lib/db";
+  import type { EntryStore, IDBRecord, SurveyStore } from "$lib/db";
 
   export let surveyStore: SurveyStore;
   export let surveyRecord: IDBRecord<Survey>;
+  export let entryStore: EntryStore;
 
   $: surveyStore.put(surveyRecord);
 
@@ -25,6 +26,31 @@
   function deleteTeam(team: string) {
     surveyRecord.teams = surveyRecord.teams.filter((t) => t.trim() != team.trim());
   }
+
+  function hasMigratableEntries() {
+    const survey = surveyRecord as IDBRecord<Survey> & { entries?: Entry[] };
+    return Array.isArray(survey.entries);
+  }
+
+  function migrateEntries() {
+    const survey = surveyRecord as IDBRecord<Survey> & { entries?: Entry[] };
+
+    if (!Array.isArray(survey.entries)) {
+      return;
+    }
+
+    const promises = [];
+
+    for (const entry of survey.entries) {
+      entry.surveyId = surveyRecord.id;
+      promises.push(entryStore.add(entry));
+    }
+
+    Promise.all(promises).then(() => {
+      delete survey.entries;
+      surveyStore.put(survey);
+    });
+  }
 </script>
 
 <Container column padding>
@@ -41,4 +67,12 @@
       {/each}
     </Container>
   </Container>
+  {#if hasMigratableEntries()}
+    <Container column>
+      Migrate entries
+      <Container>
+        <Button iconName="right-from-bracket" text="Migrate" on:click={migrateEntries} />
+      </Container>
+    </Container>
+  {/if}
 </Container>
