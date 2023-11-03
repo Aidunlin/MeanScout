@@ -42,9 +42,9 @@
 
   <Container noGap>
     {#if config.type == "team"}
-      <input class="metric-team" list="teams-list" maxlength="5" bind:value required />
+      <input class="team" list="teams-list" maxlength="5" bind:value required />
     {:else if config.type == "match"}
-      <input class="metric-match" type="number" pattern="[0-9]*" bind:value required />
+      <input class="match" type="number" pattern="[0-9]*" bind:value required />
     {:else if config.type == "toggle"}
       <Button
         on:click={() => (value = !value)}
@@ -79,3 +79,20 @@
     {/if}
   </Container>
 </Container>
+
+<style>
+  .team {
+    width: 100px;
+  }
+
+  .match,
+  .number {
+    width: 80px;
+  }
+
+  .number {
+    background: var(--fg-color);
+    padding: var(--inner-gap);
+    text-align: center;
+  }
+</style>

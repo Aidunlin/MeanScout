@@ -1,0 +1,119 @@
+* {
+  border-radius: 0 !important;
+  border: none;
+  box-sizing: border-box;
+  color: white;
+  font-family: "Fira Code", monospace;
+  font-feature-settings: "calt" 1;
+  font-size: 24px;
+  line-height: 1.25 !important;
+  text-rendering: optimizeLegibility;
+}
+
+@supports (font-variation-settings: normal) {
+  * {
+    font-family: "Fira Code VF", monospace;
+  }
+}
+
+html {
+  --outer-gap: 12px;
+  --inner-gap: 8px;
+  --fg-color: rgba(127, 127, 127, 0.2);
+  --red: #f44336;
+  --blue: #2196f3;
+  --orange: #ff9800;
+  --theme-color: var(--red);
+  --outline: white solid 2px;
+  background: black;
+  color-scheme: dark;
+  touch-action: pan-y;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  min-height: 100dvh;
+}
+
+footer {
+  align-items: center;
+  background: var(--fg-color);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--outer-gap);
+  justify-content: space-between;
+  margin-top: auto;
+  padding: var(--outer-gap);
+}
+
+h1 {
+  font-size: 30px;
+  margin: 0;
+}
+
+h2 {
+  margin: 0;
+  width: 100%;
+}
+
+h2:not(:first-child) {
+  padding-top: var(--outer-gap);
+}
+
+body :focus-visible,
+:is(input, select, textarea):focus,
+:is(input, select, textarea):hover {
+  outline: var(--outline);
+}
+
+:disabled {
+  outline: none !important;
+  cursor: default !important;
+  opacity: 0.5;
+}
+
+::selection {
+  color: white;
+  background-color: var(--theme-color);
+}
+
+.disable-theme,
+.disable-theme * {
+  color: white !important;
+}
+
+input,
+select,
+textarea {
+  appearance: none;
+  background: var(--fg-color);
+  color: var(--theme-color);
+  display: block;
+  padding: var(--inner-gap);
+  width: 100%;
+}
+
+input[type="number"] {
+  appearance: textfield;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  display: none;
+}
+
+select {
+  text-transform: capitalize;
+}
+
+textarea {
+  height: 300px;
+  resize: none;
+}
+
+i,
+option {
+  color: var(--theme-color);
+}

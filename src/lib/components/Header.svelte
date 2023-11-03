@@ -20,5 +20,28 @@
     {/if}
     <h1>{title || "MeanScout"}</h1>
   </Container>
-  <span class="theme-text" style="text-transform:capitalize">{$targetStore}</span>
+  <span>{$targetStore}</span>
 </header>
+
+<style>
+  header {
+    align-items: center;
+    background: var(--fg-color);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--outer-gap);
+    justify-content: space-between;
+    padding: var(--outer-gap);
+  }
+
+  img {
+    flex-grow: 0;
+    height: 46px;
+    padding: 5px;
+  }
+
+  span {
+    color: var(--theme-color);
+    text-transform: capitalize;
+  }
+</style>

@@ -17,6 +17,7 @@
     element.showModal();
   }}
 />
+
 <dialog bind:this={element} on:close>
   <slot />
   <Container spaceBetween>
@@ -26,3 +27,22 @@
     <Button iconName="xmark" title="Close" on:click={() => element.close()} />
   </Container>
 </dialog>
+
+<style>
+  dialog {
+    background: rgb(25, 25, 25);
+    flex-direction: column;
+    gap: var(--outer-gap);
+    max-height: 100dvh;
+    padding: var(--outer-gap);
+    width: min(100dvw, 540px);
+  }
+
+  dialog::backdrop {
+    background: rgba(0, 0, 0, 0.5);
+  }
+
+  dialog[open] {
+    display: flex;
+  }
+</style>

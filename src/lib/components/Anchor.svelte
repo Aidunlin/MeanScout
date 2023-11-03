@@ -14,3 +14,20 @@
   {/if}
   {text}
 </a>
+
+<style>
+  a {
+    background: var(--fg-color);
+    cursor: pointer;
+    display: inline-flex;
+    gap: var(--inner-gap);
+    justify-content: center;
+    padding: var(--inner-gap);
+    text-decoration: none;
+  }
+  
+  a:focus,
+  a:hover {
+    outline: var(--outline);
+  }
+</style>

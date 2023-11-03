@@ -1,5 +1,5 @@
 <script lang="ts">
-  import "$lib/app.css";
+  import "$lib/global.css";
   import Header from "$lib/components/Header.svelte";
   import { openIDB } from "$lib/db";
   import EntryPage from "$lib/pages/EntryPage.svelte";
