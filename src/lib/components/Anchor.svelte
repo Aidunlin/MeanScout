@@ -25,7 +25,7 @@
     padding: var(--inner-gap);
     text-decoration: none;
   }
-  
+
   a:focus,
   a:hover {
     outline: var(--outline);

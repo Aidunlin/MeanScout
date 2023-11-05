@@ -1,22 +1,37 @@
 <script lang="ts">
-  import { metricTypes, type MetricConfig, type Survey } from "$lib";
+  import { metricTypes, type DialogDataType, type IDBRecord, type MetricConfig, type Survey } from "$lib";
   import Anchor from "$lib/components/Anchor.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
-  import type { EntryStore, IDBRecord, SurveyStore } from "$lib/db";
 
-  export let surveyStore: SurveyStore;
-  export let surveyRecords: IDBRecord<Survey>[];
-  export let entryStore: EntryStore;
+  export let idb: IDBDatabase;
 
-  let newSurveyDialog = { name: "", error: "" };
-  let pasteSurveyDialog: { input: string; error: string } = { input: "", error: "" };
+  let surveyRecords: IDBRecord<Survey>[] = [];
+
+  const cursorRequest = idb.transaction("surveys").objectStore("surveys").openCursor();
+  cursorRequest.onsuccess = () => {
+    const cursor = cursorRequest.result;
+    if (cursor) {
+      surveyRecords = [...surveyRecords, cursor.value];
+      cursor.continue();
+    }
+  };
+
+  let newSurveyDialog: DialogDataType<{ name: string; error: string }> = {
+    data: { name: "", error: "" },
+  };
+
+  let pasteSurveyDialog: DialogDataType<{ input: string; error: string }> = {
+    data: { input: "", error: "" },
+  };
+
+  let deleteSurveyDialog: { element?: HTMLDialogElement; error: string } = { error: "" };
 
   function newSurvey() {
-    const name = newSurveyDialog.name.trim();
+    const name = newSurveyDialog.data.name.trim();
     if (!name) {
-      newSurveyDialog.error = "Name can't be blank!";
-      return false;
+      newSurveyDialog.data.error = "Name can't be blank!";
+      return;
     }
 
     const survey: Survey = {
@@ -31,9 +46,21 @@
       modified: new Date(),
     };
 
-    surveyStore.add(survey).then((id) => {
+    const addRequest = idb.transaction("surveys", "readwrite").objectStore("surveys").add(survey);
+    addRequest.onerror = () => {
+      newSurveyDialog.data.error = `Could not add survey: ${addRequest.error?.message}`;
+    };
+
+    addRequest.onsuccess = () => {
+      const id = addRequest.result as number | undefined;
+      if (id == undefined) {
+        newSurveyDialog.data.error = "Could not add survey";
+        return;
+      }
+
       surveyRecords = [...surveyRecords, { id, ...survey }];
-    });
+      newSurveyDialog.dialog?.close();
+    };
   }
 
   function parseName(name: any) {
@@ -86,17 +113,18 @@
   }
 
   function parseSurvey() {
-    if (!pasteSurveyDialog.input.trim()) {
-      return false;
+    if (!pasteSurveyDialog.data.input.trim()) {
+      pasteSurveyDialog.data.error = "Invalid input";
+      return;
     }
 
     let survey: any;
 
     try {
-      survey = JSON.parse(pasteSurveyDialog.input.trim());
+      survey = JSON.parse(pasteSurveyDialog.data.input.trim());
     } catch (e) {
-      pasteSurveyDialog.error = "Invalid input";
-      return false;
+      pasteSurveyDialog.data.error = "Invalid input";
+      return;
     }
 
     delete survey.id;
@@ -107,15 +135,55 @@
     survey.modified = parseDate(survey.modified);
     delete survey.entries;
 
-    surveyStore.add(survey).then((id) => {
+    const addRequest = idb.transaction("surveys", "readwrite").objectStore("surveys").add(survey);
+    addRequest.onerror = () => {
+      pasteSurveyDialog.data.error = `Could not add survey: ${addRequest.error?.message}`;
+    };
+
+    addRequest.onsuccess = () => {
+      const id = addRequest.result as number | undefined;
+      if (id == undefined) {
+        pasteSurveyDialog.data.error = "Could not add survey";
+        return;
+      }
+
       surveyRecords = [...surveyRecords, { id, ...survey }];
-    });
+      pasteSurveyDialog.dialog?.close();
+    };
   }
 
   function deleteSurvey(id: number) {
-    Promise.all([entryStore.deleteAllWithSurveyId(id), surveyStore.delete(id)]).then(() => {
-      surveyRecords = surveyRecords.filter((survey) => survey.id !== id);
-    });
+    const deleteTransaction = idb.transaction(["surveys", "entries"], "readwrite");
+    const surveyStore = deleteTransaction.objectStore("surveys");
+    const entryStore = deleteTransaction.objectStore("entries");
+
+    const cursorRequest = entryStore.index("surveyId").openCursor(id);
+    cursorRequest.onerror = () => {
+      deleteSurveyDialog.error = `Could not delete survey's entries: ${cursorRequest.error?.message}`;
+    };
+
+    cursorRequest.onsuccess = () => {
+      const cursor = cursorRequest.result;
+      if (cursor === undefined) {
+        deleteSurveyDialog.error = "Could not delete survey's entries";
+        return;
+      }
+
+      if (cursor) {
+        cursor.delete();
+        cursor.continue();
+      } else {
+        const surveyRequest = surveyStore.delete(id);
+        surveyRequest.onerror = () => {
+          deleteSurveyDialog.error = `Could not delete survey: ${surveyRequest.error?.message}`;
+        };
+
+        surveyRequest.onsuccess = () => {
+          surveyRecords = surveyRecords.filter((survey) => survey.id !== id);
+          deleteSurveyDialog.element?.close();
+        };
+      }
+    };
   }
 </script>
 
@@ -127,8 +195,16 @@
         <Anchor hash="survey/{survey.id}/entries" iconName="pen" title="Edit survey" />
         <span>{survey.name}</span>
       </Container>
-      <Dialog openButton={{ iconName: "trash", title: "Delete entry" }} onConfirm={() => deleteSurvey(survey.id)}>
+      <Dialog
+        openButton={{ iconName: "trash", title: "Delete entry" }}
+        onOpen={(element) => (deleteSurveyDialog = { element, error: "" })}
+        onConfirm={() => deleteSurvey(survey.id)}
+        on:close={() => (deleteSurveyDialog = { error: "" })}
+      >
         <span>Delete "{survey.name}"?</span>
+        {#if deleteSurveyDialog.error}
+          <span>{deleteSurveyDialog.error}</span>
+        {/if}
       </Dialog>
     </Container>
   {/each}
@@ -136,26 +212,28 @@
 
 <footer>
   <Dialog
+    bind:this={newSurveyDialog.dialog}
     openButton={{ iconName: "plus", title: "New survey" }}
     onConfirm={newSurvey}
-    on:close={() => (newSurveyDialog = { name: "", error: "" })}
+    on:close={() => (newSurveyDialog.data = { name: "", error: "" })}
   >
     <span>Enter name for new survey:</span>
-    <input bind:value={newSurveyDialog.name} />
-    {#if newSurveyDialog.error}
-      <span>{newSurveyDialog.error}</span>
+    <input bind:value={newSurveyDialog.data.name} />
+    {#if newSurveyDialog.data.error}
+      <span>{newSurveyDialog.data.error}</span>
     {/if}
   </Dialog>
   <Dialog
+    bind:this={pasteSurveyDialog.dialog}
     openButton={{ iconName: "paste", title: "Import survey" }}
     onConfirm={parseSurvey}
-    on:close={() => (pasteSurveyDialog = { input: "", error: "" })}
+    on:close={() => (pasteSurveyDialog.data = { input: "", error: "" })}
   >
     <span>Paste new survey:</span>
-    <textarea bind:value={pasteSurveyDialog.input} />
-    {#if pasteSurveyDialog.error}
+    <textarea bind:value={pasteSurveyDialog.data.input} />
+    {#if pasteSurveyDialog.data.error}
       <span>Could not import survey!</span>
-      <span>{pasteSurveyDialog.error}</span>
+      <span>{pasteSurveyDialog.data.error}</span>
     {/if}
   </Dialog>
 </footer>

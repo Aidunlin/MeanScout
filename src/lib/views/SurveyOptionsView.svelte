@@ -1,14 +1,12 @@
 <script lang="ts">
-  import type { Entry, Survey } from "$lib";
+  import type { Entry, IDBRecord, Survey } from "$lib";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
-  import type { EntryStore, IDBRecord, SurveyStore } from "$lib/db";
 
-  export let surveyStore: SurveyStore;
+  export let idb: IDBDatabase;
   export let surveyRecord: IDBRecord<Survey>;
-  export let entryStore: EntryStore;
 
-  $: surveyStore.put(surveyRecord);
+  $: idb.transaction("surveys", "readwrite").objectStore("surveys").put(surveyRecord);
 
   let teamInput = "";
 
@@ -20,7 +18,7 @@
   }
 
   function sortTeams(teams: string[]) {
-    return teams.sort((a, b) => a.localeCompare(b, "en", { numeric: true }));
+    return teams.toSorted((a, b) => a.localeCompare(b, "en", { numeric: true }));
   }
 
   function deleteTeam(team: string) {
@@ -39,17 +37,18 @@
       return;
     }
 
-    const promises = [];
+    const addTransaction = idb.transaction("entries", "readwrite");
+    const entryStore = addTransaction.objectStore("entries");
 
     for (const entry of survey.entries) {
       entry.surveyId = surveyRecord.id;
-      promises.push(entryStore.add(entry));
+      entryStore.add(entry);
     }
 
-    Promise.all(promises).then(() => {
+    addTransaction.oncomplete = () => {
       delete survey.entries;
-      surveyStore.put(survey);
-    });
+      surveyRecord = survey;
+    };
   }
 </script>
 

@@ -1,16 +1,21 @@
 <script lang="ts">
-  import type { Survey } from "$lib";
+  import type { IDBRecord, Survey } from "$lib";
   import Button from "$lib/components/Button.svelte";
   import ConfigEditor from "$lib/components/ConfigEditor.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
-  import type { IDBRecord, SurveyStore } from "$lib/db";
 
-  export let surveyStore: SurveyStore;
+  export let idb: IDBDatabase;
   export let surveyRecord: IDBRecord<Survey>;
-  export let disabled: boolean;
 
-  $: surveyStore.put(surveyRecord);
+  let disabled = false;
+
+  const countRequest = idb.transaction("entries").objectStore("entries").index("surveyId").count(surveyRecord.id);
+  countRequest.onsuccess = () => {
+    disabled = countRequest.result > 0;
+  };
+
+  $: idb.transaction("surveys", "readwrite").objectStore("surveys").put(surveyRecord);
 
   let copySurveyDialog = { text: "" };
 

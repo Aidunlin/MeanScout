@@ -1,18 +1,28 @@
 <script lang="ts">
-  import { flattenConfigs, getHighestMatchValue, type Entry, type Survey } from "$lib";
+  import { flattenConfigs, getHighestMatchValue, type Entry, type Survey, type IDBRecord } from "$lib";
   import Anchor from "$lib/components/Anchor.svelte";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
-  import type { EntryStore, IDBRecord, SurveyStore } from "$lib/db";
   import { targetStore } from "$lib/target";
 
-  export let surveyStore: SurveyStore;
+  export let idb: IDBDatabase;
   export let surveyRecord: IDBRecord<Survey>;
-  export let entryStore: EntryStore;
-  export let entryRecords: IDBRecord<Entry>[];
 
-  $: surveyStore.put(surveyRecord);
+  let entryRecords: IDBRecord<Entry>[] = [];
+
+  const cursorRequest = idb.transaction("entries").objectStore("entries").index("surveyId").openCursor(surveyRecord.id);
+  cursorRequest.onsuccess = () => {
+    const cursor = cursorRequest.result;
+    if (cursor) {
+      entryRecords = [...entryRecords, cursor.value];
+      cursor.continue();
+    }
+  };
+
+  $: idb.transaction("surveys", "readwrite").objectStore("surveys").put(surveyRecord);
+
+  let deleteEntryDialog: { element?: HTMLDialogElement; error: string } = { error: "" };
 
   function newEntryClicked() {
     const configs = flattenConfigs(surveyRecord.configs);
@@ -40,9 +50,13 @@
       modified: new Date(),
     };
 
-    entryStore.add(entry).then((id) => {
+    const addRequest = idb.transaction("entries", "readwrite").objectStore("entries").add(entry);
+    addRequest.onsuccess = () => {
+      const id = addRequest.result as number | undefined;
+      if (id == undefined) return;
+
       entryRecords = [...entryRecords, { id, ...entry }];
-    });
+    };
   }
 
   function valueToCSV(value: any) {
@@ -66,9 +80,15 @@
   }
 
   function deleteEntry(id: number) {
-    entryStore.delete(id).then(() => {
+    const deleteRequest = idb.transaction("entries", "readwrite").objectStore("entries").delete(id);
+    deleteRequest.onerror = () => {
+      deleteEntryDialog.error = `Could not delete entry: ${deleteRequest.error?.message}`;
+    };
+
+    deleteRequest.onsuccess = () => {
       entryRecords = entryRecords.filter((entry) => entry.id !== id);
-    });
+      deleteEntryDialog.element?.close();
+    };
   }
 </script>
 
@@ -84,7 +104,12 @@
         ...
       </Container>
 
-      <Dialog openButton={{ iconName: "trash", title: "Delete entry" }} onConfirm={() => deleteEntry(entry.id)}>
+      <Dialog
+        openButton={{ iconName: "trash", title: "Delete entry" }}
+        onOpen={(element) => (deleteEntryDialog = { element, error: "" })}
+        onConfirm={() => deleteEntry(entry.id)}
+        on:close={() => (deleteEntryDialog = { error: "" })}
+      >
         <span>Delete this entry?</span>
         {#each flattenConfigs(surveyRecord.configs).slice(0, 2) as config, i}
           <span>{config.name}: {entry.values[i]}</span>

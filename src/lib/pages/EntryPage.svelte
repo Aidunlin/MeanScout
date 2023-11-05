@@ -1,18 +1,25 @@
 <script lang="ts">
-  import { flattenConfigs, getHighestMatchValue, getMetricDefaultValue, type Entry, type Survey } from "$lib";
+  import {
+    flattenConfigs,
+    getHighestMatchValue,
+    getMetricDefaultValue,
+    type DialogDataType,
+    type Entry,
+    type IDBRecord,
+    type Survey,
+  } from "$lib";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import Header from "$lib/components/Header.svelte";
   import MetricEditor from "$lib/components/MetricEditor.svelte";
-  import type { EntryStore, IDBRecord } from "$lib/db";
 
+  export let idb: IDBDatabase;
   export let surveyRecord: IDBRecord<Survey>;
-  export let entryStore: EntryStore;
   export let entryRecord: IDBRecord<Entry>;
 
-  $: entryStore.put(entryRecord);
+  $: idb.transaction("entries", "readwrite").objectStore("entries").put(entryRecord);
 
-  let saveEntryDialog = { error: "" };
+  let saveEntryDialog: DialogDataType<{ error: string }> = { data: { error: "" } };
 
   function validateEntry() {
     let error = "";
@@ -43,38 +50,73 @@
     return error;
   }
 
+  function startNewEntry(entry: Entry) {
+    const addRequest = idb.transaction("entries", "readwrite").objectStore("entries").add(entry);
+    addRequest.onerror = () => {
+      saveEntryDialog.data.error = `Could not create new entry: ${addRequest.error?.message}`;
+    };
+
+    addRequest.onsuccess = () => {
+      const id = addRequest.result as number | undefined;
+      if (id == undefined) {
+        saveEntryDialog.data.error = "Could not create new entry";
+        return;
+      }
+
+      saveEntryDialog.dialog?.close();
+      location.hash = `/entry/${id}`;
+    };
+  }
+
   function saveAndStartNewEntry() {
     const error = validateEntry();
     if (error) {
-      saveEntryDialog.error = `Could not save entry! ${error}`;
-      return false;
+      saveEntryDialog.data.error = `Could not save entry! ${error}`;
+      return;
     }
 
-    entryStore
-      .getAllWithSurveyId(entryRecord.surveyId)
-      .then((entries) => {
-        const configs = flattenConfigs(surveyRecord.configs);
-        const matchValue = getHighestMatchValue(entries, configs) + 1;
+    const flattenedConfigs = flattenConfigs(surveyRecord.configs);
 
-        const newEntry: Entry = {
-          surveyId: entryRecord.surveyId,
-          values: configs.map((config) => {
-            switch (config.type) {
-              case "match":
-                return matchValue;
-              default:
-                return getMetricDefaultValue(config);
-            }
-          }),
-          created: new Date(),
-          modified: new Date(),
-        };
+    const request = idb
+      .transaction("entries", "readwrite")
+      .objectStore("entries")
+      .index("surveyId")
+      .getAll(entryRecord.surveyId);
 
-        return entryStore.add(newEntry);
-      })
-      .then((id) => {
-        location.hash = `/entry/${id}`;
-      });
+    request.onerror = () => {
+      const entry: Entry = {
+        surveyId: entryRecord.surveyId,
+        values: flattenedConfigs.map(getMetricDefaultValue),
+        created: new Date(),
+        modified: new Date(),
+      };
+      startNewEntry(entry);
+    };
+
+    request.onsuccess = (event) => {
+      const entries = request.result as Entry[] | undefined;
+      if (entries == undefined) {
+        request.onerror && request.onerror(event);
+        return;
+      }
+
+      const matchValue = getHighestMatchValue(entries, flattenedConfigs) + 1;
+
+      const entry: Entry = {
+        surveyId: entryRecord.surveyId,
+        values: flattenedConfigs.map((config) => {
+          switch (config.type) {
+            case "match":
+              return matchValue;
+            default:
+              return getMetricDefaultValue(config);
+          }
+        }),
+        created: new Date(),
+        modified: new Date(),
+      };
+      startNewEntry(entry);
+    };
   }
 
   function countPreviousConfigs(index: number) {
@@ -109,13 +151,14 @@
 
 <footer>
   <Dialog
+    bind:this={saveEntryDialog.dialog}
     openButton={{ iconName: "floppy-disk", title: "Save entry" }}
     onConfirm={saveAndStartNewEntry}
-    on:close={() => (saveEntryDialog = { error: "" })}
+    on:close={() => (saveEntryDialog.data = { error: "" })}
   >
     <span>Save this entry and start a new one?</span>
-    {#if saveEntryDialog.error}
-      <span>{saveEntryDialog.error}</span>
+    {#if saveEntryDialog.data.error}
+      <span>{saveEntryDialog.data.error}</span>
     {/if}
   </Dialog>
 </footer>

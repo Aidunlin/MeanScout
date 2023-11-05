@@ -1,47 +1,140 @@
 <script lang="ts">
-  import "$lib/global.css";
+  import type { Entry, IDBRecord, Survey } from "$lib";
+  import Container from "$lib/components/Container.svelte";
   import Header from "$lib/components/Header.svelte";
-  import { openIDB } from "$lib/db";
+  import "$lib/global.css";
   import EntryPage from "$lib/pages/EntryPage.svelte";
   import MainPage from "$lib/pages/MainPage.svelte";
   import SurveyPage from "$lib/pages/SurveyPage.svelte";
+  import type { ComponentProps } from "svelte";
 
-  let [dir, recordId, surveyDir] = getHashRoute();
-  onhashchange = () => ([dir, recordId, surveyDir] = getHashRoute());
+  let idbError: string;
+  let idb: IDBDatabase;
 
-  function getHashRoute() {
-    const hash = location.hash.replace(/#\/?/, "").toLowerCase().trim();
+  let current:
+    | { page: "main"; props: ComponentProps<MainPage> }
+    | { page: "survey"; props: ComponentProps<SurveyPage> }
+    | { page: "entry"; props: ComponentProps<EntryPage> };
 
-    return hash.split("/").map((value) => {
-      const parsed = Number(value);
-      if (!Number.isNaN(parsed)) return parsed;
-      return value;
-    });
+  function setMainPage(dir: ComponentProps<MainPage>["dir"] = "surveys") {
+    current = {
+      page: "main",
+      props: { dir, idb },
+    };
   }
+
+  function setSurveyPage(id: number, dir: ComponentProps<SurveyPage>["dir"]) {
+    const surveyRequest = idb.transaction("surveys").objectStore("surveys").get(id);
+    surveyRequest.onerror = () => setMainPage();
+
+    surveyRequest.onsuccess = () => {
+      const surveyRecord = surveyRequest.result as IDBRecord<Survey> | undefined;
+      if (!surveyRecord) return setMainPage();
+
+      current = {
+        page: "survey",
+        props: { dir, idb, surveyRecord },
+      };
+    };
+  }
+
+  function setEntryPage(id: number) {
+    const getTransaction = idb.transaction(["surveys", "entries"]);
+    getTransaction.onerror = () => setMainPage();
+
+    const surveyStore = getTransaction.objectStore("surveys");
+    const entryStore = getTransaction.objectStore("entries");
+
+    const entryRequest = entryStore.get(id);
+    entryRequest.onerror = () => setMainPage();
+
+    entryRequest.onsuccess = () => {
+      const entryRecord = entryRequest.result as IDBRecord<Entry> | undefined;
+      if (!entryRecord) return setMainPage();
+
+      const surveyRequest = surveyStore.get(entryRecord.surveyId);
+      surveyRequest.onerror = () => setMainPage();
+
+      surveyRequest.onsuccess = () => {
+        const surveyRecord = surveyRequest.result as IDBRecord<Survey> | undefined;
+        if (!surveyRecord) return setMainPage();
+
+        current = {
+          page: "entry",
+          props: { idb, surveyRecord, entryRecord },
+        };
+      };
+    };
+  }
+
+  function handleHashChange() {
+    const hash = location.hash.replace(/#\/?/, "").toLowerCase().trim().split("/");
+
+    const page = hash[0] == "main" || hash[0] == "survey" || hash[0] == "entry" ? hash[0] : "main";
+
+    if (page == "main") {
+      const dir = hash[1] == "surveys" || hash[1] == "options" ? hash[1] : "surveys";
+      setMainPage(dir);
+    } else if (page == "survey") {
+      const dir = hash[2] == "entries" || hash[2] == "configs" || hash[2] == "options" ? hash[2] : "entries";
+      const id = Number(hash[1]);
+      if (Number.isNaN(id)) return setMainPage();
+      setSurveyPage(id, dir);
+    } else if (page == "entry") {
+      const id = Number(hash[1]);
+      if (Number.isNaN(id)) return setMainPage();
+      setEntryPage(id);
+    }
+  }
+
+  function openIDB() {
+    const request = indexedDB.open("MeanScout", 4);
+    request.onerror = () => (idbError = `${request.error?.message}`);
+
+    request.onupgradeneeded = () => {
+      const storeNames = request.result.objectStoreNames;
+
+      if (!storeNames.contains("surveys")) {
+        request.result.createObjectStore("surveys", { keyPath: "id", autoIncrement: true });
+      }
+
+      if (!storeNames.contains("entries")) {
+        const entryStore = request.result.createObjectStore("entries", { keyPath: "id", autoIncrement: true });
+        entryStore.createIndex("surveyId", "surveyId", { unique: false });
+      }
+    };
+
+    request.onsuccess = () => {
+      if (!request.result) {
+        idbError = "Could not open IDB";
+        return;
+      }
+
+      idb = request.result;
+      handleHashChange();
+      onhashchange = handleHashChange;
+    };
+  }
+
+  openIDB();
 </script>
 
-{#await openIDB() then { surveyStore, entryStore }}
-  {#if dir == "survey" && typeof recordId == "number"}
-    {#await surveyStore.get(recordId) then surveyRecord}
-      <SurveyPage dir={surveyDir} {surveyStore} {surveyRecord} {entryStore} />
-    {:catch}
-      <MainPage dir="surveys" {surveyStore} {entryStore} />
-    {/await}
-  {:else if dir == "entry" && typeof recordId == "number"}
-    {#await entryStore.getEntryWithSurvey(recordId, surveyStore) then { surveyRecord, entryRecord }}
-      <EntryPage {surveyRecord} {entryStore} {entryRecord} />
-    {:catch}
-      <MainPage dir="surveys" {surveyStore} {entryStore} />
-    {/await}
-  {:else}
-    <MainPage {dir} {surveyStore} {entryStore} />
-  {/if}
-{:catch error}
+{#if idbError}
   <Header />
-  <h2>Error</h2>
-  <p>
-    MeanScout was unable to access IndexedDB. Double check that your device/browser supports it, and that you haven't
-    removed the permission to access it.
-  </p>
-  <p>Error: {error}</p>
-{/await}
+  <Container padding>
+    <h2>Error</h2>
+    <p>
+      MeanScout was unable to access IndexedDB. Double check that your device/browser supports it, and that you haven't
+      removed the permission to access it.
+    </p>
+    <p>Error: {idbError}</p>
+  </Container>
+{:else if current?.page == "main"}
+  <MainPage {...current.props} />
+{:else if current?.page == "survey"}
+  <SurveyPage {...current.props} />
+{:else if current?.page == "entry"}
+  {#key current.props.entryRecord.id}
+    <EntryPage {...current.props} />
+  {/key}
+{/if}

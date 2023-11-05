@@ -1,28 +1,25 @@
 <script lang="ts">
   import Header from "$lib/components/Header.svelte";
   import NavBar from "$lib/components/NavBar.svelte";
-  import type { EntryStore, SurveyStore } from "$lib/db";
   import MainOptionsView from "../views/MainOptionsView.svelte";
   import MainSurveysView from "../views/MainSurveysView.svelte";
 
-  export let dir: any;
-  export let surveyStore: SurveyStore;
-  export let entryStore: EntryStore;
+  export let dir: "surveys" | "options" = "surveys";
+  export let idb: IDBDatabase;
 </script>
 
 <Header />
 <NavBar
   currentHash={dir}
+  baseHash="main"
   links={[
     { hash: "surveys", iconName: "list-ul", title: "Surveys" },
     { hash: "options", iconName: "ellipsis-vertical", title: "Options" },
   ]}
 />
 
-{#if dir == "options"}
+{#if dir == "surveys"}
+  <MainSurveysView {idb} />
+{:else if dir == "options"}
   <MainOptionsView />
-{:else}
-  {#await surveyStore.getAll() then surveyRecords}
-    <MainSurveysView {surveyStore} {surveyRecords} {entryStore} />
-  {/await}
 {/if}

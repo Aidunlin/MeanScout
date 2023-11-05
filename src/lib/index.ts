@@ -1,3 +1,5 @@
+import type Dialog from "./components/Dialog.svelte";
+
 export const metricTypes = ["team", "match", "toggle", "number", "select", "text", "rating", "timer", "group"] as const;
 export type MetricType = (typeof metricTypes)[number];
 
@@ -41,6 +43,10 @@ export type Entry = {
   created: Date;
   modified: Date;
 };
+
+export type IDBRecord<T> = T & { id: number };
+
+export type DialogDataType<T> = { dialog?: Dialog; data: T };
 
 export function getMetricDefaultValue(config: Exclude<MetricConfig, GroupConfig>) {
   switch (config.type) {

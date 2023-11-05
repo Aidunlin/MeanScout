@@ -6,15 +6,23 @@
   let element: HTMLDialogElement;
 
   export let openButton: ComponentProps<Button>;
-  export let onOpen: (() => void) | undefined = undefined;
-  export let onConfirm: (() => boolean | void) | undefined = undefined;
+  export let onOpen: ((element: HTMLDialogElement) => void) | undefined = undefined;
+  export let onConfirm: (() => void) | undefined = undefined;
+
+  export function show() {
+    element.showModal();
+  }
+
+  export function close() {
+    element.close();
+  }
 </script>
 
 <Button
   {...openButton}
   on:click={() => {
-    onOpen && onOpen();
-    element.showModal();
+    onOpen && onOpen(element);
+    show();
   }}
 />
 
@@ -22,9 +30,9 @@
   <slot />
   <Container spaceBetween>
     {#if onConfirm}
-      <Button iconName="check" title="Confirm" on:click={() => onConfirm && onConfirm() !== false && element.close()} />
+      <Button iconName="check" title="Confirm" on:click={() => onConfirm && onConfirm()} />
     {/if}
-    <Button iconName="xmark" title="Close" on:click={() => element.close()} />
+    <Button iconName="xmark" title="Close" on:click={close} />
   </Container>
 </dialog>
 
