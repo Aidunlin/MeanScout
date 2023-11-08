@@ -20,8 +20,6 @@
     }
   };
 
-  $: idb.transaction("surveys", "readwrite").objectStore("surveys").put(surveyRecord);
-
   let deleteEntryDialog: { element?: HTMLDialogElement; error: string } = { error: "" };
 
   function newEntryClicked() {

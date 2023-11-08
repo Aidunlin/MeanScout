@@ -15,8 +15,6 @@
     disabled = countRequest.result > 0;
   };
 
-  $: idb.transaction("surveys", "readwrite").objectStore("surveys").put(surveyRecord);
-
   let copySurveyDialog = { text: "" };
 
   function newConfig() {

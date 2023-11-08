@@ -16,14 +16,32 @@
     | { page: "survey"; props: ComponentProps<SurveyPage> }
     | { page: "entry"; props: ComponentProps<EntryPage> };
 
-  function setMainPage(dir: ComponentProps<MainPage>["dir"] = "surveys") {
+  function setMainPage(view: ComponentProps<MainPage>["view"] = "surveys") {
+    if (current?.page == "main") {
+      current.props.view = view;
+      return;
+    }
+
     current = {
       page: "main",
-      props: { dir, idb },
+      props: { view, idb },
     };
   }
 
-  function setSurveyPage(id: number, dir: ComponentProps<SurveyPage>["dir"]) {
+  function setSurveyPage(id: number, view: ComponentProps<SurveyPage>["view"]) {
+    if (current?.page == "survey" && current.props.surveyRecord.id == id) {
+      current.props.view = view;
+      return;
+    }
+
+    if (current?.page == "entry") {
+      current = {
+        page: "survey",
+        props: { view, idb, surveyRecord: current.props.surveyRecord },
+      };
+      return;
+    }
+
     const surveyRequest = idb.transaction("surveys").objectStore("surveys").get(id);
     surveyRequest.onerror = () => setMainPage();
 
@@ -33,12 +51,16 @@
 
       current = {
         page: "survey",
-        props: { dir, idb, surveyRecord },
+        props: { view, idb, surveyRecord },
       };
     };
   }
 
   function setEntryPage(id: number) {
+    if (current?.page == "entry" && current.props.entryRecord.id == id) {
+      return;
+    }
+
     const getTransaction = idb.transaction(["surveys", "entries"]);
     getTransaction.onerror = () => setMainPage();
 
@@ -51,6 +73,14 @@
     entryRequest.onsuccess = () => {
       const entryRecord = entryRequest.result as IDBRecord<Entry> | undefined;
       if (!entryRecord) return setMainPage();
+
+      if (current?.page == "survey" || current?.page == "entry") {
+        current = {
+          page: "entry",
+          props: { idb, surveyRecord: current.props.surveyRecord, entryRecord },
+        };
+        return;
+      }
 
       const surveyRequest = surveyStore.get(entryRecord.surveyId);
       surveyRequest.onerror = () => setMainPage();
@@ -69,17 +99,16 @@
 
   function handleHashChange() {
     const hash = location.hash.replace(/#\/?/, "").toLowerCase().trim().split("/");
-
     const page = hash[0] == "main" || hash[0] == "survey" || hash[0] == "entry" ? hash[0] : "main";
 
     if (page == "main") {
-      const dir = hash[1] == "surveys" || hash[1] == "options" ? hash[1] : "surveys";
-      setMainPage(dir);
+      const view = hash[1] == "surveys" || hash[1] == "options" ? hash[1] : "surveys";
+      setMainPage(view);
     } else if (page == "survey") {
-      const dir = hash[2] == "entries" || hash[2] == "configs" || hash[2] == "options" ? hash[2] : "entries";
+      const view = hash[2] == "entries" || hash[2] == "configs" || hash[2] == "options" ? hash[2] : "entries";
       const id = Number(hash[1]);
       if (Number.isNaN(id)) return setMainPage();
-      setSurveyPage(id, dir);
+      setSurveyPage(id, view);
     } else if (page == "entry") {
       const id = Number(hash[1]);
       if (Number.isNaN(id)) return setMainPage();

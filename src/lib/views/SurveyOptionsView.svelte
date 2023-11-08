@@ -6,8 +6,6 @@
   export let idb: IDBDatabase;
   export let surveyRecord: IDBRecord<Survey>;
 
-  $: idb.transaction("surveys", "readwrite").objectStore("surveys").put(surveyRecord);
-
   let teamInput = "";
 
   function addTeam() {

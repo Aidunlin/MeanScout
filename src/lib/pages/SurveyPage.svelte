@@ -2,18 +2,20 @@
   import type { IDBRecord, Survey } from "$lib";
   import Header from "$lib/components/Header.svelte";
   import NavBar from "$lib/components/NavBar.svelte";
-  import SurveyConfigsView from "../views/SurveyConfigsView.svelte";
-  import SurveyEntriesView from "../views/SurveyEntriesView.svelte";
-  import SurveyOptionsView from "../views/SurveyOptionsView.svelte";
+  import SurveyConfigsView from "$lib/views/SurveyConfigsView.svelte";
+  import SurveyEntriesView from "$lib/views/SurveyEntriesView.svelte";
+  import SurveyOptionsView from "$lib/views/SurveyOptionsView.svelte";
 
-  export let dir: "entries" | "configs" | "options" = "entries";
+  export let view: "entries" | "configs" | "options" = "entries";
   export let idb: IDBDatabase;
   export let surveyRecord: IDBRecord<Survey>;
+
+  $: idb.transaction("surveys", "readwrite").objectStore("surveys").put(surveyRecord);
 </script>
 
 <Header title={surveyRecord.name} backLink="main/surveys" />
 <NavBar
-  currentHash={dir}
+  currentHash={view}
   baseHash="survey/{surveyRecord.id}"
   links={[
     { hash: "entries", iconName: "list-ol", title: "Entries" },
@@ -22,10 +24,10 @@
   ]}
 />
 
-{#if dir == "entries"}
-  <SurveyEntriesView {idb} {surveyRecord} />
-{:else if dir == "configs"}
-  <SurveyConfigsView {idb} {surveyRecord} />
-{:else if dir == "options"}
-  <SurveyOptionsView {idb} {surveyRecord} />
+{#if view == "entries"}
+  <SurveyEntriesView {idb} bind:surveyRecord />
+{:else if view == "configs"}
+  <SurveyConfigsView {idb} bind:surveyRecord />
+{:else if view == "options"}
+  <SurveyOptionsView {idb} bind:surveyRecord />
 {/if}

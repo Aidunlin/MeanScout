@@ -1,16 +1,16 @@
 <script lang="ts">
   import Header from "$lib/components/Header.svelte";
   import NavBar from "$lib/components/NavBar.svelte";
-  import MainOptionsView from "../views/MainOptionsView.svelte";
-  import MainSurveysView from "../views/MainSurveysView.svelte";
+  import MainOptionsView from "$lib/views/MainOptionsView.svelte";
+  import MainSurveysView from "$lib/views/MainSurveysView.svelte";
 
-  export let dir: "surveys" | "options" = "surveys";
+  export let view: "surveys" | "options" = "surveys";
   export let idb: IDBDatabase;
 </script>
 
 <Header />
 <NavBar
-  currentHash={dir}
+  currentHash={view}
   baseHash="main"
   links={[
     { hash: "surveys", iconName: "list-ul", title: "Surveys" },
@@ -18,8 +18,8 @@
   ]}
 />
 
-{#if dir == "surveys"}
+{#if view == "surveys"}
   <MainSurveysView {idb} />
-{:else if dir == "options"}
+{:else if view == "options"}
   <MainOptionsView />
 {/if}
