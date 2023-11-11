@@ -1,10 +1,13 @@
 <script lang="ts">
-  import type { Entry, IDBRecord, Survey } from "$lib";
+  import type { DialogDataType, Entry, IDBRecord, Survey } from "$lib";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
+  import Dialog from "$lib/components/Dialog.svelte";
 
   export let idb: IDBDatabase;
   export let surveyRecord: IDBRecord<Survey>;
+
+  let deleteSurveyDialog: DialogDataType<{ error: string }> = { data: { error: "" } };
 
   let teamInput = "";
 
@@ -48,10 +51,48 @@
       surveyRecord = survey;
     };
   }
+
+  function deleteSurvey() {
+    const deleteTransaction = idb.transaction(["surveys", "entries"], "readwrite");
+    const surveyStore = deleteTransaction.objectStore("surveys");
+    const entryStore = deleteTransaction.objectStore("entries");
+
+    deleteTransaction.onerror = () => {
+      deleteSurveyDialog.data.error = `Could not delete survey: ${deleteTransaction.error?.message}`;
+    };
+
+    const cursorRequest = entryStore.index("surveyId").openCursor(surveyRecord.id);
+    cursorRequest.onerror = () => {
+      deleteSurveyDialog.data.error = `Could not delete survey's entries: ${cursorRequest.error?.message}`;
+    };
+
+    cursorRequest.onsuccess = () => {
+      const cursor = cursorRequest.result;
+      if (cursor === undefined) {
+        deleteSurveyDialog.data.error = "Could not delete survey's entries";
+        return;
+      }
+
+      if (cursor === null) {
+        const surveyRequest = surveyStore.delete(surveyRecord.id);
+        surveyRequest.onerror = () => {
+          deleteSurveyDialog.data.error = `Could not delete survey: ${surveyRequest.error?.message}`;
+        };
+
+        surveyRequest.onsuccess = () => {
+          location.hash = "/main/surveys";
+        };
+        return;
+      }
+
+      cursor.delete();
+      cursor.continue();
+    };
+  }
 </script>
 
 <Container column padding>
-  <h2>Options</h2>
+  <h2>Team Allowlist</h2>
   <Container column>
     <Container column noGap>
       Add team
@@ -64,12 +105,26 @@
       {/each}
     </Container>
   </Container>
+
   {#if hasMigratableEntries()}
-    <Container column>
-      Migrate entries
-      <Container>
-        <Button iconName="right-from-bracket" text="Migrate" on:click={migrateEntries} />
-      </Container>
+    <h2>Entry Migrator</h2>
+    <Container>
+      <Button iconName="right-from-bracket" text="Migrate" on:click={migrateEntries} />
     </Container>
   {/if}
+
+  <h2>Danger Zone</h2>
+  <Container>
+    <Dialog
+      bind:this={deleteSurveyDialog.dialog}
+      openButton={{ iconName: "trash", text: "Delete survey" }}
+      onConfirm={deleteSurvey}
+      on:close={() => (deleteSurveyDialog.data = { error: "" })}
+    >
+      <span>Delete "{surveyRecord.name}"?</span>
+      {#if deleteSurveyDialog.data.error}
+        <span>{deleteSurveyDialog.data.error}</span>
+      {/if}
+    </Dialog>
+  </Container>
 </Container>

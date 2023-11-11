@@ -25,8 +25,6 @@
     data: { input: "", error: "" },
   };
 
-  let deleteSurveyDialog: { element?: HTMLDialogElement; error: string } = { error: "" };
-
   function newSurvey() {
     const name = newSurveyDialog.data.name.trim();
     if (!name) {
@@ -151,61 +149,14 @@
       pasteSurveyDialog.dialog?.close();
     };
   }
-
-  function deleteSurvey(id: number) {
-    const deleteTransaction = idb.transaction(["surveys", "entries"], "readwrite");
-    const surveyStore = deleteTransaction.objectStore("surveys");
-    const entryStore = deleteTransaction.objectStore("entries");
-
-    const cursorRequest = entryStore.index("surveyId").openCursor(id);
-    cursorRequest.onerror = () => {
-      deleteSurveyDialog.error = `Could not delete survey's entries: ${cursorRequest.error?.message}`;
-    };
-
-    cursorRequest.onsuccess = () => {
-      const cursor = cursorRequest.result;
-      if (cursor === undefined) {
-        deleteSurveyDialog.error = "Could not delete survey's entries";
-        return;
-      }
-
-      if (cursor) {
-        cursor.delete();
-        cursor.continue();
-      } else {
-        const surveyRequest = surveyStore.delete(id);
-        surveyRequest.onerror = () => {
-          deleteSurveyDialog.error = `Could not delete survey: ${surveyRequest.error?.message}`;
-        };
-
-        surveyRequest.onsuccess = () => {
-          surveyRecords = surveyRecords.filter((survey) => survey.id !== id);
-          deleteSurveyDialog.element?.close();
-        };
-      }
-    };
-  }
 </script>
 
 <Container column padding>
   <h2>Surveys</h2>
   {#each surveyRecords as survey (survey.id)}
-    <Container spaceBetween>
-      <Container>
-        <Anchor hash="survey/{survey.id}/entries" iconName="pen" title="Edit survey" />
-        <span>{survey.name}</span>
-      </Container>
-      <Dialog
-        openButton={{ iconName: "trash", title: "Delete entry" }}
-        onOpen={(element) => (deleteSurveyDialog = { element, error: "" })}
-        onConfirm={() => deleteSurvey(survey.id)}
-        on:close={() => (deleteSurveyDialog = { error: "" })}
-      >
-        <span>Delete "{survey.name}"?</span>
-        {#if deleteSurveyDialog.error}
-          <span>{deleteSurveyDialog.error}</span>
-        {/if}
-      </Dialog>
+    <Container>
+      <Anchor hash="survey/{survey.id}/entries" iconName="pen" title="Edit survey" />
+      <span>{survey.name}</span>
     </Container>
   {/each}
 </Container>
