@@ -118,6 +118,6 @@
 </Container>
 
 <footer>
-  <Button iconName="plus" title="New entry" on:click={newEntryClicked} />
-  <Button iconName="download" title="Download entries" on:click={downloadEntries} />
+  <Button iconName="plus" text="Entry" title="New entry" on:click={newEntryClicked} />
+  <Button iconName="download" text="Download" title="Download entries" on:click={downloadEntries} />
 </footer>

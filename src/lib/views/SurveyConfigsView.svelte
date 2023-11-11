@@ -44,10 +44,10 @@
 </Container>
 
 <footer>
-  <Button iconName="plus" title="New config" {disabled} on:click={newConfig} />
+  <Button iconName="plus" text="Config" title="New config" {disabled} on:click={newConfig} />
 
   <Dialog
-    openButton={{ iconName: "copy", title: "Copy survey" }}
+    openButton={{ iconName: "copy", text: "Copy", title: "Copy survey" }}
     onOpen={() => (copySurveyDialog = { text: surveyToString() })}
   >
     <span>Select and copy the survey:</span>

@@ -30,9 +30,9 @@
   <slot />
   <Container spaceBetween>
     {#if onConfirm}
-      <Button iconName="check" title="Confirm" on:click={() => onConfirm && onConfirm()} />
+      <Button iconName="check" text="Confirm" on:click={() => onConfirm && onConfirm()} />
     {/if}
-    <Button iconName="xmark" title="Close" on:click={close} />
+    <Button iconName="xmark" text="Close" on:click={close} />
   </Container>
 </dialog>
 

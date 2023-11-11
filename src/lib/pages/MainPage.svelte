@@ -13,8 +13,8 @@
   currentHash={view}
   baseHash="main"
   links={[
-    { hash: "surveys", iconName: "list-ul", title: "Surveys" },
-    { hash: "options", iconName: "ellipsis-vertical", title: "Options" },
+    { hash: "surveys", iconName: "list-ul", text: "Surveys" },
+    { hash: "options", iconName: "ellipsis-vertical", text: "Options" },
   ]}
 />
 

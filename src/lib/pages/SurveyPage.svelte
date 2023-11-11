@@ -18,9 +18,9 @@
   currentHash={view}
   baseHash="survey/{surveyRecord.id}"
   links={[
-    { hash: "entries", iconName: "list-ol", title: "Entries" },
-    { hash: "configs", iconName: "gears", title: "Configs" },
-    { hash: "options", iconName: "ellipsis-vertical", title: "Options" },
+    { hash: "entries", iconName: "list-ol", text: "Entries" },
+    { hash: "configs", iconName: "gears", text: "Configs" },
+    { hash: "options", iconName: "ellipsis-vertical", text: "Options" },
   ]}
 />
 

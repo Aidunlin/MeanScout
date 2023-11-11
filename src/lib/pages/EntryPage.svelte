@@ -152,7 +152,7 @@
 <footer>
   <Dialog
     bind:this={saveEntryDialog.dialog}
-    openButton={{ iconName: "floppy-disk", title: "Save entry" }}
+    openButton={{ iconName: "floppy-disk", text: "Submit", title: "Submit entry" }}
     onConfirm={saveAndStartNewEntry}
     on:close={() => (saveEntryDialog.data = { error: "" })}
   >

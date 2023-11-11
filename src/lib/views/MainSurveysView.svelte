@@ -213,7 +213,7 @@
 <footer>
   <Dialog
     bind:this={newSurveyDialog.dialog}
-    openButton={{ iconName: "plus", title: "New survey" }}
+    openButton={{ iconName: "plus", text: "Survey", title: "New survey" }}
     onConfirm={newSurvey}
     on:close={() => (newSurveyDialog.data = { name: "", error: "" })}
   >
@@ -225,7 +225,7 @@
   </Dialog>
   <Dialog
     bind:this={pasteSurveyDialog.dialog}
-    openButton={{ iconName: "paste", title: "Import survey" }}
+    openButton={{ iconName: "paste", text: "Import", title: "Import survey" }}
     onConfirm={parseSurvey}
     on:close={() => (pasteSurveyDialog.data = { input: "", error: "" })}
   >

@@ -4,11 +4,11 @@
 
   export let currentHash: any;
   export let baseHash = "";
-  export let links: { hash: string; iconName: string; title: string }[];
+  export let links: { hash: string; iconName: string; text: string }[];
 </script>
 
 <Container padding noGap>
-  {#each links as { hash, iconName, title }}
-    <Anchor hash="{baseHash && `${baseHash}/`}{hash}" {iconName} {title} disableTheme={hash != currentHash} />
+  {#each links as { hash, iconName, text }}
+    <Anchor hash="{baseHash && `${baseHash}/`}{hash}" {iconName} {text} disableTheme={hash != currentHash} />
   {/each}
 </Container>
