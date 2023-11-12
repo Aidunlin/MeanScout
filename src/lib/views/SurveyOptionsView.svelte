@@ -7,6 +7,15 @@
   export let idb: IDBDatabase;
   export let surveyRecord: IDBRecord<Survey>;
 
+  let entryCount = 0;
+
+  const countRequest = idb.transaction("entries").objectStore("entries").index("surveyId").count(surveyRecord.id);
+  countRequest.onsuccess = () => {
+    if (typeof countRequest.result == "number") {
+      entryCount = countRequest.result;
+    }
+  };
+
   let deleteSurveyDialog: DialogDataType<{ error: string }> = { data: { error: "" } };
 
   let teamInput = "";
@@ -98,12 +107,15 @@
       Add team
       <input style="width:200px" bind:value={teamInput} on:keydown={(e) => e.key == "Enter" && addTeam()} />
     </Container>
-    <span>{surveyRecord.teams.length ? "Teams" : "No teams added"}</span>
-    <Container>
-      {#each sortTeams(surveyRecord.teams) as team}
-        <Button text={team} title="Delete {team}" on:click={() => deleteTeam(team)} />
-      {/each}
-    </Container>
+    {#if surveyRecord.teams.length}
+      <Container>
+        {#each sortTeams(surveyRecord.teams) as team}
+          <Button text={team} title="Delete {team}" on:click={() => deleteTeam(team)} />
+        {/each}
+      </Container>
+    {:else}
+      <span>{surveyRecord.teams.length ? "Teams" : "No teams added"}</span>
+    {/if}
   </Container>
 
   {#if hasMigratableEntries()}
@@ -112,6 +124,14 @@
       <Button iconName="right-from-bracket" text="Migrate" on:click={migrateEntries} />
     </Container>
   {/if}
+
+  <h2>Options</h2>
+  <Container>
+    <Container column noGap>
+      Change name
+      <input bind:value={surveyRecord.name} />
+    </Container>
+  </Container>
 
   <h2>Danger Zone</h2>
   <Container>
@@ -122,6 +142,9 @@
       on:close={() => (deleteSurveyDialog.data = { error: "" })}
     >
       <span>Delete "{surveyRecord.name}"?</span>
+      {#if entryCount}
+        <span>{entryCount} {entryCount > 1 ? "entries" : "entry"} will be lost!</span>
+      {/if}
       {#if deleteSurveyDialog.data.error}
         <span>{deleteSurveyDialog.data.error}</span>
       {/if}
