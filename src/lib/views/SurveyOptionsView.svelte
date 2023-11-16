@@ -9,10 +9,19 @@
 
   let entryCount = 0;
 
-  const countRequest = idb.transaction("entries").objectStore("entries").index("surveyId").count(surveyRecord.id);
-  countRequest.onsuccess = () => {
-    if (typeof countRequest.result == "number") {
-      entryCount = countRequest.result;
+  const countTransaction = idb.transaction(["drafts", "entries"]);
+
+  const draftCountRequest = countTransaction.objectStore("drafts").index("surveyId").count(surveyRecord.id);
+  draftCountRequest.onsuccess = () => {
+    if (typeof draftCountRequest.result == "number") {
+      entryCount += draftCountRequest.result;
+    }
+  };
+
+  const entryCountRequest = countTransaction.objectStore("entries").index("surveyId").count(surveyRecord.id);
+  entryCountRequest.onsuccess = () => {
+    if (typeof entryCountRequest.result == "number") {
+      entryCount += entryCountRequest.result;
     }
   };
 
@@ -61,42 +70,47 @@
     };
   }
 
-  function deleteSurvey() {
-    const deleteTransaction = idb.transaction(["surveys", "entries"], "readwrite");
-    const surveyStore = deleteTransaction.objectStore("surveys");
-    const entryStore = deleteTransaction.objectStore("entries");
-
-    deleteTransaction.onerror = () => {
-      deleteSurveyDialog.data.error = `Could not delete survey: ${deleteTransaction.error?.message}`;
-    };
-
-    const cursorRequest = entryStore.index("surveyId").openCursor(surveyRecord.id);
+  function deleteEntries(transaction: IDBTransaction, storeName: string) {
+    const cursorRequest = transaction.objectStore(storeName).index("surveyId").openCursor(surveyRecord.id);
     cursorRequest.onerror = () => {
-      deleteSurveyDialog.data.error = `Could not delete survey's entries: ${cursorRequest.error?.message}`;
+      deleteSurveyDialog.data.error = `Could not delete survey's ${storeName}: ${cursorRequest.error?.message}`;
+      transaction.abort();
     };
 
     cursorRequest.onsuccess = () => {
       const cursor = cursorRequest.result;
       if (cursor === undefined) {
-        deleteSurveyDialog.data.error = "Could not delete survey's entries";
-        return;
+        deleteSurveyDialog.data.error = `Could not delete survey's ${storeName}`;
+        transaction.abort();
       }
 
       if (cursor === null) {
-        const surveyRequest = surveyStore.delete(surveyRecord.id);
-        surveyRequest.onerror = () => {
-          deleteSurveyDialog.data.error = `Could not delete survey: ${surveyRequest.error?.message}`;
-        };
-
-        surveyRequest.onsuccess = () => {
-          location.hash = "/main/surveys";
-        };
         return;
       }
 
       cursor.delete();
       cursor.continue();
     };
+  }
+
+  function deleteSurvey() {
+    const deleteTransaction = idb.transaction(["surveys", "drafts", "entries"], "readwrite");
+    deleteTransaction.onabort = () => {
+      deleteSurveyDialog.data.error ||= `Could not delete survey: ${deleteTransaction.error?.message}`;
+    };
+
+    deleteTransaction.oncomplete = () => {
+      location.hash = "/main/surveys";
+    };
+
+    const surveyRequest = deleteTransaction.objectStore("surveys").delete(surveyRecord.id);
+    surveyRequest.onerror = () => {
+      deleteSurveyDialog.data.error = `Could not delete survey: ${surveyRequest.error?.message}`;
+      deleteTransaction.abort();
+    };
+
+    deleteEntries(deleteTransaction, "drafts");
+    deleteEntries(deleteTransaction, "entries");
   }
 </script>
 

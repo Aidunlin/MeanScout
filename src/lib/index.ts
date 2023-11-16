@@ -83,17 +83,3 @@ export function flattenConfigs(configs: MetricConfig[]) {
     })
     .flat();
 }
-
-export function getHighestMatchValue(entries: Entry[], ungroupedConfigs: Exclude<MetricConfig, GroupConfig>[]) {
-  let highest = 0;
-
-  entries.forEach((entry) => {
-    entry.values.forEach((value, i) => {
-      if (ungroupedConfigs[i].type == "match") {
-        highest = Math.max(value, highest);
-      }
-    });
-  });
-
-  return highest;
-}

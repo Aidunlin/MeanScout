@@ -10,9 +10,16 @@
 
   let disabled = false;
 
-  const countRequest = idb.transaction("entries").objectStore("entries").index("surveyId").count(surveyRecord.id);
-  countRequest.onsuccess = () => {
-    disabled = countRequest.result > 0;
+  const countTransaction = idb.transaction(["drafts", "entries"]);
+
+  const draftCountRequest = countTransaction.objectStore("drafts").index("surveyId").count(surveyRecord.id);
+  draftCountRequest.onsuccess = () => {
+    disabled ||= draftCountRequest.result > 0;
+  };
+
+  const entryCountRequest = countTransaction.objectStore("entries").index("surveyId").count(surveyRecord.id);
+  entryCountRequest.onsuccess = () => {
+    disabled ||= entryCountRequest.result > 0;
   };
 
   let copySurveyDialog = { text: "" };

@@ -155,7 +155,7 @@
   <h2>Surveys</h2>
   {#each surveyRecords as survey (survey.id)}
     <Container>
-      <Anchor hash="survey/{survey.id}/entries" iconName="pen" title="Edit survey" />
+      <Anchor hash="survey/{survey.id}/entries" iconName="arrow-right" title="Open survey" />
       <span>{survey.name}</span>
     </Container>
   {/each}
