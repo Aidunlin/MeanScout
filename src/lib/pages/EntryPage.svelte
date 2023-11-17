@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { flattenConfigs, type DialogDataType, type Entry, type IDBRecord, type Survey } from "$lib";
+  import { flattenFields, type DialogDataType, type Entry, type IDBRecord, type Survey } from "$lib";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import Header from "$lib/components/Header.svelte";
@@ -43,22 +43,23 @@
     };
   }
 
-  function countPreviousConfigs(index: number) {
-    return flattenConfigs(surveyRecord.configs.slice(0, index)).length;
+  function countPreviousFields(index: number) {
+    return flattenFields(surveyRecord.fields.slice(0, index)).length;
   }
 </script>
 
 <Header title="Entry ({surveyRecord.name})" backLink="survey/{surveyRecord.id}/entries" />
 
 <Container column padding>
-  {#each surveyRecord.configs as config, i (config)}
-    {#if config.type == "group"}
-      <h2>{config.name}</h2>
-      {#each config.configs as innerConfig, innerConfigIndex (innerConfig)}
-        <span>{innerConfig.name}: {entryRecord.values[innerConfigIndex + countPreviousConfigs(i)]}</span>
+  {#each surveyRecord.fields as field, i (field)}
+    {@const previousFields = countPreviousFields(i)}
+    {#if field.type == "group"}
+      <h2>{field.name}</h2>
+      {#each field.fields as innerField, innerFieldIndex (innerField)}
+        <span>{innerField.name}: {entryRecord.values[previousFields + innerFieldIndex]}</span>
       {/each}
     {:else}
-      <span>{config.name}: {entryRecord.values[countPreviousConfigs(i)]}</span>
+      <span>{field.name}: {entryRecord.values[previousFields]}</span>
     {/if}
   {/each}
 </Container>

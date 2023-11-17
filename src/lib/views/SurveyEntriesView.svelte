@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { flattenConfigs, type Entry, type IDBRecord, type Survey, getMetricDefaultValue } from "$lib";
+  import { flattenFields, getDefaultFieldValue, type Entry, type IDBRecord, type Survey } from "$lib";
   import Anchor from "$lib/components/Anchor.svelte";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
@@ -36,14 +36,14 @@
   let deleteEntryDialog: { element?: HTMLDialogElement; error: string } = { error: "" };
 
   function newDraftClicked() {
-    const configs = flattenConfigs(surveyRecord.configs);
+    const fields = flattenFields(surveyRecord.fields);
 
     const allRecords = [...draftRecords, ...entryRecords];
 
     const draft: Entry = {
       surveyId: surveyRecord.id,
-      values: configs.map((config, i) => {
-        switch (config.type) {
+      values: fields.map((field, i) => {
+        switch (field.type) {
           case "match":
             if (!allRecords.length) {
               return 1;
@@ -51,9 +51,9 @@
 
             return Math.max(...allRecords.map((entry) => entry.values[i] ?? 0)) + 1;
           case "select":
-            return config.values[0];
+            return field.values[0];
           default:
-            return getMetricDefaultValue(config);
+            return getDefaultFieldValue(field);
         }
       }),
       created: new Date(),
@@ -75,8 +75,8 @@
 
   function downloadEntries() {
     const csv = [
-      flattenConfigs(surveyRecord.configs)
-        .map((config) => config.name)
+      flattenFields(surveyRecord.fields)
+        .map((field) => field.name)
         .join(","),
       ...entryRecords.map((entry) => entry.values.map(valueToCSV).join(",")),
     ].join("\n");
@@ -120,8 +120,8 @@
     <Container spaceBetween>
       <Container>
         <Anchor hash="draft/{draft.id}" iconName="arrow-right" title="Edit draft" />
-        {#each flattenConfigs(surveyRecord.configs).slice(0, 2) as config, i}
-          <span>{config.name}: {draft.values[i]}, </span>
+        {#each flattenFields(surveyRecord.fields).slice(0, 2) as field, i}
+          <span>{field.name}: {draft.values[i]}, </span>
         {/each}
         ...
       </Container>
@@ -133,8 +133,8 @@
         on:close={() => (deleteDraftDialog = { error: "" })}
       >
         <span>Delete this draft?</span>
-        {#each flattenConfigs(surveyRecord.configs).slice(0, 2) as config, i}
-          <span>{config.name}: {draft.values[i]}</span>
+        {#each flattenFields(surveyRecord.fields).slice(0, 2) as field, i}
+          <span>{field.name}: {draft.values[i]}</span>
         {/each}
         {#if deleteDraftDialog.error}
           <span>{deleteDraftDialog.error}</span>
@@ -150,8 +150,8 @@
     <Container spaceBetween>
       <Container>
         <Anchor hash="entry/{entry.id}" iconName="arrow-right" title="View entry" />
-        {#each flattenConfigs(surveyRecord.configs).slice(0, 2) as config, i}
-          <span>{config.name}: {entry.values[i]}, </span>
+        {#each flattenFields(surveyRecord.fields).slice(0, 2) as field, i}
+          <span>{field.name}: {entry.values[i]}, </span>
         {/each}
         ...
       </Container>
@@ -163,8 +163,8 @@
         on:close={() => (deleteEntryDialog = { error: "" })}
       >
         <span>Delete this entry?</span>
-        {#each flattenConfigs(surveyRecord.configs).slice(0, 2) as config, i}
-          <span>{config.name}: {entry.values[i]}</span>
+        {#each flattenFields(surveyRecord.fields).slice(0, 2) as field, i}
+          <span>{field.name}: {entry.values[i]}</span>
         {/each}
         {#if deleteEntryDialog.error}
           <span>{deleteEntryDialog.error}</span>

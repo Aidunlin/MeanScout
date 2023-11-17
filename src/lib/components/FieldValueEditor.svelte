@@ -1,9 +1,9 @@
 <script lang="ts">
-  import type { MetricConfig } from "$lib";
+  import type { Field } from "$lib";
   import Button from "./Button.svelte";
   import Container from "./Container.svelte";
 
-  export let config: MetricConfig;
+  export let field: Field;
   export let value: any;
 
   function rate(i: number) {
@@ -35,44 +35,44 @@
   }
 </script>
 
-<Container column noGap maxWidth={config.type == "text"}>
-  {#if config.type != "toggle"}
-    {config.name}
+<Container column noGap maxWidth={field.type == "text"}>
+  {#if field.type != "toggle"}
+    {field.name}
   {/if}
 
   <Container noGap>
-    {#if config.type == "team"}
+    {#if field.type == "team"}
       <input class="team" list="teams-list" maxlength="5" bind:value required />
-    {:else if config.type == "match"}
+    {:else if field.type == "match"}
       <input class="match" type="number" pattern="[0-9]*" bind:value required />
-    {:else if config.type == "toggle"}
+    {:else if field.type == "toggle"}
       <Button
         on:click={() => (value = !value)}
         iconStyle={value ? "solid" : "regular"}
         iconName={value ? "square-check" : "square"}
-        text={config.name}
+        text={field.name}
       />
-    {:else if config.type == "number"}
-      <Button on:click={() => value--} iconName="minus" disabled={config.allowNegative !== true && value < 1} />
+    {:else if field.type == "number"}
+      <Button on:click={() => value--} iconName="minus" disabled={field.allowNegative !== true && value < 1} />
       <span class="number">{value}</span>
       <Button on:click={() => value++} iconName="plus" />
-    {:else if config.type == "select"}
+    {:else if field.type == "select"}
       <select bind:value>
-        {#each config.values as val}
+        {#each field.values as val}
           <option value={val}>{val}</option>
         {/each}
       </select>
-    {:else if config.type == "text"}
-      {#if config.long}
-        <textarea placeholder={config.tip} bind:value />
+    {:else if field.type == "text"}
+      {#if field.long}
+        <textarea placeholder={field.tip} bind:value />
       {:else}
-        <input placeholder={config.tip} bind:value />
+        <input placeholder={field.tip} bind:value />
       {/if}
-    {:else if config.type == "rating"}
+    {:else if field.type == "rating"}
       {#each Array(5) as _, i}
         <Button on:click={() => rate(i)} iconStyle={value > i ? "solid" : "regular"} iconName="star" />
       {/each}
-    {:else if config.type == "timer"}
+    {:else if field.type == "timer"}
       <Button on:click={running ? pause : start} iconName={running ? "pause" : "play"} />
       <span class="number">{value.toFixed(1)}</span>
       <Button on:click={stop} iconName="stop" />

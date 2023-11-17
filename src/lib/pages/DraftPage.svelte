@@ -1,7 +1,7 @@
 <script lang="ts">
   import {
-    flattenConfigs,
-    getMetricDefaultValue,
+    flattenFields,
+    getDefaultFieldValue,
     type DialogDataType,
     type Entry,
     type IDBRecord,
@@ -9,8 +9,8 @@
   } from "$lib";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
+  import FieldValueEditor from "$lib/components/FieldValueEditor.svelte";
   import Header from "$lib/components/Header.svelte";
-  import MetricEditor from "$lib/components/MetricEditor.svelte";
 
   export let idb: IDBDatabase;
   export let surveyRecord: IDBRecord<Survey>;
@@ -22,27 +22,27 @@
 
   function validateDraft() {
     let error = "";
-    const configs = flattenConfigs(surveyRecord.configs);
+    const fields = flattenFields(surveyRecord.fields);
 
     draftRecord.values.forEach((value, i) => {
-      switch (configs[i].type) {
+      switch (fields[i].type) {
         case "team":
           if (!/^\d{1,4}[A-Z]?$/.test(value)) {
-            error = `Invalid value for ${configs[i].name}`;
+            error = `Invalid value for ${fields[i].name}`;
           }
           if (surveyRecord.teams.length && !surveyRecord.teams.includes(value)) {
-            error = `Invalid value for ${configs[i].name} (team not allowlisted)`;
+            error = `Invalid value for ${fields[i].name} (team not allowlisted)`;
           }
           break;
         case "match":
           if (!/\d{1,3}/.test(`${value}`)) {
-            error = `Invalid value for ${configs[i].name}`;
+            error = `Invalid value for ${fields[i].name}`;
           }
           break;
       }
 
-      if (value == undefined || typeof value !== typeof getMetricDefaultValue(configs[i])) {
-        error = `Invalid value for ${configs[i].name}`;
+      if (value == undefined || typeof value !== typeof getDefaultFieldValue(fields[i])) {
+        error = `Invalid value for ${fields[i].name}`;
       }
     });
 
@@ -50,16 +50,16 @@
   }
 
   function startNewDraft() {
-    const flattenedConfigs = flattenConfigs(surveyRecord.configs);
+    const flattenedFields = flattenFields(surveyRecord.fields);
 
     const draft: Entry = {
       surveyId: draftRecord.surveyId,
-      values: flattenedConfigs.map((config, i) => {
-        switch (config.type) {
+      values: flattenedFields.map((field, i) => {
+        switch (field.type) {
           case "match":
             return (draftRecord.values[i] ?? 0) + 1;
           default:
-            return getMetricDefaultValue(config);
+            return getDefaultFieldValue(field);
         }
       }),
       created: new Date(),
@@ -103,8 +103,8 @@
     moveTransaction.oncomplete = () => startNewDraft();
   }
 
-  function countPreviousConfigs(index: number) {
-    return flattenConfigs(surveyRecord.configs.slice(0, index)).length;
+  function countPreviousFields(index: number) {
+    return flattenFields(surveyRecord.fields.slice(0, index)).length;
   }
 </script>
 
@@ -117,17 +117,17 @@
 </datalist>
 
 <Container padding alignEnd>
-  {#each surveyRecord.configs as config, i (config)}
-    {@const previousConfigs = countPreviousConfigs(i)}
-    {#if config.type == "group"}
-      <h2>{config.name}</h2>
+  {#each surveyRecord.fields as field, i (field)}
+    {@const previousFields = countPreviousFields(i)}
+    {#if field.type == "group"}
+      <h2>{field.name}</h2>
       <Container alignEnd maxWidth>
-        {#each config.configs as innerConfig, innerConfigIndex (innerConfig)}
-          <MetricEditor config={innerConfig} bind:value={draftRecord.values[previousConfigs + innerConfigIndex]} />
+        {#each field.fields as innerField, innerFieldIndex (innerField)}
+          <FieldValueEditor field={innerField} bind:value={draftRecord.values[previousFields + innerFieldIndex]} />
         {/each}
       </Container>
     {:else}
-      <MetricEditor {config} bind:value={draftRecord.values[previousConfigs]} />
+      <FieldValueEditor {field} bind:value={draftRecord.values[previousFields]} />
     {/if}
   {/each}
 </Container>

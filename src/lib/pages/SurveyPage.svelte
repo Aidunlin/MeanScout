@@ -2,11 +2,11 @@
   import type { IDBRecord, Survey } from "$lib";
   import Header from "$lib/components/Header.svelte";
   import NavBar from "$lib/components/NavBar.svelte";
-  import SurveyConfigsView from "$lib/views/SurveyConfigsView.svelte";
   import SurveyEntriesView from "$lib/views/SurveyEntriesView.svelte";
+  import SurveyFieldsView from "$lib/views/SurveyFieldsView.svelte";
   import SurveyOptionsView from "$lib/views/SurveyOptionsView.svelte";
 
-  export let view: "entries" | "configs" | "options" = "entries";
+  export let view: "entries" | "fields" | "options" = "entries";
   export let idb: IDBDatabase;
   export let surveyRecord: IDBRecord<Survey>;
 
@@ -19,15 +19,15 @@
   baseHash="survey/{surveyRecord.id}"
   links={[
     { hash: "entries", iconName: "list-ol", text: "Entries" },
-    { hash: "configs", iconName: "gears", text: "Configs" },
-    { hash: "options", iconName: "ellipsis-vertical", text: "Options" },
+    { hash: "fields", iconName: "list-check", text: "Fields" },
+    { hash: "options", iconName: "gears", text: "Options" },
   ]}
 />
 
 {#if view == "entries"}
   <SurveyEntriesView {idb} bind:surveyRecord />
-{:else if view == "configs"}
-  <SurveyConfigsView {idb} bind:surveyRecord />
+{:else if view == "fields"}
+  <SurveyFieldsView {idb} bind:surveyRecord />
 {:else if view == "options"}
   <SurveyOptionsView {idb} bind:surveyRecord />
 {/if}

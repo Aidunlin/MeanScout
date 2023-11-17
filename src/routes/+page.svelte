@@ -149,7 +149,7 @@
       const view = hash[1] == "surveys" || hash[1] == "options" ? hash[1] : "surveys";
       setMainPage(view);
     } else if (page == "survey") {
-      const view = hash[2] == "entries" || hash[2] == "configs" || hash[2] == "options" ? hash[2] : "entries";
+      const view = hash[2] == "entries" || hash[2] == "fields" || hash[2] == "options" ? hash[2] : "entries";
       const id = Number(hash[1]);
       if (Number.isNaN(id)) return setMainPage();
       setSurveyPage(id, view);
@@ -164,16 +164,49 @@
     }
   }
 
+  function migrateSurveys(transaction: IDBTransaction) {
+    const surveyStore = transaction.objectStore("surveys");
+
+    const surveyCursor = surveyStore.openCursor();
+    surveyCursor.onerror = () => {};
+
+    surveyCursor.onsuccess = () => {
+      const cursor = surveyCursor.result;
+      if (!cursor) return;
+
+      const survey = cursor.value;
+
+      if (Array.isArray(survey.configs)) {
+        survey.fields = survey.configs;
+        for (const field of survey.fields) {
+          if (Array.isArray(field.configs)) {
+            field.fields = field.configs;
+            delete field.configs;
+          }
+        }
+        delete survey.configs;
+      }
+
+      if (Array.isArray(survey.entries)) {
+        const entryStore = transaction.objectStore("entries");
+        for (const entry of survey.entries) {
+          entry.surveyId = cursor.key;
+          entryStore.add(entry);
+        }
+        delete survey.entries;
+      }
+
+      cursor.update(survey);
+      cursor.continue();
+    };
+  }
+
   function openIDB() {
-    const request = indexedDB.open("MeanScout", 5);
+    const request = indexedDB.open("MeanScout", 6);
     request.onerror = () => (idbError = `${request.error?.message}`);
 
-    request.onupgradeneeded = () => {
+    request.onupgradeneeded = (e) => {
       const storeNames = request.result.objectStoreNames;
-
-      if (!storeNames.contains("surveys")) {
-        request.result.createObjectStore("surveys", { keyPath: "id", autoIncrement: true });
-      }
 
       if (!storeNames.contains("drafts")) {
         const draftStore = request.result.createObjectStore("drafts", { keyPath: "id", autoIncrement: true });
@@ -183,6 +216,12 @@
       if (!storeNames.contains("entries")) {
         const entryStore = request.result.createObjectStore("entries", { keyPath: "id", autoIncrement: true });
         entryStore.createIndex("surveyId", "surveyId", { unique: false });
+      }
+
+      if (!storeNames.contains("surveys")) {
+        request.result.createObjectStore("surveys", { keyPath: "id", autoIncrement: true });
+      } else if (e.oldVersion < 6 && request.transaction) {
+        migrateSurveys(request.transaction);
       }
     };
 

@@ -1,9 +1,9 @@
 <script lang="ts">
   import type { IDBRecord, Survey } from "$lib";
   import Button from "$lib/components/Button.svelte";
-  import ConfigEditor from "$lib/components/ConfigEditor.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
+  import FieldEditor from "$lib/components/FieldEditor.svelte";
 
   export let idb: IDBDatabase;
   export let surveyRecord: IDBRecord<Survey>;
@@ -24,14 +24,14 @@
 
   let copySurveyDialog = { text: "" };
 
-  function newConfig() {
-    surveyRecord.configs = [...surveyRecord.configs, { name: "", type: "toggle" }];
+  function newField() {
+    surveyRecord.fields = [...surveyRecord.fields, { name: "", type: "toggle" }];
   }
 
   function surveyToString() {
     const exportableSurvey = {
       name: surveyRecord.name,
-      configs: surveyRecord.configs,
+      fields: surveyRecord.fields,
       teams: surveyRecord.teams,
       created: surveyRecord.created,
       modified: surveyRecord.modified,
@@ -41,17 +41,17 @@
 </script>
 
 <Container column padding>
-  <h2>Configs</h2>
+  <h2>Fields</h2>
   {#if disabled}
-    <span>Cannot modify configs with entries present!</span>
+    <span>Cannot modify fields with entries present!</span>
   {/if}
-  {#each surveyRecord.configs as config, configIndex (config)}
-    <ConfigEditor bind:configs={surveyRecord.configs} bind:config {configIndex} {disabled} />
+  {#each surveyRecord.fields as field, fieldIndex (field)}
+    <FieldEditor bind:fields={surveyRecord.fields} bind:field {fieldIndex} {disabled} />
   {/each}
 </Container>
 
 <footer>
-  <Button iconName="plus" text="Config" title="New config" {disabled} on:click={newConfig} />
+  <Button iconName="plus" text="Field" title="New field" {disabled} on:click={newField} />
 
   <Dialog
     openButton={{ iconName: "copy", text: "Copy", title: "Copy survey" }}

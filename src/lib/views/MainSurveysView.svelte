@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { metricTypes, type DialogDataType, type IDBRecord, type MetricConfig, type Survey } from "$lib";
+  import { fieldTypes, type DialogDataType, type Field, type IDBRecord, type Survey } from "$lib";
   import Anchor from "$lib/components/Anchor.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
@@ -34,7 +34,7 @@
 
     const survey: Survey = {
       name,
-      configs: [
+      fields: [
         { name: "Team", type: "team" },
         { name: "Match", type: "match" },
         { name: "Absent", type: "toggle" },
@@ -70,25 +70,25 @@
     return name;
   }
 
-  function parseConfigs(configs: any[]): MetricConfig[] {
-    return configs.filter((config) => {
-      if (typeof config != "object") {
+  function parseFields(fields: any[]): Field[] {
+    return fields.filter((field) => {
+      if (typeof field != "object") {
         return false;
       }
 
-      if (typeof config.name != "string" || !config.name.trim()) {
+      if (typeof field.name != "string" || !field.name.trim()) {
         return false;
       }
 
-      if (!metricTypes.includes(config.type)) {
+      if (!fieldTypes.includes(field.type)) {
         return false;
       }
 
-      if (config.type == "select" && !Array.isArray(config.values)) {
+      if (field.type == "select" && !Array.isArray(field.values)) {
         return false;
       }
 
-      if (config.type == "group" && !Array.isArray(config.configs)) {
+      if (field.type == "group" && !Array.isArray(field.fields)) {
         return false;
       }
 
@@ -127,7 +127,7 @@
 
     delete survey.id;
     survey.name = parseName(survey.name);
-    survey.configs = Array.isArray(survey.configs) ? parseConfigs(survey.configs) : [];
+    survey.fields = Array.isArray(survey.fields) ? parseFields(survey.fields) : [];
     survey.teams = Array.isArray(survey.teams) ? parseTeams(survey.teams) : [];
     survey.created = parseDate(survey.created);
     survey.modified = parseDate(survey.modified);

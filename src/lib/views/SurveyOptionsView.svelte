@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { DialogDataType, Entry, IDBRecord, Survey } from "$lib";
+  import type { DialogDataType, IDBRecord, Survey } from "$lib";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
@@ -42,32 +42,6 @@
 
   function deleteTeam(team: string) {
     surveyRecord.teams = surveyRecord.teams.filter((t) => t.trim() != team.trim());
-  }
-
-  function hasMigratableEntries() {
-    const survey = surveyRecord as IDBRecord<Survey> & { entries?: Entry[] };
-    return Array.isArray(survey.entries);
-  }
-
-  function migrateEntries() {
-    const survey = surveyRecord as IDBRecord<Survey> & { entries?: Entry[] };
-
-    if (!Array.isArray(survey.entries)) {
-      return;
-    }
-
-    const addTransaction = idb.transaction("entries", "readwrite");
-    const entryStore = addTransaction.objectStore("entries");
-
-    for (const entry of survey.entries) {
-      entry.surveyId = surveyRecord.id;
-      entryStore.add(entry);
-    }
-
-    addTransaction.oncomplete = () => {
-      delete survey.entries;
-      surveyRecord = survey;
-    };
   }
 
   function deleteEntries(transaction: IDBTransaction, storeName: string) {
@@ -131,13 +105,6 @@
       <span>{surveyRecord.teams.length ? "Teams" : "No teams added"}</span>
     {/if}
   </Container>
-
-  {#if hasMigratableEntries()}
-    <h2>Entry Migrator</h2>
-    <Container>
-      <Button iconName="right-from-bracket" text="Migrate" on:click={migrateEntries} />
-    </Container>
-  {/if}
 
   <h2>Options</h2>
   <Container>

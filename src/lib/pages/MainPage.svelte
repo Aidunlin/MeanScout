@@ -14,7 +14,7 @@
   baseHash="main"
   links={[
     { hash: "surveys", iconName: "list-ul", text: "Surveys" },
-    { hash: "options", iconName: "ellipsis-vertical", text: "Options" },
+    { hash: "options", iconName: "gears", text: "Options" },
   ]}
 />
 
