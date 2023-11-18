@@ -48,7 +48,12 @@
   }
 </script>
 
-<Header title="Entry ({surveyRecord.name})" backLink="survey/{surveyRecord.id}/entries" />
+<Header
+  breadcrumbs={[
+    { text: surveyRecord.name, iconName: "list-ul", hash: `survey/${surveyRecord.id}/entries` },
+    { text: "Entry", iconName: "list-ol" },
+  ]}
+/>
 
 <Container column padding>
   {#each surveyRecord.fields as field, i (field)}

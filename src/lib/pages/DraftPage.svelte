@@ -108,7 +108,12 @@
   }
 </script>
 
-<Header title="Draft ({surveyRecord.name})" backLink="survey/{surveyRecord.id}/entries" />
+<Header
+  breadcrumbs={[
+    { text: surveyRecord.name, iconName: "list-ul", hash: `survey/${surveyRecord.id}/entries` },
+    { text: "Draft", iconName: "list-ol" },
+  ]}
+/>
 
 <datalist id="teams-list">
   {#each surveyRecord.teams as team}

@@ -36,7 +36,7 @@
       return;
     }
 
-    if (current?.page == "entry") {
+    if (current?.page == "draft" || current?.page == "entry") {
       current = {
         page: "survey",
         props: { view, idb, surveyRecord: current.props.surveyRecord },
