@@ -110,8 +110,8 @@
 
 <Header
   breadcrumbs={[
-    { text: surveyRecord.name, iconName: "list-ul", hash: `survey/${surveyRecord.id}/entries` },
-    { text: "Draft", iconName: "list-ol" },
+    { text: surveyRecord.name, iconName: "list-ul", hash: `survey/${surveyRecord.id}/drafts` },
+    { text: "Draft", iconName: "pen-ruler" },
   ]}
 />
 

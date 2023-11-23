@@ -149,7 +149,10 @@
       const view = hash[1] == "surveys" || hash[1] == "options" ? hash[1] : "surveys";
       setMainPage(view);
     } else if (page == "survey") {
-      const view = hash[2] == "entries" || hash[2] == "fields" || hash[2] == "options" ? hash[2] : "entries";
+      const view =
+        hash[2] == "drafts" || hash[2] == "entries" || hash[2] == "fields" || hash[2] == "options"
+          ? hash[2]
+          : "entries";
       const id = Number(hash[1]);
       if (Number.isNaN(id)) return setMainPage();
       setSurveyPage(id, view);
