@@ -12,6 +12,7 @@
   import Dialog from "$lib/components/Dialog.svelte";
   import FieldValueEditor from "$lib/components/FieldValueEditor.svelte";
   import Header from "$lib/components/Header.svelte";
+  import Icon from "$lib/components/Icon.svelte";
 
   export let idb: IDBDatabase;
   export let surveyRecord: IDBRecord<Survey>;
@@ -144,7 +145,11 @@
     onConfirm={submitAndStartNewDraft}
     on:close={() => (submitDraftDialog.data = { error: "" })}
   >
-    <Button iconName="floppy-disk" text="Submit" title="Submit draft" slot="opener" let:open on:click={open} />
+    <Button title="Submit draft" slot="opener" let:open on:click={open}>
+      <Icon name="floppy-disk" />
+      Submit
+    </Button>
+
     <span>Submit this draft and start a new one?</span>
     {#if submitDraftDialog.data.error}
       <span>{submitDraftDialog.data.error}</span>

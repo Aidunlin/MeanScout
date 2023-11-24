@@ -4,6 +4,7 @@
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
+  import Icon from "$lib/components/Icon.svelte";
 
   export let idb: IDBDatabase;
 
@@ -156,7 +157,9 @@
   <h2>Surveys</h2>
   {#each surveyRecords as survey (survey.id)}
     <Container>
-      <Anchor hash="survey/{survey.id}/drafts" iconName="arrow-right" title="Open survey" />
+      <Anchor hash="survey/{survey.id}/drafts" title="Open survey">
+        <Icon name="arrow-right" />
+      </Anchor>
       <span>{survey.name}</span>
     </Container>
   {/each}
@@ -168,7 +171,10 @@
     onConfirm={newSurvey}
     on:close={() => (newSurveyDialog.data = { name: "", error: "" })}
   >
-    <Button iconName="plus" text="Survey" title="New survey" slot="opener" let:open on:click={open} />
+    <Button title="New survey" slot="opener" let:open on:click={open}>
+      <Icon name="plus" />
+      Survey
+    </Button>
 
     <span>Enter name for new survey:</span>
     <input bind:value={newSurveyDialog.data.name} />
@@ -182,7 +188,10 @@
     onConfirm={parseSurvey}
     on:close={() => (pasteSurveyDialog.data = { input: "", error: "" })}
   >
-    <Button iconName="paste" text="Import" title="Import survey" slot="opener" let:open on:click={open} />
+    <Button title="Import survey" slot="opener" let:open on:click={open}>
+      <Icon name="paste" />
+      Import
+    </Button>
 
     <span>Paste new survey:</span>
     <textarea bind:value={pasteSurveyDialog.data.input} />

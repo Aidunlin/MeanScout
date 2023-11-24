@@ -2,6 +2,7 @@
   import type { Field } from "$lib";
   import Button from "./Button.svelte";
   import Container from "./Container.svelte";
+  import Icon from "./Icon.svelte";
 
   export let field: Field;
   export let value: any;
@@ -46,16 +47,22 @@
     {:else if field.type == "match"}
       <input class="match" type="number" pattern="[0-9]*" bind:value required />
     {:else if field.type == "toggle"}
-      <Button
-        on:click={() => (value = !value)}
-        iconStyle={value ? "solid" : "regular"}
-        iconName={value ? "square-check" : "square"}
-        text={field.name}
-      />
+      <Button on:click={() => (value = !value)}>
+        {#if value}
+          <Icon name="square-check" />
+        {:else}
+          <Icon style="regular" name="square" />
+        {/if}
+        {field.name}
+      </Button>
     {:else if field.type == "number"}
-      <Button on:click={() => value--} iconName="minus" disabled={field.allowNegative !== true && value < 1} />
+      <Button on:click={() => value--} disabled={field.allowNegative !== true && value < 1}>
+        <Icon name="minus" />
+      </Button>
       <span class="number">{value}</span>
-      <Button on:click={() => value++} iconName="plus" />
+      <Button on:click={() => value++}>
+        <Icon name="plus" />
+      </Button>
     {:else if field.type == "select"}
       <select bind:value>
         {#each field.values as val}
@@ -70,12 +77,18 @@
       {/if}
     {:else if field.type == "rating"}
       {#each Array(5) as _, i}
-        <Button on:click={() => rate(i)} iconStyle={value > i ? "solid" : "regular"} iconName="star" />
+        <Button star on:click={() => rate(i)}>
+          <Icon style={value > i ? "solid" : "regular"} name="star" />
+        </Button>
       {/each}
     {:else if field.type == "timer"}
-      <Button on:click={running ? pause : start} iconName={running ? "pause" : "play"} />
+      <Button on:click={running ? pause : start}>
+        <Icon name={running ? "pause" : "play"} />
+      </Button>
       <span class="number">{value.toFixed(1)}</span>
-      <Button on:click={stop} iconName="stop" />
+      <Button on:click={stop}>
+        <Icon name="stop" />
+      </Button>
     {/if}
   </Container>
 </Container>

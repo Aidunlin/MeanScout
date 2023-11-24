@@ -3,6 +3,7 @@
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
+  import Icon from "$lib/components/Icon.svelte";
 
   export let idb: IDBDatabase;
   export let surveyRecord: IDBRecord<Survey>;
@@ -98,7 +99,7 @@
     {#if surveyRecord.teams.length}
       <Container>
         {#each sortTeams(surveyRecord.teams) as team}
-          <Button text={team} title="Delete {team}" on:click={() => deleteTeam(team)} />
+          <Button title="Delete {team}" on:click={() => deleteTeam(team)}>{team}</Button>
         {/each}
       </Container>
     {:else}
@@ -121,7 +122,10 @@
       onConfirm={deleteSurvey}
       on:close={() => (deleteSurveyDialog.data = { error: "" })}
     >
-      <Button iconName="trash" text="Delete survey" slot="opener" let:open on:click={open} />
+      <Button slot="opener" let:open on:click={open}>
+        <Icon name="trash" />
+        Delete survey
+      </Button>
 
       <span>Delete "{surveyRecord.name}"?</span>
       {#if entryCount}

@@ -2,6 +2,7 @@
   import { fieldTypes, type Field } from "$lib";
   import Button from "./Button.svelte";
   import Container from "./Container.svelte";
+  import Icon from "./Icon.svelte";
 
   export let fields: Field[];
   export let field: Field;
@@ -102,33 +103,33 @@
 
   <Container spaceBetween>
     <Container>
-      <Button
-        iconName="arrow-up"
-        title="Move up"
-        disabled={fieldIndex == 0 || disabled}
-        on:click={() => moveField(-1)}
-      />
-      <Button
-        iconName="arrow-down"
-        title="Move down"
-        disabled={fieldIndex == fields.length - 1 || disabled}
-        on:click={() => moveField(1)}
-      />
-      <Button iconName="clone" title="Duplicate field" {disabled} on:click={duplicateField} />
+      <Button title="Move up" disabled={fieldIndex == 0 || disabled} on:click={() => moveField(-1)}>
+        <Icon name="arrow-up" />
+      </Button>
+      <Button title="Move down" disabled={fieldIndex == fields.length - 1 || disabled} on:click={() => moveField(1)}>
+        <Icon name="arrow-down" />
+      </Button>
+      <Button title="Duplicate field" {disabled} on:click={duplicateField}>
+        <Icon name="clone" />
+      </Button>
     </Container>
-    <Button iconName="trash" title="Delete field" {disabled} on:click={deleteField} />
+    <Button title="Delete field" {disabled} on:click={deleteField}>
+      <Icon name="trash" />
+    </Button>
   </Container>
 
   {#if !disabled}
     {#if field.type == "number"}
       <Container column maxWidth padding>
         <Container>
-          <Button
-            iconStyle={field.allowNegative ? "solid" : "regular"}
-            iconName={field.allowNegative ? "square-check" : "square"}
-            text="Allow negative"
-            on:click={toggleAllowNegative}
-          />
+          <Button on:click={toggleAllowNegative}>
+            {#if field.allowNegative}
+              <Icon name="square-check" />
+            {:else}
+              <Icon style="regular" name="square" />
+            {/if}
+            Allow negative
+          </Button>
         </Container>
       </Container>
     {:else if field.type == "select"}
@@ -138,12 +139,16 @@
           {#each field.values as value, i}
             <Container>
               <input bind:value style="width:200px" />
-              <Button iconName="trash" title="Delete value" on:click={() => deleteSelectValue(i)} />
+              <Button title="Delete value" on:click={() => deleteSelectValue(i)}>
+                <Icon name="trash" />
+              </Button>
             </Container>
           {/each}
         </Container>
         <Container>
-          <Button iconName="plus" title="New value" on:click={newSelectValue} />
+          <Button title="New value" on:click={newSelectValue}>
+            <Icon name="plus" />
+          </Button>
         </Container>
       </Container>
     {:else if field.type == "text"}
@@ -153,12 +158,14 @@
             Tip
             <input bind:value={field.tip} />
           </Container>
-          <Button
-            iconStyle={field.long ? "solid" : "regular"}
-            iconName={field.long ? "square-check" : "square"}
-            text="Long"
-            on:click={toggleLong}
-          />
+          <Button on:click={toggleLong}>
+            {#if field.long}
+              <Icon name="square-check" />
+            {:else}
+              <Icon style="regular" name="square" />
+            {/if}
+            Long
+          </Button>
         </Container>
       </Container>
     {:else if field.type == "group"}
@@ -168,7 +175,9 @@
           <svelte:self bind:fields={field.fields} bind:field={innerField} fieldIndex={innerFieldIndex} />
         {/each}
         <Container>
-          <Button iconName="plus" title="New field" on:click={newField} />
+          <Button title="New field" on:click={newField}>
+            <Icon name="plus" />
+          </Button>
         </Container>
       </Container>
     {/if}

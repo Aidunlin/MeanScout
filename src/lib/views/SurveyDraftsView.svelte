@@ -4,6 +4,7 @@
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
+  import Icon from "$lib/components/Icon.svelte";
 
   export let idb: IDBDatabase;
   export let surveyRecord: IDBRecord<Survey>;
@@ -85,7 +86,9 @@
   {#each draftRecords as draft (draft.id)}
     <Container spaceBetween>
       <Container>
-        <Anchor hash="draft/{draft.id}" iconName="arrow-right" title="Edit draft" />
+        <Anchor hash="draft/{draft.id}" title="Edit draft">
+          <Icon name="arrow-right" />
+        </Anchor>
         {#each flattenFields(surveyRecord.fields).slice(0, 2) as field, i}
           <span>{field.name}: {draft.values[i]}, </span>
         {/each}
@@ -97,7 +100,9 @@
         onConfirm={() => deleteDraft(draft.id)}
         on:close={() => (deleteDraftDialog = { error: "" })}
       >
-        <Button iconName="trash" title="Delete draft" slot="opener" let:open on:click={open} />
+        <Button title="Delete draft" slot="opener" let:open on:click={open}>
+          <Icon name="trash" />
+        </Button>
 
         <span>Delete this draft?</span>
         {#each flattenFields(surveyRecord.fields).slice(0, 2) as field, i}
@@ -112,5 +117,8 @@
 </Container>
 
 <footer>
-  <Button iconName="plus" text="Draft" title="New draft" on:click={newDraftClicked} />
+  <Button title="New draft" on:click={newDraftClicked}>
+    <Icon name="plus" />
+    Draft
+  </Button>
 </footer>

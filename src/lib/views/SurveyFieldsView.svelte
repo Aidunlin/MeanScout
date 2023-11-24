@@ -4,6 +4,7 @@
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import FieldEditor from "$lib/components/FieldEditor.svelte";
+  import Icon from "$lib/components/Icon.svelte";
 
   export let idb: IDBDatabase;
   export let surveyRecord: IDBRecord<Survey>;
@@ -51,10 +52,16 @@
 </Container>
 
 <footer>
-  <Button iconName="plus" text="Field" title="New field" {disabled} on:click={newField} />
+  <Button title="New field" {disabled} on:click={newField}>
+    <Icon name="plus" />
+    Field
+  </Button>
 
   <Dialog onOpen={() => (copySurveyDialog = { text: surveyToString() })}>
-    <Button iconName="copy" text="Copy" title="Copy survey" slot="opener" let:open on:click={open} />
+    <Button title="Copy survey" slot="opener" let:open on:click={open}>
+      <Icon name="copy" />
+      Copy
+    </Button>
 
     <span>Select and copy the survey:</span>
     <Container maxWidth>

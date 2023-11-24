@@ -4,6 +4,7 @@
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
+  import Icon from "$lib/components/Icon.svelte";
   import { targetStore } from "$lib/target";
 
   export let idb: IDBDatabase;
@@ -64,7 +65,9 @@
   {#each entryRecords as entry (entry.id)}
     <Container spaceBetween>
       <Container>
-        <Anchor hash="entry/{entry.id}" iconName="arrow-right" title="View entry" />
+        <Anchor hash="entry/{entry.id}" title="View entry">
+          <Icon name="arrow-right" />
+        </Anchor>
         {#each flattenFields(surveyRecord.fields).slice(0, 2) as field, i}
           <span>{field.name}: {entry.values[i]}, </span>
         {/each}
@@ -76,7 +79,9 @@
         onConfirm={() => deleteEntry(entry.id)}
         on:close={() => (deleteEntryDialog = { error: "" })}
       >
-        <Button iconName="trash" title="Delete entry" slot="opener" let:open on:click={open} />
+        <Button title="Delete entry" slot="opener" let:open on:click={open}>
+          <Icon name="trash" />
+        </Button>
 
         <span>Delete this entry?</span>
         {#each flattenFields(surveyRecord.fields).slice(0, 2) as field, i}
@@ -91,5 +96,8 @@
 </Container>
 
 <footer>
-  <Button iconName="download" text="Download" title="Download entries" on:click={downloadEntries} />
+  <Button title="Download entries" on:click={downloadEntries}>
+    <Icon name="download" />
+    Download
+  </Button>
 </footer>

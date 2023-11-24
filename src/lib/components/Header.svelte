@@ -2,6 +2,7 @@
   import { targetStore } from "$lib/target";
   import Anchor from "./Anchor.svelte";
   import Container from "./Container.svelte";
+  import Icon from "./Icon.svelte";
 
   export let breadcrumbs: { text: string; iconName?: string | undefined; hash?: string | undefined }[] = [];
   export let views: { text: string; iconName: string; hash: string }[] = [];
@@ -15,30 +16,30 @@
 
 <header>
   {#if breadcrumbs.length > 0}
-    <a class="breadcrumb" href="#/main/surveys">
+    <Anchor hash="main/surveys">
       <img src="./logo.svg" alt="" width="30" height="30" />
       MeanScout
-    </a>
+    </Anchor>
 
     {#each breadcrumbs as { text, iconName, hash }}
       {#if hash}
-        <a class="breadcrumb" href="#/{hash}">
+        <Anchor {hash}>
           {#if iconName}
-            <i class="fa-solid fa-{iconName} fa-fw" />
+            <Icon name={iconName} />
           {/if}
           {text}
-        </a>
+        </Anchor>
       {:else}
-        <div class="breadcrumb">
+        <div>
           {#if iconName}
-            <i class="fa-solid fa-{iconName} fa-fw" />
+            <Icon name={iconName} />
           {/if}
           <h1>{text}</h1>
         </div>
       {/if}
     {/each}
   {:else}
-    <div class="breadcrumb">
+    <div>
       <img src="./logo.svg" alt="" width="30" height="30" />
       <h1>MeanScout</h1>
     </div>
@@ -47,7 +48,10 @@
   {#if views.length > 0 && currentView && baseHash}
     <Container noGap>
       {#each views as { text, iconName, hash }}
-        <Anchor hash="{baseHash}/{hash}" {iconName} {text} disableTheme={hash != currentView} />
+        <Anchor hash="{baseHash}/{hash}" disableTheme={hash != currentView}>
+          <Icon name={iconName} />
+          {text}
+        </Anchor>
       {/each}
     </Container>
   {/if}
@@ -65,22 +69,13 @@
     padding: var(--outer-gap);
   }
 
-  .breadcrumb {
+  div {
     align-items: center;
     display: flex;
     gap: var(--inner-gap);
     justify-content: center;
     padding: var(--inner-gap);
     text-decoration: none;
-  }
-
-  a {
-    background: var(--fg-color);
-  }
-
-  a:focus,
-  a:hover {
-    outline: var(--outline);
   }
 
   span {

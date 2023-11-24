@@ -1,6 +1,7 @@
 <script lang="ts">
   import Button from "./Button.svelte";
   import Container from "./Container.svelte";
+  import Icon from "./Icon.svelte";
 
   let element: HTMLDialogElement;
 
@@ -23,9 +24,15 @@
   <slot />
   <Container spaceBetween>
     {#if onConfirm}
-      <Button iconName="check" text="Confirm" on:click={() => onConfirm && onConfirm()} />
+      <Button on:click={() => onConfirm && onConfirm()}>
+        <Icon name="check" />
+        Confirm
+      </Button>
     {/if}
-    <Button iconName="xmark" text="Close" on:click={close} />
+    <Button on:click={close}>
+      <Icon name="xmark" />
+      Close
+    </Button>
   </Container>
 </dialog>
 

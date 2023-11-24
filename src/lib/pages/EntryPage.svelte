@@ -4,6 +4,7 @@
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import Header from "$lib/components/Header.svelte";
+  import Icon from "$lib/components/Icon.svelte";
 
   export let idb: IDBDatabase;
   export let surveyRecord: IDBRecord<Survey>;
@@ -76,7 +77,10 @@
     onConfirm={editEntry}
     on:close={() => (editEntryDialog.data = { error: "" })}
   >
-    <Button iconName="pen" text="Edit" title="Edit entry" slot="opener" let:open on:click={open} />
+    <Button title="Edit entry" slot="opener" let:open on:click={open}>
+      <Icon name="pen" />
+      Edit
+    </Button>
 
     <span>Edit this entry? This will move it to drafts.</span>
     {#if editEntryDialog.data.error}
