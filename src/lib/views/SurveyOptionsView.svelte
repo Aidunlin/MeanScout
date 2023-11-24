@@ -118,10 +118,11 @@
   <Container>
     <Dialog
       bind:this={deleteSurveyDialog.dialog}
-      openButton={{ iconName: "trash", text: "Delete survey" }}
       onConfirm={deleteSurvey}
       on:close={() => (deleteSurveyDialog.data = { error: "" })}
     >
+      <Button iconName="trash" text="Delete survey" slot="opener" let:open on:click={open} />
+
       <span>Delete "{surveyRecord.name}"?</span>
       {#if entryCount}
         <span>{entryCount} {entryCount > 1 ? "entries" : "entry"} will be lost!</span>

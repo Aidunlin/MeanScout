@@ -53,10 +53,9 @@
 <footer>
   <Button iconName="plus" text="Field" title="New field" {disabled} on:click={newField} />
 
-  <Dialog
-    openButton={{ iconName: "copy", text: "Copy", title: "Copy survey" }}
-    onOpen={() => (copySurveyDialog = { text: surveyToString() })}
-  >
+  <Dialog onOpen={() => (copySurveyDialog = { text: surveyToString() })}>
+    <Button iconName="copy" text="Copy" title="Copy survey" slot="opener" let:open on:click={open} />
+
     <span>Select and copy the survey:</span>
     <Container maxWidth>
       <textarea readonly bind:value={copySurveyDialog.text} />

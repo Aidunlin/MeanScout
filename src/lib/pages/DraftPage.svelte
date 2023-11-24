@@ -7,6 +7,7 @@
     type IDBRecord,
     type Survey,
   } from "$lib";
+  import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import FieldValueEditor from "$lib/components/FieldValueEditor.svelte";
@@ -140,10 +141,10 @@
 <footer>
   <Dialog
     bind:this={submitDraftDialog.dialog}
-    openButton={{ iconName: "floppy-disk", text: "Submit", title: "Submit draft" }}
     onConfirm={submitAndStartNewDraft}
     on:close={() => (submitDraftDialog.data = { error: "" })}
   >
+    <Button iconName="floppy-disk" text="Submit" title="Submit draft" slot="opener" let:open on:click={open} />
     <span>Submit this draft and start a new one?</span>
     {#if submitDraftDialog.data.error}
       <span>{submitDraftDialog.data.error}</span>

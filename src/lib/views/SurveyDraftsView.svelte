@@ -93,11 +93,12 @@
       </Container>
 
       <Dialog
-        openButton={{ iconName: "trash", title: "Delete draft" }}
         onOpen={(element) => (deleteDraftDialog = { element, error: "" })}
         onConfirm={() => deleteDraft(draft.id)}
         on:close={() => (deleteDraftDialog = { error: "" })}
       >
+        <Button iconName="trash" title="Delete draft" slot="opener" let:open on:click={open} />
+
         <span>Delete this draft?</span>
         {#each flattenFields(surveyRecord.fields).slice(0, 2) as field, i}
           <span>{field.name}: {draft.values[i]}</span>

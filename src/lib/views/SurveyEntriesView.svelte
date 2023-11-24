@@ -72,11 +72,12 @@
       </Container>
 
       <Dialog
-        openButton={{ iconName: "trash", title: "Delete entry" }}
         onOpen={(element) => (deleteEntryDialog = { element, error: "" })}
         onConfirm={() => deleteEntry(entry.id)}
         on:close={() => (deleteEntryDialog = { error: "" })}
       >
+        <Button iconName="trash" title="Delete entry" slot="opener" let:open on:click={open} />
+
         <span>Delete this entry?</span>
         {#each flattenFields(surveyRecord.fields).slice(0, 2) as field, i}
           <span>{field.name}: {entry.values[i]}</span>

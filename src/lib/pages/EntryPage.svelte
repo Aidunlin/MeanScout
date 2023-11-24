@@ -1,5 +1,6 @@
 <script lang="ts">
   import { flattenFields, type DialogDataType, type Entry, type IDBRecord, type Survey } from "$lib";
+  import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import Header from "$lib/components/Header.svelte";
@@ -72,10 +73,11 @@
 <footer>
   <Dialog
     bind:this={editEntryDialog.dialog}
-    openButton={{ iconName: "pen", text: "Edit", title: "Edit entry" }}
     onConfirm={editEntry}
     on:close={() => (editEntryDialog.data = { error: "" })}
   >
+    <Button iconName="pen" text="Edit" title="Edit entry" slot="opener" let:open on:click={open} />
+
     <span>Edit this entry? This will move it to drafts.</span>
     {#if editEntryDialog.data.error}
       <span>{editEntryDialog.data.error}</span>

@@ -1,15 +1,14 @@
 <script lang="ts">
-  import type { ComponentProps } from "svelte";
   import Button from "./Button.svelte";
   import Container from "./Container.svelte";
 
   let element: HTMLDialogElement;
 
-  export let openButton: ComponentProps<Button>;
   export let onOpen: ((element: HTMLDialogElement) => void) | undefined = undefined;
   export let onConfirm: (() => void) | undefined = undefined;
 
-  export function show() {
+  export function open() {
+    onOpen && onOpen(element);
     element.showModal();
   }
 
@@ -18,13 +17,7 @@
   }
 </script>
 
-<Button
-  {...openButton}
-  on:click={() => {
-    onOpen && onOpen(element);
-    show();
-  }}
-/>
+<slot name="opener" {open} />
 
 <dialog bind:this={element} on:close>
   <slot />

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { fieldTypes, type DialogDataType, type Field, type IDBRecord, type Survey } from "$lib";
   import Anchor from "$lib/components/Anchor.svelte";
+  import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
 
@@ -164,22 +165,25 @@
 <footer>
   <Dialog
     bind:this={newSurveyDialog.dialog}
-    openButton={{ iconName: "plus", text: "Survey", title: "New survey" }}
     onConfirm={newSurvey}
     on:close={() => (newSurveyDialog.data = { name: "", error: "" })}
   >
+    <Button iconName="plus" text="Survey" title="New survey" slot="opener" let:open on:click={open} />
+
     <span>Enter name for new survey:</span>
     <input bind:value={newSurveyDialog.data.name} />
     {#if newSurveyDialog.data.error}
       <span>{newSurveyDialog.data.error}</span>
     {/if}
   </Dialog>
+
   <Dialog
     bind:this={pasteSurveyDialog.dialog}
-    openButton={{ iconName: "paste", text: "Import", title: "Import survey" }}
     onConfirm={parseSurvey}
     on:close={() => (pasteSurveyDialog.data = { input: "", error: "" })}
   >
+    <Button iconName="paste" text="Import" title="Import survey" slot="opener" let:open on:click={open} />
+
     <span>Paste new survey:</span>
     <textarea bind:value={pasteSurveyDialog.data.input} />
     {#if pasteSurveyDialog.data.error}
