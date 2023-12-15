@@ -23,8 +23,8 @@
     data: { name: "", error: "" },
   };
 
-  let pasteSurveyDialog: DialogDataType<{ input: string; error: string }> = {
-    data: { input: "", error: "" },
+  let pasteSurveyDialog: DialogDataType<{ files?: FileList; error: string }> = {
+    data: { error: "" },
   };
 
   function newSurvey() {
@@ -112,16 +112,17 @@
     return new Date();
   }
 
-  function parseSurvey() {
-    if (!pasteSurveyDialog.data.input.trim()) {
-      pasteSurveyDialog.data.error = "Invalid input";
+  async function parseSurvey() {
+    if (!pasteSurveyDialog.data.files?.length) {
+      pasteSurveyDialog.data.error = "No input";
       return;
     }
 
     let survey: any;
 
     try {
-      survey = JSON.parse(pasteSurveyDialog.data.input.trim());
+      const surveyText = await pasteSurveyDialog.data.files[0].text();
+      survey = JSON.parse(surveyText.trim());
     } catch (e) {
       pasteSurveyDialog.data.error = "Invalid input";
       return;
@@ -186,15 +187,17 @@
   <Dialog
     bind:this={pasteSurveyDialog.dialog}
     onConfirm={parseSurvey}
-    on:close={() => (pasteSurveyDialog.data = { input: "", error: "" })}
+    on:close={() => (pasteSurveyDialog.data.error = "")}
   >
     <Button title="Import survey" slot="opener" let:open on:click={open}>
       <Icon name="paste" />
       Import
     </Button>
 
-    <span>Paste new survey:</span>
-    <textarea bind:value={pasteSurveyDialog.data.input} />
+    <Container column noGap>
+      Import survey
+      <input type="file" accept=".json" bind:files={pasteSurveyDialog.data.files} />
+    </Container>
     {#if pasteSurveyDialog.data.error}
       <span>Could not import survey!</span>
       <span>{pasteSurveyDialog.data.error}</span>

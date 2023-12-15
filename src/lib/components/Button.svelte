@@ -12,7 +12,6 @@
 <style>
   button {
     background: var(--fg-color);
-    cursor: pointer;
     display: inline-flex;
     gap: var(--inner-gap);
     justify-content: center;

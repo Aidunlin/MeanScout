@@ -34,13 +34,13 @@ Group fields can be created for organizing your fields. Additionally, fields (as
 
 In the options page, you can add teams to the survey's allowlist to prevent entering any teams not in the particular event.
 
-## Setting up multiple devices
-
-After customizing your survey's fields, you can copy the survey as JSON text. Then, on another device in the surveys list page, you can import that JSON text. For now, you'll have to manually copy over the JSON to each device (email or messaging works well).
-
 ## Exporting
 
-In the entries list page, you can download all entries from one survey as a CSV file.
+You can export data from the survey options page.
+
+After customizing your survey's fields, you can export the survey as a JSON file. Then, on another device, you can import that JSON file. You can also download all entries from one survey as a CSV file.
+
+You'll have to manually send over the survey JSON file or entry CSV files between devices. Use Nearby Share, AirDrop, USB, email, messaging, or whatever else works best for your scouting system.
 
 ## Contributing
 

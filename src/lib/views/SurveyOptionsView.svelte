@@ -1,9 +1,10 @@
 <script lang="ts">
-  import type { DialogDataType, IDBRecord, Survey } from "$lib";
+  import { flattenFields, type DialogDataType, type Entry, type IDBRecord, type Survey } from "$lib";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import Icon from "$lib/components/Icon.svelte";
+  import { targetStore } from "$lib/target";
 
   export let idb: IDBDatabase;
   export let surveyRecord: IDBRecord<Survey>;
@@ -26,6 +27,21 @@
     }
   };
 
+  let entryRecords: IDBRecord<Entry>[] = [];
+
+  const entryCursorRequest = idb
+    .transaction("entries")
+    .objectStore("entries")
+    .index("surveyId")
+    .openCursor(surveyRecord.id);
+  entryCursorRequest.onsuccess = () => {
+    const cursor = entryCursorRequest.result;
+    if (cursor) {
+      entryRecords = [...entryRecords, cursor.value];
+      cursor.continue();
+    }
+  };
+
   let deleteSurveyDialog: DialogDataType<{ error: string }> = { data: { error: "" } };
 
   let teamInput = "";
@@ -43,6 +59,44 @@
 
   function deleteTeam(team: string) {
     surveyRecord.teams = surveyRecord.teams.filter((t) => t.trim() != team.trim());
+  }
+
+  function valueToCSV(value: any) {
+    return `${value}`.replaceAll(",", "").replaceAll("\n", ". ").trim();
+  }
+
+  function downloadEntries() {
+    const csv = [
+      flattenFields(surveyRecord.fields)
+        .map((field) => field.name)
+        .join(","),
+      ...entryRecords.map((entry) => entry.values.map(valueToCSV).join(",")),
+    ].join("\n");
+
+    const anchor = document.createElement("a");
+    anchor.download = `${surveyRecord.name}-${$targetStore}.csv`.replaceAll(" ", "_");
+    anchor.href = `data:text/plain;charset=utf-8,${encodeURIComponent(csv)}`;
+    document.body.append(anchor);
+    anchor.click();
+    anchor.remove();
+  }
+
+  function downloadSurvey() {
+    const exportableSurvey = {
+      name: surveyRecord.name,
+      fields: surveyRecord.fields,
+      teams: surveyRecord.teams,
+      created: surveyRecord.created,
+      modified: surveyRecord.modified,
+    };
+    const json = JSON.stringify(exportableSurvey, undefined, "  ");
+
+    const anchor = document.createElement("a");
+    anchor.download = `${surveyRecord.name}.json`.replaceAll(" ", "_");
+    anchor.href = `data:text/plain;charset=utf-8,${encodeURIComponent(json)}`;
+    document.body.append(anchor);
+    anchor.click();
+    anchor.remove();
   }
 
   function deleteEntries(transaction: IDBTransaction, storeName: string) {
@@ -90,6 +144,18 @@
 </script>
 
 <Container column padding>
+  <h2>Export</h2>
+  <Container>
+    <Button title="Export entries" on:click={downloadEntries}>
+      <Icon name="download" />
+      Entries
+    </Button>
+    <Button title="Export survey" on:click={downloadSurvey}>
+      <Icon name="download" />
+      Survey
+    </Button>
+  </Container>
+
   <h2>Team Allowlist</h2>
   <Container column>
     <Container column noGap>
@@ -124,7 +190,7 @@
     >
       <Button slot="opener" let:open on:click={open}>
         <Icon name="trash" />
-        Delete survey
+        Survey
       </Button>
 
       <span>Delete "{surveyRecord.name}"?</span>

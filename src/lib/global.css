@@ -103,6 +103,22 @@ input::-webkit-inner-spin-button {
   display: none;
 }
 
+input[type="file"] {
+  background: none;
+  color: white;
+  padding: 0;
+}
+
+input::file-selector-button {
+  appearance: none;
+  background: var(--fg-color);
+  border: none;
+  color: var(--theme-color);
+  font-family: inherit;
+  padding: var(--inner-gap);
+  margin-right: var(--outer-gap);
+}
+
 select {
   text-transform: capitalize;
 }

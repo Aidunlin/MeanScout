@@ -5,7 +5,6 @@
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import Icon from "$lib/components/Icon.svelte";
-  import { targetStore } from "$lib/target";
 
   export let idb: IDBDatabase;
   export let surveyRecord: IDBRecord<Survey>;
@@ -26,26 +25,6 @@
   };
 
   let deleteEntryDialog: { element?: HTMLDialogElement; error: string } = { error: "" };
-
-  function valueToCSV(value: any) {
-    return `${value}`.replaceAll(",", "").replaceAll("\n", ". ").trim();
-  }
-
-  function downloadEntries() {
-    const csv = [
-      flattenFields(surveyRecord.fields)
-        .map((field) => field.name)
-        .join(","),
-      ...entryRecords.map((entry) => entry.values.map(valueToCSV).join(",")),
-    ].join("\n");
-
-    const anchor = document.createElement("a");
-    anchor.download = `${surveyRecord.name}-${$targetStore}.csv`.replaceAll(" ", "_");
-    anchor.href = `data:text/plain;charset=utf-8,${encodeURIComponent(csv)}`;
-    document.body.append(anchor);
-    anchor.click();
-    anchor.remove();
-  }
 
   function deleteEntry(id: number) {
     const deleteRequest = idb.transaction("entries", "readwrite").objectStore("entries").delete(id);
@@ -94,10 +73,3 @@
     </Container>
   {/each}
 </Container>
-
-<footer>
-  <Button title="Download entries" on:click={downloadEntries}>
-    <Icon name="download" />
-    Download
-  </Button>
-</footer>

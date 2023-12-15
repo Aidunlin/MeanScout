@@ -2,7 +2,6 @@
   import type { IDBRecord, Survey } from "$lib";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
-  import Dialog from "$lib/components/Dialog.svelte";
   import FieldEditor from "$lib/components/FieldEditor.svelte";
   import Icon from "$lib/components/Icon.svelte";
 
@@ -23,21 +22,8 @@
     disabled ||= entryCountRequest.result > 0;
   };
 
-  let copySurveyDialog = { text: "" };
-
   function newField() {
     surveyRecord.fields = [...surveyRecord.fields, { name: "", type: "toggle" }];
-  }
-
-  function surveyToString() {
-    const exportableSurvey = {
-      name: surveyRecord.name,
-      fields: surveyRecord.fields,
-      teams: surveyRecord.teams,
-      created: surveyRecord.created,
-      modified: surveyRecord.modified,
-    };
-    return JSON.stringify(exportableSurvey, undefined, "  ");
   }
 </script>
 
@@ -56,16 +42,4 @@
     <Icon name="plus" />
     Field
   </Button>
-
-  <Dialog onOpen={() => (copySurveyDialog = { text: surveyToString() })}>
-    <Button title="Copy survey" slot="opener" let:open on:click={open}>
-      <Icon name="copy" />
-      Copy
-    </Button>
-
-    <span>Select and copy the survey:</span>
-    <Container maxWidth>
-      <textarea readonly bind:value={copySurveyDialog.text} />
-    </Container>
-  </Dialog>
 </footer>
