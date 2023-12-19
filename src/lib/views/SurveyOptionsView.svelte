@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { flattenFields, type DialogDataType, type Entry, type IDBRecord, type Survey } from "$lib";
+  import { type DialogDataType, type Entry, type IDBRecord, type Survey } from "$lib";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
@@ -65,38 +65,32 @@
     return `${value}`.replaceAll(",", "").replaceAll("\n", ". ").trim();
   }
 
-  function downloadEntries() {
-    const csv = [
-      flattenFields(surveyRecord.fields)
-        .map((field) => field.name)
-        .join(","),
-      ...entryRecords.map((entry) => entry.values.map(valueToCSV).join(",")),
-    ].join("\n");
+  function download(data: string, fileName: string, fileType: string) {
+    const blob = new Blob([data], { type: `text/${fileType}` });
+    const url = URL.createObjectURL(blob);
 
     const anchor = document.createElement("a");
-    anchor.download = `${surveyRecord.name}-${$targetStore}.csv`.replaceAll(" ", "_");
-    anchor.href = `data:text/plain;charset=utf-8,${encodeURIComponent(csv)}`;
+    anchor.download = `${fileName}.${fileType}`.replaceAll(" ", "_");
+    anchor.href = url;
     document.body.append(anchor);
     anchor.click();
     anchor.remove();
+
+    URL.revokeObjectURL(url);
+  }
+
+  function downloadEntries() {
+    const csv = entryRecords.map((entry) => entry.values.map(valueToCSV).join(",")).join("\n");
+
+    download(csv, `${surveyRecord.name}-${$targetStore}`, "csv");
   }
 
   function downloadSurvey() {
-    const exportableSurvey = {
-      name: surveyRecord.name,
-      fields: surveyRecord.fields,
-      teams: surveyRecord.teams,
-      created: surveyRecord.created,
-      modified: surveyRecord.modified,
-    };
-    const json = JSON.stringify(exportableSurvey, undefined, "  ");
+    const survey = structuredClone(surveyRecord) as Survey & { id?: number };
+    delete survey.id;
+    const json = JSON.stringify(survey, undefined, "  ");
 
-    const anchor = document.createElement("a");
-    anchor.download = `${surveyRecord.name}.json`.replaceAll(" ", "_");
-    anchor.href = `data:text/plain;charset=utf-8,${encodeURIComponent(json)}`;
-    document.body.append(anchor);
-    anchor.click();
-    anchor.remove();
+    download(json, surveyRecord.name, "json");
   }
 
   function deleteEntries(transaction: IDBTransaction, storeName: string) {
