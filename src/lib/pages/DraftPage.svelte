@@ -29,7 +29,7 @@
     draftRecord.values.forEach((value, i) => {
       switch (fields[i].type) {
         case "team":
-          if (!/^\d{1,4}[A-Z]?$/.test(value)) {
+          if (!/^\d{1,5}[A-Z]?$/.test(value)) {
             error = `Invalid value for ${fields[i].name}`;
           }
           if (surveyRecord.teams.length && !surveyRecord.teams.includes(value)) {
@@ -37,7 +37,7 @@
           }
           break;
         case "match":
-          if (!/\d{1,3}/.test(`${value}`)) {
+          if (!/\d{1,3}/.test(value)) {
             error = `Invalid value for ${fields[i].name}`;
           }
           break;
