@@ -61,16 +61,26 @@
     surveyRecord.teams = surveyRecord.teams.filter((t) => t.trim() != team.trim());
   }
 
-  function valueToCSV(value: any) {
-    return `${value}`.replaceAll(",", "").replaceAll("\n", ". ").trim();
+  function valueAsCSV(value: any) {
+    return value.toString().replaceAll(",", "").replaceAll("\n", ". ").trim();
   }
 
-  function download(data: string, fileName: string, fileType: string) {
-    const blob = new Blob([data], { type: `text/${fileType}` });
+  function entriesAsCSV() {
+    return entryRecords.map((entry) => entry.values.map(valueAsCSV).join(",")).join("\n");
+  }
+
+  function surveyAsJSON() {
+    const survey = structuredClone(surveyRecord) as Survey & { id?: number };
+    delete survey.id;
+    return JSON.stringify(survey, undefined, "  ");
+  }
+
+  function download(data: string, name: string, type: string) {
+    const blob = new Blob([data], { type });
     const url = URL.createObjectURL(blob);
 
     const anchor = document.createElement("a");
-    anchor.download = `${fileName}.${fileType}`.replaceAll(" ", "_");
+    anchor.download = name.replaceAll(" ", "_");
     anchor.href = url;
     document.body.append(anchor);
     anchor.click();
@@ -79,18 +89,27 @@
     URL.revokeObjectURL(url);
   }
 
-  function downloadEntries() {
-    const csv = entryRecords.map((entry) => entry.values.map(valueToCSV).join(",")).join("\n");
+  function share(data: string, name: string, type: string) {
+    const file = new File([data], name.replaceAll(" ", "_"), { type });
+    navigator.share({ files: [file], title: file.name });
+  }
 
-    download(csv, `${surveyRecord.name}-${$targetStore}`, "csv");
+  function downloadEntries() {
+    download(entriesAsCSV(), `${surveyRecord.name}-entries-${$targetStore}.csv`, "text/csv");
+  }
+
+  function shareEntries() {
+    share(entriesAsCSV(), `${surveyRecord.name}-entries-${$targetStore}.csv`, "text/csv");
   }
 
   function downloadSurvey() {
-    const survey = structuredClone(surveyRecord) as Survey & { id?: number };
-    delete survey.id;
-    const json = JSON.stringify(survey, undefined, "  ");
+    download(surveyAsJSON(), `${surveyRecord.name}-survey.json`, "application/json");
+  }
 
-    download(json, surveyRecord.name, "json");
+  function shareSurvey() {
+    // Web Share API does not allow JSON files.
+    // https://docs.google.com/document/d/1tKPkHA5nnJtmh2TgqWmGSREUzXgMUFDL6yMdVZHqUsg
+    share(surveyAsJSON(), `${surveyRecord.name}-survey.txt`, "text/plain");
   }
 
   function deleteEntries(transaction: IDBTransaction, storeName: string) {
@@ -138,16 +157,32 @@
 </script>
 
 <Container column padding>
-  <h2>Export</h2>
+  <h2>Entries</h2>
   <Container>
-    <Button title="Export entries" on:click={downloadEntries}>
+    <Button title="Download entries" on:click={downloadEntries}>
       <Icon name="download" />
-      Entries
+      Download
     </Button>
-    <Button title="Export survey" on:click={downloadSurvey}>
+    {#if "canShare" in navigator}
+      <Button title="Share entries" on:click={shareEntries}>
+        <Icon name="share-from-square" />
+        Share
+      </Button>
+    {/if}
+  </Container>
+
+  <h2>Survey</h2>
+  <Container>
+    <Button title="Download survey" on:click={downloadSurvey}>
       <Icon name="download" />
-      Survey
+      Download
     </Button>
+    {#if "canShare" in navigator}
+      <Button title="Share survey" on:click={shareSurvey}>
+        <Icon name="share-from-square" />
+        Share
+      </Button>
+    {/if}
   </Container>
 
   <h2>Team Allowlist</h2>

@@ -196,7 +196,7 @@
 
     <Container column noGap>
       Import survey
-      <input type="file" accept=".json" bind:files={pasteSurveyDialog.data.files} />
+      <input type="file" accept=".json,.txt" bind:files={pasteSurveyDialog.data.files} />
     </Container>
     {#if pasteSurveyDialog.data.error}
       <span>Could not import survey!</span>
