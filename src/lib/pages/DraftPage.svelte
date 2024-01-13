@@ -111,10 +111,8 @@
 </script>
 
 <Header
-  breadcrumbs={[
-    { text: surveyRecord.name, iconName: "list-ul", hash: `survey/${surveyRecord.id}/drafts` },
-    { text: "Draft", iconName: "pen-ruler" },
-  ]}
+  parent={{ text: "Drafts", iconName: "pen-ruler", hash: `survey/${surveyRecord.id}/drafts` }}
+  current={{ text: "Draft", iconName: "pen-ruler" }}
 />
 
 <datalist id="teams-list">

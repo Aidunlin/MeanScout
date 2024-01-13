@@ -1,12 +1,10 @@
 <script lang="ts">
   import type { IDBRecord, Survey } from "$lib";
+  import Anchor from "$lib/components/Anchor.svelte";
+  import Container from "$lib/components/Container.svelte";
   import Header from "$lib/components/Header.svelte";
-  import SurveyDraftsView from "$lib/views/SurveyDraftsView.svelte";
-  import SurveyEntriesView from "$lib/views/SurveyEntriesView.svelte";
-  import SurveyFieldsView from "$lib/views/SurveyFieldsView.svelte";
-  import SurveyOptionsView from "$lib/views/SurveyOptionsView.svelte";
+  import Icon from "$lib/components/Icon.svelte";
 
-  export let view: "drafts" | "entries" | "fields" | "options" = "entries";
   export let idb: IDBDatabase;
   export let surveyRecord: IDBRecord<Survey>;
 
@@ -14,23 +12,45 @@
 </script>
 
 <Header
-  breadcrumbs={[{ text: surveyRecord.name, iconName: "list-ul" }]}
-  views={[
-    { text: "Drafts", iconName: "pen-ruler", hash: "drafts" },
-    { text: "Entries", iconName: "list-ol", hash: "entries" },
-    { text: "Fields", iconName: "list-check", hash: "fields" },
-    { text: "Options", iconName: "gears", hash: "options" },
-  ]}
-  currentView={view}
-  baseHash="survey/{surveyRecord.id}"
+  parent={{ text: "Surveys", iconName: "list-ul", hash: "surveys" }}
+  current={{ text: surveyRecord.name, iconName: "list-ul" }}
 />
 
-{#if view == "drafts"}
-  <SurveyDraftsView {idb} bind:surveyRecord />
-{:else if view == "entries"}
-  <SurveyEntriesView {idb} bind:surveyRecord />
-{:else if view == "fields"}
-  <SurveyFieldsView {idb} bind:surveyRecord />
-{:else if view == "options"}
-  <SurveyOptionsView {idb} bind:surveyRecord />
-{/if}
+<Container column padding>
+  <Anchor hash="survey/{surveyRecord.id}/drafts">
+    <Container maxWidth spaceBetween>
+      <Container>
+        <Icon name="pen-ruler" />
+        Drafts
+      </Container>
+      <Icon name="arrow-right" />
+    </Container>
+  </Anchor>
+  <Anchor hash="survey/{surveyRecord.id}/entries">
+    <Container maxWidth spaceBetween>
+      <Container>
+        <Icon name="list-ol" />
+        Entries
+      </Container>
+      <Icon name="arrow-right" />
+    </Container>
+  </Anchor>
+  <Anchor hash="survey/{surveyRecord.id}/fields">
+    <Container maxWidth spaceBetween>
+      <Container>
+        <Icon name="list-check" />
+        Fields
+      </Container>
+      <Icon name="arrow-right" />
+    </Container>
+  </Anchor>
+  <Anchor hash="survey/{surveyRecord.id}/options">
+    <Container maxWidth spaceBetween>
+      <Container>
+        <Icon name="gears" />
+        Options
+      </Container>
+      <Icon name="arrow-right" />
+    </Container>
+  </Anchor>
+</Container>

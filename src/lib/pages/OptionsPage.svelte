@@ -1,10 +1,12 @@
 <script lang="ts">
   import Container from "$lib/components/Container.svelte";
+  import Header from "$lib/components/Header.svelte";
   import { targets, targetStore } from "$lib/target";
 </script>
 
+<Header current={{ text: "Options", iconName: "gears" }} />
+
 <Container column padding>
-  <h2>Options</h2>
   <Container>
     <Container column noGap>
       Target

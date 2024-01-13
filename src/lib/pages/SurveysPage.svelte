@@ -4,6 +4,7 @@
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
+  import Header from "$lib/components/Header.svelte";
   import Icon from "$lib/components/Icon.svelte";
 
   export let idb: IDBDatabase;
@@ -154,11 +155,12 @@
   }
 </script>
 
+<Header current={{ text: "Surveys", iconName: "list-ul" }} />
+
 <Container column padding>
-  <h2>Surveys</h2>
   {#each surveyRecords as survey (survey.id)}
     <Container>
-      <Anchor hash="survey/{survey.id}/drafts" title="Open survey">
+      <Anchor hash="survey/{survey.id}" title="Open survey">
         <Icon name="arrow-right" />
       </Anchor>
       <span>{survey.name}</span>

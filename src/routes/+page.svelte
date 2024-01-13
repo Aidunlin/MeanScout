@@ -6,40 +6,74 @@
   import DraftPage from "$lib/pages/DraftPage.svelte";
   import EntryPage from "$lib/pages/EntryPage.svelte";
   import MainPage from "$lib/pages/MainPage.svelte";
+  import OptionsPage from "$lib/pages/OptionsPage.svelte";
+  import SurveyDraftsPage from "$lib/pages/SurveyDraftsPage.svelte";
+  import SurveyEntriesPage from "$lib/pages/SurveyEntriesPage.svelte";
+  import SurveyFieldsPage from "$lib/pages/SurveyFieldsPage.svelte";
+  import SurveyOptionsPage from "$lib/pages/SurveyOptionsPage.svelte";
   import SurveyPage from "$lib/pages/SurveyPage.svelte";
+  import SurveysPage from "$lib/pages/SurveysPage.svelte";
   import type { ComponentProps } from "svelte";
 
   let idbError: string;
   let idb: IDBDatabase;
 
   let current:
-    | { page: "main"; props: ComponentProps<MainPage> }
-    | { page: "survey"; props: ComponentProps<SurveyPage> }
+    | { page: ""; props: ComponentProps<MainPage> }
+    | { page: "surveys"; props: ComponentProps<SurveysPage> }
+    | { page: "options"; props: ComponentProps<OptionsPage> }
+    | { page: "survey"; subpage: ""; props: ComponentProps<SurveyPage> }
+    | { page: "survey"; subpage: "drafts"; props: ComponentProps<SurveyDraftsPage> }
+    | { page: "survey"; subpage: "entries"; props: ComponentProps<SurveyEntriesPage> }
+    | { page: "survey"; subpage: "fields"; props: ComponentProps<SurveyFieldsPage> }
+    | { page: "survey"; subpage: "options"; props: ComponentProps<SurveyOptionsPage> }
     | { page: "draft"; props: ComponentProps<DraftPage> }
     | { page: "entry"; props: ComponentProps<EntryPage> };
 
-  function setMainPage(view: ComponentProps<MainPage>["view"] = "surveys") {
-    if (current?.page == "main") {
-      current.props.view = view;
+  function setMainPage() {
+    if (current?.page == "") {
       return;
     }
 
     current = {
-      page: "main",
-      props: { view, idb },
+      page: "",
+      props: { idb },
     };
   }
 
-  function setSurveyPage(id: number, view: ComponentProps<SurveyPage>["view"]) {
+  function setSurveysPage() {
+    if (current?.page == "surveys") {
+      return;
+    }
+
+    current = {
+      page: "surveys",
+      props: { idb },
+    };
+  }
+
+  function setOptionsPage() {
+    if (current?.page == "options") {
+      return;
+    }
+
+    current = {
+      page: "options",
+      props: {},
+    };
+  }
+
+  function setSurveyPage(id: number, subpage: "" | "drafts" | "entries" | "fields" | "options") {
     if (current?.page == "survey" && current.props.surveyRecord.id == id) {
-      current.props.view = view;
+      current.subpage = subpage;
       return;
     }
 
     if (current?.page == "draft" || current?.page == "entry") {
       current = {
         page: "survey",
-        props: { view, idb, surveyRecord: current.props.surveyRecord },
+        subpage,
+        props: { idb, surveyRecord: current.props.surveyRecord },
       };
       return;
     }
@@ -53,7 +87,8 @@
 
       current = {
         page: "survey",
-        props: { view, idb, surveyRecord },
+        subpage,
+        props: { idb, surveyRecord },
       };
     };
   }
@@ -143,19 +178,29 @@
   function handleHashChange() {
     const hash = location.hash.replace(/#\/?/, "").toLowerCase().trim().split("/");
     const page =
-      hash[0] == "main" || hash[0] == "survey" || hash[0] == "draft" || hash[0] == "entry" ? hash[0] : "main";
+      hash[0] == "" ||
+      hash[0] == "surveys" ||
+      hash[0] == "options" ||
+      hash[0] == "survey" ||
+      hash[0] == "draft" ||
+      hash[0] == "entry"
+        ? hash[0]
+        : "";
 
-    if (page == "main") {
-      const view = hash[1] == "surveys" || hash[1] == "options" ? hash[1] : "surveys";
-      setMainPage(view);
+    if (page == "") {
+      setMainPage();
+    } else if (page == "surveys") {
+      setSurveysPage();
+    } else if (page == "options") {
+      setOptionsPage();
     } else if (page == "survey") {
-      const view =
-        hash[2] == "drafts" || hash[2] == "entries" || hash[2] == "fields" || hash[2] == "options"
+      const subpage =
+        hash[2] == "" || hash[2] == "drafts" || hash[2] == "entries" || hash[2] == "fields" || hash[2] == "options"
           ? hash[2]
-          : "entries";
+          : "";
       const id = Number(hash[1]);
       if (Number.isNaN(id)) return setMainPage();
-      setSurveyPage(id, view);
+      setSurveyPage(id, subpage);
     } else if (page == "draft") {
       const id = Number(hash[1]);
       if (Number.isNaN(id)) return setMainPage();
@@ -253,10 +298,24 @@
     </p>
     <p>Error: {idbError}</p>
   </Container>
-{:else if current?.page == "main"}
+{:else if current?.page == ""}
   <MainPage {...current.props} />
+{:else if current?.page == "surveys"}
+  <SurveysPage {...current.props} />
+{:else if current?.page == "options"}
+  <OptionsPage {...current.props} />
 {:else if current?.page == "survey"}
-  <SurveyPage {...current.props} />
+  {#if current.subpage == ""}
+    <SurveyPage {...current.props} />
+  {:else if current.subpage == "drafts"}
+    <SurveyDraftsPage {...current.props} />
+  {:else if current.subpage == "entries"}
+    <SurveyEntriesPage {...current.props} />
+  {:else if current.subpage == "fields"}
+    <SurveyFieldsPage {...current.props} />
+  {:else if current.subpage == "options"}
+    <SurveyOptionsPage {...current.props} />
+  {/if}
 {:else if current?.page == "draft"}
   {#key current.props.draftRecord.id}
     <DraftPage {...current.props} />

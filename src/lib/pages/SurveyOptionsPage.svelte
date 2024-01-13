@@ -4,10 +4,13 @@
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import Icon from "$lib/components/Icon.svelte";
+  import Header from "$lib/components/Header.svelte";
   import { targetStore } from "$lib/target";
 
   export let idb: IDBDatabase;
   export let surveyRecord: IDBRecord<Survey>;
+
+  $: idb.transaction("surveys", "readwrite").objectStore("surveys").put(surveyRecord);
 
   let entryCount = 0;
 
@@ -142,7 +145,7 @@
     };
 
     deleteTransaction.oncomplete = () => {
-      location.hash = "/main/surveys";
+      location.hash = "/surveys";
     };
 
     const surveyRequest = deleteTransaction.objectStore("surveys").delete(surveyRecord.id);
@@ -155,6 +158,11 @@
     deleteEntries(deleteTransaction, "entries");
   }
 </script>
+
+<Header
+  parent={{ text: surveyRecord.name, iconName: "list-ul", hash: `survey/${surveyRecord.id}` }}
+  current={{ text: "Options", iconName: "gears" }}
+/>
 
 <Container column padding>
   <h2>Entries</h2>

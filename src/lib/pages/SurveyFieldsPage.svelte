@@ -4,10 +4,13 @@
   import Container from "$lib/components/Container.svelte";
   import FieldEditor from "$lib/components/FieldEditor.svelte";
   import FieldValueEditor from "$lib/components/FieldValueEditor.svelte";
+  import Header from "$lib/components/Header.svelte";
   import Icon from "$lib/components/Icon.svelte";
 
   export let idb: IDBDatabase;
   export let surveyRecord: IDBRecord<Survey>;
+
+  $: idb.transaction("surveys", "readwrite").objectStore("surveys").put(surveyRecord);
 
   let disabled = false;
   let preview = false;
@@ -33,8 +36,12 @@
   }
 </script>
 
+<Header
+  parent={{ text: surveyRecord.name, iconName: "list-ul", hash: `survey/${surveyRecord.id}` }}
+  current={{ text: "Fields", iconName: "list-check" }}
+/>
+
 <Container column padding>
-  <h2>Fields</h2>
   {#if preview}
     <Container alignEnd>
       {#each surveyRecord.fields as field (field)}

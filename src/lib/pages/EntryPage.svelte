@@ -51,10 +51,8 @@
 </script>
 
 <Header
-  breadcrumbs={[
-    { text: surveyRecord.name, iconName: "list-ul", hash: `survey/${surveyRecord.id}/entries` },
-    { text: "Entry", iconName: "list-ol" },
-  ]}
+  parent={{ text: "Entries", iconName: "list-ol", hash: `survey/${surveyRecord.id}/entries` }}
+  current={{ text: "Entry", iconName: "list-ol" }}
 />
 
 <Container column padding>

@@ -4,10 +4,13 @@
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
+  import Header from "$lib/components/Header.svelte";
   import Icon from "$lib/components/Icon.svelte";
 
   export let idb: IDBDatabase;
   export let surveyRecord: IDBRecord<Survey>;
+
+  $: idb.transaction("surveys", "readwrite").objectStore("surveys").put(surveyRecord);
 
   let draftRecords: IDBRecord<Entry>[] = [];
   let entryRecords: IDBRecord<Entry>[] = [];
@@ -81,8 +84,12 @@
   }
 </script>
 
+<Header
+  parent={{ text: surveyRecord.name, iconName: "list-ul", hash: `survey/${surveyRecord.id}` }}
+  current={{ text: "Drafts", iconName: "pen-ruler" }}
+/>
+
 <Container column padding>
-  <h2>Drafts</h2>
   {#each draftRecords as draft (draft.id)}
     <Container spaceBetween>
       <Container>
