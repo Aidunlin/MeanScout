@@ -145,7 +145,7 @@
     };
 
     deleteTransaction.oncomplete = () => {
-      location.hash = "/surveys";
+      location.hash = "/";
     };
 
     const surveyRequest = deleteTransaction.objectStore("surveys").delete(surveyRecord.id);

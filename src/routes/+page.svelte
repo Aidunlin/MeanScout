@@ -6,13 +6,12 @@
   import DraftPage from "$lib/pages/DraftPage.svelte";
   import EntryPage from "$lib/pages/EntryPage.svelte";
   import MainPage from "$lib/pages/MainPage.svelte";
-  import OptionsPage from "$lib/pages/OptionsPage.svelte";
+  import SettingsPage from "$lib/pages/SettingsPage.svelte";
   import SurveyDraftsPage from "$lib/pages/SurveyDraftsPage.svelte";
   import SurveyEntriesPage from "$lib/pages/SurveyEntriesPage.svelte";
   import SurveyFieldsPage from "$lib/pages/SurveyFieldsPage.svelte";
   import SurveyOptionsPage from "$lib/pages/SurveyOptionsPage.svelte";
   import SurveyPage from "$lib/pages/SurveyPage.svelte";
-  import SurveysPage from "$lib/pages/SurveysPage.svelte";
   import type { ComponentProps } from "svelte";
 
   let idbError: string;
@@ -20,8 +19,7 @@
 
   let current:
     | { page: ""; props: ComponentProps<MainPage> }
-    | { page: "surveys"; props: ComponentProps<SurveysPage> }
-    | { page: "options"; props: ComponentProps<OptionsPage> }
+    | { page: "settings"; props: ComponentProps<SettingsPage> }
     | { page: "survey"; subpage: ""; props: ComponentProps<SurveyPage> }
     | { page: "survey"; subpage: "drafts"; props: ComponentProps<SurveyDraftsPage> }
     | { page: "survey"; subpage: "entries"; props: ComponentProps<SurveyEntriesPage> }
@@ -41,24 +39,13 @@
     };
   }
 
-  function setSurveysPage() {
-    if (current?.page == "surveys") {
+  function setSettingsPage() {
+    if (current?.page == "settings") {
       return;
     }
 
     current = {
-      page: "surveys",
-      props: { idb },
-    };
-  }
-
-  function setOptionsPage() {
-    if (current?.page == "options") {
-      return;
-    }
-
-    current = {
-      page: "options",
+      page: "settings",
       props: {},
     };
   }
@@ -177,22 +164,15 @@
 
   function handleHashChange() {
     const hash = location.hash.replace(/#\/?/, "").toLowerCase().trim().split("/");
-    const page =
-      hash[0] == "" ||
-      hash[0] == "surveys" ||
-      hash[0] == "options" ||
-      hash[0] == "survey" ||
-      hash[0] == "draft" ||
-      hash[0] == "entry"
+    const page: (typeof current)["page"] =
+      hash[0] == "" || hash[0] == "settings" || hash[0] == "survey" || hash[0] == "draft" || hash[0] == "entry"
         ? hash[0]
         : "";
 
     if (page == "") {
       setMainPage();
-    } else if (page == "surveys") {
-      setSurveysPage();
-    } else if (page == "options") {
-      setOptionsPage();
+    } else if (page == "settings") {
+      setSettingsPage();
     } else if (page == "survey") {
       const subpage =
         hash[2] == "" || hash[2] == "drafts" || hash[2] == "entries" || hash[2] == "fields" || hash[2] == "options"
@@ -300,10 +280,8 @@
   </Container>
 {:else if current?.page == ""}
   <MainPage {...current.props} />
-{:else if current?.page == "surveys"}
-  <SurveysPage {...current.props} />
-{:else if current?.page == "options"}
-  <OptionsPage {...current.props} />
+{:else if current?.page == "settings"}
+  <SettingsPage {...current.props} />
 {:else if current?.page == "survey"}
   {#if current.subpage == ""}
     <SurveyPage {...current.props} />

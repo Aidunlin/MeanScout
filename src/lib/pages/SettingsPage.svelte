@@ -28,7 +28,7 @@
   }
 </script>
 
-<Header current={{ text: "Options", iconName: "gears" }} />
+<Header current={{ text: "Settings", iconName: "gears" }} />
 
 <Container padding>
   <Container column noGap>

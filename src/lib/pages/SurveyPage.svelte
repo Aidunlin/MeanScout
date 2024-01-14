@@ -11,10 +11,7 @@
   $: idb.transaction("surveys", "readwrite").objectStore("surveys").put(surveyRecord);
 </script>
 
-<Header
-  parent={{ text: "Surveys", iconName: "list-ul", hash: "surveys" }}
-  current={{ text: surveyRecord.name, iconName: "list-ul" }}
-/>
+<Header current={{ text: surveyRecord.name, iconName: "list-ul" }} />
 
 <Container column padding>
   <Anchor hash="survey/{surveyRecord.id}/drafts">
