@@ -12,6 +12,8 @@
 
   let editEntryDialog: DialogDataType<{ error: string }> = { data: { error: "" } };
 
+  let deleteEntryDialog: { element?: HTMLDialogElement; error: string } = { error: "" };
+
   function editEntry() {
     const moveTransaction = idb.transaction(["drafts", "entries"], "readwrite");
     moveTransaction.onabort = () => {
@@ -48,6 +50,17 @@
   function countPreviousFields(index: number) {
     return flattenFields(surveyRecord.fields.slice(0, index)).length;
   }
+
+  function deleteEntry(id: number) {
+    const deleteRequest = idb.transaction("entries", "readwrite").objectStore("entries").delete(id);
+    deleteRequest.onerror = () => {
+      deleteEntryDialog.error = `Could not delete entry: ${deleteRequest.error?.message}`;
+    };
+
+    deleteRequest.onsuccess = () => {
+      location.href = `/survey/${surveyRecord.id}/entries`;
+    };
+  }
 </script>
 
 <Header
@@ -83,6 +96,22 @@
     <span>Edit this entry? This will move it to drafts.</span>
     {#if editEntryDialog.data.error}
       <span>{editEntryDialog.data.error}</span>
+    {/if}
+  </Dialog>
+
+  <Dialog
+    onOpen={(element) => (deleteEntryDialog = { element, error: "" })}
+    onConfirm={() => deleteEntry(entryRecord.id)}
+    on:close={() => (deleteEntryDialog = { error: "" })}
+  >
+    <Button title="Delete entry" slot="opener" let:open on:click={open}>
+      <Icon name="trash" />
+      Delete
+    </Button>
+
+    <span>Delete this entry?</span>
+    {#if deleteEntryDialog.error}
+      <span>{deleteEntryDialog.error}</span>
     {/if}
   </Dialog>
 </footer>

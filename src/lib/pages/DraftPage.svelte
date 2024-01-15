@@ -22,6 +22,8 @@
 
   let submitDraftDialog: DialogDataType<{ error: string }> = { data: { error: "" } };
 
+  let deleteDraftDialog: { element?: HTMLDialogElement; error: string } = { error: "" };
+
   function validateDraft() {
     let error = "";
     const fields = flattenFields(surveyRecord.fields);
@@ -108,6 +110,17 @@
   function countPreviousFields(index: number) {
     return flattenFields(surveyRecord.fields.slice(0, index)).length;
   }
+
+  function deleteDraft(id: number) {
+    const deleteRequest = idb.transaction("drafts", "readwrite").objectStore("drafts").delete(id);
+    deleteRequest.onerror = () => {
+      deleteDraftDialog.error = `Could not delete draft: ${deleteRequest.error?.message}`;
+    };
+
+    deleteRequest.onsuccess = () => {
+      location.hash = `/survey/${surveyRecord.id}/drafts`;
+    };
+  }
 </script>
 
 <Header
@@ -151,6 +164,21 @@
     <span>Submit this draft and start a new one?</span>
     {#if submitDraftDialog.data.error}
       <span>{submitDraftDialog.data.error}</span>
+    {/if}
+  </Dialog>
+
+  <Dialog
+    onOpen={(element) => (deleteDraftDialog = { element, error: "" })}
+    onConfirm={() => deleteDraft(draftRecord.id)}
+    on:close={() => (deleteDraftDialog = { error: "" })}
+  >
+    <Button title="Delete draft" slot="opener" let:open on:click={open}>
+      <Icon name="trash" />
+      Delete
+    </Button>
+    <span>Delete this draft?</span>
+    {#if deleteDraftDialog.error}
+      <span>{deleteDraftDialog.error}</span>
     {/if}
   </Dialog>
 </footer>
