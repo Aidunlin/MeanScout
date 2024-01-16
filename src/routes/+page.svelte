@@ -270,7 +270,7 @@
 
 {#if idbError}
   <Header />
-  <Container padding>
+  <Container padding="large">
     <h2>Error</h2>
     <p>
       MeanScout was unable to access IndexedDB. Double check that your device/browser supports it, and that you haven't

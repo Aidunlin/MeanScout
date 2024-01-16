@@ -30,8 +30,8 @@
 
 <Header current={{ text: "Settings", iconName: "gears" }} />
 
-<Container padding>
-  <Container column noGap>
+<Container padding="large">
+  <Container direction="column" gap="none">
     Target
     <select bind:value={$targetStore} title="Target">
       {#each targets as target}
@@ -41,10 +41,10 @@
   </Container>
 </Container>
 
-<Container column padding>
+<Container direction="column" padding="large">
   <h2>The Blue Alliance</h2>
-  <Container alignEnd>
-    <Container noGap>
+  <Container align="end">
+    <Container gap="none">
       Read Key
       <input bind:value={tbaKey} title="TBA Key" />
     </Container>

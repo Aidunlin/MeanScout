@@ -24,20 +24,6 @@
       cursor.continue();
     }
   };
-
-  let deleteEntryDialog: { element?: HTMLDialogElement; error: string } = { error: "" };
-
-  function deleteEntry(id: number) {
-    const deleteRequest = idb.transaction("entries", "readwrite").objectStore("entries").delete(id);
-    deleteRequest.onerror = () => {
-      deleteEntryDialog.error = `Could not delete entry: ${deleteRequest.error?.message}`;
-    };
-
-    deleteRequest.onsuccess = () => {
-      entryRecords = entryRecords.filter((entry) => entry.id !== id);
-      deleteEntryDialog.element?.close();
-    };
-  }
 </script>
 
 <Header
@@ -46,11 +32,11 @@
 />
 
 {#if entryRecords.length}
-  <Container column padding>
+  <Container direction="column" padding="large">
     {#each entryRecords as entry (entry.id)}
       <Anchor hash="entry/{entry.id}" title="Edit entry">
         <Container maxWidth spaceBetween>
-          <Container column>
+          <Container direction="column" gap="small">
             {#each flattenFields(surveyRecord.fields).filter((field) => {
               return field.type == "team" || field.type == "match";
             }) as field, i}

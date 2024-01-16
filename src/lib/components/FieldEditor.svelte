@@ -85,13 +85,13 @@
   }
 </script>
 
-<Container column padding>
+<Container direction="column" padding="large">
   <Container>
-    <Container column noGap>
+    <Container direction="column" gap="none">
       Name
       <input bind:value={field.name} {disabled} />
     </Container>
-    <Container column noGap>
+    <Container direction="column" gap="none">
       Type
       <select value={field.type} on:change={(e) => switchFieldType(e.currentTarget.value)} {disabled}>
         {#each fieldTypes as fieldType}
@@ -120,7 +120,7 @@
 
   {#if !disabled}
     {#if field.type == "number"}
-      <Container column maxWidth padding>
+      <Container direction="column" padding="large" maxWidth>
         <Container>
           <Button on:click={toggleAllowNegative}>
             {#if field.allowNegative}
@@ -133,9 +133,9 @@
         </Container>
       </Container>
     {:else if field.type == "select"}
-      <Container column maxWidth padding>
+      <Container direction="column" padding="large" maxWidth>
         {field.name} Values
-        <Container column padding>
+        <Container direction="column" padding="large">
           {#each field.values as value, i}
             <Container>
               <input bind:value style="width:200px" />
@@ -152,9 +152,9 @@
         </Container>
       </Container>
     {:else if field.type == "text"}
-      <Container column maxWidth padding>
-        <Container alignEnd>
-          <Container column noGap>
+      <Container direction="column" padding="large" maxWidth>
+        <Container align="end">
+          <Container direction="column" gap="none">
             Tip
             <input bind:value={field.tip} />
           </Container>
@@ -169,7 +169,7 @@
         </Container>
       </Container>
     {:else if field.type == "group"}
-      <Container column maxWidth padding>
+      <Container direction="column" padding="large" maxWidth>
         {field.name} Fields
         {#each field.fields as innerField, innerFieldIndex (innerField)}
           <svelte:self bind:fields={field.fields} bind:field={innerField} fieldIndex={innerFieldIndex} />

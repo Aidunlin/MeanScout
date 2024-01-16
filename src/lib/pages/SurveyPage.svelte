@@ -13,7 +13,7 @@
 
 <Header current={{ text: surveyRecord.name, iconName: "list-ul" }} />
 
-<Container column padding>
+<Container direction="column" padding="large">
   <Anchor hash="survey/{surveyRecord.id}/drafts">
     <Container maxWidth spaceBetween>
       <Container>

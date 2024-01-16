@@ -41,13 +41,13 @@
   current={{ text: "Fields", iconName: "list-check" }}
 />
 
-<Container column padding>
+<Container direction="column" padding="large">
   {#if preview}
-    <Container alignEnd>
+    <Container align="end">
       {#each surveyRecord.fields as field (field)}
         {#if field.type == "group"}
           <h2>{field.name}</h2>
-          <Container alignEnd maxWidth>
+          <Container align="end" maxWidth>
             {#each field.fields as innerField (innerField)}
               <FieldValueEditor field={innerField} value={getDefaultFieldValue(innerField)} />
             {/each}

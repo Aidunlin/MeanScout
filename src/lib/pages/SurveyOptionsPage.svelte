@@ -164,7 +164,7 @@
   current={{ text: "Options", iconName: "gears" }}
 />
 
-<Container column padding>
+<Container direction="column" padding="large">
   <h2>Entries</h2>
   <Container>
     <Button title="Download entries" on:click={downloadEntries}>
@@ -194,8 +194,8 @@
   </Container>
 
   <h2>Team Allowlist</h2>
-  <Container column>
-    <Container column noGap>
+  <Container direction="column">
+    <Container direction="column" gap="none">
       Add team
       <input style="width:200px" bind:value={teamInput} on:keydown={(e) => e.key == "Enter" && addTeam()} />
     </Container>
@@ -212,7 +212,7 @@
 
   <h2>Options</h2>
   <Container>
-    <Container column noGap>
+    <Container direction="column" gap="none">
       Change name
       <input bind:value={surveyRecord.name} />
     </Container>

@@ -74,7 +74,7 @@
   current={{ text: "Drafts", iconName: "pen-ruler" }}
 />
 
-<Container column padding>
+<Container direction="column" padding="large">
   <Button title="New draft" on:click={newDraftClicked}>
     <Container maxWidth>
       <Icon name="plus" />
@@ -84,12 +84,12 @@
 </Container>
 
 {#if draftRecords.length}
-  <Container column padding>
+  <Container direction="column" padding="large">
     <h2>Drafts</h2>
     {#each draftRecords as draft (draft.id)}
       <Anchor hash="draft/{draft.id}" title="Edit draft">
-        <Container maxWidth spaceBetween>
-          <Container column>
+        <Container align="center" maxWidth spaceBetween>
+          <Container direction="column" gap="small">
             {#each flattenFields(surveyRecord.fields).filter((field) => {
               return field.type == "team" || field.type == "match";
             }) as field, i}

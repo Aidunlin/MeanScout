@@ -134,12 +134,12 @@
   {/each}
 </datalist>
 
-<Container padding alignEnd>
+<Container padding="large" align="end">
   {#each surveyRecord.fields as field, i (field)}
     {@const previousFields = countPreviousFields(i)}
     {#if field.type == "group"}
       <h2>{field.name}</h2>
-      <Container alignEnd maxWidth>
+      <Container align="end" maxWidth>
         {#each field.fields as innerField, innerFieldIndex (innerField)}
           <FieldValueEditor field={innerField} bind:value={draftRecord.values[previousFields + innerFieldIndex]} />
         {/each}

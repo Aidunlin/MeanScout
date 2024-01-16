@@ -68,7 +68,7 @@
   current={{ text: "Entry", iconName: "list-ol" }}
 />
 
-<Container column padding>
+<Container direction="column" padding="large">
   {#each surveyRecord.fields as field, i (field)}
     {@const previousFields = countPreviousFields(i)}
     {#if field.type == "group"}

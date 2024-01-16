@@ -36,12 +36,12 @@
   }
 </script>
 
-<Container column noGap maxWidth={field.type == "text"}>
+<Container direction="column" gap="none" maxWidth={field.type == "text"}>
   {#if field.type != "toggle"}
     {field.name}
   {/if}
 
-  <Container noGap>
+  <Container gap="none">
     {#if field.type == "team"}
       <input class="team" list="teams-list" maxlength="5" bind:value required />
     {:else if field.type == "match"}

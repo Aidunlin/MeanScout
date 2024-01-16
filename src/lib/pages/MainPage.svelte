@@ -158,7 +158,7 @@
 <Header />
 
 {#if surveyRecords.length}
-  <Container column padding>
+  <Container direction="column" padding="large">
     <h2>Surveys</h2>
     {#each surveyRecords as survey (survey.id)}
       <Anchor hash="survey/{survey.id}" title="Open survey">
@@ -171,7 +171,7 @@
   </Container>
 {/if}
 
-<Container column padding>
+<Container direction="column" padding="large">
   <h2>Options</h2>
   <Dialog
     bind:this={newSurveyDialog.dialog}
@@ -204,7 +204,7 @@
       </Container>
     </Button>
 
-    <Container column noGap>
+    <Container direction="column" gap="none">
       Import survey
       <input type="file" accept=".json,.txt" bind:files={pasteSurveyDialog.data.files} />
     </Container>

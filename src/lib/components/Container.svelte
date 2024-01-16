@@ -1,20 +1,16 @@
 <script lang="ts">
-  export let column = false;
-  export let padding = false;
+  export let direction: "row" | "column" = "row";
+  export let padding: "none" | "small" | "large" = "none";
+  export let align: "normal" | "center" | "start" | "end" = "normal";
   export let spaceBetween = false;
-  export let alignEnd = false;
-  export let noGap = false;
+  export let gap: "none" | "small" | "large" = "large";
   export let maxWidth = false;
   export let bg = false;
 </script>
 
 <div
-  class:flex-row={!column}
-  class:flex-column={column}
-  class:padding
+  class="direction-{direction} padding-{padding} align-{align} gap-{gap}"
   class:space-between={spaceBetween}
-  class:align-end={alignEnd}
-  class:no-gap={noGap}
   class:max-width={maxWidth}
   class:bg
 >
@@ -24,33 +20,59 @@
 <style>
   div {
     display: flex;
-    gap: var(--outer-gap);
     flex-wrap: wrap;
   }
 
-  .flex-row {
-    align-items: center;
+  .direction-row {
     flex-direction: row;
   }
 
-  .flex-column {
+  .direction-column {
     flex-direction: column;
   }
 
-  .padding {
+  .padding-none {
+    padding: 0;
+  }
+
+  .padding-small {
+    padding: var(--inner-gap);
+  }
+
+  .padding-large {
     padding: var(--outer-gap);
   }
 
-  .space-between {
-    justify-content: space-between;
+  .align-normal {
+    align-items: normal;
+  }
+
+  .align-center {
+    align-items: center;
+  }
+
+  .align-start {
+    align-items: flex-start;
   }
 
   .align-end {
     align-items: flex-end;
   }
 
-  .no-gap {
+  .space-between {
+    justify-content: space-between;
+  }
+
+  .gap-none {
     gap: 0;
+  }
+
+  .gap-small {
+    gap: var(--inner-gap);
+  }
+
+  .gap-large {
+    gap: var(--outer-gap);
   }
 
   .max-width {
