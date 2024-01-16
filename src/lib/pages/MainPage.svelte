@@ -213,7 +213,7 @@
       <span>{pasteSurveyDialog.data.error}</span>
     {/if}
   </Dialog>
-  
+
   <Anchor hash="settings">
     <Container maxWidth spaceBetween>
       <Container>

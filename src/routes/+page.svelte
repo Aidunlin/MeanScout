@@ -7,7 +7,6 @@
   import EntryPage from "$lib/pages/EntryPage.svelte";
   import MainPage from "$lib/pages/MainPage.svelte";
   import SettingsPage from "$lib/pages/SettingsPage.svelte";
-  import SurveyDraftsPage from "$lib/pages/SurveyDraftsPage.svelte";
   import SurveyEntriesPage from "$lib/pages/SurveyEntriesPage.svelte";
   import SurveyFieldsPage from "$lib/pages/SurveyFieldsPage.svelte";
   import SurveyOptionsPage from "$lib/pages/SurveyOptionsPage.svelte";
@@ -21,7 +20,6 @@
     | { page: ""; props: ComponentProps<MainPage> }
     | { page: "settings"; props: ComponentProps<SettingsPage> }
     | { page: "survey"; subpage: ""; props: ComponentProps<SurveyPage> }
-    | { page: "survey"; subpage: "drafts"; props: ComponentProps<SurveyDraftsPage> }
     | { page: "survey"; subpage: "entries"; props: ComponentProps<SurveyEntriesPage> }
     | { page: "survey"; subpage: "fields"; props: ComponentProps<SurveyFieldsPage> }
     | { page: "survey"; subpage: "options"; props: ComponentProps<SurveyOptionsPage> }
@@ -50,7 +48,7 @@
     };
   }
 
-  function setSurveyPage(id: number, subpage: "" | "drafts" | "entries" | "fields" | "options") {
+  function setSurveyPage(id: number, subpage: "" | "entries" | "fields" | "options") {
     if (current?.page == "survey" && current.props.surveyRecord.id == id) {
       current.subpage = subpage;
       return;
@@ -175,9 +173,7 @@
       setSettingsPage();
     } else if (page == "survey") {
       const subpage =
-        hash[2] == "" || hash[2] == "drafts" || hash[2] == "entries" || hash[2] == "fields" || hash[2] == "options"
-          ? hash[2]
-          : "";
+        hash[2] == "" || hash[2] == "entries" || hash[2] == "fields" || hash[2] == "options" ? hash[2] : "";
       const id = Number(hash[1]);
       if (Number.isNaN(id)) return setMainPage();
       setSurveyPage(id, subpage);
@@ -285,8 +281,6 @@
 {:else if current?.page == "survey"}
   {#if current.subpage == ""}
     <SurveyPage {...current.props} />
-  {:else if current.subpage == "drafts"}
-    <SurveyDraftsPage {...current.props} />
   {:else if current.subpage == "entries"}
     <SurveyEntriesPage {...current.props} />
   {:else if current.subpage == "fields"}
