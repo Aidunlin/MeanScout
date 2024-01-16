@@ -1,6 +1,5 @@
 <script lang="ts">
   import { getDefaultFieldValue, type IDBRecord, type Survey } from "$lib";
-  import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import FieldEditor from "$lib/components/FieldEditor.svelte";
   import FieldValueEditor from "$lib/components/FieldValueEditor.svelte";
@@ -68,16 +67,16 @@
 </Container>
 
 <footer>
-  <Button title="New field" {disabled} on:click={newField}>
+  <Container type="button" onClick={newField} title="New field" {disabled}>
     <Icon name="plus" />
     Field
-  </Button>
-  <Button title="Preview" on:click={togglePreview}>
+  </Container>
+  <Container type="button" onClick={togglePreview} title="Preview">
     {#if preview}
       <Icon name="square-check" />
     {:else}
       <Icon style="regular" name="square" />
     {/if}
     Preview
-  </Button>
+  </Container>
 </footer>

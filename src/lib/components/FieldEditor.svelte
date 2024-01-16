@@ -1,6 +1,5 @@
 <script lang="ts">
   import { fieldTypes, type Field } from "$lib";
-  import Button from "./Button.svelte";
   import Container from "./Container.svelte";
   import Icon from "./Icon.svelte";
 
@@ -103,81 +102,81 @@
 
   <Container spaceBetween>
     <Container>
-      <Button title="Move up" disabled={fieldIndex == 0 || disabled} on:click={() => moveField(-1)}>
+      <Container type="button" onClick={() => moveField(-1)} title="Move up" disabled={fieldIndex == 0 || disabled}>
         <Icon name="arrow-up" />
-      </Button>
-      <Button title="Move down" disabled={fieldIndex == fields.length - 1 || disabled} on:click={() => moveField(1)}>
+      </Container>
+      <Container type="button" onClick={() => moveField(1)} title="Move down" disabled={fieldIndex == fields.length - 1 || disabled}>
         <Icon name="arrow-down" />
-      </Button>
-      <Button title="Duplicate field" {disabled} on:click={duplicateField}>
+      </Container>
+      <Container type="button" onClick={duplicateField} title="Duplicate field" {disabled}>
         <Icon name="clone" />
-      </Button>
+      </Container>
     </Container>
-    <Button title="Delete field" {disabled} on:click={deleteField}>
+    <Container type="button" onClick={deleteField} title="Delete field" {disabled}>
       <Icon name="trash" />
-    </Button>
+    </Container>
   </Container>
 
   {#if !disabled}
     {#if field.type == "number"}
       <Container direction="column" padding="large" maxWidth>
         <Container>
-          <Button on:click={toggleAllowNegative}>
+          <Container type="button" onClick={toggleAllowNegative}>
             {#if field.allowNegative}
               <Icon name="square-check" />
             {:else}
               <Icon style="regular" name="square" />
             {/if}
             Allow negative
-          </Button>
+          </Container>
         </Container>
       </Container>
     {:else if field.type == "select"}
-      <Container direction="column" padding="large" maxWidth>
+      <Container direction="column" padding="large">
         {field.name} Values
         <Container direction="column" padding="large">
           {#each field.values as value, i}
             <Container>
               <input bind:value style="width:200px" />
-              <Button title="Delete value" on:click={() => deleteSelectValue(i)}>
+              <Container type="button" onClick={() => deleteSelectValue(i)} title="Delete value">
                 <Icon name="trash" />
-              </Button>
+              </Container>
             </Container>
           {/each}
         </Container>
         <Container>
-          <Button title="New value" on:click={newSelectValue}>
+          <Container type="button" onClick={newSelectValue} title="New value">
             <Icon name="plus" />
-          </Button>
+          </Container>
         </Container>
       </Container>
     {:else if field.type == "text"}
-      <Container direction="column" padding="large" maxWidth>
+      <Container direction="column" padding="large">
         <Container align="end">
           <Container direction="column" gap="none">
             Tip
             <input bind:value={field.tip} />
           </Container>
-          <Button on:click={toggleLong}>
+          <Container type="button" onClick={toggleLong}>
             {#if field.long}
               <Icon name="square-check" />
             {:else}
               <Icon style="regular" name="square" />
             {/if}
             Long
-          </Button>
+          </Container>
         </Container>
       </Container>
     {:else if field.type == "group"}
-      <Container direction="column" padding="large" maxWidth>
+      <Container direction="column" padding="large">
         {field.name} Fields
         {#each field.fields as innerField, innerFieldIndex (innerField)}
           <svelte:self bind:fields={field.fields} bind:field={innerField} fieldIndex={innerFieldIndex} />
         {/each}
         <Container>
-          <Button title="New field" on:click={newField}>
+          <Container type="button" onClick={newField} title="New field">
             <Icon name="plus" />
-          </Button>
+          </Container>
         </Container>
       </Container>
     {/if}

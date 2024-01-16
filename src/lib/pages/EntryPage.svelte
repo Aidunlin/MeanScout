@@ -1,6 +1,5 @@
 <script lang="ts">
   import { flattenFields, type DialogDataType, type Entry, type IDBRecord, type Survey } from "$lib";
-  import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import Header from "$lib/components/Header.svelte";
@@ -58,7 +57,7 @@
     };
 
     deleteRequest.onsuccess = () => {
-      location.href = `/survey/${surveyRecord.id}/entries`;
+      location.hash = `/survey/${surveyRecord.id}/entries`;
     };
   }
 </script>
@@ -88,10 +87,10 @@
     onConfirm={editEntry}
     on:close={() => (editEntryDialog.data = { error: "" })}
   >
-    <Button title="Edit entry" slot="opener" let:open on:click={open}>
+    <Container type="button" slot="opener" let:open onClick={open} title="Edit entry">
       <Icon name="pen" />
       Edit
-    </Button>
+    </Container>
 
     <span>Edit this entry? This will move it to drafts.</span>
     {#if editEntryDialog.data.error}
@@ -104,10 +103,10 @@
     onConfirm={() => deleteEntry(entryRecord.id)}
     on:close={() => (deleteEntryDialog = { error: "" })}
   >
-    <Button title="Delete entry" slot="opener" let:open on:click={open}>
+    <Container type="button" slot="opener" let:open onClick={open} title="Delete entry">
       <Icon name="trash" />
       Delete
-    </Button>
+    </Container>
 
     <span>Delete this entry?</span>
     {#if deleteEntryDialog.error}

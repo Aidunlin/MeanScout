@@ -1,6 +1,5 @@
 <script lang="ts">
   import { flattenFields, type Entry, type IDBRecord, type Survey } from "$lib";
-  import Anchor from "$lib/components/Anchor.svelte";
   import Container from "$lib/components/Container.svelte";
   import Header from "$lib/components/Header.svelte";
   import Icon from "$lib/components/Icon.svelte";
@@ -34,18 +33,16 @@
 {#if entryRecords.length}
   <Container direction="column" padding="large">
     {#each entryRecords as entry (entry.id)}
-      <Anchor hash="entry/{entry.id}" title="Edit entry">
-        <Container maxWidth spaceBetween>
-          <Container direction="column" gap="small">
-            {#each flattenFields(surveyRecord.fields).filter((field) => {
-              return field.type == "team" || field.type == "match";
-            }) as field, i}
-              <span>{field.name}: {entry.values[i]}</span>
-            {/each}
-          </Container>
-          <Icon name="arrow-right" />
+      <Container type="link" link="entry/{entry.id}" title="Edit entry" align="center" spaceBetween>
+        <Container direction="column" gap="small">
+          {#each flattenFields(surveyRecord.fields).filter((field) => {
+            return field.type == "team" || field.type == "match";
+          }) as field, i}
+            <span>{field.name}: {entry.values[i]}</span>
+          {/each}
         </Container>
-      </Anchor>
+        <Icon name="arrow-right" />
+      </Container>
     {/each}
   </Container>
 {/if}

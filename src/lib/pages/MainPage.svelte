@@ -1,7 +1,5 @@
 <script lang="ts">
   import { fieldTypes, type DialogDataType, type Field, type IDBRecord, type Survey } from "$lib";
-  import Anchor from "$lib/components/Anchor.svelte";
-  import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import Header from "$lib/components/Header.svelte";
@@ -161,12 +159,10 @@
   <Container direction="column" padding="large">
     <h2>Surveys</h2>
     {#each surveyRecords as survey (survey.id)}
-      <Anchor hash="survey/{survey.id}" title="Open survey">
-        <Container maxWidth spaceBetween>
-          <span>{survey.name}</span>
-          <Icon name="arrow-right" />
-        </Container>
-      </Anchor>
+      <Container type="link" link="survey/{survey.id}" title="Open survey" spaceBetween>
+        <span>{survey.name}</span>
+        <Icon name="arrow-right" />
+      </Container>
     {/each}
   </Container>
 {/if}
@@ -178,12 +174,10 @@
     onConfirm={newSurvey}
     on:close={() => (newSurveyDialog.data = { name: "", error: "" })}
   >
-    <Button title="New survey" slot="opener" let:open on:click={open}>
-      <Container maxWidth>
-        <Icon name="plus" />
-        New survey
-      </Container>
-    </Button>
+    <Container type="button" slot="opener" let:open onClick={open} title="New survey">
+      <Icon name="plus" />
+      New survey
+    </Container>
 
     <span>Enter name for new survey:</span>
     <input bind:value={newSurveyDialog.data.name} />
@@ -197,12 +191,10 @@
     onConfirm={parseSurvey}
     on:close={() => (pasteSurveyDialog.data.error = "")}
   >
-    <Button title="Import survey" slot="opener" let:open on:click={open}>
-      <Container maxWidth>
-        <Icon name="paste" />
-        Import survey
-      </Container>
-    </Button>
+    <Container type="button" slot="opener" let:open onClick={open} title="Import survey">
+      <Icon name="paste" />
+      Import survey
+    </Container>
 
     <Container direction="column" gap="none">
       Import survey
@@ -214,13 +206,11 @@
     {/if}
   </Dialog>
 
-  <Anchor hash="settings">
-    <Container maxWidth spaceBetween>
-      <Container>
-        <Icon name="gears" />
-        Settings
-      </Container>
-      <Icon name="arrow-right" />
+  <Container type="link" link="settings" spaceBetween>
+    <Container>
+      <Icon name="gears" />
+      Settings
     </Container>
-  </Anchor>
+    <Icon name="arrow-right" />
+  </Container>
 </Container>

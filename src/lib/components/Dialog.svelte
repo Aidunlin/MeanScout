@@ -1,5 +1,4 @@
 <script lang="ts">
-  import Button from "./Button.svelte";
   import Container from "./Container.svelte";
   import Icon from "./Icon.svelte";
 
@@ -24,15 +23,15 @@
   <slot />
   <Container spaceBetween>
     {#if onConfirm}
-      <Button on:click={() => onConfirm && onConfirm()}>
+      <Container type="button" onClick={() => onConfirm && onConfirm()}>
         <Icon name="check" />
         Confirm
-      </Button>
+      </Container>
     {/if}
-    <Button on:click={close}>
+    <Container type="button" onClick={close}>
       <Icon name="xmark" />
       Close
-    </Button>
+    </Container>
   </Container>
 </dialog>
 

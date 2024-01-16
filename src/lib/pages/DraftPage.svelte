@@ -7,7 +7,6 @@
     type IDBRecord,
     type Survey,
   } from "$lib";
-  import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import FieldValueEditor from "$lib/components/FieldValueEditor.svelte";
@@ -156,10 +155,10 @@
     onConfirm={submitAndStartNewDraft}
     on:close={() => (submitDraftDialog.data = { error: "" })}
   >
-    <Button title="Submit draft" slot="opener" let:open on:click={open}>
+    <Container type="button" slot="opener" let:open onClick={open} title="Submit draft">
       <Icon name="floppy-disk" />
       Submit
-    </Button>
+    </Container>
 
     <span>Submit this draft and start a new one?</span>
     {#if submitDraftDialog.data.error}
@@ -172,10 +171,10 @@
     onConfirm={() => deleteDraft(draftRecord.id)}
     on:close={() => (deleteDraftDialog = { error: "" })}
   >
-    <Button title="Delete draft" slot="opener" let:open on:click={open}>
+    <Container type="button" slot="opener" let:open onClick={open} title="Delete draft">
       <Icon name="trash" />
       Delete
-    </Button>
+    </Container>
     <span>Delete this draft?</span>
     {#if deleteDraftDialog.error}
       <span>{deleteDraftDialog.error}</span>

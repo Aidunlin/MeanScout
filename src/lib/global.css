@@ -78,11 +78,6 @@ body :focus-visible,
   background-color: var(--theme-color);
 }
 
-.disable-theme,
-.disable-theme * {
-  color: white !important;
-}
-
 input,
 select,
 textarea {

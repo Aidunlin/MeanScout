@@ -1,7 +1,5 @@
 <script lang="ts">
   import { flattenFields, getDefaultFieldValue, type Entry, type IDBRecord, type Survey } from "$lib";
-  import Anchor from "$lib/components/Anchor.svelte";
-  import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Header from "$lib/components/Header.svelte";
   import Icon from "$lib/components/Icon.svelte";
@@ -72,61 +70,51 @@
 <Header current={{ text: surveyRecord.name, iconName: "list-ul" }} />
 
 <Container direction="column" padding="large">
-  <Button title="New draft" on:click={newDraftClicked}>
-    <Container maxWidth>
-      <Icon name="plus" />
-      New draft
-    </Container>
-  </Button>
+  <Container type="button" onClick={newDraftClicked} title="New draft">
+    <Icon name="plus" />
+    New draft
+  </Container>
 </Container>
 
 {#if draftRecords.length}
   <Container direction="column" padding="large">
     <h2>Drafts</h2>
     {#each draftRecords as draft (draft.id)}
-      <Anchor hash="draft/{draft.id}" title="Edit draft">
-        <Container align="center" maxWidth spaceBetween>
-          <Container direction="column" gap="small">
-            {#each flattenFields(surveyRecord.fields).filter((field) => {
-              return field.type == "team" || field.type == "match";
-            }) as field, i}
-              <span>{field.name}: {draft.values[i]}</span>
-            {/each}
-          </Container>
-          <Icon name="arrow-right" />
+      <Container type="link" link="draft/{draft.id}" title="Edit draft" align="center" spaceBetween>
+        <Container direction="column" gap="small">
+          {#each flattenFields(surveyRecord.fields).filter((field) => {
+            return field.type == "team" || field.type == "match";
+          }) as field, i}
+            <span>{field.name}: {draft.values[i]}</span>
+          {/each}
         </Container>
-      </Anchor>
+        <Icon name="arrow-right" />
+      </Container>
     {/each}
   </Container>
 {/if}
 
 <Container direction="column" padding="large">
   <h2>Survey</h2>
-  <Anchor hash="survey/{surveyRecord.id}/entries">
-    <Container maxWidth spaceBetween>
-      <Container>
-        <Icon name="list-ol" />
-        Entries
-      </Container>
-      <Icon name="arrow-right" />
+  <Container type="link" link="survey/{surveyRecord.id}/entries" spaceBetween>
+    <Container>
+      <Icon name="list-ol" />
+      Entries
     </Container>
-  </Anchor>
-  <Anchor hash="survey/{surveyRecord.id}/fields">
-    <Container maxWidth spaceBetween>
-      <Container>
-        <Icon name="list-check" />
-        Fields
-      </Container>
-      <Icon name="arrow-right" />
+    <Icon name="arrow-right" />
+  </Container>
+  <Container type="link" link="survey/{surveyRecord.id}/fields" spaceBetween>
+    <Container>
+      <Icon name="list-check" />
+      Fields
     </Container>
-  </Anchor>
-  <Anchor hash="survey/{surveyRecord.id}/options">
-    <Container maxWidth spaceBetween>
-      <Container>
-        <Icon name="gears" />
-        Options
-      </Container>
-      <Icon name="arrow-right" />
+    <Icon name="arrow-right" />
+  </Container>
+  <Container type="link" link="survey/{surveyRecord.id}/options" spaceBetween>
+    <Container>
+      <Icon name="gears" />
+      Options
     </Container>
-  </Anchor>
+    <Icon name="arrow-right" />
+  </Container>
 </Container>

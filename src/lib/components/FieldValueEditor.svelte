@@ -1,6 +1,5 @@
 <script lang="ts">
   import type { Field } from "$lib";
-  import Button from "./Button.svelte";
   import Container from "./Container.svelte";
   import Icon from "./Icon.svelte";
 
@@ -41,56 +40,60 @@
     {field.name}
   {/if}
 
-  <Container gap="none">
-    {#if field.type == "team"}
-      <input class="team" list="teams-list" maxlength="5" bind:value required />
-    {:else if field.type == "match"}
-      <input class="match" type="number" pattern="[0-9]*" bind:value required />
-    {:else if field.type == "toggle"}
-      <Button on:click={() => (value = !value)}>
-        {#if value}
-          <Icon name="square-check" />
-        {:else}
-          <Icon style="regular" name="square" />
-        {/if}
-        {field.name}
-      </Button>
-    {:else if field.type == "number"}
-      <Button on:click={() => value--} disabled={field.allowNegative !== true && value < 1}>
-        <Icon name="minus" />
-      </Button>
-      <span class="number">{value}</span>
-      <Button on:click={() => value++}>
-        <Icon name="plus" />
-      </Button>
-    {:else if field.type == "select"}
-      <select bind:value>
-        {#each field.values as val}
-          <option value={val}>{val}</option>
-        {/each}
-      </select>
-    {:else if field.type == "text"}
-      {#if field.long}
-        <textarea placeholder={field.tip} bind:value />
+  {#if field.type == "team"}
+    <input class="team" list="teams-list" maxlength="5" bind:value required />
+  {:else if field.type == "match"}
+    <input class="match" type="number" pattern="[0-9]*" bind:value required />
+  {:else if field.type == "toggle"}
+    <Container type="button" onClick={() => (value = !value)}>
+      {#if value}
+        <Icon name="square-check" />
       {:else}
-        <input placeholder={field.tip} bind:value />
+        <Icon style="regular" name="square" />
       {/if}
-    {:else if field.type == "rating"}
-      {#each Array(5) as _, i}
-        <Button star on:click={() => rate(i)}>
-          <Icon style={value > i ? "solid" : "regular"} name="star" />
-        </Button>
+      {field.name}
+    </Container>
+  {:else if field.type == "number"}
+    <Container gap="none">
+      <Container type="button" onClick={() => value--} disabled={field.allowNegative !== true && value < 1}>
+        <Icon name="minus" />
+      </Container>
+      <span class="number">{value}</span>
+      <Container type="button" onClick={() => value++}>
+        <Icon name="plus" />
+      </Container>
+    </Container>
+  {:else if field.type == "select"}
+    <select bind:value>
+      {#each field.values as val}
+        <option value={val}>{val}</option>
       {/each}
-    {:else if field.type == "timer"}
-      <Button on:click={running ? pause : start}>
-        <Icon name={running ? "pause" : "play"} />
-      </Button>
-      <span class="number">{value.toFixed(1)}</span>
-      <Button on:click={stop}>
-        <Icon name="stop" />
-      </Button>
+    </select>
+  {:else if field.type == "text"}
+    {#if field.long}
+      <textarea placeholder={field.tip} bind:value />
+    {:else}
+      <input placeholder={field.tip} bind:value />
     {/if}
-  </Container>
+  {:else if field.type == "rating"}
+    <Container gap="none">
+      {#each Array(5) as _, i}
+        <Container type="button" onClick={() => rate(i)}>
+          <Icon style={value > i ? "solid" : "regular"} name="star" />
+        </Container>
+      {/each}
+    </Container>
+  {:else if field.type == "timer"}
+    <Container gap="none">
+      <Container type="button" onClick={running ? pause : start}>
+        <Icon name={running ? "pause" : "play"} />
+      </Container>
+      <span class="number">{value.toFixed(1)}</span>
+      <Container type="button" onClick={stop}>
+        <Icon name="stop" />
+      </Container>
+    </Container>
+  {/if}
 </Container>
 
 <style>
