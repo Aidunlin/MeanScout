@@ -6,25 +6,27 @@
   import { targets, targetStore } from "$lib/target";
   import { fetchTBA, tbaKeyStore } from "$lib/tba";
 
-  let tbaKey = $tbaKeyStore;
-  let testResult: "pending" | "error" | "offline" | number | undefined = undefined;
+  let tbaKeyInput = $tbaKeyStore;
+  let testResult = "";
 
   function testTBA() {
-    testResult = "pending";
+    testResult = "please wait.";
 
     if (!navigator.onLine) {
-      testResult = "offline";
+      testResult = "offline!";
       return;
     }
 
-    fetchTBA("/status", tbaKey)
+    fetchTBA("/status", tbaKeyInput)
       .then((response) => {
-        testResult = response.status;
-        if (testResult == 200) {
-          $tbaKeyStore = tbaKey;
+        if (response.status == "success") {
+          $tbaKeyStore = tbaKeyInput;
+          testResult = "success! Key saved.";
+        } else {
+          testResult = `${response.status}!`;
         }
       })
-      .catch(() => (testResult = "error"));
+      .catch(() => (testResult = "error!"));
   }
 </script>
 
@@ -41,31 +43,21 @@
   </Container>
 </Container>
 
-<Container direction="column" padding="large">
-  <h2>The Blue Alliance</h2>
-  <Container align="end">
-    <Container gap="none">
-      Read Key
-      <input bind:value={tbaKey} title="TBA Key" />
+{#if navigator.onLine}
+  <Container direction="column" padding="large">
+    <h2>The Blue Alliance</h2>
+    <Container align="end">
+      <Container gap="none">
+        Read Key
+        <input bind:value={tbaKeyInput} title="TBA Key" />
+      </Container>
+      <Button disabled={!tbaKeyInput.length || tbaKeyInput == $tbaKeyStore} on:click={testTBA}>
+        <Icon name="floppy-disk" />
+        Save
+      </Button>
     </Container>
-    <Button disabled={!tbaKey.length || tbaKey == $tbaKeyStore} on:click={testTBA}>
-      <Icon name="floppy-disk" />
-      Save
-    </Button>
+    {#if testResult}
+      <span>Testing... {testResult}</span>
+    {/if}
   </Container>
-  {#if testResult != undefined}
-    <span>
-      Testing...
-      {#if testResult == 200}
-        Success! Key saved.
-      {:else if testResult == 401}
-        Unauthorized!
-      {:else if testResult == "offline"}
-        Offline!
-      {:else}
-        Error!
-      {/if}
-    </span>
-  {/if}
-  <span>Note: the TBA API is not yet implemented, aside from checking and saving your API key to this device.</span>
-</Container>
+{/if}

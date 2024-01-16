@@ -6,6 +6,7 @@
   import Icon from "$lib/components/Icon.svelte";
   import Header from "$lib/components/Header.svelte";
   import { targetStore } from "$lib/target";
+  import { fetchTBA, tbaKeyStore } from "$lib/tba";
 
   export let idb: IDBDatabase;
   export let surveyRecord: IDBRecord<Survey>;
@@ -47,7 +48,30 @@
 
   let deleteSurveyDialog: DialogDataType<{ error: string }> = { data: { error: "" } };
 
+  let eventInput = "";
+  let getTeamsOutput = "";
+
   let teamInput = "";
+
+  async function getTeamsFromEvent() {
+    getTeamsOutput = "Loading...";
+
+    if (!navigator.onLine) {
+      getTeamsOutput = "Error: offline";
+      return;
+    }
+
+    let response = await fetchTBA(`/event/${eventInput.trim()}/teams/keys`, $tbaKeyStore);
+
+    if (response.status == "success" && Array.isArray(response.data)) {
+      surveyRecord.teams = response.data.map((team) => `${team}`.replace("frc", ""));
+      getTeamsOutput = "Success";
+    } else if (response.status == "not found") {
+      getTeamsOutput = "Error: could not find event";
+    } else {
+      getTeamsOutput = "Error";
+    }
+  }
 
   function addTeam() {
     if (teamInput.trim() && !surveyRecord.teams.includes(teamInput.trim())) {
@@ -195,9 +219,34 @@
 
   <h2>Team Allowlist</h2>
   <Container direction="column">
+    {#if navigator.onLine && $tbaKeyStore}
+      <Container direction="column" gap="none">
+        Get teams from TBA Event
+        <Container align="center">
+          <input
+            style="width:200px"
+            bind:value={eventInput}
+            on:keydown={(e) => e.key == "Enter" && getTeamsFromEvent()}
+          />
+          <Button disabled={!eventInput.trim().length || getTeamsOutput == "Loading..."} on:click={getTeamsFromEvent}>
+            <Icon name="cloud-arrow-down" />
+            Get
+          </Button>
+          {#if getTeamsOutput}
+            <span>{getTeamsOutput}</span>
+          {/if}
+        </Container>
+      </Container>
+    {/if}
     <Container direction="column" gap="none">
       Add team
-      <input style="width:200px" bind:value={teamInput} on:keydown={(e) => e.key == "Enter" && addTeam()} />
+      <Container>
+        <input style="width:200px" bind:value={teamInput} on:keydown={(e) => e.key == "Enter" && addTeam()} />
+        <Button disabled={!teamInput.trim().length || surveyRecord.teams.includes(teamInput.trim())} on:click={addTeam}>
+          <Icon name="plus" />
+          Add
+        </Button>
+      </Container>
     </Container>
     {#if surveyRecord.teams.length}
       <Container>
