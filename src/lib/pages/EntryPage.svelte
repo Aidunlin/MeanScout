@@ -1,5 +1,6 @@
 <script lang="ts">
   import { flattenFields, type DialogDataType, type Entry, type IDBRecord, type Survey } from "$lib";
+  import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import Header from "$lib/components/Header.svelte";
@@ -87,10 +88,10 @@
     onConfirm={editEntry}
     on:close={() => (editEntryDialog.data = { error: "" })}
   >
-    <Container type="button" slot="opener" let:open onClick={open} title="Edit entry">
+    <Button title="Edit entry" slot="opener" let:open on:click={open}>
       <Icon name="pen" />
       Edit
-    </Container>
+    </Button>
 
     <span>Edit this entry? This will move it to drafts.</span>
     {#if editEntryDialog.data.error}
@@ -103,10 +104,10 @@
     onConfirm={() => deleteEntry(entryRecord.id)}
     on:close={() => (deleteEntryDialog = { error: "" })}
   >
-    <Container type="button" slot="opener" let:open onClick={open} title="Delete entry">
+    <Button title="Delete entry" slot="opener" let:open on:click={open}>
       <Icon name="trash" />
       Delete
-    </Container>
+    </Button>
 
     <span>Delete this entry?</span>
     {#if deleteEntryDialog.error}

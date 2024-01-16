@@ -1,6 +1,6 @@
 <script lang="ts">
   import { targetStore } from "$lib/target";
-  import Container from "./Container.svelte";
+  import Anchor from "./Anchor.svelte";
   import Icon from "./Icon.svelte";
 
   export let parent: { text: string; iconName: string; hash: string } | undefined = undefined;
@@ -14,15 +14,15 @@
 <header>
   <div style="justify-content: left;">
     {#if parent}
-      <Container type="link" link={parent.hash}>
+      <Anchor hash={parent.hash}>
         <Icon name="arrow-left" />
         {parent.text}
-      </Container>
+      </Anchor>
     {:else if current}
-      <Container type="link" link="">
+      <Anchor hash="">
         <Icon name="arrow-left" />
         MeanScout
-      </Container>
+      </Anchor>
     {/if}
   </div>
 

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { type DialogDataType, type Entry, type IDBRecord, type Survey } from "$lib";
+  import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import Icon from "$lib/components/Icon.svelte";
@@ -166,29 +167,29 @@
 <Container direction="column" padding="large">
   <h2>Entries</h2>
   <Container>
-    <Container type="button" onClick={downloadEntries} title="Download entries">
+    <Button title="Download entries" on:click={downloadEntries}>
       <Icon name="download" />
       Download
-    </Container>
+    </Button>
     {#if "canShare" in navigator}
-      <Container type="button" onClick={shareEntries} title="Share entries">
+      <Button title="Share entries" on:click={shareEntries}>
         <Icon name="share-from-square" />
         Share
-      </Container>
+      </Button>
     {/if}
   </Container>
 
   <h2>Survey</h2>
   <Container>
-    <Container type="button" onClick={downloadSurvey} title="Download survey">
+    <Button title="Download survey" on:click={downloadSurvey}>
       <Icon name="download" />
       Download
-    </Container>
+    </Button>
     {#if "canShare" in navigator}
-      <Container type="button" onClick={shareSurvey} title="Share survey">
+      <Button title="Share survey" on:click={shareSurvey}>
         <Icon name="share-from-square" />
         Share
-      </Container>
+      </Button>
     {/if}
   </Container>
 
@@ -201,7 +202,7 @@
     {#if surveyRecord.teams.length}
       <Container>
         {#each sortTeams(surveyRecord.teams) as team}
-          <Container type="button" onClick={() => deleteTeam(team)} title="Delete {team}">{team}</Container>
+          <Button title="Delete {team}" on:click={() => deleteTeam(team)}>{team}</Button>
         {/each}
       </Container>
     {:else}
@@ -224,10 +225,10 @@
       onConfirm={deleteSurvey}
       on:close={() => (deleteSurveyDialog.data = { error: "" })}
     >
-      <Container type="button" slot="opener" let:open onClick={open}>
+      <Button slot="opener" let:open on:click={open}>
         <Icon name="trash" />
         Survey
-      </Container>
+      </Button>
 
       <span>Delete "{surveyRecord.name}"?</span>
       {#if entryCount}

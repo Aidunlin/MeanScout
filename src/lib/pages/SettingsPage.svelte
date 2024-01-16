@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Header from "$lib/components/Header.svelte";
   import Icon from "$lib/components/Icon.svelte";
@@ -47,10 +48,10 @@
       Read Key
       <input bind:value={tbaKey} title="TBA Key" />
     </Container>
-    <Container type="button" onClick={testTBA} disabled={!tbaKey.length || tbaKey == $tbaKeyStore}>
+    <Button disabled={!tbaKey.length || tbaKey == $tbaKeyStore} on:click={testTBA}>
       <Icon name="floppy-disk" />
       Save
-    </Container>
+    </Button>
   </Container>
   {#if testResult != undefined}
     <span>

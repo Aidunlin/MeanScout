@@ -1,75 +1,26 @@
 <script lang="ts">
-  export let type: "container" | "link" | "button" = "container";
-  export let link: string | undefined = undefined;
-  export let onClick: (() => void) | undefined = undefined;
-  export let disabled = false;
-  export let title = "";
-
-  export let direction: "row" | "column" | undefined = undefined;
-  export let padding: "none" | "small" | "large" | undefined = undefined;
-  export let align: "normal" | "center" | "start" | "end" | undefined = undefined;
+  export let direction: "row" | "column" = "row";
+  export let padding: "none" | "small" | "large" = "none";
+  export let align: "normal" | "center" | "start" | "end" = "normal";
   export let spaceBetween = false;
-  export let gap: "large" | "small" | "none" | undefined = undefined;
+  export let gap: "none" | "small" | "large" = "large";
   export let maxWidth = false;
   export let bg = false;
 </script>
 
-{#if type == "link"}
-  <a
-    href="#/{link}"
-    {title}
-    class="link direction-{direction ?? 'row'} padding-{padding ?? 'small'} align-{align ?? 'normal'} gap-{gap ??
-      'small'}"
-    class:space-between={spaceBetween}
-    class:max-width={maxWidth}
-    class:bg
-  >
-    <slot />
-  </a>
-{:else if type == "button"}
-  <button
-    on:click={onClick}
-    {disabled}
-    {title}
-    class="button direction-{direction ?? 'row'} padding-{padding ?? 'small'} align-{align ?? 'normal'} gap-{gap ??
-      'small'}"
-    class:space-between={spaceBetween}
-    class:max-width={maxWidth}
-    class:bg
-  >
-    <slot />
-  </button>
-{:else}
-  <div
-    class="container direction-{direction ?? 'row'} padding-{padding ?? 'none'} align-{align ?? 'normal'} gap-{gap ??
-      'large'}"
-    class:space-between={spaceBetween}
-    class:max-width={maxWidth}
-    class:bg
-  >
-    <slot />
-  </div>
-{/if}
+<div
+  class="direction-{direction} padding-{padding} align-{align} gap-{gap}"
+  class:space-between={spaceBetween}
+  class:max-width={maxWidth}
+  class:bg
+>
+  <slot />
+</div>
 
 <style>
-  .container,
-  .link,
-  .button {
+  div {
     display: flex;
     flex-wrap: wrap;
-  }
-
-  .link,
-  .button {
-    background: var(--fg-color);
-    text-decoration: none;
-  }
-
-  .link:focus,
-  .link:hover,
-  .button:focus,
-  .button:hover {
-    outline: var(--outline);
   }
 
   .direction-row {
