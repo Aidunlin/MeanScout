@@ -24,6 +24,10 @@
       cursor.continue();
     }
   };
+
+  const importantFields = flattenFields(surveyRecord.fields).filter(
+    (field) => field.type == "team" || field.type == "match",
+  );
 </script>
 
 <Header
@@ -37,9 +41,7 @@
       <Anchor hash="entry/{entry.id}" title="Edit entry">
         <Container align="center" maxWidth spaceBetween>
           <Container direction="column" gap="small">
-            {#each flattenFields(surveyRecord.fields).filter((field) => {
-              return field.type == "team" || field.type == "match";
-            }) as field, i}
+            {#each importantFields as field, i}
               <span>{field.name}: {entry.values[i]}</span>
             {/each}
           </Container>

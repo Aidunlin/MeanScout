@@ -24,29 +24,30 @@
 
   let deleteDraftDialog: { element?: HTMLDialogElement; error: string } = { error: "" };
 
+  const flattenedFields = flattenFields(surveyRecord.fields);
+
   function validateDraft() {
     let error = "";
-    const fields = flattenFields(surveyRecord.fields);
 
     draftRecord.values.forEach((value, i) => {
-      switch (fields[i].type) {
+      switch (flattenedFields[i].type) {
         case "team":
           if (!/^\d{1,5}[A-Z]?$/.test(value)) {
-            error = `Invalid value for ${fields[i].name}`;
+            error = `Invalid value for ${flattenedFields[i].name}`;
           }
           if (surveyRecord.teams.length && !surveyRecord.teams.includes(value)) {
-            error = `Invalid value for ${fields[i].name} (team not allowlisted)`;
+            error = `Invalid value for ${flattenedFields[i].name} (team not allowlisted)`;
           }
           break;
         case "match":
           if (!/\d{1,3}/.test(value)) {
-            error = `Invalid value for ${fields[i].name}`;
+            error = `Invalid value for ${flattenedFields[i].name}`;
           }
           break;
       }
 
-      if (value == undefined || typeof value !== typeof getDefaultFieldValue(fields[i])) {
-        error = `Invalid value for ${fields[i].name}`;
+      if (value == undefined || typeof value !== typeof getDefaultFieldValue(flattenedFields[i])) {
+        error = `Invalid value for ${flattenedFields[i].name}`;
       }
     });
 
@@ -54,8 +55,6 @@
   }
 
   function startNewDraft() {
-    const flattenedFields = flattenFields(surveyRecord.fields);
-
     const draft: Entry = {
       surveyId: draftRecord.surveyId,
       values: flattenedFields.map((field, i) => {

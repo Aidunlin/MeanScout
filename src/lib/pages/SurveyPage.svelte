@@ -34,14 +34,17 @@
     }
   };
 
-  function newDraftClicked() {
-    const fields = flattenFields(surveyRecord.fields);
+  const flattenedFields = flattenFields(surveyRecord.fields);
+  const importantFields = flattenedFields.filter(
+    (field) => field.type == "team" || field.type == "match",
+  );
 
+  function newDraftClicked() {
     const allRecords = [...draftRecords, ...entryRecords];
 
     const draft: Entry = {
       surveyId: surveyRecord.id,
-      values: fields.map((field, i) => {
+      values: flattenedFields.map((field, i) => {
         switch (field.type) {
           case "match":
             if (!allRecords.length) {
@@ -87,9 +90,7 @@
       <Anchor hash="draft/{draft.id}" title="Edit draft">
         <Container align="center" maxWidth spaceBetween>
           <Container direction="column" gap="small">
-            {#each flattenFields(surveyRecord.fields).filter((field) => {
-              return field.type == "team" || field.type == "match";
-            }) as field, i}
+            {#each importantFields as field, i}
               <span>{field.name}: {draft.values[i]}</span>
             {/each}
           </Container>
