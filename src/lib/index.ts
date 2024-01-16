@@ -83,3 +83,22 @@ export function flattenFields(fields: Field[]) {
     })
     .flat();
 }
+
+export function download(data: string, name: string, type: string) {
+  const blob = new Blob([data], { type });
+  const url = URL.createObjectURL(blob);
+
+  const anchor = document.createElement("a");
+  anchor.download = name.replaceAll(" ", "_");
+  anchor.href = url;
+  document.body.append(anchor);
+  anchor.click();
+  anchor.remove();
+
+  URL.revokeObjectURL(url);
+}
+
+export function share(data: string, name: string, type: string) {
+  const file = new File([data], name.replaceAll(" ", "_"), { type });
+  navigator.share({ files: [file], title: file.name });
+}

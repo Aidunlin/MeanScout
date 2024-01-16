@@ -1,11 +1,10 @@
 <script lang="ts">
-  import { type DialogDataType, type Entry, type IDBRecord, type Survey } from "$lib";
+  import { download, share, type DialogDataType, type Entry, type IDBRecord, type Survey } from "$lib";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
-  import Icon from "$lib/components/Icon.svelte";
   import Header from "$lib/components/Header.svelte";
-  import { targetStore } from "$lib/target";
+  import Icon from "$lib/components/Icon.svelte";
   import { fetchTBA, tbaKeyStore } from "$lib/tba";
 
   export let idb: IDBDatabase;
@@ -88,45 +87,10 @@
     surveyRecord.teams = surveyRecord.teams.filter((t) => t.trim() != team.trim());
   }
 
-  function valueAsCSV(value: any) {
-    return value.toString().replaceAll(",", "").replaceAll("\n", ". ").trim();
-  }
-
-  function entriesAsCSV() {
-    return entryRecords.map((entry) => entry.values.map(valueAsCSV).join(",")).join("\n");
-  }
-
   function surveyAsJSON() {
     const survey = structuredClone(surveyRecord) as Survey & { id?: number };
     delete survey.id;
     return JSON.stringify(survey, undefined, "  ");
-  }
-
-  function download(data: string, name: string, type: string) {
-    const blob = new Blob([data], { type });
-    const url = URL.createObjectURL(blob);
-
-    const anchor = document.createElement("a");
-    anchor.download = name.replaceAll(" ", "_");
-    anchor.href = url;
-    document.body.append(anchor);
-    anchor.click();
-    anchor.remove();
-
-    URL.revokeObjectURL(url);
-  }
-
-  function share(data: string, name: string, type: string) {
-    const file = new File([data], name.replaceAll(" ", "_"), { type });
-    navigator.share({ files: [file], title: file.name });
-  }
-
-  function downloadEntries() {
-    download(entriesAsCSV(), `${surveyRecord.name}-entries-${$targetStore}.csv`, "text/csv");
-  }
-
-  function shareEntries() {
-    share(entriesAsCSV(), `${surveyRecord.name}-entries-${$targetStore}.csv`, "text/csv");
   }
 
   function downloadSurvey() {
@@ -189,33 +153,20 @@
 />
 
 <Container direction="column" padding="large">
-  <h2>Entries</h2>
-  <Container>
-    <Button title="Download entries" on:click={downloadEntries}>
+  <Button title="Download survey" on:click={downloadSurvey}>
+    <Container maxWidth>
       <Icon name="download" />
-      Download
-    </Button>
-    {#if "canShare" in navigator}
-      <Button title="Share entries" on:click={shareEntries}>
+      Download survey
+    </Container>
+  </Button>
+  {#if "canShare" in navigator}
+    <Button title="Share survey" on:click={shareSurvey}>
+      <Container maxWidth>
         <Icon name="share-from-square" />
-        Share
-      </Button>
-    {/if}
-  </Container>
-
-  <h2>Survey</h2>
-  <Container>
-    <Button title="Download survey" on:click={downloadSurvey}>
-      <Icon name="download" />
-      Download
+        Share survey
+      </Container>
     </Button>
-    {#if "canShare" in navigator}
-      <Button title="Share survey" on:click={shareSurvey}>
-        <Icon name="share-from-square" />
-        Share
-      </Button>
-    {/if}
-  </Container>
+  {/if}
 
   <h2>Team Allowlist</h2>
   <Container direction="column">
@@ -276,7 +227,7 @@
     >
       <Button slot="opener" let:open on:click={open}>
         <Icon name="trash" />
-        Survey
+        Delete survey
       </Button>
 
       <span>Delete "{surveyRecord.name}"?</span>

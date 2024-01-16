@@ -1,9 +1,11 @@
 <script lang="ts">
-  import { flattenFields, type Entry, type IDBRecord, type Survey } from "$lib";
+  import { download, flattenFields, share, type Entry, type IDBRecord, type Survey } from "$lib";
   import Anchor from "$lib/components/Anchor.svelte";
+  import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Header from "$lib/components/Header.svelte";
   import Icon from "$lib/components/Icon.svelte";
+  import { targetStore } from "$lib/target";
 
   export let idb: IDBDatabase;
   export let surveyRecord: IDBRecord<Survey>;
@@ -28,6 +30,22 @@
   const importantFields = flattenFields(surveyRecord.fields).filter(
     (field) => field.type == "team" || field.type == "match",
   );
+
+  function valueAsCSV(value: any) {
+    return value.toString().replaceAll(",", "").replaceAll("\n", ". ").trim();
+  }
+
+  function entriesAsCSV() {
+    return entryRecords.map((entry) => entry.values.map(valueAsCSV).join(",")).join("\n");
+  }
+
+  function downloadEntries() {
+    download(entriesAsCSV(), `${surveyRecord.name}-entries-${$targetStore}.csv`, "text/csv");
+  }
+
+  function shareEntries() {
+    share(entriesAsCSV(), `${surveyRecord.name}-entries-${$targetStore}.csv`, "text/csv");
+  }
 </script>
 
 <Header
@@ -35,8 +53,24 @@
   current={{ text: "Entries", iconName: "list-ol" }}
 />
 
-{#if entryRecords.length}
-  <Container direction="column" padding="large">
+<Container direction="column" padding="large">
+  {#if entryRecords.length}
+    <Button title="Download entries" on:click={downloadEntries}>
+      <Container maxWidth>
+        <Icon name="download" />
+        Download entries
+      </Container>
+    </Button>
+    {#if "canShare" in navigator}
+      <Button title="Share entries" on:click={shareEntries}>
+        <Container maxWidth>
+          <Icon name="share-from-square" />
+          Share entries
+        </Container>
+      </Button>
+    {/if}
+
+    <h2>Entries</h2>
     {#each entryRecords as entry (entry.id)}
       <Anchor hash="entry/{entry.id}" title="Edit entry">
         <Container align="center" maxWidth spaceBetween>
@@ -49,5 +83,7 @@
         </Container>
       </Anchor>
     {/each}
-  </Container>
-{/if}
+  {:else}
+    No entries.
+  {/if}
+</Container>
