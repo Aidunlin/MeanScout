@@ -35,9 +35,7 @@
   };
 
   const flattenedFields = flattenFields(surveyRecord.fields);
-  const importantFields = flattenedFields.filter(
-    (field) => field.type == "team" || field.type == "match",
-  );
+  const importantFields = flattenedFields.filter((field) => field.type == "team" || field.type == "match");
 
   function newDraftClicked() {
     const allRecords = [...draftRecords, ...entryRecords];
@@ -117,6 +115,15 @@
       <Container>
         <Icon name="list-check" />
         Fields
+      </Container>
+      <Icon name="arrow-right" />
+    </Container>
+  </Anchor>
+  <Anchor hash="survey/{surveyRecord.id}/teams">
+    <Container maxWidth spaceBetween>
+      <Container>
+        <Icon name="people-group" />
+        Teams
       </Container>
       <Icon name="arrow-right" />
     </Container>

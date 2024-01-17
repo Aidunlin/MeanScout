@@ -11,6 +11,7 @@
   import SurveyFieldsPage from "$lib/pages/SurveyFieldsPage.svelte";
   import SurveyOptionsPage from "$lib/pages/SurveyOptionsPage.svelte";
   import SurveyPage from "$lib/pages/SurveyPage.svelte";
+  import SurveyTeamsPage from "$lib/pages/SurveyTeamsPage.svelte";
   import type { ComponentProps } from "svelte";
 
   let idbError: string;
@@ -22,6 +23,7 @@
     | { page: "survey"; subpage: ""; props: ComponentProps<SurveyPage> }
     | { page: "survey"; subpage: "entries"; props: ComponentProps<SurveyEntriesPage> }
     | { page: "survey"; subpage: "fields"; props: ComponentProps<SurveyFieldsPage> }
+    | { page: "survey"; subpage: "teams"; props: ComponentProps<SurveyTeamsPage> }
     | { page: "survey"; subpage: "options"; props: ComponentProps<SurveyOptionsPage> }
     | { page: "draft"; props: ComponentProps<DraftPage> }
     | { page: "entry"; props: ComponentProps<EntryPage> };
@@ -48,7 +50,7 @@
     };
   }
 
-  function setSurveyPage(id: number, subpage: "" | "entries" | "fields" | "options") {
+  function setSurveyPage(id: number, subpage: "" | "entries" | "fields" | "teams" | "options") {
     if (current?.page == "survey" && current.props.surveyRecord.id == id) {
       current.subpage = subpage;
       return;
@@ -173,7 +175,9 @@
       setSettingsPage();
     } else if (page == "survey") {
       const subpage =
-        hash[2] == "" || hash[2] == "entries" || hash[2] == "fields" || hash[2] == "options" ? hash[2] : "";
+        hash[2] == "" || hash[2] == "entries" || hash[2] == "fields" || hash[2] == "teams" || hash[2] == "options"
+          ? hash[2]
+          : "";
       const id = Number(hash[1]);
       if (Number.isNaN(id)) return setMainPage();
       setSurveyPage(id, subpage);
@@ -285,6 +289,8 @@
     <SurveyEntriesPage {...current.props} />
   {:else if current.subpage == "fields"}
     <SurveyFieldsPage {...current.props} />
+  {:else if current.subpage == "teams"}
+    <SurveyTeamsPage {...current.props} />
   {:else if current.subpage == "options"}
     <SurveyOptionsPage {...current.props} />
   {/if}
