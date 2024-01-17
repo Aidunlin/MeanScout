@@ -27,7 +27,12 @@
     let response = await fetchTBA(`/event/${eventInput.trim()}/teams/keys`, $tbaKeyStore);
 
     if (response.status == "success" && Array.isArray(response.data)) {
-      surveyRecord.teams = response.data.map((team) => `${team}`.replace("frc", ""));
+      response.data.forEach((team) => {
+        let teamString = `${team}`.trim().replace("frc", "");
+        if (!surveyRecord.teams.includes(teamString)) {
+          surveyRecord.teams = [...surveyRecord.teams, teamString];
+        }
+      });
       getTeamsOutput = "Success";
     } else if (response.status == "not found") {
       getTeamsOutput = "Error: could not find event";
