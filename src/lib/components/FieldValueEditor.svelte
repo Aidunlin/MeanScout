@@ -7,12 +7,30 @@
   export let field: Field;
   export let value: any;
 
+  export let onChange: (() => void) | undefined = undefined;
+
+  function toggle() {
+    value = !value;
+    onChange && onChange();
+  }
+
+  function increment() {
+    value++;
+    onChange && onChange();
+  }
+
+  function decrement() {
+    value--;
+    onChange && onChange();
+  }
+
   function rate(i: number) {
     if (value == i + 1) {
       value = 0;
     } else {
       value = i + 1;
     }
+    onChange && onChange();
   }
 
   let running = false;
@@ -21,11 +39,13 @@
   function start() {
     running = true;
     interval = setInterval(() => running && (value += 0.1), 100);
+    onChange && onChange();
   }
 
   function pause() {
     running = false;
     clearInterval(interval);
+    onChange && onChange();
   }
 
   function stop() {
@@ -33,6 +53,7 @@
       pause();
     }
     value = 0;
+    onChange && onChange();
   }
 </script>
 
@@ -43,11 +64,11 @@
 
   <Container gap="none">
     {#if field.type == "team"}
-      <input class="team" list="teams-list" maxlength="5" bind:value required />
+      <input class="team" list="teams-list" maxlength="5" bind:value on:change={onChange} required />
     {:else if field.type == "match"}
-      <input class="match" type="number" pattern="[0-9]*" bind:value required />
+      <input class="match" type="number" pattern="[0-9]*" bind:value on:change={onChange} required />
     {:else if field.type == "toggle"}
-      <Button on:click={() => (value = !value)}>
+      <Button on:click={toggle}>
         {#if value}
           <Icon name="square-check" />
         {:else}
@@ -56,24 +77,24 @@
         {field.name}
       </Button>
     {:else if field.type == "number"}
-      <Button on:click={() => value--} disabled={field.allowNegative !== true && value < 1}>
+      <Button on:click={decrement} disabled={field.allowNegative !== true && value < 1}>
         <Icon name="minus" />
       </Button>
       <span class="number">{value}</span>
-      <Button on:click={() => value++}>
+      <Button on:click={increment}>
         <Icon name="plus" />
       </Button>
     {:else if field.type == "select"}
-      <select bind:value>
+      <select bind:value on:change={onChange}>
         {#each field.values as val}
           <option value={val}>{val}</option>
         {/each}
       </select>
     {:else if field.type == "text"}
       {#if field.long}
-        <textarea placeholder={field.tip} bind:value />
+        <textarea placeholder={field.tip} bind:value on:change={onChange} />
       {:else}
-        <input placeholder={field.tip} bind:value />
+        <input placeholder={field.tip} bind:value on:change={onChange} />
       {/if}
     {:else if field.type == "rating"}
       {#each Array(5) as _, i}

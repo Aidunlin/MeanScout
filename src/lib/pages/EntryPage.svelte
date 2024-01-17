@@ -10,6 +10,8 @@
   export let surveyRecord: IDBRecord<Survey>;
   export let entryRecord: IDBRecord<Entry>;
 
+  $: idb.transaction("surveys", "readwrite").objectStore("surveys").put(surveyRecord);
+
   let editEntryDialog: DialogDataType<{ error: string }> = { data: { error: "" } };
 
   let deleteEntryDialog: { element?: HTMLDialogElement; error: string } = { error: "" };
@@ -43,6 +45,7 @@
         return;
       }
 
+      surveyRecord.modified = new Date();
       location.hash = `/draft/${id}`;
     };
   }
@@ -58,6 +61,7 @@
     };
 
     deleteRequest.onsuccess = () => {
+      surveyRecord.modified = new Date();
       location.hash = `/survey/${surveyRecord.id}/entries`;
     };
   }

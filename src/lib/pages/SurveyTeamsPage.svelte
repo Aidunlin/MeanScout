@@ -27,6 +27,7 @@
     let response = await fetchTBA(`/event/${eventInput.trim()}/teams/keys`, $tbaKeyStore);
 
     if (response.status == "success" && Array.isArray(response.data)) {
+      surveyRecord.modified = new Date();
       response.data.forEach((team) => {
         let teamString = `${team}`.trim().replace("frc", "");
         if (!surveyRecord.teams.includes(teamString)) {
@@ -42,6 +43,7 @@
   }
 
   function addTeam() {
+    surveyRecord.modified = new Date();
     if (teamInput.trim() && !surveyRecord.teams.includes(teamInput.trim())) {
       surveyRecord.teams = [...surveyRecord.teams, teamInput.trim()];
       teamInput = "";
@@ -53,6 +55,7 @@
   }
 
   function deleteTeam(team: string) {
+    surveyRecord.modified = new Date();
     surveyRecord.teams = surveyRecord.teams.filter((t) => t.trim() != team.trim());
   }
 </script>

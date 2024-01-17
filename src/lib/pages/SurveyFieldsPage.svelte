@@ -28,6 +28,7 @@
   };
 
   function newField() {
+    surveyRecord.modified = new Date();
     surveyRecord.fields = [...surveyRecord.fields, { name: "", type: "toggle" }];
   }
 
@@ -62,7 +63,13 @@
       <span>Cannot modify fields with entries present!</span>
     {/if}
     {#each surveyRecord.fields as field, fieldIndex (field)}
-      <FieldEditor bind:fields={surveyRecord.fields} bind:field {fieldIndex} {disabled} />
+      <FieldEditor
+        bind:fields={surveyRecord.fields}
+        bind:field
+        onChange={() => (surveyRecord.modified = new Date())}
+        {fieldIndex}
+        {disabled}
+      />
     {/each}
   {/if}
 </Container>

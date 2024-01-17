@@ -18,6 +18,7 @@
   export let surveyRecord: IDBRecord<Survey>;
   export let draftRecord: IDBRecord<Entry>;
 
+  $: idb.transaction("surveys", "readwrite").objectStore("surveys").put(surveyRecord);
   $: idb.transaction("drafts", "readwrite").objectStore("drafts").put(draftRecord);
 
   let submitDraftDialog: DialogDataType<{ error: string }> = { data: { error: "" } };
@@ -81,7 +82,7 @@
         return;
       }
 
-      submitDraftDialog.dialog?.close();
+      surveyRecord.modified = new Date();
       location.hash = `/draft/${id}`;
     };
   }
@@ -117,6 +118,7 @@
     };
 
     deleteRequest.onsuccess = () => {
+      surveyRecord.modified = new Date();
       location.hash = `/survey/${surveyRecord.id}/drafts`;
     };
   }
@@ -140,11 +142,25 @@
       <h2>{field.name}</h2>
       <Container align="end" maxWidth>
         {#each field.fields as innerField, innerFieldIndex (innerField)}
-          <FieldValueEditor field={innerField} bind:value={draftRecord.values[previousFields + innerFieldIndex]} />
+          <FieldValueEditor
+            field={innerField}
+            bind:value={draftRecord.values[previousFields + innerFieldIndex]}
+            onChange={() => {
+              draftRecord.modified = new Date();
+              surveyRecord.modified = new Date();
+            }}
+          />
         {/each}
       </Container>
     {:else}
-      <FieldValueEditor {field} bind:value={draftRecord.values[previousFields]} />
+      <FieldValueEditor
+        {field}
+        bind:value={draftRecord.values[previousFields]}
+        onChange={() => {
+          draftRecord.modified = new Date();
+          surveyRecord.modified = new Date();
+        }}
+      />
     {/if}
   {/each}
 </Container>

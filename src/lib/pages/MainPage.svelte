@@ -160,7 +160,7 @@
 {#if surveyRecords.length}
   <Container direction="column" padding="large">
     <h2>Surveys</h2>
-    {#each surveyRecords as survey (survey.id)}
+    {#each surveyRecords.toSorted((a, b) => b.modified.getTime() - a.modified.getTime()) as survey (survey.id)}
       <Anchor hash="survey/{survey.id}" title="Open survey">
         <Container maxWidth spaceBetween>
           <span>{survey.name}</span>

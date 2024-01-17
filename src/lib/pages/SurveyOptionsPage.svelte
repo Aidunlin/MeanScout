@@ -131,7 +131,7 @@
   <Container>
     <Container direction="column" gap="none">
       Change name
-      <input bind:value={surveyRecord.name} />
+      <input bind:value={surveyRecord.name} on:change={() => (surveyRecord.modified = new Date())} />
     </Container>
   </Container>
 

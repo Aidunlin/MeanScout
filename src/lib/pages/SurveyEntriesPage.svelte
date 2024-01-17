@@ -71,7 +71,7 @@
     {/if}
 
     <h2>Entries</h2>
-    {#each entryRecords as entry (entry.id)}
+    {#each entryRecords.toSorted((a, b) => b.modified.getTime() - a.modified.getTime()) as entry (entry.id)}
       <Anchor hash="entry/{entry.id}" title="Edit entry">
         <Container align="center" maxWidth spaceBetween>
           <Container direction="column" gap="small">

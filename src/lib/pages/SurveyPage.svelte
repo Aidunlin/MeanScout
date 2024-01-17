@@ -62,6 +62,7 @@
 
     const addRequest = idb.transaction("drafts", "readwrite").objectStore("drafts").add(draft);
     addRequest.onsuccess = () => {
+      surveyRecord.modified = new Date();
       const id = addRequest.result as number | undefined;
       if (id == undefined) return;
 
@@ -84,7 +85,7 @@
 {#if draftRecords.length}
   <Container direction="column" padding="large">
     <h2>Drafts</h2>
-    {#each draftRecords as draft (draft.id)}
+    {#each draftRecords.toSorted((a, b) => b.modified.getTime() - a.modified.getTime()) as draft (draft.id)}
       <Anchor hash="draft/{draft.id}" title="Edit draft">
         <Container align="center" maxWidth spaceBetween>
           <Container direction="column" gap="small">
