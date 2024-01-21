@@ -39,8 +39,8 @@
 
 <Container direction="column" padding="large">
   <h2>Options</h2>
-  <NewSurveyDialog {idb} bind:surveyRecords />
-  <ImportSurveyDialog {idb} bind:surveyRecords />
+  <NewSurveyDialog {idb} />
+  <ImportSurveyDialog {idb} />
   <Anchor hash="settings">
     <Container maxWidth spaceBetween>
       <Container>

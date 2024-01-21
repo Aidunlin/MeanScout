@@ -3,6 +3,7 @@
   import Button from "$lib/components/Button.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import Icon from "$lib/components/Icon.svelte";
+  import { targetStore } from "$lib/target";
 
   export let idb: IDBDatabase;
   export let surveyRecord: IDBRecord<Survey>;
@@ -15,18 +16,57 @@
   function validateDraft() {
     let validateError = "";
 
+    const validTeamValues = [...surveyRecord.teams];
+    const matchFieldIndex = flattenedFields.findIndex((field) => field.type == "match");
+    if (matchFieldIndex != -1) {
+      const matchValue = draftRecord.values[matchFieldIndex];
+
+      if (!/\d{1,3}/.test(matchValue)) {
+        return `Invalid value for ${flattenedFields[matchFieldIndex].name}`;
+      }
+
+      if (surveyRecord.matches.length) {
+        const match = surveyRecord.matches.find((m) => m.number == matchValue);
+        if (!match) return `Invalid value for ${flattenedFields[matchFieldIndex].name}`;
+
+        switch ($targetStore) {
+          case "red 1":
+            validTeamValues.push(match.red1);
+            break;
+          case "red 2":
+            validTeamValues.push(match.red2);
+            break;
+          case "red 3":
+            validTeamValues.push(match.red3);
+            break;
+          case "blue 1":
+            validTeamValues.push(match.blue1);
+            break;
+          case "blue 2":
+            validTeamValues.push(match.blue2);
+            break;
+          case "blue 3":
+            validTeamValues.push(match.blue3);
+            break;
+          case "red":
+            validTeamValues.push(match.red1, match.red2, match.red3);
+            break;
+          case "blue":
+            validTeamValues.push(match.blue1, match.blue2, match.blue3);
+            break;
+          default:
+            validTeamValues.push(match.red1, match.red2, match.red3, match.blue1, match.blue2, match.blue3);
+        }
+      }
+    }
+
     draftRecord.values.forEach((value, i) => {
       switch (flattenedFields[i].type) {
         case "team":
           if (!/^\d{1,5}[A-Z]?$/.test(value)) {
             validateError = `Invalid value for ${flattenedFields[i].name}`;
           }
-          if (surveyRecord.teams.length && !surveyRecord.teams.includes(value)) {
-            validateError = `Invalid value for ${flattenedFields[i].name} (team not allowlisted)`;
-          }
-          break;
-        case "match":
-          if (!/\d{1,3}/.test(value)) {
+          if (validTeamValues.length && !validTeamValues.includes(value)) {
             validateError = `Invalid value for ${flattenedFields[i].name}`;
           }
           break;
@@ -38,38 +78,6 @@
     });
 
     return validateError;
-  }
-
-  function startNewDraft() {
-    const draft: Entry = {
-      surveyId: draftRecord.surveyId,
-      values: flattenedFields.map((field, i) => {
-        switch (field.type) {
-          case "match":
-            return (draftRecord.values[i] ?? 0) + 1;
-          default:
-            return getDefaultFieldValue(field);
-        }
-      }),
-      created: new Date(),
-      modified: new Date(),
-    };
-
-    const addRequest = idb.transaction("drafts", "readwrite").objectStore("drafts").add(draft);
-    addRequest.onerror = () => {
-      error = `Could not create new draft: ${addRequest.error?.message}`;
-    };
-
-    addRequest.onsuccess = () => {
-      const id = addRequest.result as number | undefined;
-      if (id == undefined) {
-        error = "Could not create new draft";
-        return;
-      }
-
-      surveyRecord.modified = new Date();
-      location.hash = `/draft/${id}`;
-    };
   }
 
   function onConfirm() {
@@ -89,7 +97,10 @@
     moveTransaction.objectStore("entries").add(entryRecord);
     moveTransaction.objectStore("drafts").delete(draftRecord.id);
 
-    moveTransaction.oncomplete = () => startNewDraft();
+    moveTransaction.oncomplete = () => {
+      surveyRecord.modified = new Date();
+      location.hash = `/survey/${surveyRecord.id}`;
+    };
   }
 </script>
 
@@ -99,7 +110,7 @@
     Submit
   </Button>
 
-  <span>Submit this draft and start a new one?</span>
+  <span>Submit this draft?</span>
   {#if error}
     <span>{error}</span>
   {/if}

@@ -3,7 +3,7 @@
   import Container from "$lib/components/Container.svelte";
   import Header from "$lib/components/Header.svelte";
   import DeleteMatchDialog from "$lib/dialogs/DeleteMatchDialog.svelte";
-    import EditMatchDialog from "$lib/dialogs/EditMatchDialog.svelte";
+  import EditMatchDialog from "$lib/dialogs/EditMatchDialog.svelte";
   import GetEventMatchesDialog from "$lib/dialogs/GetEventMatchesDialog.svelte";
   import NewMatchDialog from "$lib/dialogs/NewMatchDialog.svelte";
   import { tbaKeyStore } from "$lib/tba";

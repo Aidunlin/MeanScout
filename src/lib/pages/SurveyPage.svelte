@@ -5,6 +5,7 @@
   import Container from "$lib/components/Container.svelte";
   import Header from "$lib/components/Header.svelte";
   import Icon from "$lib/components/Icon.svelte";
+  import { targetStore } from "$lib/target";
 
   export let idb: IDBDatabase;
   export let surveyRecord: IDBRecord<Survey>;
@@ -38,18 +39,48 @@
   const importantFields = flattenedFields.filter((field) => field.type == "team" || field.type == "match");
 
   function newDraftClicked() {
+    let matchValue = 1;
+    const matchFieldIndex = flattenedFields.findIndex((field) => field.type == "match");
     const allRecords = [...draftRecords, ...entryRecords];
+    if (matchFieldIndex != -1 && allRecords.length) {
+      matchValue = Math.max(...allRecords.map((entry) => entry.values[matchFieldIndex] ?? 0)) + 1;
+    }
+
+    let teamValue = "";
+    if (surveyRecord.matches.length) {
+      let match = surveyRecord.matches.find((m) => m.number == matchValue);
+      if (match) {
+        switch ($targetStore) {
+          case "red 1":
+            teamValue = match.red1;
+            break;
+          case "red 2":
+            teamValue = match.red2;
+            break;
+          case "red 3":
+            teamValue = match.red3;
+            break;
+          case "blue 1":
+            teamValue = match.blue1;
+            break;
+          case "blue 2":
+            teamValue = match.blue2;
+            break;
+          case "blue 3":
+            teamValue = match.blue3;
+            break;
+        }
+      }
+    }
 
     const draft: Entry = {
       surveyId: surveyRecord.id,
       values: flattenedFields.map((field, i) => {
         switch (field.type) {
+          case "team":
+            return teamValue;
           case "match":
-            if (!allRecords.length) {
-              return 1;
-            }
-
-            return Math.max(...allRecords.map((entry) => entry.values[i] ?? 0)) + 1;
+            return matchValue;
           case "select":
             return field.values[0];
           default:

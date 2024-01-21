@@ -59,6 +59,13 @@
       {/each}
     </Container>
   {:else}
-    <span>No teams. Any team value is allowed.</span>
+    <span>
+      No teams.
+      {#if surveyRecord.matches.length}
+        Note that teams from matches are used, depending on the selected target.
+      {:else}
+        Any team value is allowed.
+      {/if}
+    </span>
   {/if}
 </Container>

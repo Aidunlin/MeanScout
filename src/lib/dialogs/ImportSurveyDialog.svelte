@@ -1,14 +1,12 @@
 <script lang="ts">
-  import { fieldTypes, type Field, type IDBRecord, type Survey } from "$lib";
+  import { fieldTypes, type Field } from "$lib";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import Icon from "$lib/components/Icon.svelte";
 
   export let idb: IDBDatabase;
-  export let surveyRecords: IDBRecord<Survey>[];
 
-  let dialog: Dialog;
   let files: FileList | undefined = undefined;
   let error = "";
 
@@ -38,11 +36,11 @@
     return matches.filter((match) => {
       if (typeof match != "object") return false;
       if (typeof match.number != "number") return false;
-      
+
       if (typeof match.red1 != "string") return false;
       if (typeof match.red2 != "string") return false;
       if (typeof match.red3 != "string") return false;
-      
+
       if (typeof match.blue1 != "string") return false;
       if (typeof match.blue2 != "string") return false;
       if (typeof match.blue3 != "string") return false;
@@ -102,13 +100,12 @@
         return;
       }
 
-      surveyRecords = [...surveyRecords, { id, ...survey }];
-      dialog.close();
+      location.hash = `/survey/${id}`;
     };
   }
 </script>
 
-<Dialog bind:this={dialog} {onConfirm} on:close={() => (error = "")}>
+<Dialog {onConfirm} on:close={() => (error = "")}>
   <Button title="Import survey" slot="opener" let:open on:click={open}>
     <Container maxWidth>
       <Icon name="paste" />

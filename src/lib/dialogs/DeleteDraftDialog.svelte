@@ -18,7 +18,7 @@
 
     deleteRequest.onsuccess = () => {
       surveyRecord.modified = new Date();
-      location.hash = `/survey/${surveyRecord.id}/drafts`;
+      location.hash = `/survey/${surveyRecord.id}`;
     };
   }
 </script>

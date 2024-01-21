@@ -116,7 +116,7 @@
 
 <style>
   .team {
-    width: 100px;
+    width: 130px;
   }
 
   .match,
