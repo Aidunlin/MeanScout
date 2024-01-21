@@ -29,9 +29,20 @@ export type Field =
   | TimerField
   | GroupField;
 
+export type Match = {
+  number: number;
+  red1: string;
+  red2: string;
+  red3: string;
+  blue1: string;
+  blue2: string;
+  blue3: string;
+};
+
 export type Survey = {
   name: string;
   fields: Field[];
+  matches: Match[];
   teams: string[];
   created: Date;
   modified: Date;

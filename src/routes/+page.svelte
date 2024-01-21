@@ -9,6 +9,7 @@
   import SettingsPage from "$lib/pages/SettingsPage.svelte";
   import SurveyEntriesPage from "$lib/pages/SurveyEntriesPage.svelte";
   import SurveyFieldsPage from "$lib/pages/SurveyFieldsPage.svelte";
+  import SurveyMatchesPage from "$lib/pages/SurveyMatchesPage.svelte";
   import SurveyOptionsPage from "$lib/pages/SurveyOptionsPage.svelte";
   import SurveyPage from "$lib/pages/SurveyPage.svelte";
   import SurveyTeamsPage from "$lib/pages/SurveyTeamsPage.svelte";
@@ -23,6 +24,7 @@
     | { page: "survey"; subpage: ""; props: ComponentProps<SurveyPage> }
     | { page: "survey"; subpage: "entries"; props: ComponentProps<SurveyEntriesPage> }
     | { page: "survey"; subpage: "fields"; props: ComponentProps<SurveyFieldsPage> }
+    | { page: "survey"; subpage: "matches"; props: ComponentProps<SurveyMatchesPage> }
     | { page: "survey"; subpage: "teams"; props: ComponentProps<SurveyTeamsPage> }
     | { page: "survey"; subpage: "options"; props: ComponentProps<SurveyOptionsPage> }
     | { page: "draft"; props: ComponentProps<DraftPage> }
@@ -50,7 +52,7 @@
     };
   }
 
-  function setSurveyPage(id: number, subpage: "" | "entries" | "fields" | "teams" | "options") {
+  function setSurveyPage(id: number, subpage: "" | "entries" | "fields" | "matches" | "teams" | "options") {
     if (current?.page == "survey" && current.props.surveyRecord.id == id) {
       current.subpage = subpage;
       return;
@@ -71,6 +73,10 @@
     surveyRequest.onsuccess = () => {
       const surveyRecord = surveyRequest.result as IDBRecord<Survey> | undefined;
       if (!surveyRecord) return setMainPage();
+
+      if (!Array.isArray(surveyRecord.matches)) {
+        surveyRecord.matches = [];
+      }
 
       current = {
         page: "survey",
@@ -113,6 +119,10 @@
         const surveyRecord = surveyRequest.result as IDBRecord<Survey> | undefined;
         if (!surveyRecord) return setMainPage();
 
+        if (!Array.isArray(surveyRecord.matches)) {
+          surveyRecord.matches = [];
+        }
+
         current = {
           page: "draft",
           props: { idb, surveyRecord, draftRecord },
@@ -154,6 +164,10 @@
         const surveyRecord = surveyRequest.result as IDBRecord<Survey> | undefined;
         if (!surveyRecord) return setMainPage();
 
+        if (!Array.isArray(surveyRecord.matches)) {
+          surveyRecord.matches = [];
+        }
+
         current = {
           page: "entry",
           props: { idb, surveyRecord, entryRecord },
@@ -175,7 +189,12 @@
       setSettingsPage();
     } else if (page == "survey") {
       const subpage =
-        hash[2] == "" || hash[2] == "entries" || hash[2] == "fields" || hash[2] == "teams" || hash[2] == "options"
+        hash[2] == "" ||
+        hash[2] == "entries" ||
+        hash[2] == "fields" ||
+        hash[2] == "matches" ||
+        hash[2] == "teams" ||
+        hash[2] == "options"
           ? hash[2]
           : "";
       const id = Number(hash[1]);
@@ -289,6 +308,8 @@
     <SurveyEntriesPage {...current.props} />
   {:else if current.subpage == "fields"}
     <SurveyFieldsPage {...current.props} />
+  {:else if current.subpage == "matches"}
+    <SurveyMatchesPage {...current.props} />
   {:else if current.subpage == "teams"}
     <SurveyTeamsPage {...current.props} />
   {:else if current.subpage == "options"}

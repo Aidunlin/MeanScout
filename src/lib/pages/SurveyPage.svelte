@@ -120,6 +120,15 @@
       <Icon name="arrow-right" />
     </Container>
   </Anchor>
+  <Anchor hash="survey/{surveyRecord.id}/matches">
+    <Container maxWidth spaceBetween>
+      <Container>
+        <Icon name="table-list" />
+        Matches
+      </Container>
+      <Icon name="arrow-right" />
+    </Container>
+  </Anchor>
   <Anchor hash="survey/{surveyRecord.id}/teams">
     <Container maxWidth spaceBetween>
       <Container>

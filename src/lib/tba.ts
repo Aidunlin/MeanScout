@@ -12,7 +12,6 @@ export async function fetchTBA(endpoint: string, tbaKey: string) {
     headers: [["X-TBA-Auth-Key", tbaKey]],
   });
 
-  console.log(response.status);
   let data = await response.json();
 
   if (response.status == 200) {

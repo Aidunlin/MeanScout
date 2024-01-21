@@ -23,25 +23,29 @@
 
   function parseFields(fields: any[]): Field[] {
     return fields.filter((field) => {
-      if (typeof field != "object") {
-        return false;
-      }
+      if (typeof field != "object") return false;
+      if (typeof field.name != "string" || !field.name.trim()) return false;
 
-      if (typeof field.name != "string" || !field.name.trim()) {
-        return false;
-      }
+      if (!fieldTypes.includes(field.type)) return false;
+      if (field.type == "select" && !Array.isArray(field.values)) return false;
+      if (field.type == "group" && !Array.isArray(field.fields)) return false;
 
-      if (!fieldTypes.includes(field.type)) {
-        return false;
-      }
+      return true;
+    });
+  }
 
-      if (field.type == "select" && !Array.isArray(field.values)) {
-        return false;
-      }
-
-      if (field.type == "group" && !Array.isArray(field.fields)) {
-        return false;
-      }
+  function parseMatches(matches: any[]) {
+    return matches.filter((match) => {
+      if (typeof match != "object") return false;
+      if (typeof match.number != "number") return false;
+      
+      if (typeof match.red1 != "string") return false;
+      if (typeof match.red2 != "string") return false;
+      if (typeof match.red3 != "string") return false;
+      
+      if (typeof match.blue1 != "string") return false;
+      if (typeof match.blue2 != "string") return false;
+      if (typeof match.blue3 != "string") return false;
 
       return true;
     });
@@ -80,6 +84,7 @@
     delete survey.id;
     survey.name = parseName(survey.name);
     survey.fields = Array.isArray(survey.fields) ? parseFields(survey.fields) : [];
+    survey.matches = Array.isArray(survey.matches) ? parseMatches(survey.matches) : [];
     survey.teams = Array.isArray(survey.teams) ? parseTeams(survey.teams) : [];
     survey.created = parseDate(survey.created);
     survey.modified = parseDate(survey.modified);

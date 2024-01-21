@@ -26,6 +26,7 @@
         { name: "Match", type: "match" },
         { name: "Absent", type: "toggle" },
       ],
+      matches: [],
       teams: [],
       created: new Date(),
       modified: new Date(),
