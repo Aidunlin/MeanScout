@@ -1,17 +1,18 @@
 <script lang="ts">
+  export let hash = "";
+  export let href = `#/${hash}`;
   export let title = "";
   export let disableTheme = false;
-  export let disabled = false;
-  export let star = false;
 </script>
 
-<button on:click class:star class:disable-theme={disableTheme} {disabled} {title}>
+<a {href} {title} class:disable-theme={disableTheme}>
   <slot />
-</button>
+</a>
 
 <style>
-  button {
+  a {
     background: var(--fg-color);
+    cursor: pointer;
     display: inline-flex;
     gap: var(--inner-gap);
     justify-content: center;
@@ -19,12 +20,8 @@
     text-decoration: none;
   }
 
-  button:focus,
-  button:hover {
+  a:focus,
+  a:hover {
     outline: var(--outline);
-  }
-
-  .star {
-    padding: var(--inner-gap) 6px;
   }
 </style>

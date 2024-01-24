@@ -1,30 +1,67 @@
 <script lang="ts">
-  import { target } from "../app";
-  import Button from "./Button.svelte";
-  import Container from "./Container.svelte";
+  import { targetStore } from "$lib/target";
+  import Anchor from "./Anchor.svelte";
+  import Icon from "./Icon.svelte";
 
-  export let title = "";
-  export let backLink: string | undefined = undefined;
+  export let parent: { text: string; iconName: string; hash: string } | undefined = undefined;
+  export let current: { text: string; iconName: string } | undefined = undefined;
 </script>
 
 <svelte:head>
-  <title>{title && `${title} | `} MeanScout</title>
+  <title>MeanScout</title>
 </svelte:head>
 
 <header>
-  <Container>
-    {#if backLink != undefined}
-      <Button
-        iconName="arrow-left"
-        title="Go back"
-        on:click={() => {
-          if (backLink != undefined) window.location.hash = backLink;
-        }}
-      />
-    {:else}
-      <img id="logo" src="./logo.svg" alt="" />
+  <div style="justify-content: left;">
+    {#if parent}
+      <Anchor hash={parent.hash}>
+        <Icon name="arrow-left" />
+        {parent.text}
+      </Anchor>
+    {:else if current}
+      <Anchor hash="">
+        <Icon name="arrow-left" />
+        MeanScout
+      </Anchor>
     {/if}
-    <h1>{title || "MeanScout"}</h1>
-  </Container>
-  <span class="theme-text" style="text-transform:capitalize">{$target}</span>
+  </div>
+
+  <div style="justify-content: center;">
+    {#if current}
+      <Icon name={current.iconName} />
+      <h1>{current.text}</h1>
+    {:else}
+      <img src="./logo.svg" alt="" width="30" height="30" />
+      <h1>MeanScout</h1>
+    {/if}
+  </div>
+
+  <span>{$targetStore}</span>
 </header>
+
+<style>
+  header {
+    align-items: center;
+    background: var(--fg-color);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--outer-gap);
+    padding: var(--outer-gap);
+  }
+
+  div {
+    align-items: center;
+    display: flex;
+    flex: 1 1 0;
+    gap: var(--inner-gap);
+    text-decoration: none;
+  }
+
+  span {
+    color: var(--theme-color);
+    flex: 1 1 0;
+    padding: var(--inner-gap);
+    text-align: right;
+    text-transform: capitalize;
+  }
+</style>
