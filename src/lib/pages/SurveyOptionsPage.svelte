@@ -29,10 +29,7 @@
   }
 </script>
 
-<Header
-  parent={{ text: surveyRecord.name, iconName: "list-ul", hash: `survey/${surveyRecord.id}` }}
-  current={{ text: "Options", iconName: "gears" }}
-/>
+<Header backLink="survey/{surveyRecord.id}" title="Options" iconName="gears" />
 
 <Container direction="column" padding="large">
   <Button title="Download survey" on:click={downloadSurvey}>

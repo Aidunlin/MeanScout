@@ -14,10 +14,7 @@
   $: idb.transaction("surveys", "readwrite").objectStore("surveys").put(surveyRecord);
 </script>
 
-<Header
-  parent={{ text: surveyRecord.name, iconName: "list-ul", hash: `survey/${surveyRecord.id}` }}
-  current={{ text: "Matches", iconName: "table-list" }}
-/>
+<Header backLink="survey/{surveyRecord.id}" title="Matches" iconName="table-list" />
 
 <Container direction="column" padding="large">
   {#if navigator.onLine && $tbaKeyStore}

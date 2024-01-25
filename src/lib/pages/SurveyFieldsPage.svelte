@@ -37,10 +37,7 @@
   }
 </script>
 
-<Header
-  parent={{ text: surveyRecord.name, iconName: "list-ul", hash: `survey/${surveyRecord.id}` }}
-  current={{ text: "Fields", iconName: "list-check" }}
-/>
+<Header backLink="survey/{surveyRecord.id}" title="Fields" iconName="list-check" />
 
 <Container direction="column" padding="large">
   {#if preview}

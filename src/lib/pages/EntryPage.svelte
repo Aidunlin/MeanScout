@@ -16,10 +16,7 @@
   }
 </script>
 
-<Header
-  parent={{ text: "Entries", iconName: "list-ol", hash: `survey/${surveyRecord.id}/entries` }}
-  current={{ text: "Entry", iconName: "list-ol" }}
-/>
+<Header backLink="survey/{surveyRecord.id}/entries" title="Entry" iconName="list-ol" />
 
 <Container direction="column" padding="large">
   {#each surveyRecord.fields as field, i (field)}

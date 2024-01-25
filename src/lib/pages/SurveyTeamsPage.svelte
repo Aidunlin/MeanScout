@@ -28,10 +28,7 @@
   }
 </script>
 
-<Header
-  parent={{ text: surveyRecord.name, iconName: "list-ul", hash: `survey/${surveyRecord.id}` }}
-  current={{ text: "Teams", iconName: "people-group" }}
-/>
+<Header backLink="survey/{surveyRecord.id}" title="Teams" iconName="people-group" />
 
 <Container direction="column" padding="large">
   {#if navigator.onLine && $tbaKeyStore}

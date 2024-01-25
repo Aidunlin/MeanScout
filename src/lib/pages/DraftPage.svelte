@@ -67,10 +67,7 @@
   }
 </script>
 
-<Header
-  parent={{ text: surveyRecord.name, iconName: "list-ul", hash: `survey/${surveyRecord.id}` }}
-  current={{ text: "Draft", iconName: "pen-ruler" }}
-/>
+<Header backLink="survey/{surveyRecord.id}" title="Draft" iconName="pen-ruler" />
 
 <datalist id="teams-list">
   {#each getAllTeams() as team}

@@ -102,7 +102,7 @@
   }
 </script>
 
-<Header current={{ text: surveyRecord.name, iconName: "list-ul" }} />
+<Header backLink="" title={surveyRecord.name} iconName="list-ul" />
 
 <Container direction="column" padding="large">
   <Button title="New draft" on:click={newDraftClicked}>

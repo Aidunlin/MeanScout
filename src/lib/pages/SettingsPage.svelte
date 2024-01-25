@@ -5,7 +5,7 @@
   import { targets, targetStore } from "$lib/target";
 </script>
 
-<Header current={{ text: "Settings", iconName: "gears" }} />
+<Header backLink="" title="Settings" iconName="gears" />
 
 <Container padding="large">
   <Container direction="column" gap="none">
