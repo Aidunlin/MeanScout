@@ -93,10 +93,10 @@
 
     const addRequest = idb.transaction("drafts", "readwrite").objectStore("drafts").add(draft);
     addRequest.onsuccess = () => {
-      surveyRecord.modified = new Date();
-      const id = addRequest.result as number | undefined;
+      const id = addRequest.result;
       if (id == undefined) return;
-
+      
+      surveyRecord.modified = new Date();
       location.hash = `/draft/${id}`;
     };
   }

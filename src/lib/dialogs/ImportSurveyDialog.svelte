@@ -94,7 +94,7 @@
     };
 
     addRequest.onsuccess = () => {
-      const id = addRequest.result as number | undefined;
+      const id = addRequest.result;
       if (id == undefined) {
         error = "Could not add survey";
         return;

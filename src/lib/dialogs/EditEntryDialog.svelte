@@ -32,7 +32,7 @@
     };
 
     addRequest.onsuccess = () => {
-      const id = addRequest.result as number | undefined;
+      const id = addRequest.result;
       if (id == undefined) {
         moveTransaction.abort();
         error = "Could not edit entry: entry record id is undefined";

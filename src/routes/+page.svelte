@@ -1,5 +1,4 @@
 <script lang="ts">
-  import type { Entry, IDBRecord, Survey } from "$lib";
   import Container from "$lib/components/Container.svelte";
   import Header from "$lib/components/Header.svelte";
   import "$lib/global.css";
@@ -71,7 +70,7 @@
     surveyRequest.onerror = () => setMainPage();
 
     surveyRequest.onsuccess = () => {
-      const surveyRecord = surveyRequest.result as IDBRecord<Survey> | undefined;
+      const surveyRecord = surveyRequest.result;
       if (!surveyRecord) return setMainPage();
 
       if (!Array.isArray(surveyRecord.matches)) {
@@ -101,7 +100,7 @@
     draftRequest.onerror = () => setMainPage();
 
     draftRequest.onsuccess = () => {
-      const draftRecord = draftRequest.result as IDBRecord<Entry> | undefined;
+      const draftRecord = draftRequest.result;
       if (!draftRecord) return setMainPage();
 
       if (current?.page == "survey" || current?.page == "draft") {
@@ -116,7 +115,7 @@
       surveyRequest.onerror = () => setMainPage();
 
       surveyRequest.onsuccess = () => {
-        const surveyRecord = surveyRequest.result as IDBRecord<Survey> | undefined;
+        const surveyRecord = surveyRequest.result;
         if (!surveyRecord) return setMainPage();
 
         if (!Array.isArray(surveyRecord.matches)) {
@@ -146,7 +145,7 @@
     entryRequest.onerror = () => setMainPage();
 
     entryRequest.onsuccess = () => {
-      const entryRecord = entryRequest.result as IDBRecord<Entry> | undefined;
+      const entryRecord = entryRequest.result;
       if (!entryRecord) return setMainPage();
 
       if (current?.page == "survey" || current?.page == "entry") {
@@ -161,7 +160,7 @@
       surveyRequest.onerror = () => setMainPage();
 
       surveyRequest.onsuccess = () => {
-        const surveyRecord = surveyRequest.result as IDBRecord<Survey> | undefined;
+        const surveyRecord = surveyRequest.result;
         if (!surveyRecord) return setMainPage();
 
         if (!Array.isArray(surveyRecord.matches)) {
@@ -221,7 +220,7 @@
       const cursor = surveyCursor.result;
       if (!cursor) return;
 
-      const survey = cursor.value;
+      const survey = cursor.value as any;
 
       if (Array.isArray(survey.configs)) {
         survey.fields = survey.configs;
