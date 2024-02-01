@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { IDBRecord, Match, Survey } from "$lib";
+  import type { Match, Survey } from "$lib";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";

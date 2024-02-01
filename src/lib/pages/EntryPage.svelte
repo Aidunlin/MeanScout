@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { flattenFields, type Entry, type IDBRecord, type Survey } from "$lib";
+  import { flattenFields, type Entry, type Survey } from "$lib";
   import Container from "$lib/components/Container.svelte";
   import Header from "$lib/components/Header.svelte";
   import DeleteEntryDialog from "$lib/dialogs/DeleteEntryDialog.svelte";

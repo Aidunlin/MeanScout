@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { download, flattenFields, share, type Entry, type IDBRecord, type Survey } from "$lib";
+  import { download, flattenFields, share, type Entry, type Survey } from "$lib";
   import Anchor from "$lib/components/Anchor.svelte";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";

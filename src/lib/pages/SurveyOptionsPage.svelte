@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { download, share, type IDBRecord, type Survey } from "$lib";
+  import { download, share, type Survey } from "$lib";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Header from "$lib/components/Header.svelte";

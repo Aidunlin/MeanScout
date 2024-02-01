@@ -1,5 +1,3 @@
-import type Dialog from "./components/Dialog.svelte";
-
 export const fieldTypes = ["team", "match", "toggle", "number", "select", "text", "rating", "timer", "group"] as const;
 export type FieldType = (typeof fieldTypes)[number];
 
@@ -54,10 +52,6 @@ export type Entry = {
   created: Date;
   modified: Date;
 };
-
-export type IDBRecord<T> = T & { id: number };
-
-export type DialogDataType<T> = { dialog?: Dialog; data: T };
 
 export function getDefaultFieldValue(field: Exclude<Field, GroupField>) {
   switch (field.type) {

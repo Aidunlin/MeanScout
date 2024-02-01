@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { type IDBRecord, type Survey } from "$lib";
+  import { type Survey } from "$lib";
   import Anchor from "$lib/components/Anchor.svelte";
   import Container from "$lib/components/Container.svelte";
   import Header from "$lib/components/Header.svelte";

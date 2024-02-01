@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getDefaultFieldValue, type IDBRecord, type Survey } from "$lib";
+  import { getDefaultFieldValue, type Survey } from "$lib";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import FieldEditor from "$lib/components/FieldEditor.svelte";

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { flattenFields, type Entry, type IDBRecord, type Survey } from "$lib";
+  import { flattenFields, type Entry, type Survey } from "$lib";
   import Container from "$lib/components/Container.svelte";
   import FieldValueEditor from "$lib/components/FieldValueEditor.svelte";
   import Header from "$lib/components/Header.svelte";

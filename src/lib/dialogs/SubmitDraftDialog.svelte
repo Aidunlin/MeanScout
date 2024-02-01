@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { flattenFields, getDefaultFieldValue, type Entry, type IDBRecord, type Survey } from "$lib";
+  import { flattenFields, getDefaultFieldValue, type Entry, type Survey } from "$lib";
   import Button from "$lib/components/Button.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import Icon from "$lib/components/Icon.svelte";
