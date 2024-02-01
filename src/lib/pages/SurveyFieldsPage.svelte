@@ -15,16 +15,9 @@
   let disabled = false;
   let preview = false;
 
-  const countTransaction = idb.transaction(["drafts", "entries"]);
-
-  const draftCountRequest = countTransaction.objectStore("drafts").index("surveyId").count(surveyRecord.id);
-  draftCountRequest.onsuccess = () => {
-    disabled ||= draftCountRequest.result > 0;
-  };
-
-  const entryCountRequest = countTransaction.objectStore("entries").index("surveyId").count(surveyRecord.id);
+  const entryCountRequest = idb.transaction("entries").objectStore("entries").index("surveyId").count(surveyRecord.id);
   entryCountRequest.onsuccess = () => {
-    disabled ||= entryCountRequest.result > 0;
+    disabled = entryCountRequest.result > 0;
   };
 
   function newField() {

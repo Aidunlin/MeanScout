@@ -15,22 +15,16 @@
   let draftRecords: IDBRecord<Entry>[] = [];
   let entryRecords: IDBRecord<Entry>[] = [];
 
-  const cursorTransaction = idb.transaction(["drafts", "entries"]);
-
-  const draftCursorRequest = cursorTransaction.objectStore("drafts").index("surveyId").openCursor(surveyRecord.id);
-  draftCursorRequest.onsuccess = () => {
-    const cursor = draftCursorRequest.result;
-    if (cursor) {
-      draftRecords = [...draftRecords, cursor.value];
-      cursor.continue();
-    }
-  };
+  const cursorTransaction = idb.transaction("entries");
 
   const entryCursorRequest = cursorTransaction.objectStore("entries").index("surveyId").openCursor(surveyRecord.id);
   entryCursorRequest.onsuccess = () => {
     const cursor = entryCursorRequest.result;
     if (cursor) {
       entryRecords = [...entryRecords, cursor.value];
+      if (cursor.value.status == "draft") {
+        draftRecords = [...draftRecords, cursor.value];
+      }
       cursor.continue();
     }
   };
@@ -38,12 +32,11 @@
   const flattenedFields = flattenFields(surveyRecord.fields);
   const importantFields = flattenedFields.filter((field) => field.type == "team" || field.type == "match");
 
-  function newDraftClicked() {
+  function newEntryClicked() {
     let matchValue = 1;
     const matchFieldIndex = flattenedFields.findIndex((field) => field.type == "match");
-    const allRecords = [...draftRecords, ...entryRecords];
-    if (matchFieldIndex != -1 && allRecords.length) {
-      matchValue = Math.max(...allRecords.map((entry) => entry.values[matchFieldIndex] ?? 0)) + 1;
+    if (matchFieldIndex != -1 && entryRecords.length) {
+      matchValue = Math.max(...entryRecords.map((entry) => entry.values[matchFieldIndex] ?? 0)) + 1;
     }
 
     let teamValue = "";
@@ -75,6 +68,7 @@
 
     const draft: Entry = {
       surveyId: surveyRecord.id,
+      status: "draft",
       values: flattenedFields.map((field, i) => {
         switch (field.type) {
           case "team":
@@ -91,13 +85,13 @@
       modified: new Date(),
     };
 
-    const addRequest = idb.transaction("drafts", "readwrite").objectStore("drafts").add(draft);
+    const addRequest = idb.transaction("entries", "readwrite").objectStore("entries").add(draft);
     addRequest.onsuccess = () => {
       const id = addRequest.result;
       if (id == undefined) return;
 
       surveyRecord.modified = new Date();
-      location.hash = `/draft/${id}`;
+      location.hash = `/entry/${id}`;
     };
   }
 </script>
@@ -105,10 +99,10 @@
 <Header backLink="" title={surveyRecord.name} iconName="list-ul" />
 
 <Container direction="column" padding="large">
-  <Button title="New draft" on:click={newDraftClicked}>
+  <Button title="New entry" on:click={newEntryClicked}>
     <Container maxWidth>
       <Icon name="plus" />
-      New draft
+      New entry
     </Container>
   </Button>
 </Container>
@@ -117,7 +111,7 @@
   <Container direction="column" padding="large">
     <h2>Drafts</h2>
     {#each draftRecords.toSorted((a, b) => b.modified.getTime() - a.modified.getTime()) as draft (draft.id)}
-      <Anchor hash="draft/{draft.id}" title="Edit draft">
+      <Anchor hash="entry/{draft.id}" title="Edit draft">
         <Container align="center" maxWidth spaceBetween>
           <Container direction="column" gap="small">
             {#each importantFields as field, i}

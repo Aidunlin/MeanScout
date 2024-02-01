@@ -46,8 +46,12 @@ export type Survey = {
   modified: Date;
 };
 
+export const entryStatuses = ["draft", "submitted"] as const;
+export type EntryStatus = (typeof entryStatuses)[number];
+
 export type Entry = {
   surveyId: number;
+  status: EntryStatus;
   values: any[];
   created: Date;
   modified: Date;

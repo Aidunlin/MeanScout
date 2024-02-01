@@ -2,7 +2,6 @@
   import Container from "$lib/components/Container.svelte";
   import Header from "$lib/components/Header.svelte";
   import "$lib/global.css";
-  import DraftPage from "$lib/pages/DraftPage.svelte";
   import EntryPage from "$lib/pages/EntryPage.svelte";
   import MainPage from "$lib/pages/MainPage.svelte";
   import SettingsPage from "$lib/pages/SettingsPage.svelte";
@@ -26,7 +25,6 @@
     | { page: "survey"; subpage: "matches"; props: ComponentProps<SurveyMatchesPage> }
     | { page: "survey"; subpage: "teams"; props: ComponentProps<SurveyTeamsPage> }
     | { page: "survey"; subpage: "options"; props: ComponentProps<SurveyOptionsPage> }
-    | { page: "draft"; props: ComponentProps<DraftPage> }
     | { page: "entry"; props: ComponentProps<EntryPage> };
 
   function setMainPage() {
@@ -57,7 +55,7 @@
       return;
     }
 
-    if (current?.page == "draft" || current?.page == "entry") {
+    if (current?.page == "entry") {
       current = {
         page: "survey",
         subpage,
@@ -85,51 +83,6 @@
     };
   }
 
-  function setDraftPage(id: number) {
-    if (current?.page == "draft" && current.props.draftRecord.id == id) {
-      return;
-    }
-
-    const getTransaction = idb.transaction(["surveys", "drafts"]);
-    getTransaction.onerror = () => setMainPage();
-
-    const surveyStore = getTransaction.objectStore("surveys");
-    const draftStore = getTransaction.objectStore("drafts");
-
-    const draftRequest = draftStore.get(id);
-    draftRequest.onerror = () => setMainPage();
-
-    draftRequest.onsuccess = () => {
-      const draftRecord = draftRequest.result;
-      if (!draftRecord) return setMainPage();
-
-      if (current?.page == "survey" || current?.page == "draft") {
-        current = {
-          page: "draft",
-          props: { idb, surveyRecord: current.props.surveyRecord, draftRecord },
-        };
-        return;
-      }
-
-      const surveyRequest = surveyStore.get(draftRecord.surveyId);
-      surveyRequest.onerror = () => setMainPage();
-
-      surveyRequest.onsuccess = () => {
-        const surveyRecord = surveyRequest.result;
-        if (!surveyRecord) return setMainPage();
-
-        if (!Array.isArray(surveyRecord.matches)) {
-          surveyRecord.matches = [];
-        }
-
-        current = {
-          page: "draft",
-          props: { idb, surveyRecord, draftRecord },
-        };
-      };
-    };
-  }
-
   function setEntryPage(id: number) {
     if (current?.page == "entry" && current.props.entryRecord.id == id) {
       return;
@@ -147,6 +100,10 @@
     entryRequest.onsuccess = () => {
       const entryRecord = entryRequest.result;
       if (!entryRecord) return setMainPage();
+
+      if (!entryRecord.status) {
+        entryRecord.status = "submitted";
+      }
 
       if (current?.page == "survey" || current?.page == "entry") {
         current = {
@@ -177,10 +134,7 @@
 
   function handleHashChange() {
     const hash = location.hash.replace(/#\/?/, "").toLowerCase().trim().split("/");
-    const page: (typeof current)["page"] =
-      hash[0] == "" || hash[0] == "settings" || hash[0] == "survey" || hash[0] == "draft" || hash[0] == "entry"
-        ? hash[0]
-        : "";
+    const page = hash[0] == "" || hash[0] == "settings" || hash[0] == "survey" || hash[0] == "entry" ? hash[0] : "";
 
     if (page == "") {
       setMainPage();
@@ -199,10 +153,6 @@
       const id = Number(hash[1]);
       if (Number.isNaN(id)) return setMainPage();
       setSurveyPage(id, subpage);
-    } else if (page == "draft") {
-      const id = Number(hash[1]);
-      if (Number.isNaN(id)) return setMainPage();
-      setDraftPage(id);
     } else if (page == "entry") {
       const id = Number(hash[1]);
       if (Number.isNaN(id)) return setMainPage();
@@ -248,15 +198,14 @@
   }
 
   function openIDB() {
-    const request = indexedDB.open("MeanScout", 6);
+    const request = indexedDB.open("MeanScout", 7);
     request.onerror = () => (idbError = `${request.error?.message}`);
 
     request.onupgradeneeded = (e) => {
       const storeNames = request.result.objectStoreNames;
 
-      if (!storeNames.contains("drafts")) {
-        const draftStore = request.result.createObjectStore("drafts", { keyPath: "id", autoIncrement: true });
-        draftStore.createIndex("surveyId", "surveyId", { unique: false });
+      if (storeNames.contains("drafts")) {
+        request.result.deleteObjectStore("drafts");
       }
 
       if (!storeNames.contains("entries")) {
@@ -314,12 +263,6 @@
   {:else if current.subpage == "options"}
     <SurveyOptionsPage {...current.props} />
   {/if}
-{:else if current?.page == "draft"}
-  {#key current.props.draftRecord.id}
-    <DraftPage {...current.props} />
-  {/key}
 {:else if current?.page == "entry"}
-  {#key current.props.entryRecord.id}
-    <EntryPage {...current.props} />
-  {/key}
+  <EntryPage {...current.props} />
 {/if}

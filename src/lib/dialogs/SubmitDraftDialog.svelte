@@ -87,17 +87,15 @@
       return;
     }
 
-    const moveTransaction = idb.transaction(["drafts", "entries"], "readwrite");
-    moveTransaction.onabort = () => {
-      error = `Could not submit draft: ${moveTransaction.error?.message}`;
+    draftRecord.status = "submitted";
+    draftRecord.modified = new Date();
+
+    const submitRequest = idb.transaction("entries", "readwrite").objectStore("entries").put(draftRecord);
+    submitRequest.onerror = () => {
+      error = `Could not submit draft: ${submitRequest.error?.message}`;
     };
 
-    const entryRecord = structuredClone(draftRecord) as Entry & { id?: number };
-    delete entryRecord.id;
-    moveTransaction.objectStore("entries").add(entryRecord);
-    moveTransaction.objectStore("drafts").delete(draftRecord.id);
-
-    moveTransaction.oncomplete = () => {
+    submitRequest.onsuccess = () => {
       surveyRecord.modified = new Date();
       location.hash = `/survey/${surveyRecord.id}`;
     };

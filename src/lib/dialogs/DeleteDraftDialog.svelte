@@ -11,7 +11,7 @@
   let error = "";
 
   function onConfirm() {
-    const deleteRequest = idb.transaction("drafts", "readwrite").objectStore("drafts").delete(draftRecord.id);
+    const deleteRequest = idb.transaction("entries", "readwrite").objectStore("entries").delete(draftRecord.id);
     deleteRequest.onerror = () => {
       error = `Could not delete draft: ${deleteRequest.error?.message}`;
     };

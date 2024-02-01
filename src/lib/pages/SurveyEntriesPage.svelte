@@ -22,7 +22,9 @@
   entryCursorRequest.onsuccess = () => {
     const cursor = entryCursorRequest.result;
     if (cursor) {
-      entryRecords = [...entryRecords, cursor.value];
+      if (cursor.value.status != "draft") {
+        entryRecords = [...entryRecords, cursor.value];
+      }
       cursor.continue();
     }
   };
