@@ -112,7 +112,7 @@
     <SubmitDraftDialog {idb} bind:surveyRecord draftRecord={entryRecord} />
     <DeleteDraftDialog {idb} bind:surveyRecord draftRecord={entryRecord} />
   </footer>
-{:else if entryRecord.status == "submitted"}
+{:else}
   <Header backLink="survey/{surveyRecord.id}/entries" title="Entry" iconName="list-ol" />
 
   <Container direction="column" padding="large">

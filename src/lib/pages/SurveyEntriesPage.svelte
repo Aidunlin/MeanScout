@@ -5,6 +5,7 @@
   import Container from "$lib/components/Container.svelte";
   import Header from "$lib/components/Header.svelte";
   import Icon from "$lib/components/Icon.svelte";
+  import BulkSetEntryStatusDialog from "$lib/dialogs/BulkSetEntryStatusDialog.svelte";
   import { targetStore } from "$lib/target";
 
   export let idb: IDBDatabase;
@@ -12,7 +13,8 @@
 
   $: idb.transaction("surveys", "readwrite").objectStore("surveys").put(surveyRecord);
 
-  let entryRecords: IDBRecord<Entry>[] = [];
+  let submittedEntries: IDBRecord<Entry>[] = [];
+  let exportedEntries: IDBRecord<Entry>[] = [];
 
   const entryCursorRequest = idb
     .transaction("entries")
@@ -22,8 +24,11 @@
   entryCursorRequest.onsuccess = () => {
     const cursor = entryCursorRequest.result;
     if (cursor) {
-      if (cursor.value.status != "draft") {
-        entryRecords = [...entryRecords, cursor.value];
+      if (cursor.value.status == "submitted") {
+        submittedEntries = [...submittedEntries, cursor.value];
+      }
+      if (cursor.value.status == "exported") {
+        exportedEntries = [...exportedEntries, cursor.value];
       }
       cursor.continue();
     }
@@ -38,7 +43,7 @@
   }
 
   function entriesAsCSV() {
-    return entryRecords.map((entry) => entry.values.map(valueAsCSV).join(",")).join("\n");
+    return submittedEntries.map((entry) => entry.values.map(valueAsCSV).join(",")).join("\n");
   }
 
   function downloadEntries() {
@@ -53,7 +58,8 @@
 <Header backLink="survey/{surveyRecord.id}" title="Entries" iconName="list-ol" />
 
 <Container direction="column" padding="large">
-  {#if entryRecords.length}
+  {#if submittedEntries.length}
+    <h2>Submitted Entries</h2>
     <Button title="Download entries" on:click={downloadEntries}>
       <Container maxWidth>
         <Icon name="download" />
@@ -68,9 +74,17 @@
         </Container>
       </Button>
     {/if}
-
-    <h2>Entries</h2>
-    {#each entryRecords.toSorted((a, b) => b.modified.getTime() - a.modified.getTime()) as entry (entry.id)}
+    <BulkSetEntryStatusDialog
+      {idb}
+      {surveyRecord}
+      from="submitted"
+      to="exported"
+      onSet={() => {
+        exportedEntries = [...exportedEntries, ...submittedEntries];
+        submittedEntries = [];
+      }}
+    />
+    {#each submittedEntries.toSorted((a, b) => b.modified.getTime() - a.modified.getTime()) as entry (entry.id)}
       <Anchor hash="entry/{entry.id}" title="Edit entry">
         <Container align="center" maxWidth spaceBetween>
           <Container direction="column" gap="small">
@@ -82,7 +96,31 @@
         </Container>
       </Anchor>
     {/each}
-  {:else}
-    No entries.
+  {/if}
+
+  {#if exportedEntries.length}
+    <h2>Exported Entries</h2>
+    {#each exportedEntries.toSorted((a, b) => b.modified.getTime() - a.modified.getTime()) as entry (entry.id)}
+      <Anchor hash="entry/{entry.id}" title="Edit entry">
+        <Container align="center" maxWidth spaceBetween>
+          <Container direction="column" gap="small">
+            {#each importantFields as field, i}
+              <span>{field.name}: {entry.values[i]}</span>
+            {/each}
+          </Container>
+          <Icon name="arrow-right" />
+        </Container>
+      </Anchor>
+    {/each}
+    <BulkSetEntryStatusDialog
+      {idb}
+      {surveyRecord}
+      from="exported"
+      to="submitted"
+      onSet={() => {
+        submittedEntries = [...submittedEntries, ...exportedEntries];
+        exportedEntries = [];
+      }}
+    />
   {/if}
 </Container>

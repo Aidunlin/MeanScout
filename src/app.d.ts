@@ -29,7 +29,7 @@ declare global {
 
   interface IDBTransaction {
     objectStore(name: "surveys"): IDBStore<Survey>;
-    objectStore(name: "entries" | "drafts"): IDBStore<Entry>;
+    objectStore(name: "entries"): IDBStore<Entry>;
   }
 }
 
