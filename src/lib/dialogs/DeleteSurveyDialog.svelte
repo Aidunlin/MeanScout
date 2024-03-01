@@ -46,6 +46,7 @@
       if (cursor === undefined) {
         error = "Could not delete survey's entries";
         deleteTransaction.abort();
+        return;
       }
 
       if (cursor === null) {

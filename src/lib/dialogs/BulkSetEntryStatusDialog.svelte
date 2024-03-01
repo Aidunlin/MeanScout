@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Entry, EntryStatus, Survey } from "$lib";
+  import type { EntryStatus, Survey } from "$lib";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
@@ -37,10 +37,9 @@
         return;
       }
 
-      const entry = cursor.value as IDBRecord<Entry>;
-      if (entry.status == from) {
-        entry.status = to;
-        cursor.update(entry);
+      if (cursor.value.status == from) {
+        cursor.value.status = to;
+        cursor.update(cursor.value);
       }
       cursor.continue();
     };
