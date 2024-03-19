@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { persistStorage } from "$lib";
   import Container from "$lib/components/Container.svelte";
   import Header from "$lib/components/Header.svelte";
   import "$lib/global.css";
@@ -232,6 +233,7 @@
     };
   }
 
+  persistStorage();
   openIDB();
 </script>
 

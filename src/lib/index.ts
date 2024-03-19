@@ -82,15 +82,18 @@ export function getDefaultFieldValue(field: Exclude<Field, GroupField>) {
 }
 
 export function flattenFields(fields: Field[]) {
-  return fields
-    .map((field) => {
-      if (field.type == "group") {
-        return field.fields;
-      } else {
-        return field;
-      }
+  return fields.flatMap((field) => (field.type == "group" ? field.fields : field));
+}
+
+export function persistStorage() {
+  if (!navigator.storage) return;
+  navigator.storage
+    .persisted()
+    .then((isPersisted) => {
+      if (isPersisted) return;
+      navigator.storage.persist().catch(console.error);
     })
-    .flat();
+    .catch(console.error);
 }
 
 export function download(data: string, name: string, type: string) {
