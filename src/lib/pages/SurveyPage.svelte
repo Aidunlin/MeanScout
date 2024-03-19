@@ -5,6 +5,7 @@
   import Container from "$lib/components/Container.svelte";
   import Header from "$lib/components/Header.svelte";
   import Icon from "$lib/components/Icon.svelte";
+  import { modeStore } from "$lib/mode";
   import { targetStore } from "$lib/target";
 
   export let idb: IDBDatabase;
@@ -136,33 +137,35 @@
       <Icon name="arrow-right" />
     </Container>
   </Anchor>
-  <Anchor hash="survey/{surveyRecord.id}/fields">
-    <Container maxWidth spaceBetween>
-      <Container>
-        <Icon name="list-check" />
-        Fields
+  {#if $modeStore == "admin"}
+    <Anchor hash="survey/{surveyRecord.id}/fields">
+      <Container maxWidth spaceBetween>
+        <Container>
+          <Icon name="list-check" />
+          Fields
+        </Container>
+        <Icon name="arrow-right" />
       </Container>
-      <Icon name="arrow-right" />
-    </Container>
-  </Anchor>
-  <Anchor hash="survey/{surveyRecord.id}/matches">
-    <Container maxWidth spaceBetween>
-      <Container>
-        <Icon name="table-list" />
-        Matches
+    </Anchor>
+    <Anchor hash="survey/{surveyRecord.id}/matches">
+      <Container maxWidth spaceBetween>
+        <Container>
+          <Icon name="table-list" />
+          Matches
+        </Container>
+        <Icon name="arrow-right" />
       </Container>
-      <Icon name="arrow-right" />
-    </Container>
-  </Anchor>
-  <Anchor hash="survey/{surveyRecord.id}/teams">
-    <Container maxWidth spaceBetween>
-      <Container>
-        <Icon name="people-group" />
-        Teams
+    </Anchor>
+    <Anchor hash="survey/{surveyRecord.id}/teams">
+      <Container maxWidth spaceBetween>
+        <Container>
+          <Icon name="people-group" />
+          Teams
+        </Container>
+        <Icon name="arrow-right" />
       </Container>
-      <Icon name="arrow-right" />
-    </Container>
-  </Anchor>
+    </Anchor>
+  {/if}
   <Anchor hash="survey/{surveyRecord.id}/options">
     <Container maxWidth spaceBetween>
       <Container>

@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { targetStore } from "$lib/target";
+  import { modeStore } from "$lib/mode";
+import { targetStore } from "$lib/target";
   import Anchor from "./Anchor.svelte";
   import Container from "./Container.svelte";
   import Icon from "./Icon.svelte";
@@ -25,7 +26,7 @@
     <h1>{title ?? "MeanScout"}</h1>
   </Container>
 
-  <span>{$targetStore}</span>
+  <span>{$modeStore == "admin" ? "Admin" : $targetStore}</span>
 </header>
 
 <style>

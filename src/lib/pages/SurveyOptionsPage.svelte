@@ -5,6 +5,7 @@
   import Header from "$lib/components/Header.svelte";
   import Icon from "$lib/components/Icon.svelte";
   import EditSurveyNameDialog from "$lib/dialogs/EditSurveyNameDialog.svelte";
+  import { modeStore } from "$lib/mode";
   import DeleteSurveyDialog from "../dialogs/DeleteSurveyDialog.svelte";
 
   export let idb: IDBDatabase;
@@ -47,7 +48,9 @@
     </Button>
   {/if}
 
-  <h2>Options</h2>
-  <EditSurveyNameDialog bind:surveyRecord />
-  <DeleteSurveyDialog {idb} {surveyRecord} />
+  {#if $modeStore == "admin"}
+    <h2>Options</h2>
+    <EditSurveyNameDialog bind:surveyRecord />
+    <DeleteSurveyDialog {idb} {surveyRecord} />
+  {/if}
 </Container>

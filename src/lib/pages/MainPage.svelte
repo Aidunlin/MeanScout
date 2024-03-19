@@ -6,6 +6,7 @@
   import Icon from "$lib/components/Icon.svelte";
   import ImportSurveyDialog from "$lib/dialogs/ImportSurveyDialog.svelte";
   import NewSurveyDialog from "$lib/dialogs/NewSurveyDialog.svelte";
+  import { modeStore } from "$lib/mode";
 
   export let idb: IDBDatabase;
 
@@ -39,8 +40,10 @@
 
 <Container direction="column" padding="large">
   <h2>Options</h2>
-  <NewSurveyDialog {idb} />
-  <ImportSurveyDialog {idb} />
+  {#if $modeStore == "admin"}
+    <NewSurveyDialog {idb} />
+    <ImportSurveyDialog {idb} />
+  {/if}
   <Anchor hash="settings">
     <Container maxWidth spaceBetween>
       <Container>
