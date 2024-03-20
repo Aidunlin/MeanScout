@@ -5,8 +5,7 @@
   import Container from "$lib/components/Container.svelte";
   import Header from "$lib/components/Header.svelte";
   import Icon from "$lib/components/Icon.svelte";
-  import { modeStore } from "$lib/mode";
-  import { targetStore } from "$lib/target";
+  import { modeStore, targetStore } from "$lib/settings";
 
   export let idb: IDBDatabase;
   export let surveyRecord: IDBRecord<Survey>;

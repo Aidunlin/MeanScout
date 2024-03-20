@@ -7,7 +7,7 @@
   import DeleteEntryDialog from "$lib/dialogs/DeleteEntryDialog.svelte";
   import EditEntryDialog from "$lib/dialogs/EditEntryDialog.svelte";
   import SubmitDraftDialog from "$lib/dialogs/SubmitDraftDialog.svelte";
-  import { targetStore } from "$lib/target";
+  import { targetStore } from "$lib/settings";
 
   export let idb: IDBDatabase;
   export let surveyRecord: IDBRecord<Survey>;

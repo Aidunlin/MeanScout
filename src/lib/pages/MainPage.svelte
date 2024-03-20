@@ -6,7 +6,7 @@
   import Icon from "$lib/components/Icon.svelte";
   import ImportSurveyDialog from "$lib/dialogs/ImportSurveyDialog.svelte";
   import NewSurveyDialog from "$lib/dialogs/NewSurveyDialog.svelte";
-  import { modeStore } from "$lib/mode";
+  import { modeStore } from "$lib/settings";
 
   export let idb: IDBDatabase;
 

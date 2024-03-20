@@ -6,7 +6,7 @@
   import EditMatchDialog from "$lib/dialogs/EditMatchDialog.svelte";
   import GetEventMatchesDialog from "$lib/dialogs/GetEventMatchesDialog.svelte";
   import NewMatchDialog from "$lib/dialogs/NewMatchDialog.svelte";
-  import { tbaKeyStore } from "$lib/tba";
+  import { tbaKeyStore } from "$lib/settings";
 
   export let idb: IDBDatabase;
   export let surveyRecord: IDBRecord<Survey>;

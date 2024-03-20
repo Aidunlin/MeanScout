@@ -6,7 +6,7 @@
   import Header from "$lib/components/Header.svelte";
   import Icon from "$lib/components/Icon.svelte";
   import BulkSetEntryStatusDialog from "$lib/dialogs/BulkSetEntryStatusDialog.svelte";
-  import { targetStore } from "$lib/target";
+  import { targetStore } from "$lib/settings";
 
   export let idb: IDBDatabase;
   export let surveyRecord: IDBRecord<Survey>;

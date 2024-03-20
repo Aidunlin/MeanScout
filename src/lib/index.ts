@@ -85,6 +85,26 @@ export function flattenFields(fields: Field[]) {
   return fields.flatMap((field) => (field.type == "group" ? field.fields : field));
 }
 
+const API_URL = "https://www.thebluealliance.com/api/v3";
+
+export async function fetchTBA(endpoint: string, tbaKey: string) {
+  const response = await fetch(`${API_URL}${endpoint}`, {
+    headers: [["X-TBA-Auth-Key", tbaKey]],
+  });
+
+  let data = await response.json();
+
+  if (response.status == 200) {
+    return { status: "success" as const, data };
+  } else if (response.status == 401) {
+    return { status: "unauthorized" as const, error: data.Error };
+  } else if (response.status == 404) {
+    return { status: "not found" as const };
+  } else {
+    return { status: "error" as const };
+  }
+}
+
 export function persistStorage() {
   if (!navigator.storage) return;
   navigator.storage

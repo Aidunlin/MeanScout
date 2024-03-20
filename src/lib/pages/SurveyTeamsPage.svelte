@@ -5,7 +5,7 @@
   import Header from "$lib/components/Header.svelte";
   import Icon from "$lib/components/Icon.svelte";
   import GetEventTeamsDialog from "$lib/dialogs/GetEventTeamsDialog.svelte";
-  import { tbaKeyStore } from "$lib/tba";
+  import { tbaKeyStore } from "$lib/settings";
 
   export let idb: IDBDatabase;
   export let surveyRecord: IDBRecord<Survey>;

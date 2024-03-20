@@ -1,10 +1,10 @@
 <script lang="ts">
-  import type { Match, Survey } from "$lib";
+  import { fetchTBA, type Match, type Survey } from "$lib";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import Icon from "$lib/components/Icon.svelte";
-  import { fetchTBA, tbaKeyStore } from "$lib/tba";
+  import { tbaKeyStore } from "$lib/settings";
 
   export let surveyRecord: IDBRecord<Survey>;
 

@@ -1,9 +1,10 @@
 <script lang="ts">
+  import { fetchTBA } from "$lib";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import Icon from "$lib/components/Icon.svelte";
-  import { fetchTBA, tbaKeyStore } from "$lib/tba";
+  import { tbaKeyStore } from "$lib/settings";
 
   let dialog: Dialog;
   let tbaKeyInput = $tbaKeyStore;

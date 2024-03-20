@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { modeStore } from "$lib/mode";
-import { targetStore } from "$lib/target";
+  import { modeStore, targetStore } from "$lib/settings";
   import Anchor from "./Anchor.svelte";
   import Container from "./Container.svelte";
   import Icon from "./Icon.svelte";

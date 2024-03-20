@@ -2,8 +2,7 @@
   import Container from "$lib/components/Container.svelte";
   import Header from "$lib/components/Header.svelte";
   import EditTBAKeyDialog from "$lib/dialogs/EditTBAKeyDialog.svelte";
-  import { modes, modeStore } from "$lib/mode";
-  import { targets, targetStore } from "$lib/target";
+  import { modes, modeStore, targets, targetStore } from "$lib/settings";
 </script>
 
 <Header backLink="" title="Settings" iconName="gears" />
