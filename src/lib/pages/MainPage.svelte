@@ -53,4 +53,13 @@
       <Icon name="arrow-right" />
     </Container>
   </Anchor>
+  <Anchor hash="about">
+    <Container maxWidth spaceBetween>
+      <Container>
+        <Icon name="info-circle" />
+        About
+      </Container>
+      <Icon name="arrow-right" />
+    </Container>
+  </Anchor>
 </Container>

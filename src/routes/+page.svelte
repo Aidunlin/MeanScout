@@ -3,6 +3,7 @@
   import Container from "$lib/components/Container.svelte";
   import Header from "$lib/components/Header.svelte";
   import "$lib/global.css";
+  import AboutPage from "$lib/pages/AboutPage.svelte";
   import EntryPage from "$lib/pages/EntryPage.svelte";
   import MainPage from "$lib/pages/MainPage.svelte";
   import SettingsPage from "$lib/pages/SettingsPage.svelte";
@@ -20,6 +21,7 @@
   let current:
     | { page: ""; props: ComponentProps<MainPage> }
     | { page: "settings"; props: ComponentProps<SettingsPage> }
+    | { page: "about"; props: ComponentProps<AboutPage> }
     | { page: "survey"; subpage: ""; props: ComponentProps<SurveyPage> }
     | { page: "survey"; subpage: "entries"; props: ComponentProps<SurveyEntriesPage> }
     | { page: "survey"; subpage: "fields"; props: ComponentProps<SurveyFieldsPage> }
@@ -46,6 +48,17 @@
 
     current = {
       page: "settings",
+      props: {},
+    };
+  }
+
+  function setAboutPage() {
+    if (current?.page == "about") {
+      return;
+    }
+
+    current = {
+      page: "about",
       props: {},
     };
   }
@@ -135,12 +148,17 @@
 
   function handleHashChange() {
     const hash = location.hash.replace(/#\/?/, "").toLowerCase().trim().split("/");
-    const page = hash[0] == "" || hash[0] == "settings" || hash[0] == "survey" || hash[0] == "entry" ? hash[0] : "";
+    const page =
+      hash[0] == "" || hash[0] == "settings" || hash[0] == "about" || hash[0] == "survey" || hash[0] == "entry"
+        ? hash[0]
+        : "";
 
     if (page == "") {
       setMainPage();
     } else if (page == "settings") {
       setSettingsPage();
+    } else if (page == "about") {
+      setAboutPage();
     } else if (page == "survey") {
       const subpage =
         hash[2] == "" ||
@@ -251,6 +269,8 @@
   <MainPage {...current.props} />
 {:else if current?.page == "settings"}
   <SettingsPage {...current.props} />
+{:else if current?.page == "about"}
+  <AboutPage {...current.props} />
 {:else if current?.page == "survey"}
   {#if current.subpage == ""}
     <SurveyPage {...current.props} />
