@@ -4,13 +4,37 @@
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import Icon from "$lib/components/Icon.svelte";
-  import { tbaKeyStore } from "$lib/settings";
+  import { tbaKeyStore, teamStore } from "$lib/settings";
 
   export let surveyRecord: IDBRecord<Survey>;
 
   let dialog: Dialog;
-  let event = "";
+  let eventSelect: string | undefined = undefined;
   let error = "";
+
+  $: event = eventSelect ?? "";
+
+  let events: { name: string; key: string }[] = [];
+
+  async function onOpen() {
+    if (events.length || !navigator.onLine || !$tbaKeyStore || !$teamStore) {
+      return;
+    }
+
+    let response = await fetchTBA(`/team/frc${$teamStore}/events/simple`, $tbaKeyStore);
+
+    if (response.status == "success" && Array.isArray(response.data)) {
+      response.data.forEach((event) => {
+        if (event.year >= new Date().getFullYear() - 1) {
+          events = [{ name: `${event.year} ${event.name}`, key: event.key }, ...events];
+        }
+      });
+    } else if (response.status == "not found") {
+      error = `could not get events for team ${teamStore}`;
+    } else {
+      error = "error";
+    }
+  }
 
   async function onConfirm() {
     if (!navigator.onLine) {
@@ -40,10 +64,10 @@
 
 <Dialog
   bind:this={dialog}
+  {onOpen}
   {onConfirm}
   on:close={() => {
-    event = "";
-    error = "";
+    eventSelect = undefined;
   }}
 >
   <Button slot="opener" let:open on:click={open}>
@@ -54,7 +78,19 @@
   </Button>
 
   <span>Get teams from TBA event</span>
-  <input bind:value={event} />
+  {#if events.length}
+    <select bind:value={eventSelect}>
+      {#each events as { name, key }}
+        <option value={key}>{name}</option>
+      {/each}
+    </select>
+  {:else if navigator.onLine && $tbaKeyStore && $teamStore}
+    <span>Getting events for you...</span>
+  {/if}
+  <Container direction="column" gap="none">
+    Event code
+    <input bind:value={event} />
+  </Container>
   {#if error}
     <span>Error: {error}</span>
   {/if}

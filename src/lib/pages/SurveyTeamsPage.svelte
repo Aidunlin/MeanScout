@@ -59,7 +59,7 @@
     <span>
       No teams.
       {#if surveyRecord.matches.length}
-        Note that teams from matches are used, depending on the selected target.
+        Note that teams from matches are used depending on the selected target.
       {:else}
         Any team value is allowed.
       {/if}

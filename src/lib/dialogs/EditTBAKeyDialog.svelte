@@ -11,6 +11,14 @@
   let error = "";
 
   function onConfirm() {
+    const tbaKey = tbaKeyInput.trim();
+
+    if (!tbaKey) {
+      $tbaKeyStore = tbaKey;
+      dialog.close();
+      return;
+    }
+
     if (!navigator.onLine) {
       error = "offline!";
       return;
@@ -43,7 +51,7 @@
       {#if $tbaKeyStore}
         Edit
       {:else}
-        Enter
+        Enter your
       {/if} API key
     </Container>
   </Button>

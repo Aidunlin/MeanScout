@@ -25,30 +25,42 @@
 
   <h2>Matches</h2>
   {#if surveyRecord.matches.length}
-    <Container direction="column">
-      {#each surveyRecord.matches.toSorted((a, b) => a.number - b.number) as match}
-        <Container align="center" maxWidth spaceBetween>
-          <Container align="center">
-            <span class="match-number">{match.number}</span>
-            <Container direction="column" gap="small">
-              <Container gap="small">
-                <span class="red-team">{match.red1}</span>
-                <span class="red-team">{match.red2}</span>
-                <span class="red-team">{match.red3}</span>
+    <Container>
+      <table>
+        <tr>
+          <th colspan="2" class="match-number">Match</th>
+          <th colspan="3">Teams</th>
+        </tr>
+        {#each surveyRecord.matches.toSorted((a, b) => a.number - b.number) as match}
+          <tr>
+            <td>
+              <Container padding="small" gap="small">
+                <EditMatchDialog bind:surveyRecord {match} />
+                <DeleteMatchDialog bind:surveyRecord {match} />
               </Container>
-              <Container gap="small">
+            </td>
+            <td class="match-number">{match.number}</td>
+            <td>
+              <Container direction="column" padding="small" gap="small">
+                <span class="red-team">{match.red1}</span>
                 <span class="blue-team">{match.blue1}</span>
+              </Container>
+            </td>
+            <td>
+              <Container direction="column" padding="small" gap="small">
+                <span class="red-team">{match.red2}</span>
                 <span class="blue-team">{match.blue2}</span>
+              </Container>
+            </td>
+            <td>
+              <Container direction="column" padding="small" gap="small">
+                <span class="red-team">{match.red3}</span>
                 <span class="blue-team">{match.blue3}</span>
               </Container>
-            </Container>
-          </Container>
-          <Container>
-            <EditMatchDialog bind:surveyRecord {match} />
-            <DeleteMatchDialog bind:surveyRecord {match} />
-          </Container>
-        </Container>
-      {/each}
+            </td>
+          </tr>
+        {/each}
+      </table>
     </Container>
   {:else}
     <span>No matches.</span>
@@ -56,22 +68,21 @@
 </Container>
 
 <style>
-  .match-number {
-    width: 60px;
-    text-align: right;
+  td.match-number {
+    padding: var(--outer-gap);
   }
 
+  .match-number,
   .red-team,
   .blue-team {
-    width: 100px;
     text-align: right;
   }
 
-  .red-team {
+  td .red-team {
     color: var(--red);
   }
 
-  .blue-team {
+  td .blue-team {
     color: var(--blue);
   }
 </style>

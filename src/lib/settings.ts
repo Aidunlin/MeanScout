@@ -24,6 +24,10 @@ export type Mode = (typeof modes)[number];
 
 export const modeStore = localStorageStore<Mode>("mode", "admin");
 
+// Team setting
+
+export const teamStore = localStorageStore<string>("team", "");
+
 // TBA API key setting
 
 export const tbaKeyStore = localStorageStore<string>("tbaKey", "");
