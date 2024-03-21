@@ -17,7 +17,12 @@
   let events: { name: string; key: string }[] = [];
 
   async function onOpen() {
-    if (events.length || !navigator.onLine || !$tbaKeyStore || !$teamStore) {
+    if (events.length) {
+      eventSelect = events[0].key;
+      return;
+    }
+
+    if (!navigator.onLine || !$tbaKeyStore || !$teamStore) {
       return;
     }
 
@@ -29,6 +34,7 @@
           events = [{ name: `${event.year} ${event.name}`, key: event.key }, ...events];
         }
       });
+      eventSelect = events[0].key;
     } else if (response.status == "not found") {
       error = `could not get events for team ${teamStore}`;
     } else {
@@ -45,27 +51,19 @@
     let response = await fetchTBA(`/event/${event.trim()}/matches/simple`, $tbaKeyStore);
 
     if (response.status == "success" && Array.isArray(response.data)) {
-      response.data.forEach((match) => {
-        if (match.comp_level != "qm") return;
-
-        const matchData: Match = {
-          number: match.match_number,
-          red1: match.alliances.red.team_keys[0].replace("frc", ""),
-          red2: match.alliances.red.team_keys[1].replace("frc", ""),
-          red3: match.alliances.red.team_keys[2].replace("frc", ""),
-          blue1: match.alliances.blue.team_keys[0].replace("frc", ""),
-          blue2: match.alliances.blue.team_keys[1].replace("frc", ""),
-          blue3: match.alliances.blue.team_keys[2].replace("frc", ""),
-        };
-
-        let indexToReplace = surveyRecord.matches.findIndex((m) => m.number == matchData.number);
-        if (indexToReplace == -1) {
-          surveyRecord.matches.push(matchData);
-        } else {
-          surveyRecord.matches[indexToReplace] = matchData;
-        }
-      });
-
+      surveyRecord.matches = response.data
+        .filter((match) => match.comp_level == "qm")
+        .map((match): Match => {
+          return {
+            number: match.match_number,
+            red1: match.alliances.red.team_keys[0].replace("frc", ""),
+            red2: match.alliances.red.team_keys[1].replace("frc", ""),
+            red3: match.alliances.red.team_keys[2].replace("frc", ""),
+            blue1: match.alliances.blue.team_keys[0].replace("frc", ""),
+            blue2: match.alliances.blue.team_keys[1].replace("frc", ""),
+            blue3: match.alliances.blue.team_keys[2].replace("frc", ""),
+          };
+        });
       surveyRecord.modified = new Date();
       dialog.close();
     } else if (response.status == "not found") {
@@ -92,7 +90,7 @@
   </Button>
 
   <span>Get matches from TBA event</span>
-  {#if events.length}
+  {#if eventSelect !== undefined}
     <select bind:value={eventSelect}>
       {#each events as { name, key }}
         <option value={key}>{name}</option>

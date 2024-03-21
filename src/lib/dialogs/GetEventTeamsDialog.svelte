@@ -17,7 +17,12 @@
   let events: { name: string; key: string }[] = [];
 
   async function onOpen() {
-    if (events.length || !navigator.onLine || !$tbaKeyStore || !$teamStore) {
+    if (events.length) {
+      eventSelect = events[0].key;
+      return;
+    }
+    
+    if (!navigator.onLine || !$tbaKeyStore || !$teamStore) {
       return;
     }
 
@@ -29,6 +34,7 @@
           events = [{ name: `${event.year} ${event.name}`, key: event.key }, ...events];
         }
       });
+      eventSelect = events[0].key;
     } else if (response.status == "not found") {
       error = `could not get events for team ${teamStore}`;
     } else {
@@ -45,14 +51,15 @@
     let response = await fetchTBA(`/event/${event.trim()}/teams/keys`, $tbaKeyStore);
 
     if (response.status == "success" && Array.isArray(response.data)) {
-      surveyRecord.modified = new Date();
-
+      let newTeams: string[] = [];
       response.data.forEach((team) => {
         let teamString = `${team}`.trim().replace("frc", "");
-        if (!surveyRecord.teams.includes(teamString)) {
-          surveyRecord.teams = [...surveyRecord.teams, teamString];
+        if (!newTeams.includes(teamString)) {
+          newTeams = [...newTeams, teamString];
         }
       });
+      surveyRecord.teams = newTeams;
+      surveyRecord.modified = new Date();
       dialog.close();
     } else if (response.status == "not found") {
       error = "could not find event";
@@ -78,7 +85,7 @@
   </Button>
 
   <span>Get teams from TBA event</span>
-  {#if events.length}
+  {#if eventSelect !== undefined}
     <select bind:value={eventSelect}>
       {#each events as { name, key }}
         <option value={key}>{name}</option>
