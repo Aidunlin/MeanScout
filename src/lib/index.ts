@@ -39,6 +39,7 @@ export type Match = {
 
 export type Survey = {
   name: string;
+  tbaEventKey?: string | undefined;
   fields: Field[];
   matches: Match[];
   teams: string[];

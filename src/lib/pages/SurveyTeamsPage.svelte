@@ -1,10 +1,9 @@
 <script lang="ts">
-  import { type Survey } from "$lib";
+  import { fetchTBA, type Survey } from "$lib";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Header from "$lib/components/Header.svelte";
   import Icon from "$lib/components/Icon.svelte";
-  import GetEventTeamsDialog from "$lib/dialogs/GetEventTeamsDialog.svelte";
   import { tbaKeyStore } from "$lib/settings";
 
   export let idb: IDBDatabase;
@@ -13,6 +12,21 @@
   $: idb.transaction("surveys", "readwrite").objectStore("surveys").put(surveyRecord);
 
   let teamInput = "";
+
+  async function getTeamsFromTBAEvent() {
+    let response = await fetchTBA(`/event/${surveyRecord.tbaEventKey}/teams/keys`, $tbaKeyStore);
+    if (response.status == "success" && Array.isArray(response.data)) {
+      let newTeams: string[] = [];
+      response.data.forEach((team) => {
+        let teamString = `${team}`.trim().replace("frc", "");
+        if (!newTeams.includes(teamString)) {
+          newTeams = [...newTeams, teamString];
+        }
+      });
+      surveyRecord.teams = newTeams;
+      surveyRecord.modified = new Date();
+    }
+  }
 
   function addTeam() {
     surveyRecord.modified = new Date();
@@ -31,8 +45,13 @@
 <Header backLink="survey/{surveyRecord.id}" title="Teams" iconName="people-group" />
 
 <Container direction="column" padding="large">
-  {#if navigator.onLine && $tbaKeyStore}
-    <GetEventTeamsDialog bind:surveyRecord />
+  {#if navigator.onLine && $tbaKeyStore && surveyRecord.tbaEventKey}
+  <Button on:click={getTeamsFromTBAEvent}>
+    <Container maxWidth>
+      <Icon name="cloud-arrow-down" />
+      Get teams from TBA event: {surveyRecord.tbaEventKey}
+    </Container>
+  </Button>
   {/if}
 
   <Container direction="column" gap="none">

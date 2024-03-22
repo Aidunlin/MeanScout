@@ -9,19 +9,16 @@
   export let surveyRecord: IDBRecord<Survey>;
 
   let dialog: Dialog;
-  let eventSelect: string | undefined = undefined;
+  let event = surveyRecord.tbaEventKey ?? "";
   let error = "";
-
-  $: event = eventSelect ?? "";
 
   let events: { name: string; key: string }[] = [];
 
   async function onOpen() {
     if (events.length) {
-      eventSelect = events[0].key;
       return;
     }
-    
+
     if (!navigator.onLine || !$tbaKeyStore || !$teamStore) {
       return;
     }
@@ -34,7 +31,6 @@
           events = [{ name: `${event.year} ${event.name}`, key: event.key }, ...events];
         }
       });
-      eventSelect = events[0].key;
     } else if (response.status == "not found") {
       error = `could not get events for team ${teamStore}`;
     } else {
@@ -43,22 +39,31 @@
   }
 
   async function onConfirm() {
+    let trimmedEvent = event.trim();
+
+    if (!trimmedEvent) {
+      surveyRecord.tbaEventKey = trimmedEvent;
+      surveyRecord.modified = new Date();
+      dialog.close();
+      return;
+    }
+
     if (!navigator.onLine) {
       error = "offline";
       return;
     }
 
-    let response = await fetchTBA(`/event/${event.trim()}/teams/keys`, $tbaKeyStore);
+    if (events.map((e) => e.key).includes(trimmedEvent)) {
+      surveyRecord.tbaEventKey = trimmedEvent;
+      surveyRecord.modified = new Date();
+      dialog.close();
+      return;
+    }
 
-    if (response.status == "success" && Array.isArray(response.data)) {
-      let newTeams: string[] = [];
-      response.data.forEach((team) => {
-        let teamString = `${team}`.trim().replace("frc", "");
-        if (!newTeams.includes(teamString)) {
-          newTeams = [...newTeams, teamString];
-        }
-      });
-      surveyRecord.teams = newTeams;
+    let response = await fetchTBA(`/event/${trimmedEvent}/simple`, $tbaKeyStore);
+
+    if (response.status == "success") {
+      surveyRecord.tbaEventKey = trimmedEvent;
       surveyRecord.modified = new Date();
       dialog.close();
     } else if (response.status == "not found") {
@@ -74,30 +79,29 @@
   {onOpen}
   {onConfirm}
   on:close={() => {
-    eventSelect = undefined;
+    event = surveyRecord.tbaEventKey ?? "";
+    error = "";
   }}
 >
   <Button slot="opener" let:open on:click={open}>
     <Container maxWidth>
-      <Icon name="cloud-arrow-down" />
-      Get teams from TBA event
+      {#if surveyRecord.tbaEventKey}
+        <Icon name="pen" />
+        Edit event: {surveyRecord.tbaEventKey}
+      {:else}
+        <Icon name="plus" />
+        Add event
+      {/if}
     </Container>
   </Button>
 
-  <span>Get teams from TBA event</span>
-  {#if eventSelect !== undefined}
-    <select bind:value={eventSelect}>
-      {#each events as { name, key }}
-        <option value={key}>{name}</option>
-      {/each}
-    </select>
-  {:else if navigator.onLine && $tbaKeyStore && $teamStore}
-    <span>Getting events for you...</span>
-  {/if}
-  <Container direction="column" gap="none">
-    Event code
-    <input bind:value={event} />
-  </Container>
+  <span>Edit TBA event:</span>
+  <datalist id="events-list">
+    {#each events as { name, key }}
+      <option value={key}>{name}</option>
+    {/each}
+  </datalist>
+  <input bind:value={event} list="events-list" />
   {#if error}
     <span>Error: {error}</span>
   {/if}

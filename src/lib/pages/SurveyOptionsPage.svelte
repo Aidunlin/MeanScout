@@ -6,7 +6,8 @@
   import Icon from "$lib/components/Icon.svelte";
   import DeleteSurveyDialog from "$lib/dialogs/DeleteSurveyDialog.svelte";
   import EditSurveyNameDialog from "$lib/dialogs/EditSurveyNameDialog.svelte";
-  import { modeStore } from "$lib/settings";
+  import EditSurveyTBAEventKeyDialog from "$lib/dialogs/EditSurveyTBAEventKeyDialog.svelte";
+  import { modeStore, tbaKeyStore } from "$lib/settings";
 
   export let idb: IDBDatabase;
   export let surveyRecord: IDBRecord<Survey>;
@@ -33,6 +34,7 @@
 <Header backLink="survey/{surveyRecord.id}" title="Options" iconName="gears" />
 
 <Container direction="column" padding="large">
+  <h2>Export</h2>
   <Button title="Download survey" on:click={downloadSurvey}>
     <Container maxWidth>
       <Icon name="download" />
@@ -51,6 +53,13 @@
   {#if $modeStore == "admin"}
     <h2>Options</h2>
     <EditSurveyNameDialog bind:surveyRecord />
+
+    {#if $tbaKeyStore}
+      <h2>The Blue Alliance</h2>
+      <EditSurveyTBAEventKeyDialog bind:surveyRecord />
+    {/if}
+
+    <h2>Danger Zone</h2>
     <DeleteSurveyDialog {idb} {surveyRecord} />
   {/if}
 </Container>

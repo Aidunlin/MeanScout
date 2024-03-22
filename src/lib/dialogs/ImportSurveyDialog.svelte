@@ -1,9 +1,10 @@
 <script lang="ts">
-  import { fieldTypes, type Field } from "$lib";
+  import { fetchTBA, fieldTypes, type Field } from "$lib";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import Icon from "$lib/components/Icon.svelte";
+  import { tbaKeyStore } from "$lib/settings";
 
   export let idb: IDBDatabase;
 
@@ -17,6 +18,15 @@
     }
 
     return name;
+  }
+
+  async function parseTBAEventKey(tbaEventKey: string) {
+    if (navigator.onLine && $tbaKeyStore) {
+      let response = await fetchTBA(`/event/${tbaEventKey}/simple`, $tbaKeyStore);
+      if (response.status == "success") {
+        return tbaEventKey;
+      }
+    }
   }
 
   function parseFields(fields: any[]): Field[] {
@@ -81,6 +91,10 @@
 
     delete survey.id;
     survey.name = parseName(survey.name);
+    if (typeof survey.tbaEventKey == "string" && survey.tbaEventKey.length) {
+      let parsed = await parseTBAEventKey(survey.tbaEventKey.trim());
+      if (parsed) survey.tbaEventKey = parsed;
+    }
     survey.fields = Array.isArray(survey.fields) ? parseFields(survey.fields) : [];
     survey.matches = Array.isArray(survey.matches) ? parseMatches(survey.matches) : [];
     survey.teams = Array.isArray(survey.teams) ? parseTeams(survey.teams) : [];

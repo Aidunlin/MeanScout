@@ -47,16 +47,23 @@
 >
   <Button slot="opener" let:open on:click={open}>
     <Container maxWidth>
-      <Icon name="pen" />
       {#if $tbaKeyStore}
-        Edit
+        <Icon name="pen" />
+        Edit API key
       {:else}
-        Enter your
-      {/if} API key
+        <Icon name="plus" />
+        Add API key
+      {/if}
     </Container>
   </Button>
 
-  <span>Edit API key:</span>
+  <span>
+    {#if $tbaKeyStore}
+      Edit TBA API key
+    {:else}
+      Add TBA API key
+    {/if}
+  </span>
   <input bind:value={tbaKeyInput} title="TBA Key" />
   {#if error}
     <span>Error: {error}</span>

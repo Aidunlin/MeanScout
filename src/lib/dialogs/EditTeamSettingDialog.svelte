@@ -31,16 +31,23 @@
 >
   <Button slot="opener" let:open on:click={open}>
     <Container maxWidth>
-      <Icon name="pen" />
       {#if $teamStore}
-        Team {$teamStore}
+        <Icon name="pen" />
+        Edit team: {$teamStore}
       {:else}
-        Enter team
+        <Icon name="plus" />
+        Add team
       {/if}
     </Container>
   </Button>
 
-  <span>Edit team:</span>
+  <span>
+    {#if $teamStore}
+      Edit team
+    {:else}
+      Add team
+    {/if}
+  </span>
   <input bind:value={teamInput} title="TBA Key" />
   {#if error}
     <span>Error: {error}</span>

@@ -34,7 +34,7 @@
   <Button slot="opener" let:open on:click={open}>
     <Container maxWidth>
       <Icon name="pen" />
-      Edit name
+      Edit name: {surveyRecord.name}
     </Container>
   </Button>
 
