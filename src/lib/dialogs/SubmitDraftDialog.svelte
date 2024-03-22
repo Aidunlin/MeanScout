@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { flattenFields, getDefaultFieldValue, type Entry, type IDBRecord, type Survey } from "$lib";
+  import { flattenFields, getDefaultFieldValue, type Entry, type Survey } from "$lib";
   import Button from "$lib/components/Button.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import Icon from "$lib/components/Icon.svelte";
-  import { targetStore } from "$lib/target";
+  import { targetStore } from "$lib/settings";
 
   export let idb: IDBDatabase;
   export let surveyRecord: IDBRecord<Survey>;
@@ -87,17 +87,15 @@
       return;
     }
 
-    const moveTransaction = idb.transaction(["drafts", "entries"], "readwrite");
-    moveTransaction.onabort = () => {
-      error = `Could not submit draft: ${moveTransaction.error?.message}`;
+    draftRecord.status = "submitted";
+    draftRecord.modified = new Date();
+
+    const submitRequest = idb.transaction("entries", "readwrite").objectStore("entries").put(draftRecord);
+    submitRequest.onerror = () => {
+      error = `Could not submit draft: ${submitRequest.error?.message}`;
     };
 
-    const entryRecord = structuredClone(draftRecord) as Entry & { id?: number };
-    delete entryRecord.id;
-    moveTransaction.objectStore("entries").add(entryRecord);
-    moveTransaction.objectStore("drafts").delete(draftRecord.id);
-
-    moveTransaction.oncomplete = () => {
+    submitRequest.onsuccess = () => {
       surveyRecord.modified = new Date();
       location.hash = `/survey/${surveyRecord.id}`;
     };

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { type Entry, type IDBRecord, type Survey } from "$lib";
+  import { type Entry, type Survey } from "$lib";
   import Button from "$lib/components/Button.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import Icon from "$lib/components/Icon.svelte";
@@ -11,36 +11,17 @@
   let error = "";
 
   function onConfirm() {
-    const moveTransaction = idb.transaction(["drafts", "entries"], "readwrite");
-    moveTransaction.onabort = () => {
-      error ||= `Could not edit entry: ${moveTransaction.error?.message}`;
+    entryRecord.status = "draft";
+    entryRecord.modified = new Date();
+
+    const editRequest = idb.transaction("entries", "readwrite").objectStore("entries").put(entryRecord);
+    editRequest.onerror = () => {
+      error ||= `Could not edit entry: ${editRequest.error?.message}`;
     };
 
-    const deleteRequest = moveTransaction.objectStore("entries").delete(entryRecord.id);
-    deleteRequest.onerror = () => {
-      error = `Could not edit entry: ${deleteRequest.error?.message}`;
-      moveTransaction.abort();
-    };
-
-    const draftRecord = structuredClone(entryRecord) as Entry & { id?: number };
-    delete draftRecord.id;
-
-    const addRequest = moveTransaction.objectStore("drafts").add(draftRecord);
-    deleteRequest.onerror = () => {
-      error = `Could not edit entry: ${deleteRequest.error?.message}`;
-      moveTransaction.abort();
-    };
-
-    addRequest.onsuccess = () => {
-      const id = addRequest.result as number | undefined;
-      if (id == undefined) {
-        moveTransaction.abort();
-        error = "Could not edit entry: entry record id is undefined";
-        return;
-      }
-
+    editRequest.onsuccess = () => {
       surveyRecord.modified = new Date();
-      location.hash = `/draft/${id}`;
+      location.hash = `/entry/${entryRecord.id}`;
     };
   }
 </script>

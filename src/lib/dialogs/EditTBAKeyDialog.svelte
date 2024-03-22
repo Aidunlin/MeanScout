@@ -1,15 +1,24 @@
 <script lang="ts">
+  import { fetchTBA } from "$lib";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import Icon from "$lib/components/Icon.svelte";
-  import { fetchTBA, tbaKeyStore } from "$lib/tba";
+  import { tbaKeyStore } from "$lib/settings";
 
   let dialog: Dialog;
   let tbaKeyInput = $tbaKeyStore;
   let error = "";
 
   function onConfirm() {
+    const tbaKey = tbaKeyInput.trim();
+
+    if (!tbaKey) {
+      $tbaKeyStore = tbaKey;
+      dialog.close();
+      return;
+    }
+
     if (!navigator.onLine) {
       error = "offline!";
       return;
@@ -38,16 +47,23 @@
 >
   <Button slot="opener" let:open on:click={open}>
     <Container maxWidth>
-      <Icon name="pen" />
       {#if $tbaKeyStore}
-        Edit
+        <Icon name="pen" />
+        Edit API key
       {:else}
-        Enter
-      {/if} API key
+        <Icon name="plus" />
+        Add API key
+      {/if}
     </Container>
   </Button>
 
-  <span>Edit API key:</span>
+  <span>
+    {#if $tbaKeyStore}
+      Edit TBA API key
+    {:else}
+      Add TBA API key
+    {/if}
+  </span>
   <input bind:value={tbaKeyInput} title="TBA Key" />
   {#if error}
     <span>Error: {error}</span>

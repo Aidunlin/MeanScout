@@ -1,11 +1,12 @@
 <script lang="ts">
-  import { type IDBRecord, type Survey } from "$lib";
+  import { type Survey } from "$lib";
   import Anchor from "$lib/components/Anchor.svelte";
   import Container from "$lib/components/Container.svelte";
   import Header from "$lib/components/Header.svelte";
   import Icon from "$lib/components/Icon.svelte";
   import ImportSurveyDialog from "$lib/dialogs/ImportSurveyDialog.svelte";
   import NewSurveyDialog from "$lib/dialogs/NewSurveyDialog.svelte";
+  import { modeStore } from "$lib/settings";
 
   export let idb: IDBDatabase;
 
@@ -39,13 +40,24 @@
 
 <Container direction="column" padding="large">
   <h2>Options</h2>
-  <NewSurveyDialog {idb} />
-  <ImportSurveyDialog {idb} />
+  {#if $modeStore == "admin"}
+    <NewSurveyDialog {idb} />
+    <ImportSurveyDialog {idb} />
+  {/if}
   <Anchor hash="settings">
     <Container maxWidth spaceBetween>
       <Container>
         <Icon name="gears" />
         Settings
+      </Container>
+      <Icon name="arrow-right" />
+    </Container>
+  </Anchor>
+  <Anchor hash="about">
+    <Container maxWidth spaceBetween>
+      <Container>
+        <Icon name="info-circle" />
+        About
       </Container>
       <Icon name="arrow-right" />
     </Container>

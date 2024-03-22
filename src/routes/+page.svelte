@@ -1,9 +1,9 @@
 <script lang="ts">
-  import type { Entry, IDBRecord, Survey } from "$lib";
+  import { persistStorage } from "$lib";
   import Container from "$lib/components/Container.svelte";
   import Header from "$lib/components/Header.svelte";
   import "$lib/global.css";
-  import DraftPage from "$lib/pages/DraftPage.svelte";
+  import AboutPage from "$lib/pages/AboutPage.svelte";
   import EntryPage from "$lib/pages/EntryPage.svelte";
   import MainPage from "$lib/pages/MainPage.svelte";
   import SettingsPage from "$lib/pages/SettingsPage.svelte";
@@ -21,13 +21,13 @@
   let current:
     | { page: ""; props: ComponentProps<MainPage> }
     | { page: "settings"; props: ComponentProps<SettingsPage> }
+    | { page: "about"; props: ComponentProps<AboutPage> }
     | { page: "survey"; subpage: ""; props: ComponentProps<SurveyPage> }
     | { page: "survey"; subpage: "entries"; props: ComponentProps<SurveyEntriesPage> }
     | { page: "survey"; subpage: "fields"; props: ComponentProps<SurveyFieldsPage> }
     | { page: "survey"; subpage: "matches"; props: ComponentProps<SurveyMatchesPage> }
     | { page: "survey"; subpage: "teams"; props: ComponentProps<SurveyTeamsPage> }
     | { page: "survey"; subpage: "options"; props: ComponentProps<SurveyOptionsPage> }
-    | { page: "draft"; props: ComponentProps<DraftPage> }
     | { page: "entry"; props: ComponentProps<EntryPage> };
 
   function setMainPage() {
@@ -52,13 +52,24 @@
     };
   }
 
+  function setAboutPage() {
+    if (current?.page == "about") {
+      return;
+    }
+
+    current = {
+      page: "about",
+      props: {},
+    };
+  }
+
   function setSurveyPage(id: number, subpage: "" | "entries" | "fields" | "matches" | "teams" | "options") {
     if (current?.page == "survey" && current.props.surveyRecord.id == id) {
       current.subpage = subpage;
       return;
     }
 
-    if (current?.page == "draft" || current?.page == "entry") {
+    if (current?.page == "entry") {
       current = {
         page: "survey",
         subpage,
@@ -71,7 +82,7 @@
     surveyRequest.onerror = () => setMainPage();
 
     surveyRequest.onsuccess = () => {
-      const surveyRecord = surveyRequest.result as IDBRecord<Survey> | undefined;
+      const surveyRecord = surveyRequest.result;
       if (!surveyRecord) return setMainPage();
 
       if (!Array.isArray(surveyRecord.matches)) {
@@ -82,51 +93,6 @@
         page: "survey",
         subpage,
         props: { idb, surveyRecord },
-      };
-    };
-  }
-
-  function setDraftPage(id: number) {
-    if (current?.page == "draft" && current.props.draftRecord.id == id) {
-      return;
-    }
-
-    const getTransaction = idb.transaction(["surveys", "drafts"]);
-    getTransaction.onerror = () => setMainPage();
-
-    const surveyStore = getTransaction.objectStore("surveys");
-    const draftStore = getTransaction.objectStore("drafts");
-
-    const draftRequest = draftStore.get(id);
-    draftRequest.onerror = () => setMainPage();
-
-    draftRequest.onsuccess = () => {
-      const draftRecord = draftRequest.result as IDBRecord<Entry> | undefined;
-      if (!draftRecord) return setMainPage();
-
-      if (current?.page == "survey" || current?.page == "draft") {
-        current = {
-          page: "draft",
-          props: { idb, surveyRecord: current.props.surveyRecord, draftRecord },
-        };
-        return;
-      }
-
-      const surveyRequest = surveyStore.get(draftRecord.surveyId);
-      surveyRequest.onerror = () => setMainPage();
-
-      surveyRequest.onsuccess = () => {
-        const surveyRecord = surveyRequest.result as IDBRecord<Survey> | undefined;
-        if (!surveyRecord) return setMainPage();
-
-        if (!Array.isArray(surveyRecord.matches)) {
-          surveyRecord.matches = [];
-        }
-
-        current = {
-          page: "draft",
-          props: { idb, surveyRecord, draftRecord },
-        };
       };
     };
   }
@@ -146,8 +112,12 @@
     entryRequest.onerror = () => setMainPage();
 
     entryRequest.onsuccess = () => {
-      const entryRecord = entryRequest.result as IDBRecord<Entry> | undefined;
+      const entryRecord = entryRequest.result;
       if (!entryRecord) return setMainPage();
+
+      if (!entryRecord.status) {
+        entryRecord.status = "submitted";
+      }
 
       if (current?.page == "survey" || current?.page == "entry") {
         current = {
@@ -161,7 +131,7 @@
       surveyRequest.onerror = () => setMainPage();
 
       surveyRequest.onsuccess = () => {
-        const surveyRecord = surveyRequest.result as IDBRecord<Survey> | undefined;
+        const surveyRecord = surveyRequest.result;
         if (!surveyRecord) return setMainPage();
 
         if (!Array.isArray(surveyRecord.matches)) {
@@ -178,8 +148,8 @@
 
   function handleHashChange() {
     const hash = location.hash.replace(/#\/?/, "").toLowerCase().trim().split("/");
-    const page: (typeof current)["page"] =
-      hash[0] == "" || hash[0] == "settings" || hash[0] == "survey" || hash[0] == "draft" || hash[0] == "entry"
+    const page =
+      hash[0] == "" || hash[0] == "settings" || hash[0] == "about" || hash[0] == "survey" || hash[0] == "entry"
         ? hash[0]
         : "";
 
@@ -187,6 +157,8 @@
       setMainPage();
     } else if (page == "settings") {
       setSettingsPage();
+    } else if (page == "about") {
+      setAboutPage();
     } else if (page == "survey") {
       const subpage =
         hash[2] == "" ||
@@ -200,10 +172,6 @@
       const id = Number(hash[1]);
       if (Number.isNaN(id)) return setMainPage();
       setSurveyPage(id, subpage);
-    } else if (page == "draft") {
-      const id = Number(hash[1]);
-      if (Number.isNaN(id)) return setMainPage();
-      setDraftPage(id);
     } else if (page == "entry") {
       const id = Number(hash[1]);
       if (Number.isNaN(id)) return setMainPage();
@@ -221,7 +189,7 @@
       const cursor = surveyCursor.result;
       if (!cursor) return;
 
-      const survey = cursor.value;
+      const survey = cursor.value as any;
 
       if (Array.isArray(survey.configs)) {
         survey.fields = survey.configs;
@@ -249,15 +217,14 @@
   }
 
   function openIDB() {
-    const request = indexedDB.open("MeanScout", 6);
+    const request = indexedDB.open("MeanScout", 7);
     request.onerror = () => (idbError = `${request.error?.message}`);
 
     request.onupgradeneeded = (e) => {
       const storeNames = request.result.objectStoreNames;
 
-      if (!storeNames.contains("drafts")) {
-        const draftStore = request.result.createObjectStore("drafts", { keyPath: "id", autoIncrement: true });
-        draftStore.createIndex("surveyId", "surveyId", { unique: false });
+      if (storeNames.contains("drafts")) {
+        request.result.deleteObjectStore("drafts");
       }
 
       if (!storeNames.contains("entries")) {
@@ -284,6 +251,7 @@
     };
   }
 
+  persistStorage();
   openIDB();
 </script>
 
@@ -301,6 +269,8 @@
   <MainPage {...current.props} />
 {:else if current?.page == "settings"}
   <SettingsPage {...current.props} />
+{:else if current?.page == "about"}
+  <AboutPage {...current.props} />
 {:else if current?.page == "survey"}
   {#if current.subpage == ""}
     <SurveyPage {...current.props} />
@@ -315,12 +285,6 @@
   {:else if current.subpage == "options"}
     <SurveyOptionsPage {...current.props} />
   {/if}
-{:else if current?.page == "draft"}
-  {#key current.props.draftRecord.id}
-    <DraftPage {...current.props} />
-  {/key}
 {:else if current?.page == "entry"}
-  {#key current.props.entryRecord.id}
-    <EntryPage {...current.props} />
-  {/key}
+  <EntryPage {...current.props} />
 {/if}

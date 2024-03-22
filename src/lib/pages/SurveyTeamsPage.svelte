@@ -1,11 +1,10 @@
 <script lang="ts">
-  import { type IDBRecord, type Survey } from "$lib";
+  import { fetchTBA, type Survey } from "$lib";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Header from "$lib/components/Header.svelte";
   import Icon from "$lib/components/Icon.svelte";
-  import GetEventTeamsDialog from "$lib/dialogs/GetEventTeamsDialog.svelte";
-  import { tbaKeyStore } from "$lib/tba";
+  import { tbaKeyStore } from "$lib/settings";
 
   export let idb: IDBDatabase;
   export let surveyRecord: IDBRecord<Survey>;
@@ -13,6 +12,21 @@
   $: idb.transaction("surveys", "readwrite").objectStore("surveys").put(surveyRecord);
 
   let teamInput = "";
+
+  async function getTeamsFromTBAEvent() {
+    let response = await fetchTBA(`/event/${surveyRecord.tbaEventKey}/teams/keys`, $tbaKeyStore);
+    if (response.status == "success" && Array.isArray(response.data)) {
+      let newTeams: string[] = [];
+      response.data.forEach((team) => {
+        let teamString = `${team}`.trim().replace("frc", "");
+        if (!newTeams.includes(teamString)) {
+          newTeams = [...newTeams, teamString];
+        }
+      });
+      surveyRecord.teams = newTeams;
+      surveyRecord.modified = new Date();
+    }
+  }
 
   function addTeam() {
     surveyRecord.modified = new Date();
@@ -28,14 +42,16 @@
   }
 </script>
 
-<Header
-  parent={{ text: surveyRecord.name, iconName: "list-ul", hash: `survey/${surveyRecord.id}` }}
-  current={{ text: "Teams", iconName: "people-group" }}
-/>
+<Header backLink="survey/{surveyRecord.id}" title="Teams" iconName="people-group" />
 
 <Container direction="column" padding="large">
-  {#if navigator.onLine && $tbaKeyStore}
-    <GetEventTeamsDialog bind:surveyRecord />
+  {#if navigator.onLine && $tbaKeyStore && surveyRecord.tbaEventKey}
+  <Button on:click={getTeamsFromTBAEvent}>
+    <Container maxWidth>
+      <Icon name="cloud-arrow-down" />
+      Get teams from TBA event: {surveyRecord.tbaEventKey}
+    </Container>
+  </Button>
   {/if}
 
   <Container direction="column" gap="none">
@@ -62,7 +78,7 @@
     <span>
       No teams.
       {#if surveyRecord.matches.length}
-        Note that teams from matches are used, depending on the selected target.
+        Note that teams from matches are used depending on the selected target.
       {:else}
         Any team value is allowed.
       {/if}

@@ -39,7 +39,6 @@ body {
 
 footer {
   align-items: center;
-  background: var(--fg-color);
   display: flex;
   flex-wrap: wrap;
   gap: var(--outer-gap);

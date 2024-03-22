@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getDefaultFieldValue, type IDBRecord, type Survey } from "$lib";
+  import { getDefaultFieldValue, type Survey } from "$lib";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import FieldEditor from "$lib/components/FieldEditor.svelte";
@@ -15,16 +15,9 @@
   let disabled = false;
   let preview = false;
 
-  const countTransaction = idb.transaction(["drafts", "entries"]);
-
-  const draftCountRequest = countTransaction.objectStore("drafts").index("surveyId").count(surveyRecord.id);
-  draftCountRequest.onsuccess = () => {
-    disabled ||= draftCountRequest.result > 0;
-  };
-
-  const entryCountRequest = countTransaction.objectStore("entries").index("surveyId").count(surveyRecord.id);
+  const entryCountRequest = idb.transaction("entries").objectStore("entries").index("surveyId").count(surveyRecord.id);
   entryCountRequest.onsuccess = () => {
-    disabled ||= entryCountRequest.result > 0;
+    disabled = entryCountRequest.result > 0;
   };
 
   function newField() {
@@ -37,10 +30,7 @@
   }
 </script>
 
-<Header
-  parent={{ text: surveyRecord.name, iconName: "list-ul", hash: `survey/${surveyRecord.id}` }}
-  current={{ text: "Fields", iconName: "list-check" }}
-/>
+<Header backLink="survey/{surveyRecord.id}" title="Fields" iconName="list-check" />
 
 <Container direction="column" padding="large">
   {#if preview}

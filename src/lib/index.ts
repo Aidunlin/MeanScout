@@ -1,5 +1,3 @@
-import type Dialog from "./components/Dialog.svelte";
-
 export const fieldTypes = ["team", "match", "toggle", "number", "select", "text", "rating", "timer", "group"] as const;
 export type FieldType = (typeof fieldTypes)[number];
 
@@ -41,6 +39,7 @@ export type Match = {
 
 export type Survey = {
   name: string;
+  tbaEventKey?: string | undefined;
   fields: Field[];
   matches: Match[];
   teams: string[];
@@ -48,16 +47,16 @@ export type Survey = {
   modified: Date;
 };
 
+export const entryStatuses = ["draft", "submitted", "exported"] as const;
+export type EntryStatus = (typeof entryStatuses)[number];
+
 export type Entry = {
   surveyId: number;
+  status: EntryStatus;
   values: any[];
   created: Date;
   modified: Date;
 };
-
-export type IDBRecord<T> = T & { id: number };
-
-export type DialogDataType<T> = { dialog?: Dialog; data: T };
 
 export function getDefaultFieldValue(field: Exclude<Field, GroupField>) {
   switch (field.type) {
@@ -84,15 +83,38 @@ export function getDefaultFieldValue(field: Exclude<Field, GroupField>) {
 }
 
 export function flattenFields(fields: Field[]) {
-  return fields
-    .map((field) => {
-      if (field.type == "group") {
-        return field.fields;
-      } else {
-        return field;
-      }
+  return fields.flatMap((field) => (field.type == "group" ? field.fields : field));
+}
+
+const API_URL = "https://www.thebluealliance.com/api/v3";
+
+export async function fetchTBA(endpoint: string, tbaKey: string) {
+  const response = await fetch(`${API_URL}${endpoint}`, {
+    headers: [["X-TBA-Auth-Key", tbaKey]],
+  });
+
+  let data = await response.json();
+
+  if (response.status == 200) {
+    return { status: "success" as const, data };
+  } else if (response.status == 401) {
+    return { status: "unauthorized" as const, error: data.Error };
+  } else if (response.status == 404) {
+    return { status: "not found" as const };
+  } else {
+    return { status: "error" as const };
+  }
+}
+
+export function persistStorage() {
+  if (!navigator.storage) return;
+  navigator.storage
+    .persisted()
+    .then((isPersisted) => {
+      if (isPersisted) return;
+      navigator.storage.persist().catch(console.error);
     })
-    .flat();
+    .catch(console.error);
 }
 
 export function download(data: string, name: string, type: string) {

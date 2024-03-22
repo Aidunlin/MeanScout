@@ -1,24 +1,22 @@
 <script lang="ts">
-  import type { Survey } from "$lib";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import Icon from "$lib/components/Icon.svelte";
-
-  export let surveyRecord: IDBRecord<Survey>;
+  import { teamStore } from "$lib/settings";
 
   let dialog: Dialog;
-  let name = surveyRecord.name;
+  let teamInput = $teamStore;
   let error = "";
 
   function onConfirm() {
-    const trimmedName = name.trim();
-    if (!trimmedName) {
-      error = "Name can't be blank!";
+    const team = teamInput.trim();
+    if (team && !/^\d{1,5}[A-Z]?$/.test(team)) {
+      error = "invalid team!";
       return;
     }
 
-    surveyRecord.name = trimmedName;
+    $teamStore = team;
     dialog.close();
   }
 </script>
@@ -27,20 +25,31 @@
   bind:this={dialog}
   {onConfirm}
   on:close={() => {
-    name = surveyRecord.name;
+    teamInput = $teamStore;
     error = "";
   }}
 >
   <Button slot="opener" let:open on:click={open}>
     <Container maxWidth>
-      <Icon name="pen" />
-      Edit name: {surveyRecord.name}
+      {#if $teamStore}
+        <Icon name="pen" />
+        Edit team: {$teamStore}
+      {:else}
+        <Icon name="plus" />
+        Add team
+      {/if}
     </Container>
   </Button>
 
-  <span>Edit name:</span>
-  <input bind:value={name} />
+  <span>
+    {#if $teamStore}
+      Edit team
+    {:else}
+      Add team
+    {/if}
+  </span>
+  <input bind:value={teamInput} title="TBA Key" />
   {#if error}
-    <span>{error}</span>
+    <span>Error: {error}</span>
   {/if}
 </Dialog>

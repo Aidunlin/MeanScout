@@ -1,57 +1,92 @@
 <script lang="ts">
-  import { type IDBRecord, type Survey } from "$lib";
+  import { fetchTBA, type Match, type Survey } from "$lib";
+  import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Header from "$lib/components/Header.svelte";
+  import Icon from "$lib/components/Icon.svelte";
   import DeleteMatchDialog from "$lib/dialogs/DeleteMatchDialog.svelte";
   import EditMatchDialog from "$lib/dialogs/EditMatchDialog.svelte";
-  import GetEventMatchesDialog from "$lib/dialogs/GetEventMatchesDialog.svelte";
   import NewMatchDialog from "$lib/dialogs/NewMatchDialog.svelte";
-  import { tbaKeyStore } from "$lib/tba";
+  import { tbaKeyStore } from "$lib/settings";
 
   export let idb: IDBDatabase;
   export let surveyRecord: IDBRecord<Survey>;
 
   $: idb.transaction("surveys", "readwrite").objectStore("surveys").put(surveyRecord);
+
+  async function getMatchesFromTBAEvent() {
+    let response = await fetchTBA(`/event/${surveyRecord.tbaEventKey}/matches/simple`, $tbaKeyStore);
+    if (response.status == "success" && Array.isArray(response.data)) {
+      surveyRecord.matches = response.data
+        .filter((match) => match.comp_level == "qm")
+        .map((match): Match => {
+          return {
+            number: match.match_number,
+            red1: match.alliances.red.team_keys[0].replace("frc", ""),
+            red2: match.alliances.red.team_keys[1].replace("frc", ""),
+            red3: match.alliances.red.team_keys[2].replace("frc", ""),
+            blue1: match.alliances.blue.team_keys[0].replace("frc", ""),
+            blue2: match.alliances.blue.team_keys[1].replace("frc", ""),
+            blue3: match.alliances.blue.team_keys[2].replace("frc", ""),
+          };
+        });
+      surveyRecord.modified = new Date();
+    }
+  }
 </script>
 
-<Header
-  parent={{ text: surveyRecord.name, iconName: "list-ul", hash: `survey/${surveyRecord.id}` }}
-  current={{ text: "Matches", iconName: "table-list" }}
-/>
+<Header backLink="survey/{surveyRecord.id}" title="Matches" iconName="table-list" />
 
 <Container direction="column" padding="large">
-  {#if navigator.onLine && $tbaKeyStore}
-    <GetEventMatchesDialog bind:surveyRecord />
+  {#if navigator.onLine && $tbaKeyStore && surveyRecord.tbaEventKey}
+    <Button on:click={getMatchesFromTBAEvent}>
+      <Container maxWidth>
+        <Icon name="cloud-arrow-down" />
+        Get matches from TBA event: {surveyRecord.tbaEventKey}
+      </Container>
+    </Button>
   {/if}
 
   <NewMatchDialog bind:surveyRecord />
 
   <h2>Matches</h2>
   {#if surveyRecord.matches.length}
-    <Container direction="column">
-      {#each surveyRecord.matches.toSorted((a, b) => a.number - b.number) as match}
-        <Container align="center" maxWidth spaceBetween>
-          <Container align="center">
-            <span class="match-number">{match.number}</span>
-            <Container direction="column" gap="small">
-              <Container gap="small">
-                <span class="red-team">{match.red1}</span>
-                <span class="red-team">{match.red2}</span>
-                <span class="red-team">{match.red3}</span>
+    <Container>
+      <table>
+        <tr>
+          <th colspan="2" class="match-number">Match</th>
+          <th colspan="3">Teams</th>
+        </tr>
+        {#each surveyRecord.matches.toSorted((a, b) => a.number - b.number) as match}
+          <tr>
+            <td>
+              <Container padding="small" gap="small">
+                <EditMatchDialog bind:surveyRecord {match} />
+                <DeleteMatchDialog bind:surveyRecord {match} />
               </Container>
-              <Container gap="small">
+            </td>
+            <td class="match-number">{match.number}</td>
+            <td>
+              <Container direction="column" padding="small" gap="small">
+                <span class="red-team">{match.red1}</span>
                 <span class="blue-team">{match.blue1}</span>
+              </Container>
+            </td>
+            <td>
+              <Container direction="column" padding="small" gap="small">
+                <span class="red-team">{match.red2}</span>
                 <span class="blue-team">{match.blue2}</span>
+              </Container>
+            </td>
+            <td>
+              <Container direction="column" padding="small" gap="small">
+                <span class="red-team">{match.red3}</span>
                 <span class="blue-team">{match.blue3}</span>
               </Container>
-            </Container>
-          </Container>
-          <Container>
-            <EditMatchDialog bind:surveyRecord {match} />
-            <DeleteMatchDialog bind:surveyRecord {match} />
-          </Container>
-        </Container>
-      {/each}
+            </td>
+          </tr>
+        {/each}
+      </table>
     </Container>
   {:else}
     <span>No matches.</span>
@@ -59,22 +94,21 @@
 </Container>
 
 <style>
-  .match-number {
-    width: 60px;
-    text-align: right;
+  td.match-number {
+    padding: var(--outer-gap);
   }
 
+  .match-number,
   .red-team,
   .blue-team {
-    width: 100px;
     text-align: right;
   }
 
-  .red-team {
+  td .red-team {
     color: var(--red);
   }
 
-  .blue-team {
+  td .blue-team {
     color: var(--blue);
   }
 </style>

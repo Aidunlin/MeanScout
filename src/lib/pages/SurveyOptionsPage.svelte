@@ -1,11 +1,13 @@
 <script lang="ts">
-  import { download, share, type IDBRecord, type Survey } from "$lib";
+  import { download, share, type Survey } from "$lib";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Header from "$lib/components/Header.svelte";
   import Icon from "$lib/components/Icon.svelte";
+  import DeleteSurveyDialog from "$lib/dialogs/DeleteSurveyDialog.svelte";
   import EditSurveyNameDialog from "$lib/dialogs/EditSurveyNameDialog.svelte";
-  import DeleteSurveyDialog from "../dialogs/DeleteSurveyDialog.svelte";
+  import EditSurveyTBAEventKeyDialog from "$lib/dialogs/EditSurveyTBAEventKeyDialog.svelte";
+  import { modeStore, tbaKeyStore } from "$lib/settings";
 
   export let idb: IDBDatabase;
   export let surveyRecord: IDBRecord<Survey>;
@@ -29,12 +31,10 @@
   }
 </script>
 
-<Header
-  parent={{ text: surveyRecord.name, iconName: "list-ul", hash: `survey/${surveyRecord.id}` }}
-  current={{ text: "Options", iconName: "gears" }}
-/>
+<Header backLink="survey/{surveyRecord.id}" title="Options" iconName="gears" />
 
 <Container direction="column" padding="large">
+  <h2>Export</h2>
   <Button title="Download survey" on:click={downloadSurvey}>
     <Container maxWidth>
       <Icon name="download" />
@@ -50,7 +50,16 @@
     </Button>
   {/if}
 
-  <h2>Options</h2>
-  <EditSurveyNameDialog bind:surveyRecord />
-  <DeleteSurveyDialog {idb} {surveyRecord} />
+  {#if $modeStore == "admin"}
+    <h2>Options</h2>
+    <EditSurveyNameDialog bind:surveyRecord />
+
+    {#if $tbaKeyStore}
+      <h2>The Blue Alliance</h2>
+      <EditSurveyTBAEventKeyDialog bind:surveyRecord />
+    {/if}
+
+    <h2>Danger Zone</h2>
+    <DeleteSurveyDialog {idb} {surveyRecord} />
+  {/if}
 </Container>
