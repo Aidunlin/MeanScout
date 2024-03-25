@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { fetchTBA } from "$lib";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import Icon from "$lib/components/Icon.svelte";
-  import { isValidField, type Field } from "$lib/field";
-  import { tbaKeyStore } from "$lib/settings";
+  import { isValidField } from "$lib/field";
+  import { tbaAuthKeyStore } from "$lib/settings";
+  import { tbaEventExists } from "$lib/tba";
 
   export let idb: IDBDatabase;
 
@@ -21,17 +21,13 @@
     return name;
   }
 
-  async function parseTBAEventKey(tbaEventKey: string) {
-    if (navigator.onLine && $tbaKeyStore) {
-      let response = await fetchTBA(`/event/${tbaEventKey}/simple`, $tbaKeyStore);
-      if (response.status == "success") {
-        return tbaEventKey;
+  async function parseTBAEventKey(tbaEventKey: any) {
+    if (typeof tbaEventKey == "string" && tbaEventKey.length) {
+      const eventKey = tbaEventKey.trim();
+      if (navigator.onLine && $tbaAuthKeyStore && (await tbaEventExists(eventKey, $tbaAuthKeyStore))) {
+        return eventKey;
       }
     }
-  }
-
-  function parseFields(fields: any[]): Field[] {
-    return fields.filter(isValidField);
   }
 
   function parseMatches(matches: any[]) {
@@ -83,11 +79,8 @@
 
     delete survey.id;
     survey.name = parseName(survey.name);
-    if (typeof survey.tbaEventKey == "string" && survey.tbaEventKey.length) {
-      let parsed = await parseTBAEventKey(survey.tbaEventKey.trim());
-      if (parsed) survey.tbaEventKey = parsed;
-    }
-    survey.fields = Array.isArray(survey.fields) ? parseFields(survey.fields) : [];
+    survey.tbaEventKey = await parseTBAEventKey(survey.tbaEventKey);
+    survey.fields = Array.isArray(survey.fields) ? survey.fields.filter(isValidField) : [];
     survey.matches = Array.isArray(survey.matches) ? parseMatches(survey.matches) : [];
     survey.teams = Array.isArray(survey.teams) ? parseTeams(survey.teams) : [];
     survey.created = parseDate(survey.created);

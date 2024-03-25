@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { fetchTBA, type Match, type Survey } from "$lib";
+  import { type Survey } from "$lib";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Header from "$lib/components/Header.svelte";
@@ -7,7 +7,8 @@
   import DeleteMatchDialog from "$lib/dialogs/DeleteMatchDialog.svelte";
   import EditMatchDialog from "$lib/dialogs/EditMatchDialog.svelte";
   import NewMatchDialog from "$lib/dialogs/NewMatchDialog.svelte";
-  import { tbaKeyStore } from "$lib/settings";
+  import { tbaAuthKeyStore } from "$lib/settings";
+  import { tbaGetEventMatches } from "$lib/tba";
 
   export let idb: IDBDatabase;
   export let surveyRecord: IDBRecord<Survey>;
@@ -15,21 +16,11 @@
   $: idb.transaction("surveys", "readwrite").objectStore("surveys").put(surveyRecord);
 
   async function getMatchesFromTBAEvent() {
-    let response = await fetchTBA(`/event/${surveyRecord.tbaEventKey}/matches/simple`, $tbaKeyStore);
-    if (response.status == "success" && Array.isArray(response.data)) {
-      surveyRecord.matches = response.data
-        .filter((match) => match.comp_level == "qm")
-        .map((match): Match => {
-          return {
-            number: match.match_number,
-            red1: match.alliances.red.team_keys[0].replace("frc", ""),
-            red2: match.alliances.red.team_keys[1].replace("frc", ""),
-            red3: match.alliances.red.team_keys[2].replace("frc", ""),
-            blue1: match.alliances.blue.team_keys[0].replace("frc", ""),
-            blue2: match.alliances.blue.team_keys[1].replace("frc", ""),
-            blue3: match.alliances.blue.team_keys[2].replace("frc", ""),
-          };
-        });
+    if (!surveyRecord.tbaEventKey) return;
+
+    const response = await tbaGetEventMatches(surveyRecord.tbaEventKey, $tbaAuthKeyStore);
+    if (response) {
+      surveyRecord.matches = response;
       surveyRecord.modified = new Date();
     }
   }
@@ -38,7 +29,7 @@
 <Header backLink="survey/{surveyRecord.id}" title="Matches" iconName="table-list" />
 
 <Container direction="column" padding="large">
-  {#if navigator.onLine && $tbaKeyStore && surveyRecord.tbaEventKey}
+  {#if navigator.onLine && $tbaAuthKeyStore && surveyRecord.tbaEventKey}
     <Button on:click={getMatchesFromTBAEvent}>
       <Container maxWidth>
         <Icon name="cloud-arrow-down" />

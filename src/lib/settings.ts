@@ -30,4 +30,4 @@ export const teamStore = localStorageStore<string>("team", "");
 
 // TBA API key setting
 
-export const tbaKeyStore = localStorageStore<string>("tbaKey", "");
+export const tbaAuthKeyStore = localStorageStore<string>("tbaAuthKey", "");

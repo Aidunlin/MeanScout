@@ -1,10 +1,11 @@
 <script lang="ts">
-  import { fetchTBA, type Survey } from "$lib";
+  import { type Survey } from "$lib";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import Icon from "$lib/components/Icon.svelte";
-  import { tbaKeyStore, teamStore } from "$lib/settings";
+  import { tbaAuthKeyStore, teamStore } from "$lib/settings";
+  import { tbaEventExists, tbaGetTeamEvents } from "$lib/tba";
 
   export let surveyRecord: IDBRecord<Survey>;
 
@@ -19,30 +20,24 @@
       return;
     }
 
-    if (!navigator.onLine || !$tbaKeyStore || !$teamStore) {
+    if (!navigator.onLine || !$tbaAuthKeyStore || !$teamStore) {
       return;
     }
 
-    let response = await fetchTBA(`/team/frc${$teamStore}/events/simple`, $tbaKeyStore);
+    const response = await tbaGetTeamEvents($teamStore, $tbaAuthKeyStore);
 
-    if (response.status == "success" && Array.isArray(response.data)) {
-      response.data.forEach((event) => {
-        if (event.year >= new Date().getFullYear() - 1) {
-          events = [{ name: `${event.year} ${event.name}`, key: event.key }, ...events];
-        }
-      });
-    } else if (response.status == "not found") {
-      error = `could not get events for team ${teamStore}`;
-    } else {
-      error = "error";
+    if (response.events) {
+      events = response.events;
+    } else if (response.error) {
+      error = response.error;
     }
   }
 
   async function onConfirm() {
-    let trimmedEvent = event.trim();
+    event = event.trim();
 
-    if (!trimmedEvent) {
-      surveyRecord.tbaEventKey = trimmedEvent;
+    if (!event) {
+      surveyRecord.tbaEventKey = event;
       surveyRecord.modified = new Date();
       dialog.close();
       return;
@@ -53,23 +48,14 @@
       return;
     }
 
-    if (events.map((e) => e.key).includes(trimmedEvent)) {
-      surveyRecord.tbaEventKey = trimmedEvent;
+    const eventAlreadyFound = events.map((e) => e.key).includes(event);
+
+    if (eventAlreadyFound || (await tbaEventExists(event, $tbaAuthKeyStore))) {
+      surveyRecord.tbaEventKey = event;
       surveyRecord.modified = new Date();
       dialog.close();
-      return;
-    }
-
-    let response = await fetchTBA(`/event/${trimmedEvent}/simple`, $tbaKeyStore);
-
-    if (response.status == "success") {
-      surveyRecord.tbaEventKey = trimmedEvent;
-      surveyRecord.modified = new Date();
-      dialog.close();
-    } else if (response.status == "not found") {
-      error = "could not find event";
     } else {
-      error = "error";
+      error = "could not find event";
     }
   }
 </script>

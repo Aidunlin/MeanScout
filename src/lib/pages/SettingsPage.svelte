@@ -1,7 +1,7 @@
 <script lang="ts">
   import Container from "$lib/components/Container.svelte";
   import Header from "$lib/components/Header.svelte";
-  import EditTBAKeyDialog from "$lib/dialogs/EditTBAKeyDialog.svelte";
+  import EditTbaAuthKeyDialog from "$lib/dialogs/EditTbaAuthKeyDialog.svelte";
   import EditTeamSettingDialog from "$lib/dialogs/EditTeamSettingDialog.svelte";
   import { modes, modeStore, targets, targetStore } from "$lib/settings";
 </script>
@@ -35,7 +35,7 @@
     <EditTeamSettingDialog />
     {#if navigator.onLine}
       <h2>The Blue Alliance</h2>
-      <EditTBAKeyDialog />
+      <EditTbaAuthKeyDialog />
     {/if}
   {/if}
 </Container>

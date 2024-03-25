@@ -1,10 +1,11 @@
 <script lang="ts">
-  import { fetchTBA, type Survey } from "$lib";
+  import { type Survey } from "$lib";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Header from "$lib/components/Header.svelte";
   import Icon from "$lib/components/Icon.svelte";
-  import { tbaKeyStore } from "$lib/settings";
+  import { tbaAuthKeyStore } from "$lib/settings";
+  import { tbaGetEventTeams } from "$lib/tba";
 
   export let idb: IDBDatabase;
   export let surveyRecord: IDBRecord<Survey>;
@@ -14,38 +15,33 @@
   let teamInput = "";
 
   async function getTeamsFromTBAEvent() {
-    let response = await fetchTBA(`/event/${surveyRecord.tbaEventKey}/teams/keys`, $tbaKeyStore);
-    if (response.status == "success" && Array.isArray(response.data)) {
-      let newTeams: string[] = [];
-      response.data.forEach((team) => {
-        let teamString = `${team}`.trim().replace("frc", "");
-        if (!newTeams.includes(teamString)) {
-          newTeams = [...newTeams, teamString];
-        }
-      });
-      surveyRecord.teams = newTeams;
+    if (!surveyRecord.tbaEventKey) return;
+
+    const response = await tbaGetEventTeams(surveyRecord.tbaEventKey, $tbaAuthKeyStore);
+    if (response) {
+      surveyRecord.teams = response;
       surveyRecord.modified = new Date();
     }
   }
 
   function addTeam() {
-    surveyRecord.modified = new Date();
     if (teamInput.trim() && !surveyRecord.teams.includes(teamInput.trim())) {
       surveyRecord.teams = [...surveyRecord.teams, teamInput.trim()];
+      surveyRecord.modified = new Date();
       teamInput = "";
     }
   }
 
   function deleteTeam(team: string) {
-    surveyRecord.modified = new Date();
     surveyRecord.teams = surveyRecord.teams.filter((t) => t.trim() != team.trim());
+    surveyRecord.modified = new Date();
   }
 </script>
 
 <Header backLink="survey/{surveyRecord.id}" title="Teams" iconName="people-group" />
 
 <Container direction="column" padding="large">
-  {#if navigator.onLine && $tbaKeyStore && surveyRecord.tbaEventKey}
+  {#if navigator.onLine && $tbaAuthKeyStore && surveyRecord.tbaEventKey}
     <Button on:click={getTeamsFromTBAEvent}>
       <Container maxWidth>
         <Icon name="cloud-arrow-down" />

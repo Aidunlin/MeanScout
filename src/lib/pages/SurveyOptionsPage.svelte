@@ -6,8 +6,8 @@
   import Icon from "$lib/components/Icon.svelte";
   import DeleteSurveyDialog from "$lib/dialogs/DeleteSurveyDialog.svelte";
   import EditSurveyNameDialog from "$lib/dialogs/EditSurveyNameDialog.svelte";
-  import EditSurveyTBAEventKeyDialog from "$lib/dialogs/EditSurveyTBAEventKeyDialog.svelte";
-  import { modeStore, tbaKeyStore } from "$lib/settings";
+  import EditSurveyTbaEventKeyDialog from "$lib/dialogs/EditSurveyTbaEventKeyDialog.svelte";
+  import { modeStore, tbaAuthKeyStore } from "$lib/settings";
 
   export let idb: IDBDatabase;
   export let surveyRecord: IDBRecord<Survey>;
@@ -54,9 +54,9 @@
     <h2>Options</h2>
     <EditSurveyNameDialog bind:surveyRecord />
 
-    {#if $tbaKeyStore}
+    {#if $tbaAuthKeyStore}
       <h2>The Blue Alliance</h2>
-      <EditSurveyTBAEventKeyDialog bind:surveyRecord />
+      <EditSurveyTbaEventKeyDialog bind:surveyRecord />
     {/if}
 
     <h2>Danger Zone</h2>
