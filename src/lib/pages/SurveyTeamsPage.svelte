@@ -46,12 +46,12 @@
 
 <Container direction="column" padding="large">
   {#if navigator.onLine && $tbaKeyStore && surveyRecord.tbaEventKey}
-  <Button on:click={getTeamsFromTBAEvent}>
-    <Container maxWidth>
-      <Icon name="cloud-arrow-down" />
-      Get teams from TBA event: {surveyRecord.tbaEventKey}
-    </Container>
-  </Button>
+    <Button on:click={getTeamsFromTBAEvent}>
+      <Container maxWidth>
+        <Icon name="cloud-arrow-down" />
+        Get teams from TBA event: {surveyRecord.tbaEventKey}
+      </Container>
+    </Button>
   {/if}
 
   <Container direction="column" gap="none">

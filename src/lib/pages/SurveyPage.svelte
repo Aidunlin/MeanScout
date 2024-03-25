@@ -1,10 +1,11 @@
 <script lang="ts">
-  import { flattenFields, getDefaultFieldValue, type Entry, type Survey } from "$lib";
+  import { type Entry, type Survey } from "$lib";
   import Anchor from "$lib/components/Anchor.svelte";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Header from "$lib/components/Header.svelte";
   import Icon from "$lib/components/Icon.svelte";
+  import { flattenFields, getDefaultFieldValue } from "$lib/field";
   import { modeStore, targetStore } from "$lib/settings";
 
   export let idb: IDBDatabase;

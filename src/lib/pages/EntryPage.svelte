@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { flattenFields, type Entry, type Survey } from "$lib";
+  import { type Entry, type Survey } from "$lib";
   import Container from "$lib/components/Container.svelte";
   import FieldValueEditor from "$lib/components/FieldValueEditor.svelte";
   import Header from "$lib/components/Header.svelte";
@@ -7,6 +7,7 @@
   import DeleteEntryDialog from "$lib/dialogs/DeleteEntryDialog.svelte";
   import EditEntryDialog from "$lib/dialogs/EditEntryDialog.svelte";
   import SubmitDraftDialog from "$lib/dialogs/SubmitDraftDialog.svelte";
+  import { flattenFields } from "$lib/field";
   import { targetStore } from "$lib/settings";
 
   export let idb: IDBDatabase;

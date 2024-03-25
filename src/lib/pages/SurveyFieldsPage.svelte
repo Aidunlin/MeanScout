@@ -1,11 +1,12 @@
 <script lang="ts">
-  import { getDefaultFieldValue, type Survey } from "$lib";
+  import { type Survey } from "$lib";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import FieldEditor from "$lib/components/FieldEditor.svelte";
   import FieldValueEditor from "$lib/components/FieldValueEditor.svelte";
   import Header from "$lib/components/Header.svelte";
   import Icon from "$lib/components/Icon.svelte";
+  import { getDefaultFieldValue } from "$lib/field";
 
   export let idb: IDBDatabase;
   export let surveyRecord: IDBRecord<Survey>;
@@ -27,6 +28,10 @@
 
   function togglePreview() {
     preview = !preview;
+  }
+
+  function onChange() {
+    surveyRecord.modified = new Date();
   }
 </script>
 
@@ -53,13 +58,7 @@
       <span>Cannot modify fields with entries present!</span>
     {/if}
     {#each surveyRecord.fields as field, fieldIndex (field)}
-      <FieldEditor
-        bind:fields={surveyRecord.fields}
-        bind:field
-        onChange={() => (surveyRecord.modified = new Date())}
-        {fieldIndex}
-        {disabled}
-      />
+      <FieldEditor bind:fields={surveyRecord.fields} bind:field {fieldIndex} {disabled} {onChange} />
     {/each}
   {/if}
 </Container>

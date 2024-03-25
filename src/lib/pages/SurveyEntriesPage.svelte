@@ -1,11 +1,12 @@
 <script lang="ts">
-  import { download, flattenFields, share, type Entry, type Survey } from "$lib";
+  import { download, share, type Entry, type Survey } from "$lib";
   import Anchor from "$lib/components/Anchor.svelte";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Header from "$lib/components/Header.svelte";
   import Icon from "$lib/components/Icon.svelte";
   import BulkSetEntryStatusDialog from "$lib/dialogs/BulkSetEntryStatusDialog.svelte";
+  import { flattenFields } from "$lib/field";
   import { targetStore } from "$lib/settings";
 
   export let idb: IDBDatabase;

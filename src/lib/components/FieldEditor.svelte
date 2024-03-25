@@ -1,8 +1,9 @@
 <script lang="ts">
-  import { fieldTypes, type Field } from "$lib";
-  import Button from "./Button.svelte";
-  import Container from "./Container.svelte";
-  import Icon from "./Icon.svelte";
+  import Button from "$lib/components/Button.svelte";
+  import Container from "$lib/components/Container.svelte";
+  import Icon from "$lib/components/Icon.svelte";
+  import FieldOptionsDialog from "$lib/dialogs/FieldOptionsDialog.svelte";
+  import { fieldTypes, type Field } from "$lib/field";
 
   export let fields: Field[];
   export let field: Field;
@@ -10,12 +11,6 @@
   export let disabled = false;
 
   export let onChange: (() => void) | undefined = undefined;
-
-  function moveField(by: number) {
-    fields.splice(fieldIndex + by, 0, ...fields.splice(fieldIndex, 1));
-    fields = fields;
-    onChange && onChange();
-  }
 
   function switchFieldType(to: string) {
     switch (to) {
@@ -49,14 +44,8 @@
     onChange && onChange();
   }
 
-  function duplicateField() {
-    fields.splice(fieldIndex, 0, structuredClone(fields[fieldIndex]));
-    fields = fields;
-    onChange && onChange();
-  }
-
-  function deleteField() {
-    fields = fields.filter((_, i) => i != fieldIndex);
+  function moveField(by: number) {
+    fields = fields.toSpliced(fieldIndex + by, 0, ...fields.splice(fieldIndex, 1));
     onChange && onChange();
   }
 
@@ -112,21 +101,14 @@
     </Container>
   </Container>
 
-  <Container spaceBetween>
-    <Container>
-      <Button title="Move up" disabled={fieldIndex == 0 || disabled} on:click={() => moveField(-1)}>
-        <Icon name="arrow-up" />
-      </Button>
-      <Button title="Move down" disabled={fieldIndex == fields.length - 1 || disabled} on:click={() => moveField(1)}>
-        <Icon name="arrow-down" />
-      </Button>
-      <Button title="Duplicate field" {disabled} on:click={duplicateField}>
-        <Icon name="clone" />
-      </Button>
-    </Container>
-    <Button title="Delete field" {disabled} on:click={deleteField}>
-      <Icon name="trash" />
+  <Container>
+    <Button title="Move up" disabled={fieldIndex == 0 || disabled} on:click={() => moveField(-1)}>
+      <Icon name="arrow-up" />
     </Button>
+    <Button title="Move down" disabled={fieldIndex == fields.length - 1 || disabled} on:click={() => moveField(1)}>
+      <Icon name="arrow-down" />
+    </Button>
+    <FieldOptionsDialog bind:fields bind:field {fieldIndex} {disabled} {onChange} />
   </Container>
 
   {#if !disabled}
@@ -146,16 +128,14 @@
     {:else if field.type == "select"}
       <Container direction="column" padding="large" maxWidth>
         {field.name} Values
-        <Container direction="column" padding="large">
-          {#each field.values as value, i}
-            <Container>
-              <input bind:value on:change={onChange} style="width:200px" />
-              <Button title="Delete value" on:click={() => deleteSelectValue(i)}>
-                <Icon name="trash" />
-              </Button>
-            </Container>
-          {/each}
-        </Container>
+        {#each field.values as value, i}
+          <Container>
+            <input bind:value on:change={onChange} style="width:200px" />
+            <Button title="Delete value" on:click={() => deleteSelectValue(i)}>
+              <Icon name="trash" />
+            </Button>
+          </Container>
+        {/each}
         <Container>
           <Button title="New value" on:click={newSelectValue}>
             <Icon name="plus" />

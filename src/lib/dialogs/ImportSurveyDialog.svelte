@@ -1,9 +1,10 @@
 <script lang="ts">
-  import { fetchTBA, fieldTypes, type Field } from "$lib";
+  import { fetchTBA } from "$lib";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import Icon from "$lib/components/Icon.svelte";
+  import { isValidField, type Field } from "$lib/field";
   import { tbaKeyStore } from "$lib/settings";
 
   export let idb: IDBDatabase;
@@ -30,16 +31,7 @@
   }
 
   function parseFields(fields: any[]): Field[] {
-    return fields.filter((field) => {
-      if (typeof field != "object") return false;
-      if (typeof field.name != "string" || !field.name.trim()) return false;
-
-      if (!fieldTypes.includes(field.type)) return false;
-      if (field.type == "select" && !Array.isArray(field.values)) return false;
-      if (field.type == "group" && !Array.isArray(field.fields)) return false;
-
-      return true;
-    });
+    return fields.filter(isValidField);
   }
 
   function parseMatches(matches: any[]) {

@@ -1,7 +1,7 @@
 <script lang="ts">
-  import Button from "./Button.svelte";
-  import Container from "./Container.svelte";
-  import Icon from "./Icon.svelte";
+  import Button from "$lib/components/Button.svelte";
+  import Container from "$lib/components/Container.svelte";
+  import Icon from "$lib/components/Icon.svelte";
 
   let element: HTMLDialogElement;
 

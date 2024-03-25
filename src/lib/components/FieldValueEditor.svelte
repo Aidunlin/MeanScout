@@ -1,8 +1,8 @@
 <script lang="ts">
-  import type { Field } from "$lib";
-  import Button from "./Button.svelte";
-  import Container from "./Container.svelte";
-  import Icon from "./Icon.svelte";
+  import Button from "$lib/components/Button.svelte";
+  import Container from "$lib/components/Container.svelte";
+  import Icon from "$lib/components/Icon.svelte";
+  import type { Field } from "$lib/field";
 
   export let field: Field;
   export let value: any;
