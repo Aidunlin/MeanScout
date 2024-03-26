@@ -22,9 +22,9 @@
   }
 
   async function parseTBAEventKey(tbaEventKey: any) {
-    if (typeof tbaEventKey == "string" && tbaEventKey.length) {
+    if ($tbaAuthKeyStore && typeof tbaEventKey == "string" && tbaEventKey.length) {
       const eventKey = tbaEventKey.trim();
-      if (navigator.onLine && $tbaAuthKeyStore && (await tbaEventExists(eventKey, $tbaAuthKeyStore))) {
+      if (await tbaEventExists(eventKey, $tbaAuthKeyStore)) {
         return eventKey;
       }
     }

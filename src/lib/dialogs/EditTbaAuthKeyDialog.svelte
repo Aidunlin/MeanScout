@@ -4,7 +4,7 @@
   import Dialog from "$lib/components/Dialog.svelte";
   import Icon from "$lib/components/Icon.svelte";
   import { tbaAuthKeyStore } from "$lib/settings";
-  import { tbaFetch } from "$lib/tba";
+  import { tbaAuthKeyIsValid } from "$lib/tba";
 
   let dialog: Dialog;
   let tbaAuthKey = $tbaAuthKeyStore;
@@ -19,17 +19,11 @@
       return;
     }
 
-    if (!navigator.onLine) {
-      error = "offline!";
-      return;
-    }
-
-    const response = await tbaFetch("/status", tbaAuthKey);
-    if (response.status == "success") {
+    if (await tbaAuthKeyIsValid(tbaAuthKey)) {
       $tbaAuthKeyStore = tbaAuthKey;
       dialog.close();
     } else {
-      error = `${response.status}!`;
+      error = `unauthorized!`;
     }
   }
 </script>

@@ -33,9 +33,7 @@
   {#if $modeStore == "admin"}
     <h2>Team</h2>
     <EditTeamSettingDialog />
-    {#if navigator.onLine}
-      <h2>The Blue Alliance</h2>
-      <EditTbaAuthKeyDialog />
-    {/if}
+    <h2>The Blue Alliance</h2>
+    <EditTbaAuthKeyDialog />
   {/if}
 </Container>

@@ -20,6 +20,11 @@ export async function tbaFetch(endpoint: string, authKey: string) {
   }
 }
 
+export async function tbaAuthKeyIsValid(authKey: string) {
+  const response = await tbaFetch("/status", authKey);
+  return response.status == "success";
+}
+
 export async function tbaEventExists(eventKey: string, authKey: string) {
   const response = await tbaFetch(`/event/${eventKey}/simple`, authKey);
   return response.status == "success";

@@ -20,7 +20,7 @@
       return;
     }
 
-    if (!navigator.onLine || !$tbaAuthKeyStore || !$teamStore) {
+    if (!$tbaAuthKeyStore || !$teamStore) {
       return;
     }
 
@@ -29,6 +29,7 @@
     if (response.events) {
       events = response.events;
     } else if (response.error) {
+      console.log(response.error);
       error = response.error;
     }
   }
@@ -43,11 +44,6 @@
       return;
     }
 
-    if (!navigator.onLine) {
-      error = "offline";
-      return;
-    }
-
     const eventAlreadyFound = events.map((e) => e.key).includes(event);
 
     if (eventAlreadyFound || (await tbaEventExists(event, $tbaAuthKeyStore))) {
@@ -56,6 +52,7 @@
       dialog.close();
     } else {
       error = "could not find event";
+      console.log(error);
     }
   }
 </script>

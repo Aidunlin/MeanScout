@@ -29,7 +29,7 @@
 <Header backLink="survey/{surveyRecord.id}" title="Matches" iconName="table-list" />
 
 <Container direction="column" padding="large">
-  {#if navigator.onLine && $tbaAuthKeyStore && surveyRecord.tbaEventKey}
+  {#if $tbaAuthKeyStore && surveyRecord.tbaEventKey}
     <Button on:click={getMatchesFromTBAEvent}>
       <Container maxWidth>
         <Icon name="cloud-arrow-down" />

@@ -41,7 +41,7 @@
 <Header backLink="survey/{surveyRecord.id}" title="Teams" iconName="people-group" />
 
 <Container direction="column" padding="large">
-  {#if navigator.onLine && $tbaAuthKeyStore && surveyRecord.tbaEventKey}
+  {#if $tbaAuthKeyStore && surveyRecord.tbaEventKey}
     <Button on:click={getTeamsFromTBAEvent}>
       <Container maxWidth>
         <Icon name="cloud-arrow-down" />
