@@ -47,16 +47,21 @@ export function download(data: string, name: string, type: string) {
   const url = URL.createObjectURL(blob);
 
   const anchor = document.createElement("a");
-  anchor.download = name.replaceAll(" ", "_");
+  anchor.download = name;
   anchor.href = url;
   document.body.append(anchor);
   anchor.click();
   anchor.remove();
+  console.log(anchor.toString());
 
   URL.revokeObjectURL(url);
 }
 
-export function share(data: string, name: string, type: string) {
-  const file = new File([data], name.replaceAll(" ", "_"), { type });
+export function shareAsFile(data: string, name: string, type: string) {
+  const file = new File([data], name, { type });
   navigator.share({ files: [file], title: file.name });
+}
+
+export function shareAsText(data: string, name: string) {
+  navigator.share({ text: data, title: name });
 }

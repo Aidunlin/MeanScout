@@ -1,13 +1,12 @@
 <script lang="ts">
-  import { download, share, type Entry, type Survey } from "$lib";
+  import { type Entry, type Survey } from "$lib";
   import Anchor from "$lib/components/Anchor.svelte";
-  import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Header from "$lib/components/Header.svelte";
   import Icon from "$lib/components/Icon.svelte";
   import BulkSetEntryStatusDialog from "$lib/dialogs/BulkSetEntryStatusDialog.svelte";
+  import ExportEntriesDialog from "$lib/dialogs/ExportEntriesDialog.svelte";
   import { flattenFields } from "$lib/field";
-  import { targetStore } from "$lib/settings";
 
   export let idb: IDBDatabase;
   export let surveyRecord: IDBRecord<Survey>;
@@ -38,22 +37,6 @@
   const importantFields = flattenFields(surveyRecord.fields).filter(
     (field) => field.type == "team" || field.type == "match",
   );
-
-  function valueAsCSV(value: any) {
-    return value.toString().replaceAll(",", "").replaceAll("\n", ". ").trim();
-  }
-
-  function entriesAsCSV() {
-    return submittedEntries.map((entry) => entry.values.map(valueAsCSV).join(",")).join("\n");
-  }
-
-  function downloadEntries() {
-    download(entriesAsCSV(), `${surveyRecord.name}-entries-${$targetStore}.csv`, "text/csv");
-  }
-
-  function shareEntries() {
-    share(entriesAsCSV(), `${surveyRecord.name}-entries-${$targetStore}.csv`, "text/csv");
-  }
 </script>
 
 <Header backLink="survey/{surveyRecord.id}" title="Entries" iconName="list-ol" />
@@ -61,20 +44,7 @@
 <Container direction="column" padding="large">
   {#if submittedEntries.length}
     <h2>Submitted Entries</h2>
-    <Button title="Download entries" on:click={downloadEntries}>
-      <Container maxWidth>
-        <Icon name="download" />
-        Download entries
-      </Container>
-    </Button>
-    {#if "canShare" in navigator}
-      <Button title="Share entries" on:click={shareEntries}>
-        <Container maxWidth>
-          <Icon name="share-from-square" />
-          Share entries
-        </Container>
-      </Button>
-    {/if}
+    <ExportEntriesDialog {surveyRecord} entries={submittedEntries} />
     <BulkSetEntryStatusDialog
       {idb}
       {surveyRecord}

@@ -165,14 +165,14 @@
         <Icon name="arrow-right" />
       </Container>
     </Anchor>
-  {/if}
-  <Anchor hash="survey/{surveyRecord.id}/options">
-    <Container maxWidth spaceBetween>
-      <Container>
-        <Icon name="gears" />
-        Options
+    <Anchor hash="survey/{surveyRecord.id}/options">
+      <Container maxWidth spaceBetween>
+        <Container>
+          <Icon name="gears" />
+          Options
+        </Container>
+        <Icon name="arrow-right" />
       </Container>
-      <Icon name="arrow-right" />
-    </Container>
-  </Anchor>
+    </Anchor>
+  {/if}
 </Container>
