@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { download, shareAsFile, type Entry, type Survey, shareAsText } from "$lib";
+  import { download, shareAsFile, shareAsText, type Entry, type Survey } from "$lib";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
@@ -16,7 +16,15 @@
   }
 
   function entriesAsCSV() {
-    return entries.map((entry) => entry.values.map(valueAsCSV).join(",")).join("\n");
+    return entries
+      .map((entry) => {
+        const mainValues = [valueAsCSV(entry.team)];
+        if (entry.type == "match") {
+          mainValues.push(valueAsCSV(entry.match), valueAsCSV(entry.absent));
+        }
+        return [...mainValues, ...entry.values.map(valueAsCSV)].join(",");
+      })
+      .join("\n");
   }
 
   function downloadEntries() {
