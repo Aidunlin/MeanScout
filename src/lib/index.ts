@@ -10,26 +10,40 @@ export type Match = {
   blue3: string;
 };
 
-export type Survey = {
+export const surveyTypes = ["match", "pit"] as const;
+export type SurveyType = (typeof surveyTypes)[number];
+
+type BaseSurvey<T extends SurveyType> = {
   name: string;
+  type: T;
   tbaEventKey?: string | undefined;
   fields: Field[];
-  matches: Match[];
   teams: string[];
   created: Date;
   modified: Date;
 };
 
+export type MatchSurvey = BaseSurvey<"match"> & { matches: Match[] };
+export type PitSurvey = BaseSurvey<"pit">;
+
+export type Survey = MatchSurvey | PitSurvey;
+
 export const entryStatuses = ["draft", "submitted", "exported"] as const;
 export type EntryStatus = (typeof entryStatuses)[number];
 
-export type Entry = {
+type BaseEntry<T extends SurveyType> = {
   surveyId: number;
+  type: T;
   status: EntryStatus;
   values: any[];
   created: Date;
   modified: Date;
 };
+
+export type MatchEntry = BaseEntry<"match"> & { team: string; match: number; absent: boolean };
+export type PitEntry = BaseEntry<"pit"> & { team: string };
+
+export type Entry = MatchEntry | PitEntry;
 
 export function persistStorage() {
   if (!navigator.storage) return;

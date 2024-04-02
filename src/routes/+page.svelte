@@ -1,7 +1,8 @@
 <script lang="ts">
-  import { persistStorage } from "$lib";
+  import { persistStorage, type Entry, type MatchSurvey } from "$lib";
   import Container from "$lib/components/Container.svelte";
   import Header from "$lib/components/Header.svelte";
+  import { fieldTypes, flattenFields, type Field } from "$lib/field";
   import "$lib/global.css";
   import AboutPage from "$lib/pages/AboutPage.svelte";
   import EntryPage from "$lib/pages/EntryPage.svelte";
@@ -70,6 +71,15 @@
     }
 
     if (current?.page == "entry") {
+      if (subpage == "matches") {
+        current = {
+          page: "survey",
+          subpage,
+          props: { idb, surveyRecord: current.props.surveyRecord as IDBRecord<MatchSurvey> },
+        };
+        return;
+      }
+
       current = {
         page: "survey",
         subpage,
@@ -85,8 +95,13 @@
       const surveyRecord = surveyRequest.result;
       if (!surveyRecord) return setMainPage();
 
-      if (!Array.isArray(surveyRecord.matches)) {
-        surveyRecord.matches = [];
+      if (subpage == "matches") {
+        current = {
+          page: "survey",
+          subpage,
+          props: { idb, surveyRecord: surveyRecord as IDBRecord<MatchSurvey> },
+        };
+        return;
       }
 
       current = {
@@ -134,10 +149,6 @@
         const surveyRecord = surveyRequest.result;
         if (!surveyRecord) return setMainPage();
 
-        if (!Array.isArray(surveyRecord.matches)) {
-          surveyRecord.matches = [];
-        }
-
         current = {
           page: "entry",
           props: { idb, surveyRecord, entryRecord },
@@ -179,62 +190,121 @@
     }
   }
 
-  function migrateSurveys(transaction: IDBTransaction) {
-    const surveyStore = transaction.objectStore("surveys");
+  function migrateEntries(entryStore: IDBStore<Entry>, surveyId: number, flattenedFields: any[]) {
+    const entryCursorRequest = entryStore.index("surveyId").openCursor(surveyId);
+    entryCursorRequest.onerror = () => {};
 
-    const surveyCursor = surveyStore.openCursor();
-    surveyCursor.onerror = () => {};
+    entryCursorRequest.onsuccess = () => {
+      const entryCursor = entryCursorRequest.result;
+      if (!entryCursor) return;
 
-    surveyCursor.onsuccess = () => {
-      const cursor = surveyCursor.result;
-      if (!cursor) return;
+      const entry = entryCursor.value as any;
 
-      const survey = cursor.value as any;
+      if (!entry.type) {
+        entry.type = "match";
+      }
 
-      if (Array.isArray(survey.configs)) {
-        survey.fields = survey.configs;
-        for (const field of survey.fields) {
-          if (Array.isArray(field.configs)) {
-            field.fields = field.configs;
-            delete field.configs;
+      flattenedFields.forEach((field, i) => {
+        if (field.type == "team") {
+          entry.team = entry.values[i];
+          entry.values.splice(i, 1);
+        }
+
+        if (entry.type == "match") {
+          if (field.type == "match") {
+            entry.match = entry.values[i];
+            entry.values.splice(i, 1);
+          }
+
+          if (field.type == "toggle" && field.name == "Absent") {
+            entry.absent = entry.values[i];
+            entry.values.splice(i, 1);
           }
         }
-        delete survey.configs;
+      });
+
+      if (!entry.team) {
+        entry.team = "";
       }
 
-      if (Array.isArray(survey.entries)) {
-        const entryStore = transaction.objectStore("entries");
-        for (const entry of survey.entries) {
-          entry.surveyId = cursor.key;
-          entryStore.add(entry);
+      if (entry.type == "match") {
+        if (!entry.match) {
+          entry.match = 1;
         }
-        delete survey.entries;
+
+        if (!entry.absent) {
+          entry.absent = false;
+        }
       }
 
-      cursor.update(survey);
-      cursor.continue();
+      entryCursor.update(entry);
+      entryCursor.continue();
+    };
+  }
+
+  function migrateFields<T extends Field>(fields: T[]) {
+    return fields
+      .map((field) => {
+        if (field.type == "group") {
+          field.fields = migrateFields(field.fields);
+        }
+        return field;
+      })
+      .filter((field) => fieldTypes.includes(field.type) && !(field.type == "toggle" && field.name == "Absent"));
+  }
+
+  function migrateSurveys(transaction: IDBTransaction) {
+    const surveyStore = transaction.objectStore("surveys");
+    const entryStore = transaction.objectStore("entries");
+
+    const surveyCursorRequest = surveyStore.openCursor();
+    surveyCursorRequest.onerror = () => {};
+
+    surveyCursorRequest.onsuccess = () => {
+      const surveyCursor = surveyCursorRequest.result;
+      if (!surveyCursor) return;
+
+      const survey = surveyCursor.value as any;
+
+      if (!survey.type) {
+        survey.type = "match";
+      }
+
+      if (survey.type == "match" && !Array.isArray(survey.matches)) {
+        survey.matches = [];
+      }
+
+      migrateEntries(entryStore, survey.id, flattenFields(survey.fields));
+
+      survey.fields = migrateFields(survey.fields);
+
+      surveyCursor.update(survey);
+      surveyCursor.continue();
     };
   }
 
   function openIDB() {
-    const request = indexedDB.open("MeanScout", 7);
+    const request = indexedDB.open("MeanScout", 8);
     request.onerror = () => (idbError = `${request.error?.message}`);
 
     request.onupgradeneeded = (e) => {
       const storeNames = request.result.objectStoreNames;
 
-      if (storeNames.contains("drafts")) {
-        request.result.deleteObjectStore("drafts");
-      }
-
       if (!storeNames.contains("entries")) {
         const entryStore = request.result.createObjectStore("entries", { keyPath: "id", autoIncrement: true });
         entryStore.createIndex("surveyId", "surveyId", { unique: false });
+      } else if (request.transaction) {
+        const entryStore = request.transaction.objectStore("entries");
+        if (!entryStore.indexNames.contains("surveyId")) {
+          entryStore.createIndex("surveyId", "surveyId", { unique: false });
+        }
       }
 
       if (!storeNames.contains("surveys")) {
         request.result.createObjectStore("surveys", { keyPath: "id", autoIncrement: true });
-      } else if (e.oldVersion < 6 && request.transaction) {
+      }
+
+      if (e.oldVersion < 8 && request.transaction) {
         migrateSurveys(request.transaction);
       }
     };

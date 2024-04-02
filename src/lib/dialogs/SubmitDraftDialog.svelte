@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { type Entry, type Survey } from "$lib";
+  import { type Entry, type MatchEntry, type Survey } from "$lib";
   import Button from "$lib/components/Button.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import Icon from "$lib/components/Icon.svelte";
@@ -18,17 +18,15 @@
     let validateError = "";
 
     const validTeamValues = [...surveyRecord.teams];
-    const matchFieldIndex = flattenedFields.findIndex((field) => field.type == "match");
-    if (matchFieldIndex != -1) {
-      const matchValue = draftRecord.values[matchFieldIndex];
 
-      if (!/\d{1,3}/.test(matchValue)) {
-        return `Invalid value for ${flattenedFields[matchFieldIndex].name}`;
+    if (surveyRecord.type == "match" && draftRecord.type == "match") {
+      if (!/\d{1,3}/.test(`${draftRecord.match}`)) {
+        return "Invalid value for match";
       }
 
       if (surveyRecord.matches.length) {
-        const match = surveyRecord.matches.find((m) => m.number == matchValue);
-        if (!match) return `Invalid value for ${flattenedFields[matchFieldIndex].name}`;
+        const match = surveyRecord.matches.find((m) => m.number == (draftRecord as MatchEntry).match);
+        if (!match) return "Invalid value for match";
 
         switch ($targetStore) {
           case "red 1":
@@ -49,30 +47,20 @@
           case "blue 3":
             validTeamValues.push(match.blue3);
             break;
-          case "red":
-            validTeamValues.push(match.red1, match.red2, match.red3);
-            break;
-          case "blue":
-            validTeamValues.push(match.blue1, match.blue2, match.blue3);
-            break;
           default:
             validTeamValues.push(match.red1, match.red2, match.red3, match.blue1, match.blue2, match.blue3);
         }
       }
     }
 
-    draftRecord.values.forEach((value, i) => {
-      switch (flattenedFields[i].type) {
-        case "team":
-          if (!/^\d{1,5}[A-Z]?$/.test(value)) {
-            validateError = `Invalid value for ${flattenedFields[i].name}`;
-          }
-          if (validTeamValues.length && !validTeamValues.includes(value)) {
-            validateError = `Invalid value for ${flattenedFields[i].name}`;
-          }
-          break;
-      }
+    const temHasInvalidFormat = !/^\d{1,5}[A-Z]?$/.test(draftRecord.team);
+    const teamIsNotAllowlisted = validTeamValues.length && !validTeamValues.includes(draftRecord.team);
 
+    if (temHasInvalidFormat || teamIsNotAllowlisted) {
+      validateError = "Invalid value for team";
+    }
+
+    draftRecord.values.forEach((value, i) => {
       if (value == undefined || typeof value !== typeof getDefaultFieldValue(flattenedFields[i])) {
         validateError = `Invalid value for ${flattenedFields[i].name}`;
       }

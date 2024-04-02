@@ -16,7 +16,8 @@
       <span style="color:var(--blue)">blue alliance</span>, and <span style="color:var(--orange)">pit scouting</span>
     </li>
     <li>Customizable fields: toggles, numbers, selectors, textfields, ratings, and timers</li>
-    <li>Optional match schedules and team lists</li>
+    <li>Options for scouting matches and pits</li>
+    <li>Supports match schedules and team lists</li>
     <li>Stores data locally, in the browser</li>
     <li>Export/share surveys as JSON and entries as CSV</li>
   </ul>
@@ -85,20 +86,14 @@
       </a>
     </li>
     <li>Enter that API key, and your team number, in MeanScout's <a href="#/settings">settings page</a></li>
-    <li>
-      In your survey's matches page, select one of your team's upcoming or recent events to get match data (or enter a
-      valid TBA event key)
-    </li>
-    <li>
-      If your event doesn't have a match schedule during competition, you can still get the list of teams from that
-      event in the survey teams page
-    </li>
+    <li>In your survey's options page, select one of your team's upcoming (or recent) events (or enter any valid TBA event key)</li>
+    <li>In either your survey's matches page or teams page, get the corresponding data from TBA</li>
   </ol>
   <h2>Exporting</h2>
   <ul>
     <li>Export survey config as JSON from the survey's options page</li>
     <li>Export entries as CSV from the survey's entries page</li>
-    <li>You'll have to manually send these files between devices</li>
+    <li>You'll have to manually send these files or text snippets between devices</li>
     <li>
       Use Quick Share (Android), AirDrop (Apple), USB, email, messaging, smoke signals, whatever will work best for your
       scouting system

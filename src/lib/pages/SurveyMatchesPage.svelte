@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { type Survey } from "$lib";
+  import { type MatchSurvey } from "$lib";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Header from "$lib/components/Header.svelte";
@@ -11,7 +11,7 @@
   import { tbaGetEventMatches } from "$lib/tba";
 
   export let idb: IDBDatabase;
-  export let surveyRecord: IDBRecord<Survey>;
+  export let surveyRecord: IDBRecord<MatchSurvey>;
 
   $: idb.transaction("surveys", "readwrite").objectStore("surveys").put(surveyRecord);
 

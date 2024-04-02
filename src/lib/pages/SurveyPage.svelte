@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { type Entry, type Survey } from "$lib";
+  import { type Entry, type MatchEntry, type Survey } from "$lib";
   import Anchor from "$lib/components/Anchor.svelte";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
@@ -31,17 +31,22 @@
   };
 
   const flattenedFields = flattenFields(surveyRecord.fields);
-  const importantFields = flattenedFields.filter((field) => field.type == "team" || field.type == "match");
 
   function newEntryClicked() {
     let matchValue = 1;
-    const matchFieldIndex = flattenedFields.findIndex((field) => field.type == "match");
-    if (matchFieldIndex != -1 && entryRecords.length) {
-      matchValue = Math.max(...entryRecords.map((entry) => entry.values[matchFieldIndex] ?? 0)) + 1;
+    if (surveyRecord.type == "match") {
+      matchValue =
+        1 +
+        Math.max(
+          ...entryRecords
+            .filter((entry): entry is IDBRecord<MatchEntry> => entry.type == "match")
+            .map((entry) => entry.match),
+          0,
+        );
     }
 
     let teamValue = "";
-    if (surveyRecord.matches.length) {
+    if (surveyRecord.type == "match" && surveyRecord.matches.length) {
       let match = surveyRecord.matches.find((m) => m.number == matchValue);
       if (match) {
         switch ($targetStore) {
@@ -67,24 +72,40 @@
       }
     }
 
-    const draft: Entry = {
-      surveyId: surveyRecord.id,
-      status: "draft",
-      values: flattenedFields.map((field, i) => {
-        switch (field.type) {
-          case "team":
-            return teamValue;
-          case "match":
-            return matchValue;
-          case "select":
-            return field.values[0];
-          default:
-            return getDefaultFieldValue(field);
-        }
-      }),
-      created: new Date(),
-      modified: new Date(),
-    };
+    const defaultValues = flattenedFields.map((field) => {
+      switch (field.type) {
+        case "select":
+          return field.values[0];
+        default:
+          return getDefaultFieldValue(field);
+      }
+    });
+
+    if (surveyRecord.type == "match") {
+      var draft: Entry = {
+        surveyId: surveyRecord.id,
+        type: surveyRecord.type,
+        status: "draft",
+        team: teamValue,
+        match: matchValue,
+        absent: false,
+        values: defaultValues,
+        created: new Date(),
+        modified: new Date(),
+      };
+    } else if (surveyRecord.type == "pit") {
+      var draft: Entry = {
+        surveyId: surveyRecord.id,
+        type: surveyRecord.type,
+        status: "draft",
+        team: teamValue,
+        values: defaultValues,
+        created: new Date(),
+        modified: new Date(),
+      };
+    } else {
+      return;
+    }
 
     const addRequest = idb.transaction("entries", "readwrite").objectStore("entries").add(draft);
     addRequest.onsuccess = () => {
@@ -115,9 +136,10 @@
       <Anchor hash="entry/{draft.id}" title="Edit draft">
         <Container align="center" maxWidth spaceBetween>
           <Container direction="column" gap="small">
-            {#each importantFields as field, i}
-              <span>{field.name}: {draft.values[i]}</span>
-            {/each}
+            <span>Team: {draft.team}</span>
+            {#if draft.type == "match"}
+              <span>Match: {draft.match}</span>
+            {/if}
           </Container>
           <Icon name="arrow-right" />
         </Container>
@@ -147,15 +169,17 @@
         <Icon name="arrow-right" />
       </Container>
     </Anchor>
-    <Anchor hash="survey/{surveyRecord.id}/matches">
-      <Container maxWidth spaceBetween>
-        <Container>
-          <Icon name="table-list" />
-          Matches
+    {#if surveyRecord.type == "match"}
+      <Anchor hash="survey/{surveyRecord.id}/matches">
+        <Container maxWidth spaceBetween>
+          <Container>
+            <Icon name="table-list" />
+            Matches
+          </Container>
+          <Icon name="arrow-right" />
         </Container>
-        <Icon name="arrow-right" />
-      </Container>
-    </Anchor>
+      </Anchor>
+    {/if}
     <Anchor hash="survey/{surveyRecord.id}/teams">
       <Container maxWidth spaceBetween>
         <Container>

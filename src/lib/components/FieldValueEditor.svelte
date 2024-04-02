@@ -63,11 +63,7 @@
   {/if}
 
   <Container gap="none">
-    {#if field.type == "team"}
-      <input class="team" list="teams-list" maxlength="5" bind:value on:change={onChange} required />
-    {:else if field.type == "match"}
-      <input class="match" type="number" pattern="[0-9]*" bind:value on:change={onChange} required />
-    {:else if field.type == "toggle"}
+    {#if field.type == "toggle"}
       <Button on:click={toggle}>
         {#if value}
           <Icon name="square-check" />
@@ -115,18 +111,10 @@
 </Container>
 
 <style>
-  .team {
-    width: 130px;
-  }
-
-  .match,
-  .number {
-    width: 80px;
-  }
-
   .number {
     background: var(--fg-color);
     padding: var(--inner-gap);
     text-align: center;
+    width: 80px;
   }
 </style>

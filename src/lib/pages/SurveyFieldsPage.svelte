@@ -15,6 +15,7 @@
 
   let disabled = false;
   let preview = false;
+  let previewAbsentValue = false;
 
   const entryCountRequest = idb.transaction("entries").objectStore("entries").index("surveyId").count(surveyRecord.id);
   entryCountRequest.onsuccess = () => {
@@ -40,18 +41,41 @@
 <Container direction="column" padding="large">
   {#if preview}
     <Container align="end">
-      {#each surveyRecord.fields as field (field)}
-        {#if field.type == "group"}
-          <h2>{field.name}</h2>
-          <Container align="end" maxWidth>
-            {#each field.fields as innerField (innerField)}
-              <FieldValueEditor field={innerField} value={getDefaultFieldValue(innerField)} />
-            {/each}
-          </Container>
-        {:else}
-          <FieldValueEditor {field} value={getDefaultFieldValue(field)} />
-        {/if}
-      {/each}
+      <Container direction="column" gap="none">
+        Team
+        <input class="team" list="teams-list" maxlength="6" />
+      </Container>
+      {#if surveyRecord.type == "match"}
+        <Container direction="column" gap="none">
+          Match
+          <input class="match" type="number" pattern="[0-9]*" required />
+        </Container>
+        <Container direction="column" gap="none">
+          <Button on:click={() => (previewAbsentValue = !previewAbsentValue)}>
+            {#if previewAbsentValue}
+              <Icon name="square-check" />
+            {:else}
+              <Icon style="regular" name="square" />
+            {/if}
+            Absent
+          </Button>
+        </Container>
+      {/if}
+
+      {#if surveyRecord.type != "match" || !previewAbsentValue}
+        {#each surveyRecord.fields as field (field)}
+          {#if field.type == "group"}
+            <h2>{field.name}</h2>
+            <Container align="end" maxWidth>
+              {#each field.fields as innerField (innerField)}
+                <FieldValueEditor field={innerField} value={getDefaultFieldValue(innerField)} />
+              {/each}
+            </Container>
+          {:else}
+            <FieldValueEditor {field} value={getDefaultFieldValue(field)} />
+          {/if}
+        {/each}
+      {/if}
     </Container>
   {:else}
     {#if disabled}
@@ -77,3 +101,13 @@
     Preview
   </Button>
 </footer>
+
+<style>
+  .team {
+    width: 130px;
+  }
+
+  .match {
+    width: 80px;
+  }
+</style>

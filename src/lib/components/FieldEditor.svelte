@@ -14,8 +14,6 @@
 
   function switchFieldType(to: string) {
     switch (to) {
-      case "team":
-      case "match":
       case "toggle":
       case "number":
       case "text":

@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { type Match, type Survey } from "$lib";
+  import { type Match, type MatchSurvey } from "$lib";
   import Button from "$lib/components/Button.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import Icon from "$lib/components/Icon.svelte";
 
-  export let surveyRecord: IDBRecord<Survey>;
+  export let surveyRecord: IDBRecord<MatchSurvey>;
   export let match: Match;
 
   let dialog: Dialog;

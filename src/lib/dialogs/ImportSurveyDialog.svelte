@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { surveyTypes, type SurveyType } from "$lib";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
@@ -19,6 +20,13 @@
     }
 
     return name;
+  }
+
+  function parseType(type: any): SurveyType {
+    if (!surveyTypes.includes(type)) {
+      return "match";
+    }
+    return type;
   }
 
   async function parseTBAEventKey(tbaEventKey: any) {
@@ -79,9 +87,12 @@
 
     delete survey.id;
     survey.name = parseName(survey.name);
+    survey.type = parseType(survey.type);
     survey.tbaEventKey = await parseTBAEventKey(survey.tbaEventKey);
     survey.fields = Array.isArray(survey.fields) ? survey.fields.filter(isValidField) : [];
-    survey.matches = Array.isArray(survey.matches) ? parseMatches(survey.matches) : [];
+    if (survey.type == "match") {
+      survey.matches = Array.isArray(survey.matches) ? parseMatches(survey.matches) : [];
+    }
     survey.teams = Array.isArray(survey.teams) ? parseTeams(survey.teams) : [];
     survey.created = parseDate(survey.created);
     survey.modified = parseDate(survey.modified);

@@ -1,11 +1,11 @@
 <script lang="ts">
-  import type { Match, Survey } from "$lib";
+  import type { Match, MatchSurvey } from "$lib";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import Icon from "$lib/components/Icon.svelte";
 
-  export let surveyRecord: IDBRecord<Survey>;
+  export let surveyRecord: IDBRecord<MatchSurvey>;
 
   let dialog: Dialog;
   let error = "";

@@ -6,7 +6,6 @@
   import Icon from "$lib/components/Icon.svelte";
   import BulkSetEntryStatusDialog from "$lib/dialogs/BulkSetEntryStatusDialog.svelte";
   import ExportEntriesDialog from "$lib/dialogs/ExportEntriesDialog.svelte";
-  import { flattenFields } from "$lib/field";
 
   export let idb: IDBDatabase;
   export let surveyRecord: IDBRecord<Survey>;
@@ -33,10 +32,6 @@
       cursor.continue();
     }
   };
-
-  const importantFields = flattenFields(surveyRecord.fields).filter(
-    (field) => field.type == "team" || field.type == "match",
-  );
 </script>
 
 <Header backLink="survey/{surveyRecord.id}" title="Entries" iconName="list-ol" />
@@ -59,9 +54,10 @@
       <Anchor hash="entry/{entry.id}" title="Edit entry">
         <Container align="center" maxWidth spaceBetween>
           <Container direction="column" gap="small">
-            {#each importantFields as field, i}
-              <span>{field.name}: {entry.values[i]}</span>
-            {/each}
+            <span>Team: {entry.team}</span>
+            {#if entry.type == "match"}
+              <span>Match: {entry.match}</span>
+            {/if}
           </Container>
           <Icon name="arrow-right" />
         </Container>
@@ -75,9 +71,10 @@
       <Anchor hash="entry/{entry.id}" title="Edit entry">
         <Container align="center" maxWidth spaceBetween>
           <Container direction="column" gap="small">
-            {#each importantFields as field, i}
-              <span>{field.name}: {entry.values[i]}</span>
-            {/each}
+            <span>Team: {entry.team}</span>
+            {#if entry.type == "match"}
+              <span>Match: {entry.match}</span>
+            {/if}
           </Container>
           <Icon name="arrow-right" />
         </Container>
