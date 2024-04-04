@@ -6,6 +6,8 @@
   import Icon from "$lib/components/Icon.svelte";
   import BulkSetEntryStatusDialog from "$lib/dialogs/BulkSetEntryStatusDialog.svelte";
   import ExportEntriesDialog from "$lib/dialogs/ExportEntriesDialog.svelte";
+  import ImportEntriesDialog from "$lib/dialogs/ImportEntriesDialog.svelte";
+  import { modeStore } from "$lib/settings";
 
   export let idb: IDBDatabase;
   export let surveyRecord: IDBRecord<Survey>;
@@ -37,6 +39,9 @@
 <Header backLink="survey/{surveyRecord.id}" title="Entries" iconName="list-ol" />
 
 <Container direction="column" padding="large">
+  {#if $modeStore == "admin"}
+    <ImportEntriesDialog {idb} {surveyRecord} />
+  {/if}
   {#if submittedEntries.length}
     <h2>Submitted Entries</h2>
     <ExportEntriesDialog {surveyRecord} entries={submittedEntries} />
