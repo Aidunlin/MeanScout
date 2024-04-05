@@ -8,6 +8,7 @@
   import EntryPage from "$lib/pages/EntryPage.svelte";
   import MainPage from "$lib/pages/MainPage.svelte";
   import SettingsPage from "$lib/pages/SettingsPage.svelte";
+  import SurveyAnalysisPage from "$lib/pages/SurveyAnalysisPage.svelte";
   import SurveyEntriesPage from "$lib/pages/SurveyEntriesPage.svelte";
   import SurveyFieldsPage from "$lib/pages/SurveyFieldsPage.svelte";
   import SurveyMatchesPage from "$lib/pages/SurveyMatchesPage.svelte";
@@ -25,6 +26,7 @@
     | { page: "about"; props: ComponentProps<AboutPage> }
     | { page: "survey"; subpage: ""; props: ComponentProps<SurveyPage> }
     | { page: "survey"; subpage: "entries"; props: ComponentProps<SurveyEntriesPage> }
+    | { page: "survey"; subpage: "analysis"; props: ComponentProps<SurveyAnalysisPage> }
     | { page: "survey"; subpage: "fields"; props: ComponentProps<SurveyFieldsPage> }
     | { page: "survey"; subpage: "matches"; props: ComponentProps<SurveyMatchesPage> }
     | { page: "survey"; subpage: "teams"; props: ComponentProps<SurveyTeamsPage> }
@@ -64,14 +66,17 @@
     };
   }
 
-  function setSurveyPage(id: number, subpage: "" | "entries" | "fields" | "matches" | "teams" | "options") {
+  function setSurveyPage(
+    id: number,
+    subpage: "" | "entries" | "analysis" | "fields" | "matches" | "teams" | "options",
+  ) {
     if (current?.page == "survey" && current.props.surveyRecord.id == id) {
       current.subpage = subpage;
       return;
     }
 
     if (current?.page == "entry") {
-      if (subpage == "matches") {
+      if (subpage == "analysis" || subpage == "matches") {
         current = {
           page: "survey",
           subpage,
@@ -95,7 +100,7 @@
       const surveyRecord = surveyRequest.result;
       if (!surveyRecord) return setMainPage();
 
-      if (subpage == "matches") {
+      if (subpage == "analysis" || subpage == "matches") {
         current = {
           page: "survey",
           subpage,
@@ -174,6 +179,7 @@
       const subpage =
         hash[2] == "" ||
         hash[2] == "entries" ||
+        hash[2] == "analysis" ||
         hash[2] == "fields" ||
         hash[2] == "matches" ||
         hash[2] == "teams" ||
@@ -346,6 +352,8 @@
     <SurveyPage {...current.props} />
   {:else if current.subpage == "entries"}
     <SurveyEntriesPage {...current.props} />
+  {:else if current.subpage == "analysis"}
+    <SurveyAnalysisPage {...current.props} />
   {:else if current.subpage == "fields"}
     <SurveyFieldsPage {...current.props} />
   {:else if current.subpage == "matches"}

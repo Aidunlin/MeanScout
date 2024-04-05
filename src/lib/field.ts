@@ -40,6 +40,26 @@ export function flattenFields(fields: Field[]) {
   return fields.flatMap((field) => (field.type == "group" ? field.fields : field));
 }
 
+export function getDetailedFieldName(fields: Field[], flattenedFieldIndex: number) {
+  let flattenedFieldCount = 0;
+  for (const field of fields) {
+    if (field.type == "group") {
+      for (const subField of field.fields) {
+        if (flattenedFieldCount == flattenedFieldIndex) {
+          return `${field.name} ${subField.name}`;
+        }
+        flattenedFieldCount++;
+      }
+    } else {
+      if (flattenedFieldCount == flattenedFieldIndex) {
+        return field.name;
+      }
+      flattenedFieldCount++;
+    }
+  }
+  return "";
+}
+
 export function isValidField(field: any) {
   if (typeof field != "object") return false;
   if (typeof field.name != "string" || !field.name.trim()) return false;

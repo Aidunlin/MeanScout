@@ -46,6 +46,10 @@
     width: min(100dvw, 540px);
   }
 
+  dialog:focus-visible {
+    outline: none;
+  }
+
   dialog::backdrop {
     background: rgba(0, 0, 0, 0.5);
   }

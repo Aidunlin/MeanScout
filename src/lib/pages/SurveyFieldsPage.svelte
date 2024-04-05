@@ -13,13 +13,15 @@
 
   $: idb.transaction("surveys", "readwrite").objectStore("surveys").put(surveyRecord);
 
-  let disabled = false;
+  let entriesPresent = false;
+  let disabled = surveyRecord.expressions.length > 0 || surveyRecord.pickLists.length > 0;
   let preview = false;
   let previewAbsentValue = false;
 
   const entryCountRequest = idb.transaction("entries").objectStore("entries").index("surveyId").count(surveyRecord.id);
   entryCountRequest.onsuccess = () => {
-    disabled = entryCountRequest.result > 0;
+    entriesPresent = entryCountRequest.result > 0;
+    if (!disabled) disabled = entriesPresent;
   };
 
   function newField() {
@@ -79,7 +81,15 @@
     </Container>
   {:else}
     {#if disabled}
-      <span>Cannot modify fields with entries present!</span>
+      <span>
+        Cannot modify fields with
+        {#if entriesPresent}
+          entries
+        {:else}
+          pick lists/expressions
+        {/if}
+        present!
+      </span>
     {/if}
     {#each surveyRecord.fields as field, fieldIndex (field)}
       <FieldEditor bind:fields={surveyRecord.fields} bind:field {fieldIndex} {disabled} {onChange} />

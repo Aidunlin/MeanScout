@@ -16,9 +16,11 @@
   let draftRecords: IDBRecord<Entry>[] = [];
   let entryRecords: IDBRecord<Entry>[] = [];
 
-  const cursorTransaction = idb.transaction("entries");
-
-  const entryCursorRequest = cursorTransaction.objectStore("entries").index("surveyId").openCursor(surveyRecord.id);
+  const entryCursorRequest = idb
+    .transaction("entries")
+    .objectStore("entries")
+    .index("surveyId")
+    .openCursor(surveyRecord.id);
   entryCursorRequest.onsuccess = () => {
     const cursor = entryCursorRequest.result;
     if (cursor) {
@@ -159,6 +161,17 @@
       <Icon name="arrow-right" />
     </Container>
   </Anchor>
+  {#if surveyRecord.type == "match"}
+    <Anchor hash="survey/{surveyRecord.id}/analysis">
+      <Container maxWidth spaceBetween>
+        <Container>
+          <Icon name="chart-simple" />
+          Analysis
+        </Container>
+        <Icon name="arrow-right" />
+      </Container>
+    </Anchor>
+  {/if}
   {#if $modeStore == "admin"}
     <Anchor hash="survey/{surveyRecord.id}/fields">
       <Container maxWidth spaceBetween>

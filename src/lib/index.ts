@@ -1,4 +1,5 @@
 import type { Field } from "$lib/field";
+import type { Expression, PickList } from "$lib/analysis";
 
 export type Match = {
   number: number;
@@ -19,6 +20,8 @@ type BaseSurvey<T extends SurveyType> = {
   tbaEventKey?: string | undefined;
   fields: Field[];
   teams: string[];
+  expressions: Expression[];
+  pickLists: PickList[];
   created: Date;
   modified: Date;
 };

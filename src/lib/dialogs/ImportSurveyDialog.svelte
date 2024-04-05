@@ -94,6 +94,8 @@
       survey.matches = Array.isArray(survey.matches) ? parseMatches(survey.matches) : [];
     }
     survey.teams = Array.isArray(survey.teams) ? parseTeams(survey.teams) : [];
+    survey.expressions = Array.isArray(survey.expressions) ? survey.expressions : [];
+    survey.pickLists = Array.isArray(survey.pickLists) ? survey.pickLists : [];
     survey.created = parseDate(survey.created);
     survey.modified = parseDate(survey.modified);
     delete survey.entries;
