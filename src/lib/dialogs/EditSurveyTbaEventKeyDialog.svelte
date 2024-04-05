@@ -29,7 +29,6 @@
     if (response.events) {
       events = response.events;
     } else if (response.error) {
-      console.log(response.error);
       error = response.error;
     }
   }
@@ -52,7 +51,6 @@
       dialog.close();
     } else {
       error = "could not find event";
-      console.log(error);
     }
   }
 </script>

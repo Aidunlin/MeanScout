@@ -48,6 +48,20 @@ export type PitEntry = BaseEntry<"pit"> & { team: string };
 
 export type Entry = MatchEntry | PitEntry;
 
+export function parseValueFromString(value: string) {
+  if (value.toLowerCase() == "true") {
+    return true;
+  } else if (value.toLowerCase() == "false") {
+    return false;
+  } else if (value == "") {
+    return "";
+  } else if (!Number.isNaN(Number(value))) {
+    return Number(value);
+  } else {
+    return value;
+  }
+}
+
 export function persistStorage() {
   if (!navigator.storage) return;
   navigator.storage
@@ -69,7 +83,6 @@ export function download(data: string, name: string, type: string) {
   document.body.append(anchor);
   anchor.click();
   anchor.remove();
-  console.log(anchor.toString());
 
   URL.revokeObjectURL(url);
 }

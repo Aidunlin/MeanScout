@@ -122,7 +122,6 @@ export function runExpression(team: string, expressionName: string, expressions:
   if (!expression) return 0;
 
   const values: any[] = expression.inputs.flatMap((input) => getExpressionInput(team, input, expressions, entries));
-  console.log(team, expressionName, values);
 
   switch (expression.type) {
     case "average":

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Entry, Survey } from "$lib";
+  import { parseValueFromString, type Entry, type Survey } from "$lib";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
@@ -12,20 +12,6 @@
   let files: FileList | undefined = undefined;
   let error = "";
 
-  function csvParseValue(value: string) {
-    if (value.toLowerCase() == "true") {
-      return true;
-    } else if (value.toLowerCase() == "false") {
-      return false;
-    } else if (value == "") {
-      return "";
-    } else if (!Number.isNaN(Number(value))) {
-      return Number(value);
-    } else {
-      return value;
-    }
-  }
-
   function addEntry(entryCSV: string[], entryStore: IDBStore<Entry>) {
     if (surveyRecord.type == "match") {
       var entry: Entry = {
@@ -35,7 +21,7 @@
         team: entryCSV[0],
         match: parseInt(entryCSV[1]),
         absent: entryCSV[2].toLowerCase() == "true" ? true : false,
-        values: entryCSV.slice(3).map(csvParseValue),
+        values: entryCSV.slice(3).map(parseValueFromString),
         created: new Date(),
         modified: new Date(),
       };
@@ -45,7 +31,7 @@
         type: surveyRecord.type,
         status: "exported",
         team: entryCSV[0],
-        values: entryCSV.slice(1).map(csvParseValue),
+        values: entryCSV.slice(1).map(parseValueFromString),
         created: new Date(),
         modified: new Date(),
       };
@@ -53,7 +39,6 @@
 
     entryStore.add(entry).onerror = (e) => {
       e.preventDefault();
-      console.log("Could not add entry: ", ...entryCSV);
     };
   }
 

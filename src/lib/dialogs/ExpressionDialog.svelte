@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { mapExpressionTypes, reduceExpressionTypes, type Expression, generateExpressionName } from "$lib/analysis";
+  import { parseValueFromString } from "$lib";
+  import { mapExpressionTypes, reduceExpressionTypes, type Expression } from "$lib/analysis";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
@@ -26,6 +27,19 @@
     if (expressions.find((e, i) => e.name == expression.name && i != expressionIndex)) {
       error = "name must be unique!";
       return;
+    }
+
+    if (expression.type == "divide" && expression.divisor == 0) {
+      error = "divisor can't be 0!";
+      return;
+    }
+
+    if (expression.type == "convert") {
+      expression.converters = expression.converters.map(({ from, to }) => ({
+        from: parseValueFromString(from),
+        to: parseValueFromString(to),
+      }));
+      expression.defaultTo = parseValueFromString(expression.defaultTo);
     }
 
     if (expressionIndex == undefined) {
@@ -121,6 +135,14 @@
               multiplier: 1,
             };
             break;
+          case "divide":
+            expression = {
+              name: expression.name,
+              type: e.currentTarget.value,
+              inputs: expression.inputs,
+              divisor: 1,
+            };
+            break;
         }
       }}
     >
@@ -145,7 +167,7 @@
   {:else if expression.type == "convert"}
     Converters
     {#each expression.converters as converter, converterIndex}
-      <Container padding="large">
+      <Container align="end">
         <Button
           on:click={() => {
             if (expression.type == "convert") {
@@ -155,14 +177,18 @@
         >
           <Icon name="trash" />
         </Button>
-        <Container direction="column" gap="none">
-          From
-          <input bind:value={converter.from} />
-        </Container>
-        <Icon name="arrow-right" />
-        <Container direction="column" gap="none">
-          To
-          <input bind:value={converter.to} />
+        <Container gap="none" align="end">
+          <Container direction="column" gap="none">
+            From
+            <input class="converter" bind:value={converter.from} />
+          </Container>
+          <Container padding="small">
+            <Icon name="arrow-right" />
+          </Container>
+          <Container direction="column" gap="none">
+            To
+            <input class="converter" bind:value={converter.to} />
+          </Container>
         </Container>
       </Container>
     {/each}
@@ -173,16 +199,24 @@
         }
       }}
     >
-      <Icon name="plus" />
+      <Container maxWidth>
+        <Icon name="plus" />
+        New converter
+      </Container>
     </Button>
     <Container direction="column" gap="none">
       Default to
-      <input bind:value={expression.defaultTo} />
+      <input bind:value={expression.defaultTo} placeholder="Leave blank to keep input" />
     </Container>
   {:else if expression.type == "multiply"}
     <Container direction="column" gap="none">
       Multiplier
       <input type="number" bind:value={expression.multiplier} />
+    </Container>
+  {:else if expression.type == "divide"}
+    <Container direction="column" gap="none">
+      Divisor
+      <input type="number" bind:value={expression.divisor} />
     </Container>
   {/if}
 
@@ -216,3 +250,9 @@
     <span>Error: {error}</span>
   {/if}
 </Dialog>
+
+<style>
+  .converter {
+    width: 150px;
+  }
+</style>
