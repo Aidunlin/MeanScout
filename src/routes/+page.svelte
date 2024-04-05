@@ -100,6 +100,14 @@
       const surveyRecord = surveyRequest.result;
       if (!surveyRecord) return setMainPage();
 
+      if (!surveyRecord.expressions) {
+        surveyRecord.expressions = [];
+      }
+
+      if (!surveyRecord.pickLists) {
+        surveyRecord.pickLists = [];
+      }
+
       if (subpage == "analysis" || subpage == "matches") {
         current = {
           page: "survey",
@@ -153,6 +161,14 @@
       surveyRequest.onsuccess = () => {
         const surveyRecord = surveyRequest.result;
         if (!surveyRecord) return setMainPage();
+
+        if (!surveyRecord.expressions) {
+          surveyRecord.expressions = [];
+        }
+
+        if (!surveyRecord.pickLists) {
+          surveyRecord.pickLists = [];
+        }
 
         current = {
           page: "entry",
@@ -283,6 +299,14 @@
       migrateEntries(entryStore, survey.id, flattenFields(survey.fields));
 
       survey.fields = migrateFields(survey.fields);
+
+      if (!survey.expressions) {
+        survey.expressions = [];
+      }
+
+      if (!survey.pickLists) {
+        survey.pickLists = [];
+      }
 
       surveyCursor.update(survey);
       surveyCursor.continue();

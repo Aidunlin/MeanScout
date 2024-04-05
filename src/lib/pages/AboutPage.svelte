@@ -17,6 +17,7 @@
     </li>
     <li>Customizable fields: toggles, numbers, selectors, textfields, ratings, and timers</li>
     <li>Options for scouting matches and pits</li>
+    <li>Data analysis (pick lists and expressions)</li>
     <li>Supports match schedules and team lists</li>
     <li>Stores data locally, in the browser</li>
     <li>Export/share surveys as JSON and entries as CSV</li>
@@ -77,6 +78,13 @@
     <li>Use group fields to organize your fields</li>
     <li>Duplicate fields (and groups!) to quickly set up your survey</li>
   </ul>
+  <h2>Data analysis</h2>
+  <ol>
+    <li>Analysis tools are availabe in your survey's analysis page</li>
+    <li>Create expressions that transform (multiply, convert) and summarize (average, sum) your data</li>
+    <li>Build pick lists using those expressions with given weights</li>
+    <li>View the best teams for each pick list (and even expressions)</li>
+  </ol>
   <h2>Integrating The Blue Alliance</h2>
   <ol>
     <li>
@@ -86,13 +94,16 @@
       </a>
     </li>
     <li>Enter that API key, and your team number, in MeanScout's <a href="#/settings">settings page</a></li>
-    <li>In your survey's options page, select one of your team's upcoming (or recent) events (or enter any valid TBA event key)</li>
+    <li>
+      In your survey's options page, select one of your team's upcoming (or recent) events (or enter any valid TBA event
+      key)
+    </li>
     <li>In either your survey's matches page or teams page, get the corresponding data from TBA</li>
   </ol>
   <h2>Exporting</h2>
   <ul>
-    <li>Export survey config as JSON from the survey's options page</li>
-    <li>Export entries as CSV from the survey's entries page</li>
+    <li>Export survey config as JSON from your survey's options page</li>
+    <li>Export entries as CSV from your survey's entries page</li>
     <li>You'll have to manually send these files or text snippets between devices</li>
     <li>
       Use Quick Share (Android), AirDrop (Apple), USB, email, messaging, smoke signals, whatever will work best for your
