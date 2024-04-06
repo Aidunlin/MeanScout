@@ -48,7 +48,9 @@ export type PitEntry = BaseEntry<"pit"> & { team: string };
 
 export type Entry = MatchEntry | PitEntry;
 
-export function parseValueFromString(value: string) {
+export function parseValueFromString(value: any) {
+  if (typeof value !== "string") return value;
+
   if (value.toLowerCase() == "true") {
     return true;
   } else if (value.toLowerCase() == "false") {
@@ -57,9 +59,9 @@ export function parseValueFromString(value: string) {
     return "";
   } else if (!Number.isNaN(Number(value))) {
     return Number(value);
-  } else {
-    return value;
   }
+
+  return value;
 }
 
 export function persistStorage() {
