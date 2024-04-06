@@ -15,9 +15,9 @@
 
   function onConfirm() {
     if (pickListIndex == undefined) {
-      pickLists = [...pickLists, pickList];
+      pickLists = [...pickLists, structuredClone(pickList)];
     } else {
-      pickLists[pickListIndex] = pickList;
+      pickLists[pickListIndex] = structuredClone(pickList);
     }
     dialog.close();
   }
@@ -30,7 +30,7 @@
     if (pickListIndex == undefined) {
       pickList = { name: "New pick list", weights: [] };
     } else {
-      pickList = pickLists[pickListIndex];
+      pickList = structuredClone(pickLists[pickListIndex]);
     }
     error = "";
   }}

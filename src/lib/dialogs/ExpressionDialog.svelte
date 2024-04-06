@@ -43,7 +43,7 @@
     }
 
     if (expressionIndex == undefined) {
-      expressions = [...expressions, expression];
+      expressions = [...expressions, structuredClone(expression)];
     } else {
       const prevName = expressions[expressionIndex].name;
       if (expression.name != prevName) {
@@ -57,7 +57,7 @@
           return e;
         });
       }
-      expressions[expressionIndex] = expression;
+      expressions[expressionIndex] = structuredClone(expression);
     }
     dialog.close();
   }
@@ -70,7 +70,7 @@
     if (expressionIndex == undefined) {
       expression = { name: "", type: "average", inputs: [] };
     } else {
-      expression = expressions[expressionIndex];
+      expression = structuredClone(expressions[expressionIndex]);
     }
     error = "";
   }}

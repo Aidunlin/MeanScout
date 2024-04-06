@@ -24,9 +24,9 @@
 
   function onConfirm() {
     if (inputIndex == undefined) {
-      inputs = [...inputs, input];
+      inputs = [...inputs, structuredClone(input)];
     } else {
-      inputs[inputIndex] = input;
+      inputs[inputIndex] = structuredClone(input);
     }
     dialog.close();
   }
@@ -39,7 +39,7 @@
     if (inputIndex == undefined) {
       input = { from: "field", fieldIndex: 0 };
     } else {
-      input = inputs[inputIndex];
+      input = structuredClone(inputs[inputIndex]);
     }
     error = "";
   }}
