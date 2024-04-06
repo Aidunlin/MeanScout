@@ -5,10 +5,10 @@
   import FieldValueEditor from "$lib/components/FieldValueEditor.svelte";
   import Header from "$lib/components/Header.svelte";
   import Icon from "$lib/components/Icon.svelte";
-  import DeleteDraftDialog from "$lib/dialogs/DeleteDraftDialog.svelte";
-  import DeleteEntryDialog from "$lib/dialogs/DeleteEntryDialog.svelte";
-  import EditEntryDialog from "$lib/dialogs/EditEntryDialog.svelte";
-  import SubmitDraftDialog from "$lib/dialogs/SubmitDraftDialog.svelte";
+  import DeleteDraftDialog from "$lib/dialogs/entry/DeleteDraftDialog.svelte";
+  import DeleteEntryDialog from "$lib/dialogs/entry/DeleteEntryDialog.svelte";
+  import EditEntryDialog from "$lib/dialogs/entry/EditEntryDialog.svelte";
+  import SubmitDraftDialog from "$lib/dialogs/entry/SubmitDraftDialog.svelte";
   import { flattenFields } from "$lib/field";
   import { targetStore } from "$lib/settings";
 

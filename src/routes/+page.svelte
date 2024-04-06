@@ -8,13 +8,13 @@
   import EntryPage from "$lib/pages/EntryPage.svelte";
   import MainPage from "$lib/pages/MainPage.svelte";
   import SettingsPage from "$lib/pages/SettingsPage.svelte";
-  import SurveyAnalysisPage from "$lib/pages/SurveyAnalysisPage.svelte";
-  import SurveyEntriesPage from "$lib/pages/SurveyEntriesPage.svelte";
-  import SurveyFieldsPage from "$lib/pages/SurveyFieldsPage.svelte";
-  import SurveyMatchesPage from "$lib/pages/SurveyMatchesPage.svelte";
-  import SurveyOptionsPage from "$lib/pages/SurveyOptionsPage.svelte";
-  import SurveyPage from "$lib/pages/SurveyPage.svelte";
-  import SurveyTeamsPage from "$lib/pages/SurveyTeamsPage.svelte";
+  import SurveyAnalysisPage from "$lib/pages/survey/SurveyAnalysisPage.svelte";
+  import SurveyEntriesPage from "$lib/pages/survey/SurveyEntriesPage.svelte";
+  import SurveyFieldsPage from "$lib/pages/survey/SurveyFieldsPage.svelte";
+  import SurveyMatchesPage from "$lib/pages/survey/SurveyMatchesPage.svelte";
+  import SurveyOptionsPage from "$lib/pages/survey/SurveyOptionsPage.svelte";
+  import SurveyPage from "$lib/pages/survey/SurveyPage.svelte";
+  import SurveyTeamsPage from "$lib/pages/survey/SurveyTeamsPage.svelte";
   import type { ComponentProps } from "svelte";
 
   let idbError: string;

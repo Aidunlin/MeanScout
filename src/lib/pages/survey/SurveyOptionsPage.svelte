@@ -2,10 +2,10 @@
   import { type Survey } from "$lib";
   import Container from "$lib/components/Container.svelte";
   import Header from "$lib/components/Header.svelte";
-  import DeleteSurveyDialog from "$lib/dialogs/DeleteSurveyDialog.svelte";
-  import EditSurveyNameDialog from "$lib/dialogs/EditSurveyNameDialog.svelte";
-  import EditSurveyTbaEventKeyDialog from "$lib/dialogs/EditSurveyTbaEventKeyDialog.svelte";
-  import ExportSurveyDialog from "$lib/dialogs/ExportSurveyDialog.svelte";
+  import DeleteSurveyDialog from "$lib/dialogs/survey/DeleteSurveyDialog.svelte";
+  import EditSurveyNameDialog from "$lib/dialogs/survey/EditSurveyNameDialog.svelte";
+  import EditSurveyTbaEventKeyDialog from "$lib/dialogs/survey/EditSurveyTbaEventKeyDialog.svelte";
+  import ExportSurveyDialog from "$lib/dialogs/survey/ExportSurveyDialog.svelte";
   import { tbaAuthKeyStore } from "$lib/settings";
 
   export let idb: IDBDatabase;

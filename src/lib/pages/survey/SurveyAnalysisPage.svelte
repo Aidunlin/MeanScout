@@ -4,11 +4,11 @@
   import Container from "$lib/components/Container.svelte";
   import Header from "$lib/components/Header.svelte";
   import Icon from "$lib/components/Icon.svelte";
-  import CalculateExpressionDialog from "$lib/dialogs/CalculateExpressionDialog.svelte";
-  import CalculatePickListDialog from "$lib/dialogs/CalculatePickListDialog.svelte";
-  import DeletePickListDialog from "$lib/dialogs/DeletePickListDialog.svelte";
-  import ExpressionDialog from "$lib/dialogs/ExpressionDialog.svelte";
-  import PickListDialog from "$lib/dialogs/PickListDialog.svelte";
+  import CalculateExpressionDialog from "$lib/dialogs/analysis/CalculateExpressionDialog.svelte";
+  import CalculatePickListDialog from "$lib/dialogs/analysis/CalculatePickListDialog.svelte";
+  import DeletePickListDialog from "$lib/dialogs/analysis/DeletePickListDialog.svelte";
+  import ExpressionDialog from "$lib/dialogs/analysis/ExpressionDialog.svelte";
+  import PickListDialog from "$lib/dialogs/analysis/PickListDialog.svelte";
   import { modeStore } from "$lib/settings";
 
   export let idb: IDBDatabase;

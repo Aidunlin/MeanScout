@@ -4,9 +4,9 @@
   import Container from "$lib/components/Container.svelte";
   import Header from "$lib/components/Header.svelte";
   import Icon from "$lib/components/Icon.svelte";
-  import BulkSetEntryStatusDialog from "$lib/dialogs/BulkSetEntryStatusDialog.svelte";
-  import ExportEntriesDialog from "$lib/dialogs/ExportEntriesDialog.svelte";
-  import ImportEntriesDialog from "$lib/dialogs/ImportEntriesDialog.svelte";
+  import BulkSetEntryStatusDialog from "$lib/dialogs/entry/BulkSetEntryStatusDialog.svelte";
+  import ExportEntriesDialog from "$lib/dialogs/entry/ExportEntriesDialog.svelte";
+  import ImportEntriesDialog from "$lib/dialogs/entry/ImportEntriesDialog.svelte";
   import { modeStore } from "$lib/settings";
 
   export let idb: IDBDatabase;

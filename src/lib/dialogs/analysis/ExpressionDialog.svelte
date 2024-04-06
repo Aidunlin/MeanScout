@@ -5,8 +5,8 @@
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import Icon from "$lib/components/Icon.svelte";
+  import ExpressionInputDialog from "$lib/dialogs/analysis/ExpressionInputDialog.svelte";
   import { getDetailedFieldName, type Field } from "$lib/field";
-  import ExpressionInputDialog from "./ExpressionInputDialog.svelte";
 
   export let expressions: Expression[];
   export let expressionIndex: number | undefined = undefined;

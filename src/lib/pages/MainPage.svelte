@@ -4,8 +4,8 @@
   import Container from "$lib/components/Container.svelte";
   import Header from "$lib/components/Header.svelte";
   import Icon from "$lib/components/Icon.svelte";
-  import ImportSurveyDialog from "$lib/dialogs/ImportSurveyDialog.svelte";
-  import NewSurveyDialog from "$lib/dialogs/NewSurveyDialog.svelte";
+  import ImportSurveyDialog from "$lib/dialogs/survey/ImportSurveyDialog.svelte";
+  import NewSurveyDialog from "$lib/dialogs/survey/NewSurveyDialog.svelte";
   import { modeStore } from "$lib/settings";
 
   export let idb: IDBDatabase;
