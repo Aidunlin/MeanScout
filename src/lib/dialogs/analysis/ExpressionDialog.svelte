@@ -6,6 +6,7 @@
     type Expression,
     type ExpressionAsExpressionInput,
     type FieldAsExpressionInput,
+    type PickList,
   } from "$lib/analysis";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
@@ -17,6 +18,7 @@
   export let expressionIndex: number | undefined = undefined;
   export let expression: Expression = { name: "", type: "average", inputs: [] };
   export let fields: Field[];
+  export let pickLists: PickList[];
 
   const flattenedFields = flattenFields(fields);
 
@@ -93,6 +95,15 @@
             return i;
           });
           return e;
+        });
+        pickLists = pickLists.map((pickList) => {
+          pickList.weights = pickList.weights.map(weight => {
+            if (weight.expressionName == prevName) {
+              weight.expressionName = expression.name;
+            }
+            return weight;
+          });
+          return pickList;
         });
       }
       expressions[expressionIndex] = structuredClone(expression);

@@ -81,7 +81,11 @@
 <Container direction="column" padding="large">
   <h2>Expressions</h2>
   {#if $modeStore == "admin"}
-    <ExpressionDialog bind:expressions={surveyRecord.expressions} fields={surveyRecord.fields} />
+    <ExpressionDialog
+      bind:expressions={surveyRecord.expressions}
+      fields={surveyRecord.fields}
+      bind:pickLists={surveyRecord.pickLists}
+    />
   {/if}
 
   <Container direction="column" gap="none">
@@ -96,6 +100,7 @@
               {expressionIndex}
               expression={structuredClone(expression)}
               fields={surveyRecord.fields}
+              bind:pickLists={surveyRecord.pickLists}
             />
             {#if !used}
               <Button
