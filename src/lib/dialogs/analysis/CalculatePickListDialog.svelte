@@ -53,8 +53,8 @@
   <span>{pickList.name}</span>
 
   {#if sortedTeamData.length}
-    <div>
-      <table>
+    <div class="dialog-overflow">
+      <table class="team-rank-table">
         <tr>
           <th>Rank</th>
           <th>Team</th>
@@ -75,20 +75,3 @@
     <span>Error: {error}</span>
   {/if}
 </Dialog>
-
-<style>
-  div {
-    max-height: 500px;
-    overflow: auto;
-  }
-
-  table {
-    text-align: right;
-    width: 100%;
-  }
-
-  td,
-  th {
-    padding: var(--outer-gap);
-  }
-</style>

@@ -1,20 +1,58 @@
 <script lang="ts">
   import { parseValueFromString } from "$lib";
-  import { mapExpressionTypes, reduceExpressionTypes, type Expression } from "$lib/analysis";
+  import {
+    mapExpressionTypes,
+    reduceExpressionTypes,
+    type Expression,
+    type ExpressionAsExpressionInput,
+    type FieldAsExpressionInput,
+  } from "$lib/analysis";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import Icon from "$lib/components/Icon.svelte";
-  import ExpressionInputDialog from "$lib/dialogs/analysis/ExpressionInputDialog.svelte";
-  import { getDetailedFieldName, type Field } from "$lib/field";
+  import { flattenFields, getDetailedFieldName, type Field } from "$lib/field";
 
   export let expressions: Expression[];
   export let expressionIndex: number | undefined = undefined;
   export let expression: Expression = { name: "", type: "average", inputs: [] };
   export let fields: Field[];
 
+  const flattenedFields = flattenFields(fields);
+
+  let sortedExpressions: Expression[] = [];
+  let sortedFields: {
+    field: (typeof flattenedFields)[number];
+    index: number;
+  }[] = [];
   let dialog: Dialog;
   let error = "";
+
+  function onOpen() {
+    sortedExpressions = expressions
+      .filter((exp) => exp.name != expression.name)
+      .toSorted((a, b) => {
+        if (expressionIndex === undefined) return 0;
+        const inputExpressionNames = expressions[expressionIndex].inputs
+          .filter((input): input is ExpressionAsExpressionInput => input.from == "expression")
+          .map((input) => input.expressionName);
+        const includesA = inputExpressionNames.includes(a.name);
+        const includesB = inputExpressionNames.includes(b.name);
+        return Number(includesB) - Number(includesA);
+      });
+
+    sortedFields = flattenedFields
+      .map((field, index) => ({ field, index }))
+      .toSorted((a, b) => {
+        if (expressionIndex === undefined) return 0;
+        const inputFieldIndexes = expressions[expressionIndex].inputs
+          .filter((input): input is FieldAsExpressionInput => input.from == "field")
+          .map((input) => input.fieldIndex);
+        const includesA = inputFieldIndexes.includes(a.index);
+        const includesB = inputFieldIndexes.includes(b.index);
+        return Number(includesB) - Number(includesA);
+      });
+  }
 
   function onConfirm() {
     expression.name = expression.name.trim();
@@ -65,6 +103,7 @@
 
 <Dialog
   bind:this={dialog}
+  {onOpen}
   {onConfirm}
   on:close={() => {
     if (expressionIndex == undefined) {
@@ -73,6 +112,8 @@
       expression = structuredClone(expressions[expressionIndex]);
     }
     error = "";
+    sortedExpressions = [];
+    sortedFields = [];
   }}
 >
   <Button slot="opener" let:open on:click={open}>
@@ -220,31 +261,74 @@
     </Container>
   {/if}
 
-  Inputs
-  {#each expression.inputs as input, inputIndex}
-    <Container align="center">
-      <ExpressionInputDialog
-        {expressions}
-        {expressionIndex}
-        bind:inputs={expression.inputs}
-        {inputIndex}
-        input={structuredClone(input)}
-        {fields}
-      />
-      <Container>
-        <Button
-          on:click={() => {
-            expression.inputs = expression.inputs.toSpliced(inputIndex, 1);
-          }}
-        >
-          <Icon name="trash" />
-        </Button>
-      </Container>
-      {input.from == "expression" ? input.expressionName : getDetailedFieldName(fields, input.fieldIndex)}
-    </Container>
-  {/each}
+  <span>Inputs</span>
 
-  <ExpressionInputDialog {expressions} {expressionIndex} bind:inputs={expression.inputs} {fields} />
+  <div class="dialog-overflow">
+    <details open>
+      <summary>Expressions</summary>
+      <Container direction="column" padding="small" gap="small">
+        {#each sortedExpressions as sortedExpression}
+          {@const inputIndex = expression.inputs.findIndex(
+            (input) => input.from == "expression" && input.expressionName == sortedExpression.name,
+          )}
+          {@const isInput = inputIndex != -1}
+
+          <Button
+            on:click={() => {
+              if (isInput) {
+                expression.inputs = expression.inputs.toSpliced(inputIndex, 1);
+              } else {
+                expression.inputs = [
+                  ...expression.inputs,
+                  { from: "expression", expressionName: sortedExpression.name },
+                ];
+              }
+            }}
+          >
+            <Container maxWidth>
+              {#if isInput}
+                <Icon name="square-check" />
+              {:else}
+                <Icon style="regular" name="square" />
+              {/if}
+              {sortedExpression.name}
+            </Container>
+          </Button>
+        {/each}
+      </Container>
+    </details>
+
+    <details open>
+      <summary>Fields</summary>
+      <Container direction="column" padding="small" gap="small">
+        {#each sortedFields as sortedField}
+          {@const inputIndex = expression.inputs.findIndex(
+            (input) => input.from == "field" && input.fieldIndex == sortedField.index,
+          )}
+          {@const isInput = inputIndex != -1}
+
+          <Button
+            on:click={() => {
+              if (isInput) {
+                expression.inputs = expression.inputs.toSpliced(inputIndex, 1);
+              } else {
+                expression.inputs = [...expression.inputs, { from: "field", fieldIndex: sortedField.index }];
+              }
+            }}
+          >
+            <Container maxWidth>
+              {#if isInput}
+                <Icon name="square-check" />
+              {:else}
+                <Icon style="regular" name="square" />
+              {/if}
+              {getDetailedFieldName(fields, sortedField.index)}
+            </Container>
+          </Button>
+        {/each}
+      </Container>
+    </details>
+  </div>
 
   {#if error}
     <span>Error: {error}</span>
@@ -254,5 +338,21 @@
 <style>
   .converter {
     width: 150px;
+  }
+
+  summary {
+    background: var(--fg-color);
+    cursor: default;
+    padding: var(--inner-gap);
+    padding-left: var(--outer-gap);
+  }
+
+  summary:hover,
+  summary:focus {
+    outline: var(--outline);
+  }
+
+  summary::marker {
+    color: var(--theme-color);
   }
 </style>

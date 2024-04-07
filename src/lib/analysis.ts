@@ -1,5 +1,21 @@
 import type { Entry } from "$lib";
-import { getDetailedFieldName, type Field } from "./field";
+import { getDetailedFieldName, type Field } from "$lib/field";
+
+export const expressionInputTypes = ["field", "expression"] as const;
+export type ExpressionInputType = (typeof expressionInputTypes)[number];
+
+type BaseExpressionInput<T extends ExpressionInputType> = {
+  from: T;
+};
+
+export type FieldAsExpressionInput = BaseExpressionInput<"field"> & {
+  fieldIndex: number;
+};
+export type ExpressionAsExpressionInput = BaseExpressionInput<"expression"> & {
+  expressionName: string;
+};
+
+export type ExpressionInput = FieldAsExpressionInput | ExpressionAsExpressionInput;
 
 export const reduceExpressionTypes = ["average", "min", "max", "sum", "count"] as const;
 export type ReduceExpressionType = (typeof reduceExpressionTypes)[number];
@@ -20,32 +36,35 @@ type AverageExpression = BaseExpression<"average">;
 type MinExpression = BaseExpression<"min">;
 type MaxExpression = BaseExpression<"max">;
 type SumExpression = BaseExpression<"sum">;
-type CountExpression = BaseExpression<"count"> & { valueToCount: any };
+type CountExpression = BaseExpression<"count"> & {
+  valueToCount: any;
+};
 
-export type ReduceExpression = AverageExpression | MinExpression | MaxExpression | SumExpression | CountExpression;
-
-type ConvertExpression = BaseExpression<"convert"> & { converters: { from: any; to: any }[]; defaultTo: any };
-type MultiplyExpression = BaseExpression<"multiply"> & { multiplier: number };
-type DivideExpression = BaseExpression<"divide"> & { divisor: number };
+type ConvertExpression = BaseExpression<"convert"> & {
+  converters: {
+    from: any;
+    to: any;
+  }[];
+  defaultTo: any;
+};
+type MultiplyExpression = BaseExpression<"multiply"> & {
+  multiplier: number;
+};
+type DivideExpression = BaseExpression<"divide"> & {
+  divisor: number;
+};
 type AbsExpression = BaseExpression<"abs">;
 
+export type ReduceExpression = AverageExpression | MinExpression | MaxExpression | SumExpression | CountExpression;
 export type MapExpression = ConvertExpression | MultiplyExpression | DivideExpression | AbsExpression;
-
 export type Expression = ReduceExpression | MapExpression;
-
-export const expressionInputTypes = ["field", "expression"] as const;
-export type ExpressionInputType = (typeof expressionInputTypes)[number];
-
-export type ExpressionInput = { from: "field"; fieldIndex: number } | { from: "expression"; expressionName: string };
-
-export type Weight = {
-  expressionName: string;
-  percentage: number;
-};
 
 export type PickList = {
   name: string;
-  weights: Weight[];
+  weights: {
+    expressionName: string;
+    percentage: number;
+  }[];
 };
 
 export function generateExpressionName(expressions: Expression[], fields: Field[], expression: Expression) {
