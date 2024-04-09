@@ -9,9 +9,8 @@
   export let entriesByTeam: Record<string, IDBRecord<Entry>[]>;
   export let expressions: Expression[];
   export let expression: Expression;
-  export let disabled = false;
 
-  let sortedTeamData: { team: string; value: number }[] = [];
+  let sortedTeamData: { team: string; percentage: number; value: number }[] = [];
   let error = "";
 
   function onOpen() {
@@ -19,7 +18,7 @@
     const normalizedTeamData = normalizeTeamData(teamData);
 
     sortedTeamData = Object.keys(normalizedTeamData)
-      .map((team) => ({ team, value: normalizedTeamData[team] }))
+      .map((team) => ({ team, percentage: normalizedTeamData[team], value: teamData[team] }))
       .toSorted((a, b) => b.value - a.value);
   }
 </script>
@@ -31,7 +30,7 @@
     error = "";
   }}
 >
-  <Button slot="opener" let:open on:click={open} {disabled}>
+  <Button slot="opener" let:open on:click={open}>
     <Container gap="small" maxWidth>
       <Icon name="percent" />
       {expression.name}
@@ -46,13 +45,15 @@
         <tr>
           <th>Rank</th>
           <th>Team</th>
+          <th>Value</th>
           <th>Percent</th>
         </tr>
         {#each sortedTeamData as teamValue, i}
           <tr>
             <td>{i + 1}</td>
             <td>{teamValue.team}</td>
-            <td>{teamValue.value.toFixed(2)}%</td>
+            <td>{teamValue.value.toFixed(2)}</td>
+            <td>{teamValue.percentage.toFixed(2)}%</td>
           </tr>
         {/each}
       </table>

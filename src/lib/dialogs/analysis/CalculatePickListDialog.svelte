@@ -10,7 +10,7 @@
   export let expressions: Expression[];
   export let pickList: PickList;
 
-  let sortedTeamData: { team: string; value: number }[] = [];
+  let sortedTeamData: { team: string; percentage: number }[] = [];
   let error = "";
 
   function onOpen() {
@@ -31,8 +31,8 @@
     const normalizedPickListData = normalizeTeamData(pickListData);
 
     sortedTeamData = Object.keys(normalizedPickListData)
-      .map((team) => ({ team, value: normalizedPickListData[team] }))
-      .toSorted((a, b) => b.value - a.value);
+      .map((team) => ({ team, percentage: normalizedPickListData[team] }))
+      .toSorted((a, b) => b.percentage - a.percentage);
   }
 </script>
 
@@ -64,7 +64,7 @@
           <tr>
             <td>{i + 1}</td>
             <td>{teamValue.team}</td>
-            <td>{teamValue.value.toFixed(2)}%</td>
+            <td>{teamValue.percentage.toFixed(2)}%</td>
           </tr>
         {/each}
       </table>

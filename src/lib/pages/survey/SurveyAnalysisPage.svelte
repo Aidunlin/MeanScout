@@ -68,7 +68,7 @@
         <Container direction="column" padding="large">
           <CalculatePickListDialog {entriesByTeam} expressions={surveyRecord.expressions} {pickList} />
           {#if $modeStore == "admin"}
-            <Container spaceBetween>
+            <Container>
               <PickListDialog
                 expressions={surveyRecord.expressions}
                 bind:pickLists={surveyRecord.pickLists}
@@ -96,16 +96,24 @@
       {preselectedExpressionNames}
     />
     <Container>
-      {#if isSelecting}
-        <Button
-          on:click={() => {
+      <Button
+        on:click={() => {
+          if (isSelecting) {
             preselectedExpressionNames = [];
             isSelecting = false;
-          }}
-        >
-          <Icon name="list-check" />
+          } else {
+            isSelecting = true;
+          }
+        }}
+      >
+        <Icon name="list-check" />
+        {#if isSelecting}
           Stop selecting
-        </Button>
+        {:else}
+          Select
+        {/if}
+      </Button>
+      {#if isSelecting}
         <Button
           on:click={() => {
             if (preselectedExpressionNames.length) {
@@ -124,11 +132,6 @@
               Select all
             {/if}
           </Container>
-        </Button>
-      {:else}
-        <Button on:click={() => (isSelecting = true)}>
-          <Icon name="list-check" />
-          Select
         </Button>
       {/if}
     </Container>
@@ -159,23 +162,25 @@
           </Button>
         {:else}
           <CalculateExpressionDialog {entriesByTeam} expressions={surveyRecord.expressions} {expression} />
-          <Container spaceBetween>
-            <ExpressionDialog
-              bind:expressions={surveyRecord.expressions}
-              {expressionIndex}
-              expression={structuredClone(expression)}
-              fields={surveyRecord.fields}
-              bind:pickLists={surveyRecord.pickLists}
-            />
-            {#if !usedExpressionNames.includes(expression.name)}
-              <Button
-                on:click={() => (surveyRecord.expressions = surveyRecord.expressions.toSpliced(expressionIndex, 1))}
-              >
-                <Icon name="trash" />
-                Delete
-              </Button>
-            {/if}
-          </Container>
+          {#if $modeStore == "admin"}
+            <Container>
+              <ExpressionDialog
+                bind:expressions={surveyRecord.expressions}
+                {expressionIndex}
+                expression={structuredClone(expression)}
+                fields={surveyRecord.fields}
+                bind:pickLists={surveyRecord.pickLists}
+              />
+              {#if !usedExpressionNames.includes(expression.name)}
+                <Button
+                  on:click={() => (surveyRecord.expressions = surveyRecord.expressions.toSpliced(expressionIndex, 1))}
+                >
+                  <Icon name="trash" />
+                  Delete
+                </Button>
+              {/if}
+            </Container>
+          {/if}
         {/if}
       </Container>
     {/each}
