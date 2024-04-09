@@ -62,6 +62,9 @@
             <span>Team: {entry.team}</span>
             {#if entry.type == "match"}
               <span>Match: {entry.match}</span>
+              {#if entry.absent}
+                <strong>Absent: {entry.absent}</strong>
+              {/if}
             {/if}
           </Container>
           <Icon name="arrow-right" />
@@ -79,6 +82,9 @@
             <span>Team: {entry.team}</span>
             {#if entry.type == "match"}
               <span>Match: {entry.match}</span>
+              {#if entry.absent}
+                <strong>Absent: {entry.absent}</strong>
+              {/if}
             {/if}
           </Container>
           <Icon name="arrow-right" />

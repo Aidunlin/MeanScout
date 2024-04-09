@@ -1,12 +1,11 @@
 <script lang="ts">
-  import { type Entry, type MatchEntry, type Survey } from "$lib";
+  import { type Entry, type Survey } from "$lib";
   import Anchor from "$lib/components/Anchor.svelte";
-  import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Header from "$lib/components/Header.svelte";
   import Icon from "$lib/components/Icon.svelte";
-  import { flattenFields, getDefaultFieldValue } from "$lib/field";
-  import { modeStore, targetStore } from "$lib/settings";
+  import NewEntryDialog from "$lib/dialogs/entry/NewEntryDialog.svelte";
+  import { modeStore } from "$lib/settings";
 
   export let idb: IDBDatabase;
   export let surveyRecord: IDBRecord<Survey>;
@@ -31,104 +30,12 @@
       cursor.continue();
     }
   };
-
-  const flattenedFields = flattenFields(surveyRecord.fields);
-
-  function newEntryClicked() {
-    let matchValue = 1;
-    if (surveyRecord.type == "match") {
-      matchValue =
-        1 +
-        Math.max(
-          ...entryRecords
-            .filter((entry): entry is IDBRecord<MatchEntry> => entry.type == "match")
-            .map((entry) => entry.match),
-          0,
-        );
-    }
-
-    let teamValue = "";
-    if (surveyRecord.type == "match" && surveyRecord.matches.length) {
-      let match = surveyRecord.matches.find((m) => m.number == matchValue);
-      if (match) {
-        switch ($targetStore) {
-          case "red 1":
-            teamValue = match.red1;
-            break;
-          case "red 2":
-            teamValue = match.red2;
-            break;
-          case "red 3":
-            teamValue = match.red3;
-            break;
-          case "blue 1":
-            teamValue = match.blue1;
-            break;
-          case "blue 2":
-            teamValue = match.blue2;
-            break;
-          case "blue 3":
-            teamValue = match.blue3;
-            break;
-        }
-      }
-    }
-
-    const defaultValues = flattenedFields.map((field) => {
-      switch (field.type) {
-        case "select":
-          return field.values[0];
-        default:
-          return getDefaultFieldValue(field);
-      }
-    });
-
-    if (surveyRecord.type == "match") {
-      var draft: Entry = {
-        surveyId: surveyRecord.id,
-        type: surveyRecord.type,
-        status: "draft",
-        team: teamValue,
-        match: matchValue,
-        absent: false,
-        values: defaultValues,
-        created: new Date(),
-        modified: new Date(),
-      };
-    } else if (surveyRecord.type == "pit") {
-      var draft: Entry = {
-        surveyId: surveyRecord.id,
-        type: surveyRecord.type,
-        status: "draft",
-        team: teamValue,
-        values: defaultValues,
-        created: new Date(),
-        modified: new Date(),
-      };
-    } else {
-      return;
-    }
-
-    const addRequest = idb.transaction("entries", "readwrite").objectStore("entries").add(draft);
-    addRequest.onsuccess = () => {
-      const id = addRequest.result;
-      if (id == undefined) return;
-
-      surveyRecord.modified = new Date();
-      location.hash = `/entry/${id}`;
-    };
-  }
 </script>
 
 <Header backLink="" title={surveyRecord.name} iconName="list-ul" />
 
 <Container direction="column" padding="large">
-  <Button title="New entry" on:click={newEntryClicked}>
-    <Container maxWidth>
-      <Icon name="plus" />
-      New entry
-    </Container>
-  </Button>
+  <NewEntryDialog {idb} bind:surveyRecord {entryRecords} />
 </Container>
 
 {#if draftRecords.length}
