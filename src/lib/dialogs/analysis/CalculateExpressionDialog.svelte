@@ -9,6 +9,7 @@
   export let entriesByTeam: Record<string, IDBRecord<Entry>[]>;
   export let expressions: Expression[];
   export let expression: Expression;
+  export let disabled = false;
 
   let sortedTeamData: { team: string; value: number }[] = [];
   let error = "";
@@ -30,7 +31,7 @@
     error = "";
   }}
 >
-  <Button slot="opener" let:open on:click={open}>
+  <Button slot="opener" let:open on:click={open} {disabled}>
     <Container gap="small" maxWidth>
       <Icon name="percent" />
       {expression.name}

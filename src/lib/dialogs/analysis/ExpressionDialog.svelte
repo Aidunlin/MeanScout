@@ -1,17 +1,11 @@
 <script lang="ts">
   import { parseValueFromString } from "$lib";
-  import {
-    mapExpressionTypes,
-    reduceExpressionTypes,
-    type Expression,
-    type ExpressionAsExpressionInput,
-    type FieldAsExpressionInput,
-    type PickList,
-  } from "$lib/analysis";
+  import { mapExpressionTypes, reduceExpressionTypes, type Expression, type PickList } from "$lib/analysis";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import Icon from "$lib/components/Icon.svelte";
+  import ExpressionConvertersDialog from "$lib/dialogs/analysis/ExpressionConvertersDialog.svelte";
   import { flattenFields, getDetailedFieldName, type Field } from "$lib/field";
 
   export let expressions: Expression[];
@@ -19,41 +13,20 @@
   export let expression: Expression = { name: "", type: "average", inputs: [] };
   export let fields: Field[];
   export let pickLists: PickList[];
+  export let preselectedExpressionNames: string[] | undefined = undefined;
 
   const flattenedFields = flattenFields(fields);
 
-  let sortedExpressions: Expression[] = [];
-  let sortedFields: {
-    field: (typeof flattenedFields)[number];
-    index: number;
-  }[] = [];
   let dialog: Dialog;
   let error = "";
 
   function onOpen() {
-    sortedExpressions = expressions
-      .filter((exp) => exp.name != expression.name)
-      .toSorted((a, b) => {
-        if (expressionIndex === undefined) return 0;
-        const inputExpressionNames = expressions[expressionIndex].inputs
-          .filter((input): input is ExpressionAsExpressionInput => input.from == "expression")
-          .map((input) => input.expressionName);
-        const includesA = inputExpressionNames.includes(a.name);
-        const includesB = inputExpressionNames.includes(b.name);
-        return Number(includesB) - Number(includesA);
-      });
-
-    sortedFields = flattenedFields
-      .map((field, index) => ({ field, index }))
-      .toSorted((a, b) => {
-        if (expressionIndex === undefined) return 0;
-        const inputFieldIndexes = expressions[expressionIndex].inputs
-          .filter((input): input is FieldAsExpressionInput => input.from == "field")
-          .map((input) => input.fieldIndex);
-        const includesA = inputFieldIndexes.includes(a.index);
-        const includesB = inputFieldIndexes.includes(b.index);
-        return Number(includesB) - Number(includesA);
-      });
+    if (preselectedExpressionNames?.length) {
+      expression.inputs = preselectedExpressionNames.map((expressionName) => ({
+        from: "expression",
+        expressionName,
+      }));
+    }
   }
 
   function onConfirm() {
@@ -97,7 +70,7 @@
           return e;
         });
         pickLists = pickLists.map((pickList) => {
-          pickList.weights = pickList.weights.map(weight => {
+          pickList.weights = pickList.weights.map((weight) => {
             if (weight.expressionName == prevName) {
               weight.expressionName = expression.name;
             }
@@ -123,8 +96,6 @@
       expression = structuredClone(expressions[expressionIndex]);
     }
     error = "";
-    sortedExpressions = [];
-    sortedFields = [];
   }}
 >
   <Button slot="opener" let:open on:click={open}>
@@ -132,6 +103,9 @@
       <Container maxWidth>
         <Icon name="plus" />
         New expression
+        {#if preselectedExpressionNames?.length}
+          using selected expressions ({preselectedExpressionNames.length})
+        {/if}
       </Container>
     {:else}
       <Icon name="pen" />
@@ -217,49 +191,11 @@
       <input bind:value={expression.valueToCount} />
     </Container>
   {:else if expression.type == "convert"}
-    Converters
-    {#each expression.converters as converter, converterIndex}
-      <Container align="end">
-        <Button
-          on:click={() => {
-            if (expression.type == "convert") {
-              expression.converters = expression.converters.toSpliced(converterIndex, 1);
-            }
-          }}
-        >
-          <Icon name="trash" />
-        </Button>
-        <Container gap="none" align="end">
-          <Container direction="column" gap="none">
-            From
-            <input class="converter" bind:value={converter.from} />
-          </Container>
-          <Container padding="small">
-            <Icon name="arrow-right" />
-          </Container>
-          <Container direction="column" gap="none">
-            To
-            <input class="converter" bind:value={converter.to} />
-          </Container>
-        </Container>
-      </Container>
-    {/each}
-    <Button
-      on:click={() => {
-        if (expression.type == "convert") {
-          expression.converters = [...expression.converters, { from: "", to: "" }];
-        }
-      }}
-    >
-      <Container maxWidth>
-        <Icon name="plus" />
-        New converter
-      </Container>
-    </Button>
-    <Container direction="column" gap="none">
-      Default to
-      <input bind:value={expression.defaultTo} placeholder="Leave blank to keep input" />
-    </Container>
+    <ExpressionConvertersDialog
+      bind:expression
+      converters={structuredClone(expression.converters)}
+      defaultTo={structuredClone(expression.defaultTo)}
+    />
   {:else if expression.type == "multiply"}
     <Container direction="column" gap="none">
       Multiplier
@@ -278,9 +214,9 @@
     <details open>
       <summary>Expressions</summary>
       <Container direction="column" padding="small" gap="small">
-        {#each sortedExpressions as sortedExpression}
+        {#each expressions as exp}
           {@const inputIndex = expression.inputs.findIndex(
-            (input) => input.from == "expression" && input.expressionName == sortedExpression.name,
+            (input) => input.from == "expression" && input.expressionName == exp.name,
           )}
           {@const isInput = inputIndex != -1}
 
@@ -289,10 +225,7 @@
               if (isInput) {
                 expression.inputs = expression.inputs.toSpliced(inputIndex, 1);
               } else {
-                expression.inputs = [
-                  ...expression.inputs,
-                  { from: "expression", expressionName: sortedExpression.name },
-                ];
+                expression.inputs = [...expression.inputs, { from: "expression", expressionName: exp.name }];
               }
             }}
           >
@@ -302,7 +235,7 @@
               {:else}
                 <Icon style="regular" name="square" />
               {/if}
-              {sortedExpression.name}
+              {exp.name}
             </Container>
           </Button>
         {/each}
@@ -312,9 +245,9 @@
     <details open>
       <summary>Fields</summary>
       <Container direction="column" padding="small" gap="small">
-        {#each sortedFields as sortedField}
+        {#each flattenedFields as _, fieldIndex}
           {@const inputIndex = expression.inputs.findIndex(
-            (input) => input.from == "field" && input.fieldIndex == sortedField.index,
+            (input) => input.from == "field" && input.fieldIndex == fieldIndex,
           )}
           {@const isInput = inputIndex != -1}
 
@@ -323,7 +256,7 @@
               if (isInput) {
                 expression.inputs = expression.inputs.toSpliced(inputIndex, 1);
               } else {
-                expression.inputs = [...expression.inputs, { from: "field", fieldIndex: sortedField.index }];
+                expression.inputs = [...expression.inputs, { from: "field", fieldIndex }];
               }
             }}
           >
@@ -333,7 +266,7 @@
               {:else}
                 <Icon style="regular" name="square" />
               {/if}
-              {getDetailedFieldName(fields, sortedField.index)}
+              {getDetailedFieldName(fields, fieldIndex)}
             </Container>
           </Button>
         {/each}
@@ -347,10 +280,6 @@
 </Dialog>
 
 <style>
-  .converter {
-    width: 150px;
-  }
-
   summary {
     background: var(--fg-color);
     cursor: default;

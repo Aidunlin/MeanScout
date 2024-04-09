@@ -9,23 +9,20 @@
   export let pickLists: PickList[];
   export let pickListIndex: number | undefined = undefined;
   export let pickList: PickList = { name: "New pick list", weights: [] };
+  export let preselectedExpressionNames: string[] | undefined = undefined;
 
   $: totalWeights = pickList.weights.reduce((total, weight) => total + Math.abs(weight.percentage), 0);
 
-  let sortedExpressions: Expression[] = [];
   let dialog: Dialog;
   let error = "";
 
   function onOpen() {
-    sortedExpressions = expressions.toSorted((a, b) => {
-      if (pickListIndex === undefined) return 0;
-      const weightExpressionNames = pickLists[pickListIndex].weights
-        .filter((w) => w.percentage)
-        .map((w) => w.expressionName);
-      const includesA = weightExpressionNames.includes(a.name);
-      const includesB = weightExpressionNames.includes(b.name);
-      return Number(includesB) - Number(includesA);
-    });
+    if (preselectedExpressionNames?.length) {
+      pickList.weights = preselectedExpressionNames.map((expressionName) => ({
+        expressionName,
+        percentage: (1 / (preselectedExpressionNames?.length ?? 1)) * 100,
+      }));
+    }
   }
 
   function onConfirm() {
@@ -50,7 +47,6 @@
       pickList = structuredClone(pickLists[pickListIndex]);
     }
     error = "";
-    sortedExpressions = [];
   }}
 >
   <Button slot="opener" let:open on:click={open}>
@@ -58,6 +54,9 @@
       <Container maxWidth>
         <Icon name="plus" />
         New pick list
+        {#if preselectedExpressionNames?.length}
+          using selected expressions ({preselectedExpressionNames.length})
+        {/if}
       </Container>
     {:else}
       <Icon name="pen" />
@@ -75,8 +74,8 @@
   <span>Expressions</span>
 
   <div class="dialog-overflow">
-    {#each sortedExpressions as sortedExpression}
-      {@const weightIndex = pickList.weights.findIndex((weight) => weight.expressionName == sortedExpression.name)}
+    {#each expressions as expression}
+      {@const weightIndex = pickList.weights.findIndex((weight) => weight.expressionName == expression.name)}
       {@const isWeight = weightIndex != -1}
 
       <Container direction="column" gap="small">
@@ -85,7 +84,7 @@
             if (isWeight) {
               pickList.weights = pickList.weights.toSpliced(weightIndex, 1);
             } else {
-              pickList.weights = [...pickList.weights, { expressionName: sortedExpression.name, percentage: 0 }];
+              pickList.weights = [...pickList.weights, { expressionName: expression.name, percentage: 0 }];
             }
           }}
         >
@@ -95,7 +94,7 @@
             {:else}
               <Icon style="regular" name="square" />
             {/if}
-            {sortedExpression.name}
+            {expression.name}
           </Container>
         </Button>
         {#if isWeight}

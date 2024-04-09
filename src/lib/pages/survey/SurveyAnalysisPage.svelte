@@ -16,7 +16,11 @@
 
   $: idb.transaction("surveys", "readwrite").objectStore("surveys").put(surveyRecord);
 
-  $: usedExpressions = [
+  let preselectedExpressionNames: string[] = [];
+
+  let isSelecting = false;
+
+  $: usedExpressionNames = [
     ...new Set([
       ...surveyRecord.expressions
         .flatMap((e) => e.inputs)
@@ -52,7 +56,11 @@
   <Container direction="column" padding="large">
     <h2>Pick Lists</h2>
     {#if $modeStore == "admin"}
-      <PickListDialog expressions={surveyRecord.expressions} bind:pickLists={surveyRecord.pickLists} />
+      <PickListDialog
+        expressions={surveyRecord.expressions}
+        bind:pickLists={surveyRecord.pickLists}
+        {preselectedExpressionNames}
+      />
     {/if}
 
     <Container direction="column" gap="none">
@@ -85,15 +93,72 @@
       bind:expressions={surveyRecord.expressions}
       fields={surveyRecord.fields}
       bind:pickLists={surveyRecord.pickLists}
+      {preselectedExpressionNames}
     />
+    <Container>
+      {#if isSelecting}
+        <Button
+          on:click={() => {
+            preselectedExpressionNames = [];
+            isSelecting = false;
+          }}
+        >
+          <Icon name="list-check" />
+          Stop selecting
+        </Button>
+        <Button
+          on:click={() => {
+            if (preselectedExpressionNames.length) {
+              preselectedExpressionNames = [];
+            } else {
+              preselectedExpressionNames = surveyRecord.expressions.map((expression) => expression.name);
+            }
+          }}
+        >
+          <Container>
+            {#if preselectedExpressionNames.length}
+              <Icon name="xmark" />
+              Deselect all
+            {:else}
+              <Icon name="check" />
+              Select all
+            {/if}
+          </Container>
+        </Button>
+      {:else}
+        <Button on:click={() => (isSelecting = true)}>
+          <Icon name="list-check" />
+          Select
+        </Button>
+      {/if}
+    </Container>
   {/if}
 
   <Container direction="column" gap="none">
     {#each surveyRecord.expressions as expression, expressionIndex}
-      {@const used = usedExpressions.includes(expression.name)}
       <Container direction="column" padding="large">
-        <CalculateExpressionDialog {entriesByTeam} expressions={surveyRecord.expressions} {expression} />
-        {#if $modeStore == "admin"}
+        {#if isSelecting}
+          {@const isSelected = preselectedExpressionNames.includes(expression.name)}
+          <Button
+            on:click={() => {
+              if (isSelected) {
+                preselectedExpressionNames = preselectedExpressionNames.filter((name) => name != expression.name);
+              } else {
+                preselectedExpressionNames = [...preselectedExpressionNames, expression.name];
+              }
+            }}
+          >
+            <Container maxWidth gap="small">
+              {#if isSelected}
+                <Icon name="square-check" />
+              {:else}
+                <Icon style="regular" name="square" />
+              {/if}
+              {expression.name}
+            </Container>
+          </Button>
+        {:else}
+          <CalculateExpressionDialog {entriesByTeam} expressions={surveyRecord.expressions} {expression} />
           <Container spaceBetween>
             <ExpressionDialog
               bind:expressions={surveyRecord.expressions}
@@ -102,7 +167,7 @@
               fields={surveyRecord.fields}
               bind:pickLists={surveyRecord.pickLists}
             />
-            {#if !used}
+            {#if !usedExpressionNames.includes(expression.name)}
               <Button
                 on:click={() => (surveyRecord.expressions = surveyRecord.expressions.toSpliced(expressionIndex, 1))}
               >

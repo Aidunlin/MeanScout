@@ -40,7 +40,7 @@ type CountExpression = BaseExpression<"count"> & {
   valueToCount: any;
 };
 
-type ConvertExpression = BaseExpression<"convert"> & {
+export type ConvertExpression = BaseExpression<"convert"> & {
   converters: {
     from: any;
     to: any;
