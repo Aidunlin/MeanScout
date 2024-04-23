@@ -7,6 +7,7 @@
   import BulkSetEntryStatusDialog from "$lib/dialogs/entry/BulkSetEntryStatusDialog.svelte";
   import ExportEntriesDialog from "$lib/dialogs/entry/ExportEntriesDialog.svelte";
   import ImportEntriesDialog from "$lib/dialogs/entry/ImportEntriesDialog.svelte";
+  import ImportEntryDialog from "$lib/dialogs/entry/ImportEntryDialog.svelte";
   import { modeStore } from "$lib/settings";
 
   export let idb: IDBDatabase;
@@ -41,7 +42,9 @@
 <Container direction="column" padding="large">
   {#if $modeStore == "admin"}
     <ImportEntriesDialog {idb} {surveyRecord} />
+    <ImportEntryDialog {idb} {surveyRecord} bind:exportedEntries />
   {/if}
+
   {#if submittedEntries.length}
     <h2>Submitted Entries</h2>
     <ExportEntriesDialog {surveyRecord} entries={submittedEntries} />

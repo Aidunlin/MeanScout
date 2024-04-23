@@ -6,6 +6,7 @@
   import DeleteDraftDialog from "$lib/dialogs/entry/DeleteDraftDialog.svelte";
   import DeleteEntryDialog from "$lib/dialogs/entry/DeleteEntryDialog.svelte";
   import EditEntryDialog from "$lib/dialogs/entry/EditEntryDialog.svelte";
+  import ExportEntryDialog from "$lib/dialogs/entry/ExportEntryDialog.svelte";
   import SubmitDraftDialog from "$lib/dialogs/entry/SubmitDraftDialog.svelte";
   import { flattenFields } from "$lib/field";
 
@@ -62,6 +63,10 @@
   </footer>
 {:else}
   <Header backLink="survey/{surveyRecord.id}/entries" title="Entry" iconName="list-ol" />
+
+  <Container padding="large">
+    <ExportEntryDialog {surveyRecord} entry={entryRecord} />
+  </Container>
 
   <Container direction="column" padding="large">
     <span>Team: <strong>{entryRecord.team}</strong></span>
