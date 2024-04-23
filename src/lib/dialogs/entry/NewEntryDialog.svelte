@@ -102,7 +102,7 @@
         return;
       }
 
-      if (!surveyRecord.matches.some((m) => m.number == match)) {
+      if (surveyRecord.matches.length && !surveyRecord.matches.some((m) => m.number == match)) {
         error = "match is not listed";
         return;
       }
