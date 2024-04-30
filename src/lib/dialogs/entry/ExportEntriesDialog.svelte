@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { download, shareAsFile, shareAsText, type Entry, type Survey } from "$lib";
+  import { download, entryAsCSV, shareAsFile, shareAsText, type Entry, type Survey } from "$lib";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
@@ -11,24 +11,8 @@
 
   const exportFileName = `${surveyRecord.name}-entries-${$targetStore}.csv`.replaceAll(" ", "_");
 
-  function valueAsCSV(value: any) {
-    return value.toString().replaceAll(",", "").replaceAll("\n", ". ").trim();
-  }
-
   function entriesAsCSV() {
-    return entries
-      .map((entry) => {
-        const mainValues = [valueAsCSV(entry.team)];
-        if (entry.type == "match") {
-          mainValues.push(valueAsCSV(entry.match), valueAsCSV(entry.absent));
-        }
-        return [...mainValues, ...entry.values.map(valueAsCSV)].join(",");
-      })
-      .join("\n");
-  }
-
-  function downloadEntries() {
-    download(entriesAsCSV(), exportFileName, "text/csv");
+    return entries.map(entryAsCSV).join("\n");
   }
 
   function shareEntriesAsFile() {
@@ -37,6 +21,10 @@
 
   function shareEntriesAsText() {
     shareAsText(entriesAsCSV(), exportFileName);
+  }
+
+  function downloadEntries() {
+    download(entriesAsCSV(), exportFileName, "text/csv");
   }
 </script>
 

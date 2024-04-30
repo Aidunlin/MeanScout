@@ -4,59 +4,20 @@
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
   import Icon from "$lib/components/Icon.svelte";
-  import jsQR from "jsqr";
+  import QrCodeReader from "$lib/components/QRCodeReader.svelte";
 
   export let idb: IDBDatabase;
   export let surveyRecord: IDBRecord<Survey>;
   export let exportedEntries: IDBRecord<Entry>[];
 
   let dialog: Dialog;
+  let qrCodeReader: QrCodeReader;
+
+  let qrCodeData: string | undefined = undefined;
   let error = "";
 
-  let readingQrCode = false;
-  let qrCodeData: string | undefined = undefined;
-
-  let videoElement: HTMLVideoElement = document.createElement("video");
-  let canvasElement: HTMLCanvasElement;
-  let canvasContext: CanvasRenderingContext2D;
-
-  let cameraStream: MediaStream;
-
-  function tickVideo() {
-    if (videoElement.readyState == videoElement.HAVE_ENOUGH_DATA) {
-      canvasElement.height = videoElement.videoHeight;
-      canvasElement.width = videoElement.videoWidth;
-
-      canvasContext.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
-      const image = canvasContext.getImageData(0, 0, canvasElement.width, canvasElement.height);
-      const code = jsQR(image.data, image.width, image.height, { inversionAttempts: "dontInvert" });
-
-      if (code) {
-        qrCodeData = code.data;
-        readingQrCode = false;
-      }
-    }
-
-    if (readingQrCode) requestAnimationFrame(tickVideo);
-  }
-
   function onOpen() {
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } }).then((stream) => {
-      cameraStream = stream;
-
-      const context = canvasElement.getContext("2d", { willReadFrequently: true });
-      if (context) {
-        canvasContext = context;
-      }
-
-      videoElement.srcObject = cameraStream;
-      videoElement.playsInline = true;
-      videoElement.play();
-
-      readingQrCode = true;
-
-      requestAnimationFrame(tickVideo);
-    });
+    qrCodeReader.start();
   }
 
   async function onConfirm() {
@@ -126,10 +87,8 @@
   {onConfirm}
   {onOpen}
   on:close={() => {
-    readingQrCode = false;
-    cameraStream.getTracks().forEach((track) => track.stop());
-    videoElement.pause();
-    videoElement = document.createElement("video");
+    qrCodeReader.stop();
+    qrCodeData = "";
     error = "";
   }}
 >
@@ -141,13 +100,12 @@
   </Button>
 
   <span>Import from QR code</span>
-  <canvas
-    bind:this={canvasElement}
-    style:display={readingQrCode ? "block" : "none"}
-    style="max-width:100%;flex-basis:0;"
-  >
-    Displays the camera when trying to read a QR code.
-  </canvas>
+  <QrCodeReader
+    bind:this={qrCodeReader}
+    onRead={(data) => {
+      qrCodeData = data;
+    }}
+  />
   {#if qrCodeData}
     <span>{qrCodeData}</span>
   {/if}

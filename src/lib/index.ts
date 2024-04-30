@@ -1,5 +1,6 @@
-import type { Field } from "$lib/field";
 import type { Expression, PickList } from "$lib/analysis";
+import type { Field } from "$lib/field";
+import type { Target } from "$lib/settings";
 
 export type Match = {
   number: number;
@@ -47,6 +48,34 @@ export type MatchEntry = BaseEntry<"match"> & { team: string; match: number; abs
 export type PitEntry = BaseEntry<"pit"> & { team: string };
 
 export type Entry = MatchEntry | PitEntry;
+
+export function valueAsCSV(value: any) {
+  return value.toString().replaceAll(",", "").replaceAll("\n", ". ").trim();
+}
+
+export function entryAsCSV(entry: Entry) {
+  const mainValues = [valueAsCSV(entry.team)];
+  if (entry.type == "match") {
+    mainValues.push(valueAsCSV(entry.match), valueAsCSV(entry.absent));
+  }
+  return [...mainValues, ...entry.values.map(valueAsCSV)].join(",");
+}
+
+export function createEntryFileName(survey: Survey, entry: Entry | Entry[], target?: Target) {
+  if (Array.isArray(entry)) {
+    if (target) {
+      var fileName = `${survey.name}-entries-${target}.csv`;
+    } else {
+      var fileName = `${survey.name}-entries.csv`;
+    }
+  } else if (entry.type == "match") {
+    var fileName = `${survey.name}-entry-${entry.team}-${entry.match}-${entry.absent}.csv`;
+  } else {
+    var fileName = `${survey.name}-entry-${entry.team}.csv`;
+  }
+
+  return fileName.replaceAll(" ", "_");
+}
 
 export function parseValueFromString(value: any) {
   if (typeof value !== "string") return value;
