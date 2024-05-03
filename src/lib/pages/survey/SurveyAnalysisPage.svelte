@@ -1,5 +1,6 @@
 <script lang="ts">
   import { type Entry, type MatchSurvey } from "$lib";
+  import type { ExpressionAsExpressionInput } from "$lib/analysis";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Header from "$lib/components/Header.svelte";
@@ -26,32 +27,31 @@
   let isSelecting = false;
 
   $: usedExpressionNames = [
-    ...new Set([
-      ...surveyRecord.expressions
-        .flatMap((e) => e.inputs)
-        .filter((input): input is { from: "expression"; expressionName: string } => input.from == "expression")
-        .map((input) => input.expressionName),
-      ...surveyRecord.pickLists.flatMap((p) => p.weights).map((w) => w.expressionName),
-    ]),
+    ...surveyRecord.expressions
+      .flatMap((e) => e.inputs)
+      .filter((input): input is ExpressionAsExpressionInput => input.from == "expression")
+      .map((input) => input.expressionName),
+    ...surveyRecord.pickLists.flatMap((p) => p.weights).map((w) => w.expressionName),
   ];
 
   const entriesByTeam: Record<string, IDBRecord<Entry>[]> = {};
-  const entriesCursorRequest = idb
-    .transaction("entries")
-    .objectStore("entries")
-    .index("surveyId")
-    .openCursor(surveyRecord.id);
-  entriesCursorRequest.onsuccess = () => {
-    const cursor = entriesCursorRequest.result;
-    if (!cursor) return;
-    if (cursor.value.status != "draft") {
-      if (cursor.value.team in entriesByTeam) {
-        entriesByTeam[cursor.value.team] = [...entriesByTeam[cursor.value.team], cursor.value];
+
+  const entriesRequest = idb.transaction("entries").objectStore("entries").index("surveyId").getAll(surveyRecord.id);
+  entriesRequest.onsuccess = () => {
+    const entries = entriesRequest.result;
+    if (!entries) return;
+
+    for (const entry of entries) {
+      if (entry.status == "draft") {
+        continue;
+      }
+
+      if (entry.team in entriesByTeam) {
+        entriesByTeam[entry.team] = [...entriesByTeam[entry.team], entry];
       } else {
-        entriesByTeam[cursor.value.team] = [cursor.value];
+        entriesByTeam[entry.team] = [entry];
       }
     }
-    cursor.continue();
   };
 </script>
 

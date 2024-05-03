@@ -17,23 +17,19 @@
 
   let submittedEntries: IDBRecord<Entry>[] = [];
   let exportedEntries: IDBRecord<Entry>[] = [];
+  let show = false;
 
-  const entryCursorRequest = idb
-    .transaction("entries")
-    .objectStore("entries")
-    .index("surveyId")
-    .openCursor(surveyRecord.id);
-  entryCursorRequest.onsuccess = () => {
-    const cursor = entryCursorRequest.result;
-    if (cursor) {
-      if (cursor.value.status == "submitted") {
-        submittedEntries = [...submittedEntries, cursor.value];
-      }
-      if (cursor.value.status == "exported") {
-        exportedEntries = [...exportedEntries, cursor.value];
-      }
-      cursor.continue();
-    }
+  const entriesRequest = idb.transaction("entries").objectStore("entries").index("surveyId").getAll(surveyRecord.id);
+  entriesRequest.onerror = () => (show = true);
+
+  entriesRequest.onsuccess = () => {
+    const entries = entriesRequest.result;
+    if (!entries) return;
+
+    submittedEntries = entries.filter((entry) => entry.status == "submitted");
+    exportedEntries = entries.filter((entry) => entry.status == "exported");
+
+    show = true;
   };
 </script>
 
@@ -45,8 +41,8 @@
     <ImportEntryDialog {idb} {surveyRecord} bind:exportedEntries />
   {/if}
 
-  {#if submittedEntries.length}
-    <h2>Submitted Entries</h2>
+  <h2>Submitted Entries</h2>
+  {#if show && submittedEntries.length}
     <ExportEntriesDialog {surveyRecord} entries={submittedEntries} />
     <BulkSetEntryStatusDialog
       {idb}
@@ -74,10 +70,24 @@
         </Container>
       </Anchor>
     {/each}
+  {:else if show}
+    <span>No entries.</span>
+  {:else}
+    <span>Loading...</span>
   {/if}
 
-  {#if exportedEntries.length}
-    <h2>Exported Entries</h2>
+  <h2>Exported Entries</h2>
+  {#if show && exportedEntries.length}
+    <BulkSetEntryStatusDialog
+      {idb}
+      {surveyRecord}
+      from="exported"
+      to="submitted"
+      onSet={() => {
+        submittedEntries = [...submittedEntries, ...exportedEntries];
+        exportedEntries = [];
+      }}
+    />
     {#each exportedEntries.toSorted((a, b) => b.modified.getTime() - a.modified.getTime()) as entry (entry.id)}
       <Anchor hash="entry/{entry.id}" title="Edit entry">
         <Container align="center" maxWidth spaceBetween>
@@ -94,15 +104,9 @@
         </Container>
       </Anchor>
     {/each}
-    <BulkSetEntryStatusDialog
-      {idb}
-      {surveyRecord}
-      from="exported"
-      to="submitted"
-      onSet={() => {
-        submittedEntries = [...submittedEntries, ...exportedEntries];
-        exportedEntries = [];
-      }}
-    />
+  {:else if show}
+    <span>No entries.</span>
+  {:else}
+    <span>Loading...</span>
   {/if}
 </Container>

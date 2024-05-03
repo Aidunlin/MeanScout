@@ -12,13 +12,9 @@
 
   let surveyRecords: IDBRecord<Survey>[] = [];
 
-  const cursorRequest = idb.transaction("surveys").objectStore("surveys").openCursor();
-  cursorRequest.onsuccess = () => {
-    const cursor = cursorRequest.result;
-    if (cursor) {
-      surveyRecords = [...surveyRecords, cursor.value];
-      cursor.continue();
-    }
+  const surveysRequest = idb.transaction("surveys").objectStore("surveys").getAll();
+  surveysRequest.onsuccess = () => {
+    surveyRecords = surveysRequest.result ?? [];
   };
 </script>
 

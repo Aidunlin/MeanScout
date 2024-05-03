@@ -12,23 +12,21 @@
 
   $: idb.transaction("surveys", "readwrite").objectStore("surveys").put(surveyRecord);
 
-  let draftRecords: IDBRecord<Entry>[] = [];
   let entryRecords: IDBRecord<Entry>[] = [];
+  let draftEntries: IDBRecord<Entry>[] = [];
+  let show = false;
 
-  const entryCursorRequest = idb
-    .transaction("entries")
-    .objectStore("entries")
-    .index("surveyId")
-    .openCursor(surveyRecord.id);
-  entryCursorRequest.onsuccess = () => {
-    const cursor = entryCursorRequest.result;
-    if (cursor) {
-      entryRecords = [...entryRecords, cursor.value];
-      if (cursor.value.status == "draft") {
-        draftRecords = [...draftRecords, cursor.value];
-      }
-      cursor.continue();
-    }
+  const entriesRequest = idb.transaction("entries").objectStore("entries").index("surveyId").getAll(surveyRecord.id);
+  entriesRequest.onerror = () => (show = true);
+
+  entriesRequest.onsuccess = () => {
+    const entries = entriesRequest.result;
+    if (!entries) return;
+
+    entryRecords = entries;
+    draftEntries = entries.filter((entry) => entry.status == "draft");
+
+    show = true;
   };
 </script>
 
@@ -38,10 +36,10 @@
   <NewEntryDialog {idb} bind:surveyRecord {entryRecords} />
 </Container>
 
-{#if draftRecords.length}
+{#if show && draftEntries.length}
   <Container direction="column" padding="large">
     <h2>Drafts</h2>
-    {#each draftRecords.toSorted((a, b) => b.modified.getTime() - a.modified.getTime()) as draft (draft.id)}
+    {#each draftEntries.toSorted((a, b) => b.modified.getTime() - a.modified.getTime()) as draft (draft.id)}
       <Anchor hash="entry/{draft.id}" title="Edit draft">
         <Container align="center" maxWidth spaceBetween>
           <Container direction="column" gap="small">
