@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { download, entryAsCSV, shareAsFile, shareAsText, type Entry, type Survey } from "$lib";
+  import { createEntryFileName, download, entryAsCSV, shareAsFile, shareAsText, type Entry, type Survey } from "$lib";
   import Button from "$lib/components/Button.svelte";
   import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
@@ -9,8 +9,7 @@
   export let surveyRecord: IDBRecord<Survey>;
   export let entry: IDBRecord<Entry>;
 
-  const entryDetails = entry.type == "match" ? `-${entry.match}-${entry.absent}` : "";
-  const exportFileName = `${surveyRecord.name}-entry-${entry.team}${entryDetails}.csv`.replaceAll(" ", "_");
+  const exportFileName = createEntryFileName(surveyRecord, entry);
 
   let entryData: string;
 

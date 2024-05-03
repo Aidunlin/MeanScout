@@ -7,22 +7,33 @@
 
   export let expressions: Expression[];
   export let pickLists: PickList[];
-  export let pickListIndex: number | undefined = undefined;
-  export let pickList: PickList = { name: "New pick list", weights: [] };
   export let preselectedExpressionNames: string[] | undefined = undefined;
 
   $: totalWeights = pickList.weights.reduce((total, weight) => total + Math.abs(weight.percentage), 0);
 
   let dialog: Dialog;
+  let pickListIndex: number | undefined = undefined;
+  let pickList: PickList = { name: "New pick list", weights: [] };
   let error = "";
 
-  function onOpen() {
+  export function newPickList() {
+    pickListIndex = undefined;
+    pickList = { name: "New pick list", weights: [] };
+    
     if (preselectedExpressionNames?.length) {
       pickList.weights = preselectedExpressionNames.map((expressionName) => ({
         expressionName,
         percentage: (1 / (preselectedExpressionNames?.length ?? 1)) * 100,
       }));
     }
+
+    dialog.open();
+  }
+
+  export function editPickList(index: number) {
+    pickListIndex = index;
+    pickList = structuredClone(pickLists[pickListIndex]);
+    dialog.open();
   }
 
   function onConfirm() {
@@ -34,34 +45,26 @@
     }
     dialog.close();
   }
-</script>
 
-<Dialog
-  bind:this={dialog}
-  {onOpen}
-  {onConfirm}
-  on:close={() => {
+  function onClose() {
     if (pickListIndex == undefined) {
       pickList = { name: "New pick list", weights: [] };
     } else {
       pickList = structuredClone(pickLists[pickListIndex]);
     }
     error = "";
-  }}
->
-  <Button slot="opener" let:open on:click={open}>
-    {#if pickListIndex == undefined}
-      <Container maxWidth>
-        <Icon name="plus" />
-        New pick list
-        {#if preselectedExpressionNames?.length}
-          using selected expressions ({preselectedExpressionNames.length})
-        {/if}
-      </Container>
-    {:else}
-      <Icon name="pen" />
-      Edit
-    {/if}
+  }
+</script>
+
+<Dialog bind:this={dialog} {onConfirm} on:close={onClose}>
+  <Button slot="opener" on:click={newPickList}>
+    <Container maxWidth>
+      <Icon name="plus" />
+      New pick list
+      {#if preselectedExpressionNames?.length}
+        using selected expressions ({preselectedExpressionNames.length})
+      {/if}
+    </Container>
   </Button>
 
   <span>{pickListIndex == undefined ? "New" : "Edit"} pick list</span>

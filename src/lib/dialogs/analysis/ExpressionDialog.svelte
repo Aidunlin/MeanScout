@@ -9,8 +9,6 @@
   import { flattenFields, getDetailedFieldName, type Field } from "$lib/field";
 
   export let expressions: Expression[];
-  export let expressionIndex: number | undefined = undefined;
-  export let expression: Expression = { name: "", type: "average", inputs: [] };
   export let fields: Field[];
   export let pickLists: PickList[];
   export let preselectedExpressionNames: string[] | undefined = undefined;
@@ -18,15 +16,28 @@
   const flattenedFields = flattenFields(fields);
 
   let dialog: Dialog;
+  let expressionIndex: number | undefined = undefined;
+  let expression: Expression = { name: "", type: "average", inputs: [] };
   let error = "";
 
-  function onOpen() {
+  export function newExpression() {
+    expressionIndex = undefined;
+    expression = { name: "", type: "average", inputs: [] };
+
     if (preselectedExpressionNames?.length) {
       expression.inputs = preselectedExpressionNames.map((expressionName) => ({
         from: "expression",
         expressionName,
       }));
     }
+
+    dialog.open();
+  }
+
+  export function editExpression(index: number) {
+    expressionIndex = index;
+    expression = structuredClone(expressions[expressionIndex]);
+    dialog.open();
   }
 
   function onConfirm() {
@@ -83,34 +94,26 @@
     }
     dialog.close();
   }
-</script>
 
-<Dialog
-  bind:this={dialog}
-  {onOpen}
-  {onConfirm}
-  on:close={() => {
+  function onClose() {
     if (expressionIndex == undefined) {
       expression = { name: "", type: "average", inputs: [] };
     } else {
       expression = structuredClone(expressions[expressionIndex]);
     }
     error = "";
-  }}
->
-  <Button slot="opener" let:open on:click={open}>
-    {#if expressionIndex == undefined}
-      <Container maxWidth>
-        <Icon name="plus" />
-        New expression
-        {#if preselectedExpressionNames?.length}
-          using selected expressions ({preselectedExpressionNames.length})
-        {/if}
-      </Container>
-    {:else}
-      <Icon name="pen" />
-      Edit
-    {/if}
+  }
+</script>
+
+<Dialog bind:this={dialog} {onConfirm} on:close={onClose}>
+  <Button slot="opener" on:click={newExpression}>
+    <Container maxWidth>
+      <Icon name="plus" />
+      New expression
+      {#if preselectedExpressionNames?.length}
+        using selected expressions ({preselectedExpressionNames.length})
+      {/if}
+    </Container>
   </Button>
 
   <span>{expressionIndex == undefined ? "New" : "Edit"} expression</span>

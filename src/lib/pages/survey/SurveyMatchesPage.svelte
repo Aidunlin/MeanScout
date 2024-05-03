@@ -5,8 +5,7 @@
   import Header from "$lib/components/Header.svelte";
   import Icon from "$lib/components/Icon.svelte";
   import DeleteMatchDialog from "$lib/dialogs/DeleteMatchDialog.svelte";
-  import EditMatchDialog from "$lib/dialogs/EditMatchDialog.svelte";
-  import NewMatchDialog from "$lib/dialogs/NewMatchDialog.svelte";
+  import MatchDialog from "$lib/dialogs/MatchDialog.svelte";
   import { tbaAuthKeyStore } from "$lib/settings";
   import { tbaGetEventMatches } from "$lib/tba";
 
@@ -14,6 +13,8 @@
   export let surveyRecord: IDBRecord<MatchSurvey>;
 
   $: idb.transaction("surveys", "readwrite").objectStore("surveys").put(surveyRecord);
+
+  let matchDialog: MatchDialog;
 
   async function getMatchesFromTBAEvent() {
     if (!surveyRecord.tbaEventKey) return;
@@ -24,6 +25,9 @@
       surveyRecord.modified = new Date();
     }
   }
+
+  let show = false;
+  setTimeout(() => (show = true), 0);
 </script>
 
 <Header backLink="survey/{surveyRecord.id}" title="Matches" iconName="table-list" />
@@ -38,10 +42,10 @@
     </Button>
   {/if}
 
-  <NewMatchDialog bind:surveyRecord />
+  <MatchDialog bind:this={matchDialog} bind:surveyRecord />
 
   <h2>Matches</h2>
-  {#if surveyRecord.matches.length}
+  {#if show && surveyRecord.matches.length}
     <Container>
       <table>
         <tr>
@@ -52,7 +56,9 @@
           <tr>
             <td>
               <Container padding="small" gap="small">
-                <EditMatchDialog bind:surveyRecord {match} />
+                <Button on:click={() => matchDialog.editMatch(match.number)}>
+                  <Icon name="pen" />
+                </Button>
                 <DeleteMatchDialog bind:surveyRecord {match} />
               </Container>
             </td>
@@ -79,8 +85,10 @@
         {/each}
       </table>
     </Container>
-  {:else}
+  {:else if show}
     <span>No matches.</span>
+  {:else}
+    <span>Loading...</span>
   {/if}
 </Container>
 

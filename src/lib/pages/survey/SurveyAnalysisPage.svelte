@@ -16,8 +16,13 @@
 
   $: idb.transaction("surveys", "readwrite").objectStore("surveys").put(surveyRecord);
 
-  let preselectedExpressionNames: string[] = [];
+  let calculatePickListDialog: CalculatePickListDialog;
+  let pickListDialog: PickListDialog;
 
+  let calculateExpressionDialog: CalculateExpressionDialog;
+  let expressionDialog: ExpressionDialog;
+
+  let preselectedExpressionNames: string[] = [];
   let isSelecting = false;
 
   $: usedExpressionNames = [
@@ -55,26 +60,36 @@
 {#if surveyRecord.expressions.length}
   <Container direction="column" padding="large">
     <h2>Pick Lists</h2>
+    <CalculatePickListDialog
+      bind:this={calculatePickListDialog}
+      pickLists={surveyRecord.pickLists}
+      {entriesByTeam}
+      expressions={surveyRecord.expressions}
+    />
+
     {#if $modeStore == "admin"}
       <PickListDialog
+        bind:this={pickListDialog}
         expressions={surveyRecord.expressions}
         bind:pickLists={surveyRecord.pickLists}
         {preselectedExpressionNames}
       />
     {/if}
-
     <Container direction="column" gap="none">
       {#each surveyRecord.pickLists as pickList, pickListIndex}
         <Container direction="column" padding="large">
-          <CalculatePickListDialog {entriesByTeam} expressions={surveyRecord.expressions} {pickList} />
+          <Button on:click={() => calculatePickListDialog.open(pickListIndex)}>
+            <Container gap="small" maxWidth>
+              <Icon name="list-ol" />
+              {pickList.name}
+            </Container>
+          </Button>
           {#if $modeStore == "admin"}
             <Container>
-              <PickListDialog
-                expressions={surveyRecord.expressions}
-                bind:pickLists={surveyRecord.pickLists}
-                {pickListIndex}
-                pickList={structuredClone(pickList)}
-              />
+              <Button on:click={() => pickListDialog.editPickList(pickListIndex)}>
+                <Icon name="pen" />
+                Edit
+              </Button>
               <DeletePickListDialog bind:surveyRecord {pickListIndex} />
             </Container>
           {/if}
@@ -88,12 +103,18 @@
 
 <Container direction="column" padding="large">
   <h2>Expressions</h2>
+  <CalculateExpressionDialog
+    bind:this={calculateExpressionDialog}
+    {entriesByTeam}
+    expressions={surveyRecord.expressions}
+  />
+
   {#if $modeStore == "admin"}
     <ExpressionDialog
+      bind:this={expressionDialog}
       bind:expressions={surveyRecord.expressions}
       fields={surveyRecord.fields}
       bind:pickLists={surveyRecord.pickLists}
-      {preselectedExpressionNames}
     />
     <Container>
       <Button
@@ -161,16 +182,18 @@
             </Container>
           </Button>
         {:else}
-          <CalculateExpressionDialog {entriesByTeam} expressions={surveyRecord.expressions} {expression} />
+          <Button on:click={() => calculateExpressionDialog.open(expressionIndex)}>
+            <Container gap="small" maxWidth>
+              <Icon name="percent" />
+              {expression.name}
+            </Container>
+          </Button>
           {#if $modeStore == "admin"}
             <Container>
-              <ExpressionDialog
-                bind:expressions={surveyRecord.expressions}
-                {expressionIndex}
-                expression={structuredClone(expression)}
-                fields={surveyRecord.fields}
-                bind:pickLists={surveyRecord.pickLists}
-              />
+              <Button on:click={() => expressionDialog.editExpression(expressionIndex)}>
+                <Icon name="pen" />
+                Edit
+              </Button>
               {#if !usedExpressionNames.includes(expression.name)}
                 <Button
                   on:click={() => (surveyRecord.expressions = surveyRecord.expressions.toSpliced(expressionIndex, 1))}

@@ -1,19 +1,20 @@
 <script lang="ts">
   import type { Entry } from "$lib";
   import { calculateTeamData, normalizeTeamData, type Expression, type PickList } from "$lib/analysis";
-  import Button from "$lib/components/Button.svelte";
-  import Container from "$lib/components/Container.svelte";
   import Dialog from "$lib/components/Dialog.svelte";
-  import Icon from "$lib/components/Icon.svelte";
 
+  export let pickLists: PickList[];
   export let entriesByTeam: Record<string, IDBRecord<Entry>[]>;
   export let expressions: Expression[];
-  export let pickList: PickList;
 
+  let dialog: Dialog;
+  let pickList: PickList = { name: "New pick list", weights: [] };
   let sortedTeamData: { team: string; percentage: number }[] = [];
   let error = "";
 
-  function onOpen() {
+  export function open(index: number) {
+    pickList = pickLists[index];
+
     const pickListData: Record<string, number> = {};
     for (const team in entriesByTeam) {
       pickListData[team] = 0;
@@ -33,23 +34,18 @@
     sortedTeamData = Object.keys(normalizedPickListData)
       .map((team) => ({ team, percentage: normalizedPickListData[team] }))
       .toSorted((a, b) => b.percentage - a.percentage);
+
+    dialog.open();
+  }
+
+  function onClose() {
+    pickList = { name: "New pick list", weights: [] };
+    sortedTeamData = [];
+    error = "";
   }
 </script>
 
-<Dialog
-  {onOpen}
-  on:close={() => {
-    sortedTeamData = [];
-    error = "";
-  }}
->
-  <Button slot="opener" let:open on:click={open}>
-    <Container gap="small" maxWidth>
-      <Icon name="list-ol" />
-      {pickList.name}
-    </Container>
-  </Button>
-
+<Dialog bind:this={dialog} on:close={onClose}>
   <span>{pickList.name}</span>
 
   {#if sortedTeamData.length}
