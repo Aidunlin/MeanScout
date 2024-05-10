@@ -3,13 +3,11 @@
   import type { HTMLButtonAttributes } from "svelte/elements";
 
   let {
-    title = "",
     disabled = false,
     star = false,
     onclick,
     children,
   }: {
-    title?: string;
     disabled?: boolean;
     star?: boolean;
     onclick?: HTMLButtonAttributes["onclick"];
@@ -17,7 +15,7 @@
   } = $props();
 </script>
 
-<button {onclick} class:star {disabled} {title}>
+<button {onclick} class:star {disabled}>
   {@render children()}
 </button>
 

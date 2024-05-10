@@ -1,5 +1,5 @@
-import type { Entry } from "$lib";
-import { getDetailedFieldName, type Field } from "$lib/field";
+import type { Entry } from "./entry";
+import { getDetailedFieldName, type Field } from "./field";
 
 export const expressionInputTypes = ["field", "expression"] as const;
 export type ExpressionInputType = (typeof expressionInputTypes)[number];

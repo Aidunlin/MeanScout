@@ -1,6 +1,6 @@
-import type { Expression, PickList } from "$lib/analysis";
-import type { Field } from "$lib/field";
-import type { Target } from "$lib/settings";
+import type { Entry } from "./entry";
+import type { Target } from "./settings";
+import type { Survey } from "./survey";
 
 export type Match = {
   number: number;
@@ -11,55 +11,6 @@ export type Match = {
   blue2: string;
   blue3: string;
 };
-
-export const surveyTypes = ["match", "pit"] as const;
-export type SurveyType = (typeof surveyTypes)[number];
-
-type BaseSurvey<T extends SurveyType> = {
-  name: string;
-  type: T;
-  tbaEventKey?: string | undefined;
-  fields: Field[];
-  teams: string[];
-  expressions: Expression[];
-  pickLists: PickList[];
-  created: Date;
-  modified: Date;
-};
-
-export type MatchSurvey = BaseSurvey<"match"> & { matches: Match[] };
-export type PitSurvey = BaseSurvey<"pit">;
-
-export type Survey = MatchSurvey | PitSurvey;
-
-export const entryStatuses = ["draft", "submitted", "exported"] as const;
-export type EntryStatus = (typeof entryStatuses)[number];
-
-type BaseEntry<T extends SurveyType> = {
-  surveyId: number;
-  type: T;
-  status: EntryStatus;
-  values: any[];
-  created: Date;
-  modified: Date;
-};
-
-export type MatchEntry = BaseEntry<"match"> & { team: string; match: number; absent: boolean };
-export type PitEntry = BaseEntry<"pit"> & { team: string };
-
-export type Entry = MatchEntry | PitEntry;
-
-export function valueAsCSV(value: any) {
-  return value.toString().replaceAll(",", "").replaceAll("\n", ". ").trim();
-}
-
-export function entryAsCSV(entry: Entry) {
-  const mainValues = [valueAsCSV(entry.team)];
-  if (entry.type == "match") {
-    mainValues.push(valueAsCSV(entry.match), valueAsCSV(entry.absent));
-  }
-  return [...mainValues, ...entry.values.map(valueAsCSV)].join(",");
-}
 
 export function createEntryFileName(survey: Survey, entry: Entry | Entry[], target?: Target) {
   if (Array.isArray(entry)) {
