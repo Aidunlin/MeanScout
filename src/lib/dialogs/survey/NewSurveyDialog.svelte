@@ -5,21 +5,28 @@
   import Dialog from "$lib/components/Dialog.svelte";
   import Icon from "$lib/components/Icon.svelte";
 
-  export let idb: IDBDatabase;
+  let {
+    idb,
+  }: {
+    idb: IDBDatabase;
+  } = $props();
 
-  let name = "";
-  let type: SurveyType;
-  let error = "";
+  let dialog: Dialog;
 
-  function onConfirm() {
+  let name = $state("");
+  let type = $state<SurveyType>("match");
+  let error = $state("");
+
+  function onconfirm() {
     const trimmedName = name.trim();
     if (!trimmedName) {
       error = "Name can't be blank!";
       return;
     }
 
+    let survey: Survey;
     if (type == "match") {
-      var survey: Survey = {
+      survey = {
         name: trimmedName,
         type,
         fields: [],
@@ -31,7 +38,7 @@
         modified: new Date(),
       };
     } else if (type == "pit") {
-      var survey: Survey = {
+      survey = {
         name: trimmedName,
         type,
         fields: [],
@@ -61,22 +68,21 @@
       location.hash = `/survey/${id}`;
     };
   }
-</script>
 
-<Dialog
-  {onConfirm}
-  on:close={() => {
+  function onclose() {
     name = "";
     error = "";
-  }}
->
-  <Button title="New survey" slot="opener" let:open on:click={open}>
-    <Container maxWidth>
-      <Icon name="plus" />
-      New survey
-    </Container>
-  </Button>
+  }
+</script>
 
+<Button onclick={() => dialog.open()}>
+  <Container maxWidth>
+    <Icon name="plus" />
+    New survey
+  </Container>
+</Button>
+
+<Dialog bind:this={dialog} {onconfirm} {onclose}>
   <span>New survey</span>
 
   <Container direction="column" gap="none">

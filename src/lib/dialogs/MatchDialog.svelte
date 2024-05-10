@@ -5,11 +5,17 @@
   import Dialog from "$lib/components/Dialog.svelte";
   import Icon from "$lib/components/Icon.svelte";
 
-  export let surveyRecord: IDBRecord<MatchSurvey>;
+  let {
+    surveyRecord = $bindable(),
+  }: {
+    surveyRecord: IDBRecord<MatchSurvey>;
+  } = $props();
 
   let dialog: Dialog;
-  let matchNumber: number | undefined = undefined;
-  let match: Match = {
+
+  let error = $state("");
+  let matchNumber = $state<number | undefined>(undefined);
+  let match = $state<Match>({
     number: 0,
     red1: "",
     red2: "",
@@ -17,9 +23,7 @@
     blue1: "",
     blue2: "",
     blue3: "",
-  };
-
-  let error = "";
+  });
 
   export function newMatch() {
     matchNumber = undefined;
@@ -44,7 +48,7 @@
 
   export function editMatch(number: number) {
     matchNumber = number;
-    match = structuredClone(surveyRecord.matches.find((m) => m.number == number)) ?? {
+    match = structuredClone($state.snapshot(surveyRecord.matches.find((m) => m.number == number))) ?? {
       number: 0,
       red1: "",
       red2: "",
@@ -56,7 +60,7 @@
     dialog.open();
   }
 
-  function onConfirm() {
+  function onconfirm() {
     surveyRecord.modified = new Date();
 
     const number = parseFloat(`${match.number}`);
@@ -93,15 +97,15 @@
 
     let indexToReplace = surveyRecord.matches.findIndex((m) => m.number == match.number);
     if (indexToReplace == -1) {
-      surveyRecord.matches = [...surveyRecord.matches, structuredClone(match)];
+      surveyRecord.matches = [...surveyRecord.matches, structuredClone($state.snapshot(match))];
     } else {
-      surveyRecord.matches[indexToReplace] = structuredClone(match);
+      surveyRecord.matches[indexToReplace] = structuredClone($state.snapshot(match));
     }
 
     dialog.close();
   }
 
-  function onClose() {
+  function onclose() {
     match = {
       number: 0,
       red1: "",
@@ -115,14 +119,14 @@
   }
 </script>
 
-<Dialog bind:this={dialog} {onConfirm} on:close={onClose}>
-  <Button slot="opener" on:click={newMatch}>
-    <Container maxWidth>
-      <Icon name="plus" />
-      Add match
-    </Container>
-  </Button>
+<Button onclick={newMatch}>
+  <Container maxWidth>
+    <Icon name="plus" />
+    Add match
+  </Container>
+</Button>
 
+<Dialog bind:this={dialog} {onconfirm} {onclose}>
   {#if matchNumber == undefined}
     <span>Add match</span>
     <Container direction="column" gap="none">

@@ -1,6 +1,11 @@
 <script lang="ts">
-  export let style = "solid";
-  export let name: string;
+  let {
+    style = "solid",
+    name,
+  }: {
+    style?: string;
+    name: string;
+  } = $props();
 </script>
 
-<i class="fa-{style} fa-{name} fa-fw" />
+<i class="fa-{style} fa-{name} fa-fw"></i>

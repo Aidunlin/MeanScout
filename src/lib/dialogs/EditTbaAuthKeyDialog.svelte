@@ -7,10 +7,10 @@
   import { tbaAuthKeyIsValid } from "$lib/tba";
 
   let dialog: Dialog;
-  let tbaAuthKey = $tbaAuthKeyStore;
-  let error = "";
+  let tbaAuthKey = $state($tbaAuthKeyStore);
+  let error = $state("");
 
-  async function onConfirm() {
+  async function onconfirm() {
     tbaAuthKey = tbaAuthKey.trim();
 
     if (!tbaAuthKey) {
@@ -26,28 +26,26 @@
       error = `unauthorized!`;
     }
   }
-</script>
 
-<Dialog
-  bind:this={dialog}
-  {onConfirm}
-  on:close={() => {
+  function onclose() {
     tbaAuthKey = $tbaAuthKeyStore;
     error = "";
-  }}
->
-  <Button slot="opener" let:open on:click={open}>
-    <Container maxWidth>
-      {#if $tbaAuthKeyStore}
-        <Icon name="pen" />
-        Edit API auth key
-      {:else}
-        <Icon name="plus" />
-        Add API auth key
-      {/if}
-    </Container>
-  </Button>
+  }
+</script>
 
+<Button onclick={() => dialog.open()}>
+  <Container maxWidth>
+    {#if $tbaAuthKeyStore}
+      <Icon name="pen" />
+      Edit API auth key
+    {:else}
+      <Icon name="plus" />
+      Add API auth key
+    {/if}
+  </Container>
+</Button>
+
+<Dialog bind:this={dialog} {onconfirm} {onclose}>
   <span>
     {#if $tbaAuthKeyStore}
       Edit TBA API auth key
@@ -55,7 +53,7 @@
       Add TBA API auth key
     {/if}
   </span>
-  <input bind:value={tbaAuthKey} title="TBA Key" />
+  <input bind:value={tbaAuthKey} />
   {#if error}
     <span>Error: {error}</span>
   {/if}

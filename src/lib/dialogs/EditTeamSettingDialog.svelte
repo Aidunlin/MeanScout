@@ -6,41 +6,39 @@
   import { teamStore } from "$lib/settings";
 
   let dialog: Dialog;
-  let teamInput = $teamStore;
-  let error = "";
+  let teamInput = $state($teamStore);
+  let error = $state("");
 
-  function onConfirm() {
-    const team = teamInput.trim();
-    if (team && !/^\d{1,5}[A-Z]?$/.test(team)) {
+  function onconfirm() {
+    teamInput = teamInput.trim();
+    if (teamInput && !/^\d{1,5}[A-Z]?$/.test(teamInput)) {
       error = "invalid team!";
       return;
     }
 
-    $teamStore = team;
+    $teamStore = teamInput;
     dialog.close();
+  }
+
+  function onclose() {
+    teamInput = $teamStore;
+    error = "";
   }
 </script>
 
-<Dialog
-  bind:this={dialog}
-  {onConfirm}
-  on:close={() => {
-    teamInput = $teamStore;
-    error = "";
-  }}
->
-  <Button slot="opener" let:open on:click={open}>
-    <Container maxWidth>
-      {#if $teamStore}
-        <Icon name="pen" />
-        Edit team: {$teamStore}
-      {:else}
-        <Icon name="plus" />
-        Add team
-      {/if}
-    </Container>
-  </Button>
+<Button onclick={() => dialog.open()}>
+  <Container maxWidth>
+    {#if $teamStore}
+      <Icon name="pen" />
+      Edit team: {$teamStore}
+    {:else}
+      <Icon name="plus" />
+      Add team
+    {/if}
+  </Container>
+</Button>
 
+<Dialog bind:this={dialog} {onconfirm} {onclose}>
   <span>
     {#if $teamStore}
       Edit team
@@ -48,7 +46,7 @@
       Add team
     {/if}
   </span>
-  <input bind:value={teamInput} title="TBA Key" />
+  <input bind:value={teamInput} />
   {#if error}
     <span>Error: {error}</span>
   {/if}

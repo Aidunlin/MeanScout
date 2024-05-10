@@ -5,16 +5,23 @@
   import Dialog from "$lib/components/Dialog.svelte";
   import Icon from "$lib/components/Icon.svelte";
 
-  export let idb: IDBDatabase;
-  export let surveyRecord: IDBRecord<Survey>;
+  let {
+    idb,
+    surveyRecord,
+  }: {
+    idb: IDBDatabase;
+    surveyRecord: IDBRecord<Survey>;
+  } = $props();
 
   let dialog: Dialog;
-  let files: FileList | undefined = undefined;
-  let error = "";
+
+  let files = $state<FileList | undefined>(undefined);
+  let error = $state("");
 
   function addEntry(entryCSV: string[], entryStore: IDBStore<Entry>) {
+    let entry: Entry;
     if (surveyRecord.type == "match") {
-      var entry: Entry = {
+      entry = {
         surveyId: surveyRecord.id,
         type: surveyRecord.type,
         status: "exported",
@@ -26,7 +33,7 @@
         modified: new Date(),
       };
     } else {
-      var entry: Entry = {
+      entry = {
         surveyId: surveyRecord.id,
         type: surveyRecord.type,
         status: "exported",
@@ -42,7 +49,7 @@
     };
   }
 
-  async function onConfirm() {
+  async function onconfirm() {
     if (!files?.length) {
       error = "No input";
       return;
@@ -79,16 +86,20 @@
       addEntry(entryCSV, entryStore);
     }
   }
+
+  function onclose() {
+    error = "";
+  }
 </script>
 
-<Dialog bind:this={dialog} {onConfirm} on:close={() => (error = "")}>
-  <Button title="Import entries" slot="opener" let:open on:click={open}>
-    <Container maxWidth>
-      <Icon name="paste" />
-      Import entries
-    </Container>
-  </Button>
+<Button onclick={() => dialog.open()}>
+  <Container maxWidth>
+    <Icon name="paste" />
+    Import entries
+  </Container>
+</Button>
 
+<Dialog bind:this={dialog} {onconfirm} {onclose}>
   <span>Import entries</span>
   <input type="file" accept=".csv" bind:files />
   {#if error}

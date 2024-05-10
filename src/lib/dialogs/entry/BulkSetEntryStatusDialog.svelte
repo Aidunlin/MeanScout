@@ -5,16 +5,25 @@
   import Dialog from "$lib/components/Dialog.svelte";
   import Icon from "$lib/components/Icon.svelte";
 
-  export let idb: IDBDatabase;
-  export let surveyRecord: IDBRecord<Survey>;
-  export let from: EntryStatus;
-  export let to: EntryStatus;
-  export let onSet: (() => void) | undefined = undefined;
+  let {
+    idb,
+    surveyRecord,
+    from,
+    to,
+    onset = undefined,
+  }: {
+    idb: IDBDatabase;
+    surveyRecord: IDBRecord<Survey>;
+    from: EntryStatus;
+    to: EntryStatus;
+    onset?: (() => void) | undefined;
+  } = $props();
 
   let dialog: Dialog;
-  let error = "";
 
-  function onConfirm() {
+  let error = $state("");
+
+  function onconfirm() {
     let cursorRequest = idb
       .transaction("entries", "readwrite")
       .objectStore("entries")
@@ -32,7 +41,7 @@
       }
 
       if (cursor === null) {
-        onSet && onSet();
+        onset && onset();
         dialog.close();
         return;
       }
@@ -44,16 +53,20 @@
       cursor.continue();
     };
   }
+
+  function onclose() {
+    error = "";
+  }
 </script>
 
-<Dialog bind:this={dialog} {onConfirm} on:close={() => (error = "")}>
-  <Button title="Set entries as {to}" slot="opener" let:open on:click={open}>
-    <Container maxWidth>
-      <Icon name="file-pen" />
-      Set entries as {to}
-    </Container>
-  </Button>
+<Button onclick={() => dialog.open()}>
+  <Container maxWidth>
+    <Icon name="file-pen" />
+    Set entries as {to}
+  </Container>
+</Button>
 
+<Dialog bind:this={dialog} {onconfirm} {onclose}>
   <span>Set {from} entries as {to}?</span>
   {#if error}
     <span>{error}</span>

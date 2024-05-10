@@ -3,33 +3,43 @@
   import Container from "$lib/components/Container.svelte";
   import FieldValueEditor from "$lib/components/FieldValueEditor.svelte";
   import Header from "$lib/components/Header.svelte";
-  import DeleteDraftDialog from "$lib/dialogs/entry/DeleteDraftDialog.svelte";
   import DeleteEntryDialog from "$lib/dialogs/entry/DeleteEntryDialog.svelte";
   import EditEntryDialog from "$lib/dialogs/entry/EditEntryDialog.svelte";
   import ExportEntryDialog from "$lib/dialogs/entry/ExportEntryDialog.svelte";
-  import SubmitDraftDialog from "$lib/dialogs/entry/SubmitDraftDialog.svelte";
+  import SubmitDraftDialog from "$lib/dialogs/entry/SubmitEntryDialog.svelte";
   import { flattenFields } from "$lib/field";
 
-  export let idb: IDBDatabase;
-  export let surveyRecord: IDBRecord<Survey>;
-  export let entryRecord: IDBRecord<Entry>;
+  let {
+    idb,
+    surveyRecord,
+    entryRecord,
+  }: {
+    idb: IDBDatabase;
+    surveyRecord: IDBRecord<Survey>;
+    entryRecord: IDBRecord<Entry>;
+  } = $props();
 
-  $: idb.transaction("surveys", "readwrite").objectStore("surveys").put(surveyRecord);
-  $: idb.transaction("entries", "readwrite").objectStore("entries").put(entryRecord);
+  $effect(() => {
+    idb.transaction("surveys", "readwrite").objectStore("surveys").put($state.snapshot(surveyRecord));
+  });
+
+  $effect(() => {
+    idb.transaction("entries", "readwrite").objectStore("entries").put($state.snapshot(entryRecord));
+  });
 
   function countPreviousFields(index: number) {
     return flattenFields(surveyRecord.fields.slice(0, index)).length;
   }
 
-  function onChange() {
+  function onchange() {
     entryRecord.modified = new Date();
     surveyRecord.modified = new Date();
   }
 </script>
 
-{#if entryRecord.status == "draft"}
-  <Header backLink="survey/{surveyRecord.id}" title="Draft" iconName="pen-ruler" />
+<Header backLink="survey/{surveyRecord.id}" title="Entry" iconName="list-ol" />
 
+{#if entryRecord.status == "draft"}
   <Container padding="large" align="end">
     <Container direction="column">
       <span>Team: <strong>{entryRecord.team}</strong></span>
@@ -47,23 +57,16 @@
             <FieldValueEditor
               field={innerField}
               bind:value={entryRecord.values[previousFields + innerFieldIndex]}
-              {onChange}
+              {onchange}
             />
           {/each}
         </Container>
       {:else}
-        <FieldValueEditor {field} bind:value={entryRecord.values[previousFields]} {onChange} />
+        <FieldValueEditor {field} bind:value={entryRecord.values[previousFields]} {onchange} />
       {/if}
     {/each}
   </Container>
-
-  <footer>
-    <SubmitDraftDialog {idb} bind:surveyRecord draftRecord={entryRecord} />
-    <DeleteDraftDialog {idb} bind:surveyRecord draftRecord={entryRecord} />
-  </footer>
 {:else}
-  <Header backLink="survey/{surveyRecord.id}/entries" title="Entry" iconName="list-ol" />
-
   <Container padding="large">
     <ExportEntryDialog {surveyRecord} entry={entryRecord} />
   </Container>
@@ -89,9 +92,14 @@
       {/each}
     {/if}
   </Container>
-
-  <footer>
-    <EditEntryDialog {idb} bind:surveyRecord {entryRecord} />
-    <DeleteEntryDialog {idb} bind:surveyRecord {entryRecord} />
-  </footer>
 {/if}
+
+<footer>
+  {#if entryRecord.status == "draft"}
+    <SubmitDraftDialog {idb} bind:surveyRecord {entryRecord} />
+  {:else}
+    <EditEntryDialog {idb} bind:surveyRecord {entryRecord} />
+  {/if}
+
+  <DeleteEntryDialog {idb} bind:surveyRecord {entryRecord} />
+</footer>

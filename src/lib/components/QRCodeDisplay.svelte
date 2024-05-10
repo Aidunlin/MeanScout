@@ -2,7 +2,11 @@
   import QRCode from "qrcode";
   import { onMount } from "svelte";
 
-  export let data: string;
+  let {
+    data,
+  }: {
+    data: string;
+  } = $props();
 
   let canvas: HTMLCanvasElement;
 

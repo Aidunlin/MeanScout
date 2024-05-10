@@ -1,12 +1,24 @@
 <script lang="ts">
-  export let title = "";
-  export let disableTheme = false;
-  export let disabled = false;
-  export let star = false;
+  import type { Snippet } from "svelte";
+  import type { HTMLButtonAttributes } from "svelte/elements";
+
+  let {
+    title = "",
+    disabled = false,
+    star = false,
+    onclick,
+    children,
+  }: {
+    title?: string;
+    disabled?: boolean;
+    star?: boolean;
+    onclick?: HTMLButtonAttributes["onclick"];
+    children: Snippet;
+  } = $props();
 </script>
 
-<button on:click class:star class:disable-theme={disableTheme} {disabled} {title}>
-  <slot />
+<button {onclick} class:star {disabled} {title}>
+  {@render children()}
 </button>
 
 <style>

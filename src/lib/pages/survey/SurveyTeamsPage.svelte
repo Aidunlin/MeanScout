@@ -7,12 +7,19 @@
   import { tbaAuthKeyStore } from "$lib/settings";
   import { tbaGetEventTeams } from "$lib/tba";
 
-  export let idb: IDBDatabase;
-  export let surveyRecord: IDBRecord<Survey>;
+  let {
+    idb,
+    surveyRecord,
+  }: {
+    idb: IDBDatabase;
+    surveyRecord: IDBRecord<Survey>;
+  } = $props();
 
-  $: idb.transaction("surveys", "readwrite").objectStore("surveys").put(surveyRecord);
+  $effect(() => {
+    idb.transaction("surveys", "readwrite").objectStore("surveys").put($state.snapshot(surveyRecord));
+  });
 
-  let teamInput = "";
+  let teamInput = $state("");
 
   async function getTeamsFromTBAEvent() {
     if (!surveyRecord.tbaEventKey) return;
@@ -42,7 +49,7 @@
 
 <Container direction="column" padding="large">
   {#if $tbaAuthKeyStore && surveyRecord.tbaEventKey}
-    <Button on:click={getTeamsFromTBAEvent}>
+    <Button onclick={getTeamsFromTBAEvent}>
       <Container maxWidth>
         <Icon name="cloud-arrow-down" />
         Get teams from TBA event: {surveyRecord.tbaEventKey}
@@ -53,8 +60,8 @@
   <Container direction="column" gap="none">
     Add team
     <Container>
-      <input style="width:200px" bind:value={teamInput} on:keydown={(e) => e.key == "Enter" && addTeam()} />
-      <Button disabled={!teamInput.trim().length || surveyRecord.teams.includes(teamInput.trim())} on:click={addTeam}>
+      <input style="width:200px" bind:value={teamInput} onkeydown={(e) => e.key == "Enter" && addTeam()} />
+      <Button disabled={!teamInput.trim().length || surveyRecord.teams.includes(teamInput.trim())} onclick={addTeam}>
         <Icon name="plus" />
         Add
       </Button>
@@ -65,7 +72,7 @@
   {#if surveyRecord.teams.length}
     <Container>
       {#each surveyRecord.teams.toSorted((a, b) => a.localeCompare(b, "en", { numeric: true })) as team}
-        <Button title="Delete {team}" on:click={() => deleteTeam(team)}>
+        <Button onclick={() => deleteTeam(team)}>
           {team}
         </Button>
       {/each}

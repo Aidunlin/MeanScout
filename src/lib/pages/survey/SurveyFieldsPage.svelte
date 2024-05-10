@@ -8,15 +8,22 @@
   import Icon from "$lib/components/Icon.svelte";
   import { getDefaultFieldValue } from "$lib/field";
 
-  export let idb: IDBDatabase;
-  export let surveyRecord: IDBRecord<Survey>;
+  let {
+    idb,
+    surveyRecord,
+  }: {
+    idb: IDBDatabase;
+    surveyRecord: IDBRecord<Survey>;
+  } = $props();
 
-  $: idb.transaction("surveys", "readwrite").objectStore("surveys").put(surveyRecord);
+  $effect(() => {
+    idb.transaction("surveys", "readwrite").objectStore("surveys").put($state.snapshot(surveyRecord));
+  });
 
-  let entriesPresent = false;
-  let disabled = surveyRecord.expressions.length > 0 || surveyRecord.pickLists.length > 0;
-  let preview = false;
-  let previewAbsentValue = false;
+  let entriesPresent = $state(false);
+  let disabled = $state(surveyRecord.expressions.length > 0 || surveyRecord.pickLists.length > 0);
+  let preview = $state(false);
+  let previewAbsentValue = $state(false);
 
   const entryCountRequest = idb.transaction("entries").objectStore("entries").index("surveyId").count(surveyRecord.id);
   entryCountRequest.onsuccess = () => {
@@ -33,7 +40,7 @@
     preview = !preview;
   }
 
-  function onChange() {
+  function onchange() {
     surveyRecord.modified = new Date();
   }
 </script>
@@ -53,7 +60,7 @@
           <input class="match" type="number" pattern="[0-9]*" required />
         </Container>
         <Container direction="column" gap="none">
-          <Button on:click={() => (previewAbsentValue = !previewAbsentValue)}>
+          <Button onclick={() => (previewAbsentValue = !previewAbsentValue)}>
             {#if previewAbsentValue}
               <Icon name="square-check" />
             {:else}
@@ -92,17 +99,23 @@
       </span>
     {/if}
     {#each surveyRecord.fields as field, fieldIndex (field)}
-      <FieldEditor bind:fields={surveyRecord.fields} bind:field {fieldIndex} {disabled} {onChange} />
+      <FieldEditor
+        bind:fields={surveyRecord.fields}
+        bind:field={surveyRecord.fields[fieldIndex]}
+        {fieldIndex}
+        {disabled}
+        {onchange}
+      />
     {/each}
   {/if}
 </Container>
 
 <footer>
-  <Button title="New field" {disabled} on:click={newField}>
+  <Button {disabled} onclick={newField}>
     <Icon name="plus" />
     Field
   </Button>
-  <Button title="Preview" on:click={togglePreview}>
+  <Button onclick={togglePreview}>
     {#if preview}
       <Icon name="square-check" />
     {:else}

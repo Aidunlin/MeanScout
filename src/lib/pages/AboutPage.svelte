@@ -27,25 +27,25 @@
     <li>
       <a href="https://kit.svelte.dev/" target="_blank">
         <span>SvelteKit</span>
-        <i class="fa-solid fa-up-right-from-square" />
+        <i class="fa-solid fa-up-right-from-square"></i>
       </a>
     </li>
     <li>
       <a href="https://fontawesome.com/" target="_blank">
         <span>FontAwesome</span>
-        <i class="fa-solid fa-up-right-from-square" />
+        <i class="fa-solid fa-up-right-from-square"></i>
       </a>
     </li>
     <li>
       <a href="https://github.com/tonsky/FiraCode" target="_blank">
         <span>Fira Code</span>
-        <i class="fa-solid fa-up-right-from-square" />
+        <i class="fa-solid fa-up-right-from-square"></i>
       </a>
     </li>
     <li>
       <a href="https://www.thebluealliance.com/" target="_blank">
         <span>The Blue Alliance</span>
-        <i class="fa-solid fa-up-right-from-square" />
+        <i class="fa-solid fa-up-right-from-square"></i>
       </a>
     </li>
   </ul>
@@ -90,7 +90,7 @@
     <li>
       <a href="https://www.thebluealliance.com/" target="_blank">
         <span>Create an account and Read API Key</span>
-        <i class="fa-solid fa-up-right-from-square" />
+        <i class="fa-solid fa-up-right-from-square"></i>
       </a>
     </li>
     <li>Enter that API key, and your team number, in MeanScout's <a href="#/settings">settings page</a></li>
@@ -137,7 +137,7 @@
     MeanScout is Free and Open Source Software.
     <a href="https://github.com/TeamMeanMachine/MeanScout" target="_blank">
       <span>Visit MeanScout's GitHub repository</span>
-      <i class="fa-solid fa-up-right-from-square" />
+      <i class="fa-solid fa-up-right-from-square"></i>
     </a>
     to browse the source code, provide feedback, and/or contribute to the project.
   </span>

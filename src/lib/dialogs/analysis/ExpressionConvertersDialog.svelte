@@ -6,40 +6,48 @@
   import Dialog from "$lib/components/Dialog.svelte";
   import Icon from "$lib/components/Icon.svelte";
 
-  export let expression: ConvertExpression;
-  export let converters: {
-    from: any;
-    to: any;
-  }[];
-  export let defaultTo: any;
+  let {
+    expression = $bindable(),
+    converters,
+    defaultTo,
+  }: {
+    expression: ConvertExpression;
+    converters: {
+      from: any;
+      to: any;
+    }[];
+    defaultTo: any;
+  } = $props();
 
   let dialog: Dialog;
 
-  function onConfirm() {
-    expression.converters = structuredClone(converters).map(({ from, to }) => ({
+  function onconfirm() {
+    expression.converters = structuredClone($state.snapshot(converters)).map(({ from, to }) => ({
       from: parseValueFromString(from),
       to: parseValueFromString(to),
     }));
-    expression.defaultTo = parseValueFromString(structuredClone(defaultTo));
+    expression.defaultTo = parseValueFromString(structuredClone($state.snapshot(defaultTo)));
     dialog.close();
+  }
+
+  function onclose() {
+    converters = structuredClone($state.snapshot(expression.converters));
+    defaultTo = structuredClone($state.snapshot(expression.defaultTo));
   }
 </script>
 
-<Dialog bind:this={dialog} {onConfirm} on:close={() => {
-  converters = structuredClone(expression.converters);
-  defaultTo = structuredClone(expression.defaultTo);
-}}>
-  <Button slot="opener" let:open on:click={open}>
-    <Container maxWidth gap="small">
-      <Icon name="pen" />
-      Edit Converters
-    </Container>
-  </Button>
+<Button onclick={() => dialog.open()}>
+  <Container maxWidth gap="small">
+    <Icon name="pen" />
+    Edit Converters
+  </Container>
+</Button>
 
+<Dialog bind:this={dialog} {onconfirm} {onclose}>
   Converters
   {#each converters as converter, converterIndex}
     <Container align="end">
-      <Button on:click={() => (converters = converters.toSpliced(converterIndex, 1))}>
+      <Button onclick={() => (converters = converters.toSpliced(converterIndex, 1))}>
         <Icon name="trash" />
       </Button>
       <Container gap="none" align="end">
@@ -57,7 +65,7 @@
       </Container>
     </Container>
   {/each}
-  <Button on:click={() => (converters = [...converters, { from: "", to: "" }])}>
+  <Button onclick={() => (converters = [...converters, { from: "", to: "" }])}>
     <Container maxWidth>
       <Icon name="plus" />
       New converter

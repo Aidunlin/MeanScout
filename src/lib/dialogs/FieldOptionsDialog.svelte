@@ -5,45 +5,52 @@
   import Icon from "$lib/components/Icon.svelte";
   import type { Field } from "$lib/field";
 
-  export let fields: Field[];
-  export let field: Field;
-  export let fieldIndex: number;
-  export let disabled = false;
-
-  export let onChange: (() => void) | undefined = undefined;
+  let {
+    fields = $bindable(),
+    field = $bindable(),
+    fieldIndex,
+    disabled = false,
+    onchange = undefined,
+  }: {
+    fields: Field[];
+    field: Field;
+    fieldIndex: number;
+    disabled: boolean;
+    onchange?: (() => void) | undefined;
+  } = $props();
 
   let dialog: Dialog;
 
   function duplicateField() {
-    fields = fields.toSpliced(fieldIndex, 0, structuredClone(field));
-    onChange && onChange();
+    fields = fields.toSpliced(fieldIndex, 0, structuredClone($state.snapshot(field)));
+    onchange && onchange();
     dialog.close();
   }
 
   function deleteField() {
     fields = fields.filter((_, i) => i != fieldIndex);
-    onChange && onChange();
+    onchange && onchange();
     dialog.close();
   }
 </script>
 
-<Dialog bind:this={dialog}>
-  <Button title="Options" {disabled} slot="opener" let:open on:click={open}>
-    <Icon name="ellipsis-vertical" />
-  </Button>
+<Button {disabled} onclick={() => dialog.open()}>
+  <Icon name="ellipsis-vertical" />
+</Button>
 
+<Dialog bind:this={dialog}>
   <span>
     Field: {field.name}
     <br />
     Type: {field.type}
   </span>
-  <Button on:click={duplicateField}>
+  <Button onclick={duplicateField}>
     <Container maxWidth>
       <Icon name="clone" />
       Clone field
     </Container>
   </Button>
-  <Button on:click={deleteField}>
+  <Button onclick={deleteField}>
     <Container maxWidth>
       <Icon name="trash" />
       Delete field

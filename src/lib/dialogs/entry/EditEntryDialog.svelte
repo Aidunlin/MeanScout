@@ -4,19 +4,31 @@
   import Dialog from "$lib/components/Dialog.svelte";
   import Icon from "$lib/components/Icon.svelte";
 
-  export let idb: IDBDatabase;
-  export let surveyRecord: IDBRecord<Survey>;
-  export let entryRecord: IDBRecord<Entry>;
+  let {
+    idb,
+    surveyRecord = $bindable(),
+    entryRecord,
+  }: {
+    idb: IDBDatabase;
+    surveyRecord: IDBRecord<Survey>;
+    entryRecord: IDBRecord<Entry>;
+  } = $props();
 
-  let error = "";
+  let dialog: Dialog;
 
-  function onConfirm() {
+  let error = $state("");
+
+  function onconfirm() {
     entryRecord.status = "draft";
     entryRecord.modified = new Date();
 
-    const editRequest = idb.transaction("entries", "readwrite").objectStore("entries").put(entryRecord);
+    const editRequest = idb
+      .transaction("entries", "readwrite")
+      .objectStore("entries")
+      .put($state.snapshot(entryRecord));
+
     editRequest.onerror = () => {
-      error ||= `Could not edit entry: ${editRequest.error?.message}`;
+      error = `Could not edit entry: ${editRequest.error?.message}`;
     };
 
     editRequest.onsuccess = () => {
@@ -24,15 +36,19 @@
       location.hash = `/entry/${entryRecord.id}`;
     };
   }
+
+  function onclose() {
+    error = "";
+  }
 </script>
 
-<Dialog {onConfirm} on:close={() => (error = "")}>
-  <Button title="Edit entry" slot="opener" let:open on:click={open}>
-    <Icon name="pen" />
-    Edit
-  </Button>
+<Button onclick={() => dialog.open()}>
+  <Icon name="pen" />
+  Edit
+</Button>
 
-  <span>Edit this entry? This will move it to drafts.</span>
+<Dialog bind:this={dialog} {onconfirm} {onclose}>
+  <span>Edit this entry?</span>
   {#if error}
     <span>{error}</span>
   {/if}

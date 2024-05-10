@@ -7,21 +7,28 @@
   import { flattenFields, getDefaultFieldValue } from "$lib/field";
   import { targetStore } from "$lib/settings";
 
-  export let idb: IDBDatabase;
-  export let surveyRecord: IDBRecord<Survey>;
-  export let entryRecords: IDBRecord<Entry>[];
+  let {
+    idb,
+    surveyRecord = $bindable(),
+    entryRecords,
+  }: {
+    idb: IDBDatabase;
+    surveyRecord: IDBRecord<Survey>;
+    entryRecords: IDBRecord<Entry>[];
+  } = $props();
 
   const flattenedFields = flattenFields(surveyRecord.fields);
 
   let dialog: Dialog;
-  let match = 0;
-  let team = "";
-  let absent = false;
-  let error = "";
 
-  $: suggestedTeams = suggestTeams(match);
+  let team = $state("");
+  let match = $state(0);
+  let absent = $state(false);
+  let error = $state("");
 
-  function onOpen() {
+  let suggestedTeams = $derived(getSuggestedTeams(match));
+
+  function onopen() {
     match =
       1 +
       Math.max(
@@ -32,7 +39,7 @@
       );
   }
 
-  function suggestTeams(matchValue: number) {
+  function getSuggestedTeams(matchValue: number) {
     const teamSet = new Set<string>();
 
     if (surveyRecord.type == "match") {
@@ -80,7 +87,7 @@
     return [...teamSet].toSorted((a, b) => parseInt(a) - parseInt(b));
   }
 
-  function onConfirm() {
+  function onconfirm() {
     team = team.trim();
 
     const teamHasInvalidFormat = !/^\d{1,5}[A-Z]?$/.test(team);
@@ -117,30 +124,29 @@
       }
     });
 
+    let entry: Entry;
     if (surveyRecord.type == "match") {
-      var entry: Entry = {
+      entry = {
         surveyId: surveyRecord.id,
         type: surveyRecord.type,
         status: absent ? "submitted" : "draft",
-        team,
-        match,
-        absent,
-        values: defaultValues,
-        created: new Date(),
-        modified: new Date(),
-      };
-    } else if (surveyRecord.type == "pit") {
-      var entry: Entry = {
-        surveyId: surveyRecord.id,
-        type: surveyRecord.type,
-        status: "draft",
-        team,
+        team: $state.snapshot(team),
+        match: $state.snapshot(match),
+        absent: $state.snapshot(absent),
         values: defaultValues,
         created: new Date(),
         modified: new Date(),
       };
     } else {
-      return;
+      entry = {
+        surveyId: surveyRecord.id,
+        type: surveyRecord.type,
+        status: "draft",
+        team: $state.snapshot(team),
+        values: defaultValues,
+        created: new Date(),
+        modified: new Date(),
+      };
     }
 
     const addRequest = idb.transaction("entries", "readwrite").objectStore("entries").add(entry);
@@ -157,31 +163,28 @@
       }
     };
   }
-</script>
 
-<Dialog
-  bind:this={dialog}
-  {onOpen}
-  {onConfirm}
-  on:close={() => {
+  function onclose() {
     team = "";
     match = 0;
     absent = false;
     error = "";
-  }}
->
-  <Button slot="opener" let:open on:click={open}>
-    <Container maxWidth>
-      <Icon name="plus" />
-      New entry
-    </Container>
-  </Button>
+  }
+</script>
 
+<Button onclick={() => dialog.open()}>
+  <Container maxWidth>
+    <Icon name="plus" />
+    New entry
+  </Container>
+</Button>
+
+<Dialog bind:this={dialog} {onopen} {onconfirm} {onclose}>
   <span>New entry</span>
 
   <datalist id="teams-list">
     {#each suggestedTeams as team}
-      <option value={team} />
+      <option value={team}></option>
     {/each}
   </datalist>
   <Container direction="column" gap="none">
@@ -194,7 +197,7 @@
       Match
       <input type="number" bind:value={match} />
     </Container>
-    <Button on:click={() => (absent = !absent)}>
+    <Button onclick={() => (absent = !absent)}>
       <Container gap="small" maxWidth>
         {#if absent}
           <Icon name="square-check" />

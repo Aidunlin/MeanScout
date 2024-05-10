@@ -10,14 +10,21 @@
   import ImportEntryDialog from "$lib/dialogs/entry/ImportEntryDialog.svelte";
   import { modeStore } from "$lib/settings";
 
-  export let idb: IDBDatabase;
-  export let surveyRecord: IDBRecord<Survey>;
+  let {
+    idb,
+    surveyRecord,
+  }: {
+    idb: IDBDatabase;
+    surveyRecord: IDBRecord<Survey>;
+  } = $props();
 
-  $: idb.transaction("surveys", "readwrite").objectStore("surveys").put(surveyRecord);
+  $effect(() => {
+    idb.transaction("surveys", "readwrite").objectStore("surveys").put($state.snapshot(surveyRecord));
+  });
 
-  let submittedEntries: IDBRecord<Entry>[] = [];
-  let exportedEntries: IDBRecord<Entry>[] = [];
-  let show = false;
+  let submittedEntries = $state<IDBRecord<Entry>[]>([]);
+  let exportedEntries = $state<IDBRecord<Entry>[]>([]);
+  let show = $state(false);
 
   const entriesRequest = idb.transaction("entries").objectStore("entries").index("surveyId").getAll(surveyRecord.id);
   entriesRequest.onerror = () => (show = true);
@@ -49,13 +56,13 @@
       {surveyRecord}
       from="submitted"
       to="exported"
-      onSet={() => {
+      onset={() => {
         exportedEntries = [...exportedEntries, ...submittedEntries];
         submittedEntries = [];
       }}
     />
     {#each submittedEntries.toSorted((a, b) => b.modified.getTime() - a.modified.getTime()) as entry (entry.id)}
-      <Anchor hash="entry/{entry.id}" title="Edit entry">
+      <Anchor route="entry/{entry.id}">
         <Container align="center" maxWidth spaceBetween>
           <Container direction="column" gap="small">
             <span>Team: {entry.team}</span>
@@ -83,13 +90,13 @@
       {surveyRecord}
       from="exported"
       to="submitted"
-      onSet={() => {
+      onset={() => {
         submittedEntries = [...submittedEntries, ...exportedEntries];
         exportedEntries = [];
       }}
     />
     {#each exportedEntries.toSorted((a, b) => b.modified.getTime() - a.modified.getTime()) as entry (entry.id)}
-      <Anchor hash="entry/{entry.id}" title="Edit entry">
+      <Anchor route="entry/{entry.id}">
         <Container align="center" maxWidth spaceBetween>
           <Container direction="column" gap="small">
             <span>Team: {entry.team}</span>

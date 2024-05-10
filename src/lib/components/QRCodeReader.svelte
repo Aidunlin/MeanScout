@@ -1,9 +1,13 @@
 <script lang="ts">
   import jsQR from "jsqr";
 
-  export let onRead: (data: string) => void;
+  let {
+    onRead,
+  }: {
+    onRead: (data: string) => void;
+  } = $props();
 
-  let reading = false;
+  let reading = $state(false);
   let canvas: HTMLCanvasElement;
   let canvasContext: CanvasRenderingContext2D;
   let videoElement = document.createElement("video");

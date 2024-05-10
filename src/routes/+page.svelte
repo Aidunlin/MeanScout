@@ -17,10 +17,11 @@
   import SurveyTeamsPage from "$lib/pages/survey/SurveyTeamsPage.svelte";
   import type { ComponentProps } from "svelte";
 
-  let idbError: string;
+  let idbError = $state("");
   let idb: IDBDatabase;
 
-  let current:
+  type CurrentPage =
+    | undefined
     | { page: ""; props: ComponentProps<MainPage> }
     | { page: "settings"; props: ComponentProps<SettingsPage> }
     | { page: "about"; props: ComponentProps<AboutPage> }
@@ -32,6 +33,8 @@
     | { page: "survey"; subpage: "teams"; props: ComponentProps<SurveyTeamsPage> }
     | { page: "survey"; subpage: "options"; props: ComponentProps<SurveyOptionsPage> }
     | { page: "entry"; props: ComponentProps<EntryPage> };
+
+  let current = $state<CurrentPage>(undefined);
 
   function setMainPage() {
     if (current?.page == "") {

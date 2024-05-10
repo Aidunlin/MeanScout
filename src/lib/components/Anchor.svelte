@@ -1,19 +1,24 @@
 <script lang="ts">
-  export let hash = "";
-  export let href = `#/${hash}`;
-  export let title = "";
-  export let disableTheme = false;
+  import type { Snippet } from "svelte";
+
+  let {
+    route = "",
+    title = "",
+    children,
+  }: {
+    route?: string;
+    title?: string;
+    children: Snippet;
+  } = $props();
 </script>
 
-<a {href} {title} class:disable-theme={disableTheme}>
-  <slot />
+<a href="#/{route}" {title}>
+  {@render children()}
 </a>
 
 <style>
   a {
     background: var(--fg-color);
-    cursor: pointer;
-    display: inline-flex;
     gap: var(--inner-gap);
     justify-content: center;
     padding: var(--inner-gap);

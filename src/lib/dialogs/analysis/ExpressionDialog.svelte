@@ -8,17 +8,25 @@
   import ExpressionConvertersDialog from "$lib/dialogs/analysis/ExpressionConvertersDialog.svelte";
   import { flattenFields, getDetailedFieldName, type Field } from "$lib/field";
 
-  export let expressions: Expression[];
-  export let fields: Field[];
-  export let pickLists: PickList[];
-  export let preselectedExpressionNames: string[] | undefined = undefined;
+  let {
+    expressions = $bindable(),
+    fields,
+    pickLists = $bindable(),
+    preselectedExpressionNames = undefined,
+  }: {
+    expressions: Expression[];
+    fields: Field[];
+    pickLists: PickList[];
+    preselectedExpressionNames?: string[] | undefined;
+  } = $props();
 
   const flattenedFields = flattenFields(fields);
 
   let dialog: Dialog;
-  let expressionIndex: number | undefined = undefined;
-  let expression: Expression = { name: "", type: "average", inputs: [] };
-  let error = "";
+
+  let expressionIndex = $state<number | undefined>(undefined);
+  let expression = $state<Expression>({ name: "", type: "average", inputs: [] });
+  let error = $state("");
 
   export function newExpression() {
     expressionIndex = undefined;
@@ -36,11 +44,11 @@
 
   export function editExpression(index: number) {
     expressionIndex = index;
-    expression = structuredClone(expressions[expressionIndex]);
+    expression = structuredClone($state.snapshot(expressions[expressionIndex]));
     dialog.open();
   }
 
-  function onConfirm() {
+  function onconfirm() {
     expression.name = expression.name.trim();
 
     if (!expression.name) {
@@ -67,7 +75,7 @@
     }
 
     if (expressionIndex == undefined) {
-      expressions = [...expressions, structuredClone(expression)];
+      expressions = [...expressions, structuredClone($state.snapshot(expression))];
     } else {
       const prevName = expressions[expressionIndex].name;
       if (expression.name != prevName) {
@@ -90,32 +98,32 @@
           return pickList;
         });
       }
-      expressions[expressionIndex] = structuredClone(expression);
+      expressions[expressionIndex] = structuredClone($state.snapshot(expression));
     }
     dialog.close();
   }
 
-  function onClose() {
+  function onclose() {
     if (expressionIndex == undefined) {
       expression = { name: "", type: "average", inputs: [] };
     } else {
-      expression = structuredClone(expressions[expressionIndex]);
+      expression = structuredClone($state.snapshot(expressions[expressionIndex]));
     }
     error = "";
   }
 </script>
 
-<Dialog bind:this={dialog} {onConfirm} on:close={onClose}>
-  <Button slot="opener" on:click={newExpression}>
-    <Container maxWidth>
-      <Icon name="plus" />
-      New expression
-      {#if preselectedExpressionNames?.length}
-        using selected expressions ({preselectedExpressionNames.length})
-      {/if}
-    </Container>
-  </Button>
+<Button onclick={newExpression}>
+  <Container maxWidth>
+    <Icon name="plus" />
+    New expression
+    {#if preselectedExpressionNames?.length}
+      using selected expressions ({preselectedExpressionNames.length})
+    {/if}
+  </Container>
+</Button>
 
+<Dialog bind:this={dialog} {onconfirm} {onclose}>
   <span>{expressionIndex == undefined ? "New" : "Edit"} expression</span>
 
   <Container direction="column" gap="none">
@@ -127,7 +135,7 @@
     Type
     <select
       value={expression.type}
-      on:change={(e) => {
+      onchange={(e) => {
         switch (e.currentTarget.value) {
           case "average":
           case "min":
@@ -196,8 +204,8 @@
   {:else if expression.type == "convert"}
     <ExpressionConvertersDialog
       bind:expression
-      converters={structuredClone(expression.converters)}
-      defaultTo={structuredClone(expression.defaultTo)}
+      converters={structuredClone($state.snapshot(expression.converters))}
+      defaultTo={structuredClone($state.snapshot(expression.defaultTo))}
     />
   {:else if expression.type == "multiply"}
     <Container direction="column" gap="none">
@@ -224,7 +232,7 @@
           {@const isInput = inputIndex != -1}
 
           <Button
-            on:click={() => {
+            onclick={() => {
               if (isInput) {
                 expression.inputs = expression.inputs.toSpliced(inputIndex, 1);
               } else {
@@ -255,7 +263,7 @@
           {@const isInput = inputIndex != -1}
 
           <Button
-            on:click={() => {
+            onclick={() => {
               if (isInput) {
                 expression.inputs = expression.inputs.toSpliced(inputIndex, 1);
               } else {

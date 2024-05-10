@@ -6,21 +6,27 @@
   import Icon from "$lib/components/Icon.svelte";
   import QrCodeReader from "$lib/components/QRCodeReader.svelte";
 
-  export let idb: IDBDatabase;
-  export let surveyRecord: IDBRecord<Survey>;
-  export let exportedEntries: IDBRecord<Entry>[];
+  let {
+    idb,
+    surveyRecord,
+    exportedEntries = $bindable(),
+  }: {
+    idb: IDBDatabase;
+    surveyRecord: IDBRecord<Survey>;
+    exportedEntries: IDBRecord<Entry>[];
+  } = $props();
 
   let dialog: Dialog;
   let qrCodeReader: QrCodeReader;
 
-  let qrCodeData: string | undefined = undefined;
+  let qrCodeData = $state<string | undefined>(undefined);
   let error = "";
 
-  function onOpen() {
+  function onopen() {
     qrCodeReader.start();
   }
 
-  async function onConfirm() {
+  async function onconfirm() {
     if (!qrCodeData) {
       error = "No input";
       return;
@@ -40,8 +46,9 @@
       return;
     }
 
+    let entry: Entry;
     if (surveyRecord.type == "match") {
-      var entry: Entry = {
+      entry = {
         surveyId: surveyRecord.id,
         type: surveyRecord.type,
         status: "exported",
@@ -53,7 +60,7 @@
         modified: new Date(),
       };
     } else {
-      var entry: Entry = {
+      entry = {
         surveyId: surveyRecord.id,
         type: surveyRecord.type,
         status: "exported",
@@ -63,6 +70,7 @@
         modified: new Date(),
       };
     }
+
     const addRequest = idb.transaction("entries", "readwrite").objectStore("entries").add(entry);
     addRequest.onsuccess = () => {
       const id = addRequest.result;
@@ -80,25 +88,22 @@
       error = "Could not add entry!";
     };
   }
-</script>
 
-<Dialog
-  bind:this={dialog}
-  {onConfirm}
-  {onOpen}
-  on:close={() => {
+  function onclose() {
     qrCodeReader.stop();
     qrCodeData = "";
     error = "";
-  }}
->
-  <Button slot="opener" let:open on:click={open}>
-    <Container maxWidth>
-      <Icon name="qrcode" />
-      Import from QR code
-    </Container>
-  </Button>
+  }
+</script>
 
+<Button onclick={() => dialog.open()}>
+  <Container maxWidth>
+    <Icon name="qrcode" />
+    Import from QR code
+  </Container>
+</Button>
+
+<Dialog bind:this={dialog} {onconfirm} {onopen} {onclose}>
   <span>Import from QR code</span>
   <QrCodeReader
     bind:this={qrCodeReader}

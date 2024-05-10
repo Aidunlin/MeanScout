@@ -7,14 +7,21 @@
   import NewEntryDialog from "$lib/dialogs/entry/NewEntryDialog.svelte";
   import { modeStore } from "$lib/settings";
 
-  export let idb: IDBDatabase;
-  export let surveyRecord: IDBRecord<Survey>;
+  let {
+    idb,
+    surveyRecord,
+  }: {
+    idb: IDBDatabase;
+    surveyRecord: IDBRecord<Survey>;
+  } = $props();
 
-  $: idb.transaction("surveys", "readwrite").objectStore("surveys").put(surveyRecord);
+  $effect(() => {
+    idb.transaction("surveys", "readwrite").objectStore("surveys").put($state.snapshot(surveyRecord));
+  });
 
-  let entryRecords: IDBRecord<Entry>[] = [];
-  let draftEntries: IDBRecord<Entry>[] = [];
-  let show = false;
+  let entryRecords = $state<IDBRecord<Entry>[]>([]);
+  let draftEntries = $state<IDBRecord<Entry>[]>([]);
+  let show = $state(false);
 
   const entriesRequest = idb.transaction("entries").objectStore("entries").index("surveyId").getAll(surveyRecord.id);
   entriesRequest.onerror = () => (show = true);
@@ -40,7 +47,7 @@
   <Container direction="column" padding="large">
     <h2>Drafts</h2>
     {#each draftEntries.toSorted((a, b) => b.modified.getTime() - a.modified.getTime()) as draft (draft.id)}
-      <Anchor hash="entry/{draft.id}" title="Edit draft">
+      <Anchor route="entry/{draft.id}">
         <Container align="center" maxWidth spaceBetween>
           <Container direction="column" gap="small">
             <span>Team: {draft.team}</span>
@@ -57,7 +64,7 @@
 
 <Container direction="column" padding="large">
   <h2>Survey</h2>
-  <Anchor hash="survey/{surveyRecord.id}/entries">
+  <Anchor route="survey/{surveyRecord.id}/entries">
     <Container maxWidth spaceBetween>
       <Container>
         <Icon name="list-ol" />
@@ -67,7 +74,7 @@
     </Container>
   </Anchor>
   {#if surveyRecord.type == "match"}
-    <Anchor hash="survey/{surveyRecord.id}/analysis">
+    <Anchor route="survey/{surveyRecord.id}/analysis">
       <Container maxWidth spaceBetween>
         <Container>
           <Icon name="chart-simple" />
@@ -78,7 +85,7 @@
     </Anchor>
   {/if}
   {#if $modeStore == "admin"}
-    <Anchor hash="survey/{surveyRecord.id}/fields">
+    <Anchor route="survey/{surveyRecord.id}/fields">
       <Container maxWidth spaceBetween>
         <Container>
           <Icon name="list-check" />
@@ -88,7 +95,7 @@
       </Container>
     </Anchor>
     {#if surveyRecord.type == "match"}
-      <Anchor hash="survey/{surveyRecord.id}/matches">
+      <Anchor route="survey/{surveyRecord.id}/matches">
         <Container maxWidth spaceBetween>
           <Container>
             <Icon name="table-list" />
@@ -98,7 +105,7 @@
         </Container>
       </Anchor>
     {/if}
-    <Anchor hash="survey/{surveyRecord.id}/teams">
+    <Anchor route="survey/{surveyRecord.id}/teams">
       <Container maxWidth spaceBetween>
         <Container>
           <Icon name="people-group" />
@@ -107,7 +114,7 @@
         <Icon name="arrow-right" />
       </Container>
     </Anchor>
-    <Anchor hash="survey/{surveyRecord.id}/options">
+    <Anchor route="survey/{surveyRecord.id}/options">
       <Container maxWidth spaceBetween>
         <Container>
           <Icon name="gears" />

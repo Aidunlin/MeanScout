@@ -8,9 +8,13 @@
   import NewSurveyDialog from "$lib/dialogs/survey/NewSurveyDialog.svelte";
   import { modeStore } from "$lib/settings";
 
-  export let idb: IDBDatabase;
+  let {
+    idb,
+  }: {
+    idb: IDBDatabase;
+  } = $props();
 
-  let surveyRecords: IDBRecord<Survey>[] = [];
+  let surveyRecords = $state<IDBRecord<Survey>[]>([]);
 
   const surveysRequest = idb.transaction("surveys").objectStore("surveys").getAll();
   surveysRequest.onsuccess = () => {
@@ -24,7 +28,7 @@
   <Container direction="column" padding="large">
     <h2>Surveys</h2>
     {#each surveyRecords.toSorted((a, b) => b.modified.getTime() - a.modified.getTime()) as survey (survey.id)}
-      <Anchor hash="survey/{survey.id}" title="Open survey">
+      <Anchor route="survey/{survey.id}">
         <Container maxWidth spaceBetween>
           <span>{survey.name}</span>
           <Icon name="arrow-right" />
@@ -40,7 +44,7 @@
     <NewSurveyDialog {idb} />
     <ImportSurveyDialog {idb} />
   {/if}
-  <Anchor hash="settings">
+  <Anchor route="settings">
     <Container maxWidth spaceBetween>
       <Container>
         <Icon name="gears" />
@@ -49,7 +53,7 @@
       <Icon name="arrow-right" />
     </Container>
   </Anchor>
-  <Anchor hash="about">
+  <Anchor route="about">
     <Container maxWidth spaceBetween>
       <Container>
         <Icon name="info-circle" />

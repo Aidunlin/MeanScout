@@ -6,8 +6,15 @@
   import Icon from "$lib/components/Icon.svelte";
   import { targetStore } from "$lib/settings";
 
-  export let surveyRecord: IDBRecord<Survey>;
-  export let entries: IDBRecord<Entry>[];
+  let {
+    surveyRecord,
+    entries,
+  }: {
+    surveyRecord: IDBRecord<Survey>;
+    entries: IDBRecord<Entry>[];
+  } = $props();
+
+  let dialog: Dialog;
 
   const exportFileName = `${surveyRecord.name}-entries-${$targetStore}.csv`.replaceAll(" ", "_");
 
@@ -28,30 +35,30 @@
   }
 </script>
 
-<Dialog>
-  <Button slot="opener" let:open on:click={open}>
-    <Container maxWidth>
-      <Icon name="share-from-square" />
-      Export entries
-    </Container>
-  </Button>
+<Button onclick={() => dialog.open()}>
+  <Container maxWidth>
+    <Icon name="share-from-square" />
+    Export entries
+  </Container>
+</Button>
 
+<Dialog bind:this={dialog}>
   <span>Export entries</span>
   {#if "canShare" in navigator}
-    <Button title="Share entries" on:click={shareEntriesAsFile}>
+    <Button onclick={shareEntriesAsFile}>
       <Container maxWidth>
         <Icon name="share-from-square" />
         Share as file
       </Container>
     </Button>
-    <Button on:click={shareEntriesAsText}>
+    <Button onclick={shareEntriesAsText}>
       <Container maxWidth>
         <Icon name="share" />
         Share as text snippet
       </Container>
     </Button>
   {/if}
-  <Button title="Download entries" on:click={downloadEntries}>
+  <Button onclick={downloadEntries}>
     <Container maxWidth>
       <Icon name="download" />
       Download as file

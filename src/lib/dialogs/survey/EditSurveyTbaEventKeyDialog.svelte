@@ -7,15 +7,19 @@
   import { tbaAuthKeyStore, teamStore } from "$lib/settings";
   import { tbaEventExists, tbaGetTeamEvents } from "$lib/tba";
 
-  export let surveyRecord: IDBRecord<Survey>;
+  let {
+    surveyRecord = $bindable(),
+  }: {
+    surveyRecord: IDBRecord<Survey>;
+  } = $props();
 
   let dialog: Dialog;
-  let event = surveyRecord.tbaEventKey ?? "";
-  let error = "";
 
-  let events: { name: string; key: string }[] = [];
+  let event = $state(surveyRecord.tbaEventKey ?? "");
+  let error = $state("");
+  let events = $state<{ name: string; key: string }[]>([]);
 
-  async function onOpen() {
+  async function onopen() {
     if (events.length) {
       return;
     }
@@ -33,7 +37,7 @@
     }
   }
 
-  async function onConfirm() {
+  async function onconfirm() {
     event = event.trim();
 
     if (!event) {
@@ -53,29 +57,26 @@
       error = "could not find event";
     }
   }
-</script>
 
-<Dialog
-  bind:this={dialog}
-  {onOpen}
-  {onConfirm}
-  on:close={() => {
+  function onclose() {
     event = surveyRecord.tbaEventKey ?? "";
     error = "";
-  }}
->
-  <Button slot="opener" let:open on:click={open}>
-    <Container maxWidth>
-      {#if surveyRecord.tbaEventKey}
-        <Icon name="pen" />
-        Edit event: {surveyRecord.tbaEventKey}
-      {:else}
-        <Icon name="plus" />
-        Add event
-      {/if}
-    </Container>
-  </Button>
+  }
+</script>
 
+<Button onclick={() => dialog.open()}>
+  <Container maxWidth>
+    {#if surveyRecord.tbaEventKey}
+      <Icon name="pen" />
+      Edit event: {surveyRecord.tbaEventKey}
+    {:else}
+      <Icon name="plus" />
+      Add event
+    {/if}
+  </Container>
+</Button>
+
+<Dialog bind:this={dialog} {onopen} {onconfirm} {onclose}>
   <span>Edit TBA event:</span>
   <datalist id="events-list">
     {#each events as { name, key }}

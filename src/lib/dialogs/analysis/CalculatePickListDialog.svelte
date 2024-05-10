@@ -3,14 +3,21 @@
   import { calculateTeamData, normalizeTeamData, type Expression, type PickList } from "$lib/analysis";
   import Dialog from "$lib/components/Dialog.svelte";
 
-  export let pickLists: PickList[];
-  export let entriesByTeam: Record<string, IDBRecord<Entry>[]>;
-  export let expressions: Expression[];
+  let {
+    pickLists,
+    entriesByTeam,
+    expressions,
+  }: {
+    pickLists: PickList[];
+    entriesByTeam: Record<string, IDBRecord<Entry>[]>;
+    expressions: Expression[];
+  } = $props();
 
   let dialog: Dialog;
-  let pickList: PickList = { name: "New pick list", weights: [] };
-  let sortedTeamData: { team: string; percentage: number }[] = [];
-  let error = "";
+
+  let pickList = $state<PickList>({ name: "New pick list", weights: [] });
+  let sortedTeamData = $state<{ team: string; percentage: number }[]>([]);
+  let error = $state("");
 
   export function open(index: number) {
     pickList = pickLists[index];
@@ -38,31 +45,35 @@
     dialog.open();
   }
 
-  function onClose() {
+  function onclose() {
     pickList = { name: "New pick list", weights: [] };
     sortedTeamData = [];
     error = "";
   }
 </script>
 
-<Dialog bind:this={dialog} on:close={onClose}>
+<Dialog bind:this={dialog} {onclose}>
   <span>{pickList.name}</span>
 
   {#if sortedTeamData.length}
     <div class="dialog-overflow">
       <table class="team-rank-table">
-        <tr>
-          <th>Rank</th>
-          <th>Team</th>
-          <th>Percent</th>
-        </tr>
-        {#each sortedTeamData as teamValue, i}
+        <thead>
           <tr>
-            <td>{i + 1}</td>
-            <td>{teamValue.team}</td>
-            <td>{teamValue.percentage.toFixed(2)}%</td>
+            <th>Rank</th>
+            <th>Team</th>
+            <th>Percent</th>
           </tr>
-        {/each}
+        </thead>
+        <tbody>
+          {#each sortedTeamData as teamValue, i}
+            <tr>
+              <td>{i + 1}</td>
+              <td>{teamValue.team}</td>
+              <td>{teamValue.percentage.toFixed(2)}%</td>
+            </tr>
+          {/each}
+        </tbody>
       </table>
     </div>
   {/if}

@@ -5,21 +5,28 @@
   import Dialog from "$lib/components/Dialog.svelte";
   import Icon from "$lib/components/Icon.svelte";
 
-  export let expressions: Expression[];
-  export let pickLists: PickList[];
-  export let preselectedExpressionNames: string[] | undefined = undefined;
-
-  $: totalWeights = pickList.weights.reduce((total, weight) => total + Math.abs(weight.percentage), 0);
+  let {
+    expressions,
+    pickLists = $bindable(),
+    preselectedExpressionNames = undefined,
+  }: {
+    expressions: Expression[];
+    pickLists: PickList[];
+    preselectedExpressionNames?: string[] | undefined;
+  } = $props();
 
   let dialog: Dialog;
-  let pickListIndex: number | undefined = undefined;
-  let pickList: PickList = { name: "New pick list", weights: [] };
-  let error = "";
+
+  let error = $state("");
+  let pickListIndex = $state<number | undefined>(undefined);
+  let pickList = $state<PickList>({ name: "New pick list", weights: [] });
+
+  let totalWeights = $derived(pickList.weights.reduce((total, weight) => total + Math.abs(weight.percentage), 0));
 
   export function newPickList() {
     pickListIndex = undefined;
     pickList = { name: "New pick list", weights: [] };
-    
+
     if (preselectedExpressionNames?.length) {
       pickList.weights = preselectedExpressionNames.map((expressionName) => ({
         expressionName,
@@ -32,41 +39,41 @@
 
   export function editPickList(index: number) {
     pickListIndex = index;
-    pickList = structuredClone(pickLists[pickListIndex]);
+    pickList = structuredClone($state.snapshot(pickLists[pickListIndex]));
     dialog.open();
   }
 
-  function onConfirm() {
+  function onconfirm() {
     pickList.weights = pickList.weights.filter((weight) => weight.percentage);
     if (pickListIndex == undefined) {
-      pickLists = [...pickLists, structuredClone(pickList)];
+      pickLists = [...pickLists, structuredClone($state.snapshot(pickList))];
     } else {
-      pickLists[pickListIndex] = structuredClone(pickList);
+      pickLists[pickListIndex] = structuredClone($state.snapshot(pickList));
     }
     dialog.close();
   }
 
-  function onClose() {
+  function onclose() {
     if (pickListIndex == undefined) {
       pickList = { name: "New pick list", weights: [] };
     } else {
-      pickList = structuredClone(pickLists[pickListIndex]);
+      pickList = structuredClone($state.snapshot(pickLists[pickListIndex]));
     }
     error = "";
   }
 </script>
 
-<Dialog bind:this={dialog} {onConfirm} on:close={onClose}>
-  <Button slot="opener" on:click={newPickList}>
-    <Container maxWidth>
-      <Icon name="plus" />
-      New pick list
-      {#if preselectedExpressionNames?.length}
-        using selected expressions ({preselectedExpressionNames.length})
-      {/if}
-    </Container>
-  </Button>
+<Button onclick={newPickList}>
+  <Container maxWidth>
+    <Icon name="plus" />
+    New pick list
+    {#if preselectedExpressionNames?.length}
+      using selected expressions ({preselectedExpressionNames.length})
+    {/if}
+  </Container>
+</Button>
 
+<Dialog bind:this={dialog} {onconfirm} {onclose}>
   <span>{pickListIndex == undefined ? "New" : "Edit"} pick list</span>
 
   <Container direction="column" gap="none">
@@ -83,7 +90,7 @@
 
       <Container direction="column" gap="small">
         <Button
-          on:click={() => {
+          onclick={() => {
             if (isWeight) {
               pickList.weights = pickList.weights.toSpliced(weightIndex, 1);
             } else {

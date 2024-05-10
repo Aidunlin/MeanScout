@@ -4,8 +4,13 @@
   import Dialog from "$lib/components/Dialog.svelte";
   import Icon from "$lib/components/Icon.svelte";
 
-  export let surveyRecord: IDBRecord<Survey>;
-  export let pickListIndex: number;
+  let {
+    surveyRecord = $bindable(),
+    pickListIndex,
+  }: {
+    surveyRecord: IDBRecord<Survey>;
+    pickListIndex: number;
+  } = $props();
 
   let dialog: Dialog;
 
@@ -16,11 +21,11 @@
   }
 </script>
 
-<Dialog bind:this={dialog} {onConfirm}>
-  <Button slot="opener" let:open on:click={open}>
-    <Icon name="trash" />
-    Delete
-  </Button>
+<Button onclick={() => dialog.open()}>
+  <Icon name="trash" />
+  Delete
+</Button>
 
+<Dialog bind:this={dialog} onconfirm={onConfirm}>
   <span>Delete pick list?</span>
 </Dialog>

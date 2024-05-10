@@ -4,13 +4,21 @@
   import Dialog from "$lib/components/Dialog.svelte";
   import Icon from "$lib/components/Icon.svelte";
 
-  export let idb: IDBDatabase;
-  export let surveyRecord: IDBRecord<Survey>;
-  export let entryRecord: IDBRecord<Entry>;
+  let {
+    idb,
+    surveyRecord = $bindable(),
+    entryRecord,
+  }: {
+    idb: IDBDatabase;
+    surveyRecord: IDBRecord<Survey>;
+    entryRecord: IDBRecord<Entry>;
+  } = $props();
 
-  let error = "";
+  let dialog: Dialog;
 
-  function onConfirm() {
+  let error = $state("");
+
+  function onconfirm() {
     const deleteRequest = idb.transaction("entries", "readwrite").objectStore("entries").delete(entryRecord.id);
     deleteRequest.onerror = () => {
       error = `Could not delete entry: ${deleteRequest.error?.message}`;
@@ -18,17 +26,26 @@
 
     deleteRequest.onsuccess = () => {
       surveyRecord.modified = new Date();
-      location.hash = `/survey/${surveyRecord.id}/entries`;
+
+      if (entryRecord.status == "draft") {
+        location.hash = `/survey/${surveyRecord.id}/entries`;
+      } else {
+        location.hash = `/survey/${surveyRecord.id}`;
+      }
     };
+  }
+
+  function onclose() {
+    error = "";
   }
 </script>
 
-<Dialog {onConfirm} on:close={() => (error = "")}>
-  <Button title="Delete entry" slot="opener" let:open on:click={open}>
-    <Icon name="trash" />
-    Delete
-  </Button>
+<Button onclick={() => dialog.open()}>
+  <Icon name="trash" />
+  Delete
+</Button>
 
+<Dialog bind:this={dialog} {onconfirm} {onclose}>
   <span>Delete this entry?</span>
   {#if error}
     <span>{error}</span>

@@ -5,12 +5,18 @@
   import Dialog from "$lib/components/Dialog.svelte";
   import Icon from "$lib/components/Icon.svelte";
 
-  export let surveyRecord: IDBRecord<Survey>;
+  let {
+    surveyRecord,
+  }: {
+    surveyRecord: IDBRecord<Survey>;
+  } = $props();
+
+  let dialog: Dialog;
 
   const cleanedSurveyName = surveyRecord.name.replaceAll(" ", "_");
 
   function surveyAsJSON() {
-    const survey = structuredClone(surveyRecord) as Survey & { id?: number };
+    const survey = structuredClone($state.snapshot(surveyRecord)) as Survey & { id?: number };
     delete survey.id;
     return JSON.stringify(survey, undefined, "  ");
   }
@@ -30,30 +36,30 @@
   }
 </script>
 
-<Dialog>
-  <Button slot="opener" let:open on:click={open}>
-    <Container maxWidth>
-      <Icon name="share-from-square" />
-      Export survey
-    </Container>
-  </Button>
+<Button onclick={() => dialog.open()}>
+  <Container maxWidth>
+    <Icon name="share-from-square" />
+    Export survey
+  </Container>
+</Button>
 
+<Dialog bind:this={dialog}>
   <span>Export survey</span>
   {#if "canShare" in navigator}
-    <Button on:click={shareSurveyAsFile}>
+    <Button onclick={shareSurveyAsFile}>
       <Container maxWidth>
         <Icon name="share-from-square" />
         Share as file
       </Container>
     </Button>
-    <Button on:click={shareSurveyAsText}>
+    <Button onclick={shareSurveyAsText}>
       <Container maxWidth>
         <Icon name="share" />
         Share as text snippet
       </Container>
     </Button>
   {/if}
-  <Button on:click={downloadSurvey}>
+  <Button onclick={downloadSurvey}>
     <Container maxWidth>
       <Icon name="file-code" />
       Download as file

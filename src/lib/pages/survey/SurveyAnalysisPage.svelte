@@ -12,27 +12,34 @@
   import PickListDialog from "$lib/dialogs/analysis/PickListDialog.svelte";
   import { modeStore } from "$lib/settings";
 
-  export let idb: IDBDatabase;
-  export let surveyRecord: IDBRecord<MatchSurvey>;
+  let {
+    idb,
+    surveyRecord,
+  }: {
+    idb: IDBDatabase;
+    surveyRecord: IDBRecord<MatchSurvey>;
+  } = $props();
 
-  $: idb.transaction("surveys", "readwrite").objectStore("surveys").put(surveyRecord);
+  $effect(() => {
+    idb.transaction("surveys", "readwrite").objectStore("surveys").put($state.snapshot(surveyRecord));
+  });
 
-  let calculatePickListDialog: CalculatePickListDialog;
-  let pickListDialog: PickListDialog;
+  let calculatePickListDialog = $state<CalculatePickListDialog | undefined>(undefined);
+  let pickListDialog = $state<PickListDialog | undefined>(undefined);
 
-  let calculateExpressionDialog: CalculateExpressionDialog;
-  let expressionDialog: ExpressionDialog;
+  let calculateExpressionDialog = $state<CalculateExpressionDialog | undefined>(undefined);
+  let expressionDialog = $state<ExpressionDialog | undefined>(undefined);
 
-  let preselectedExpressionNames: string[] = [];
-  let isSelecting = false;
+  let preselectedExpressionNames = $state<string[]>([]);
+  let isSelecting = $state(false);
 
-  $: usedExpressionNames = [
+  let usedExpressionNames = $derived([
     ...surveyRecord.expressions
       .flatMap((e) => e.inputs)
       .filter((input): input is ExpressionAsExpressionInput => input.from == "expression")
       .map((input) => input.expressionName),
     ...surveyRecord.pickLists.flatMap((p) => p.weights).map((w) => w.expressionName),
-  ];
+  ]);
 
   const entriesByTeam: Record<string, IDBRecord<Entry>[]> = {};
 
@@ -78,7 +85,7 @@
     <Container direction="column" gap="none">
       {#each surveyRecord.pickLists as pickList, pickListIndex}
         <Container direction="column" padding="large">
-          <Button on:click={() => calculatePickListDialog.open(pickListIndex)}>
+          <Button onclick={() => calculatePickListDialog?.open(pickListIndex)}>
             <Container gap="small" maxWidth>
               <Icon name="list-ol" />
               {pickList.name}
@@ -86,7 +93,7 @@
           </Button>
           {#if $modeStore == "admin"}
             <Container>
-              <Button on:click={() => pickListDialog.editPickList(pickListIndex)}>
+              <Button onclick={() => pickListDialog?.editPickList(pickListIndex)}>
                 <Icon name="pen" />
                 Edit
               </Button>
@@ -118,7 +125,7 @@
     />
     <Container>
       <Button
-        on:click={() => {
+        onclick={() => {
           if (isSelecting) {
             preselectedExpressionNames = [];
             isSelecting = false;
@@ -136,7 +143,7 @@
       </Button>
       {#if isSelecting}
         <Button
-          on:click={() => {
+          onclick={() => {
             if (preselectedExpressionNames.length) {
               preselectedExpressionNames = [];
             } else {
@@ -164,7 +171,7 @@
         {#if isSelecting}
           {@const isSelected = preselectedExpressionNames.includes(expression.name)}
           <Button
-            on:click={() => {
+            onclick={() => {
               if (isSelected) {
                 preselectedExpressionNames = preselectedExpressionNames.filter((name) => name != expression.name);
               } else {
@@ -182,7 +189,7 @@
             </Container>
           </Button>
         {:else}
-          <Button on:click={() => calculateExpressionDialog.open(expressionIndex)}>
+          <Button onclick={() => calculateExpressionDialog?.open(expressionIndex)}>
             <Container gap="small" maxWidth>
               <Icon name="percent" />
               {expression.name}
@@ -190,13 +197,13 @@
           </Button>
           {#if $modeStore == "admin"}
             <Container>
-              <Button on:click={() => expressionDialog.editExpression(expressionIndex)}>
+              <Button onclick={() => expressionDialog?.editExpression(expressionIndex)}>
                 <Icon name="pen" />
                 Edit
               </Button>
               {#if !usedExpressionNames.includes(expression.name)}
                 <Button
-                  on:click={() => (surveyRecord.expressions = surveyRecord.expressions.toSpliced(expressionIndex, 1))}
+                  onclick={() => (surveyRecord.expressions = surveyRecord.expressions.toSpliced(expressionIndex, 1))}
                 >
                   <Icon name="trash" />
                   Delete

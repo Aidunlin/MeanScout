@@ -23,7 +23,7 @@
   <Container>
     <Container direction="column" gap="none">
       Target
-      <select bind:value={$targetStore} title="Target" disabled={$modeStore == "scout"}>
+      <select bind:value={$targetStore} disabled={$modeStore == "scout"}>
         {#each targets as target}
           <option>{target}</option>
         {/each}

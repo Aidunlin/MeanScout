@@ -4,22 +4,27 @@
   import Dialog from "$lib/components/Dialog.svelte";
   import Icon from "$lib/components/Icon.svelte";
 
-  export let surveyRecord: IDBRecord<MatchSurvey>;
-  export let match: Match;
+  let {
+    surveyRecord = $bindable(),
+    match,
+  }: {
+    surveyRecord: IDBRecord<MatchSurvey>;
+    match: Match;
+  } = $props();
 
   let dialog: Dialog;
 
-  function onConfirm() {
+  function onconfirm() {
     surveyRecord.modified = new Date();
     surveyRecord.matches = surveyRecord.matches.filter((m) => m.number != match.number);
     dialog.close();
   }
 </script>
 
-<Dialog bind:this={dialog} {onConfirm}>
-  <Button title="Delete match" slot="opener" let:open on:click={open}>
-    <Icon name="trash" />
-  </Button>
+<Button onclick={() => dialog.open()}>
+  <Icon name="trash" />
+</Button>
 
+<Dialog bind:this={dialog} {onconfirm}>
   <span>Delete match {match.number}?</span>
 </Dialog>

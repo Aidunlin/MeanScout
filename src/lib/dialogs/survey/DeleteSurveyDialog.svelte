@@ -5,10 +5,18 @@
   import Dialog from "$lib/components/Dialog.svelte";
   import Icon from "$lib/components/Icon.svelte";
 
-  export let idb: IDBDatabase;
-  export let surveyRecord: IDBRecord<Survey>;
+  let {
+    idb,
+    surveyRecord,
+  }: {
+    idb: IDBDatabase;
+    surveyRecord: IDBRecord<Survey>;
+  } = $props();
 
-  let entryCount = 0;
+  let dialog: Dialog;
+
+  let entryCount = $state(0);
+  let error = $state("");
 
   const entryCountRequest = idb.transaction("entries").objectStore("entries").index("surveyId").count(surveyRecord.id);
   entryCountRequest.onsuccess = () => {
@@ -17,9 +25,7 @@
     }
   };
 
-  let error = "";
-
-  function onConfirm() {
+  function onconfirm() {
     const deleteTransaction = idb.transaction(["surveys", "entries"], "readwrite");
     deleteTransaction.onabort = () => {
       error ||= `Could not delete survey: ${deleteTransaction.error?.message}`;
@@ -57,16 +63,20 @@
       cursor.continue();
     };
   }
+
+  function onclose() {
+    error = "";
+  }
 </script>
 
-<Dialog {onConfirm} on:close={() => (error = "")}>
-  <Button slot="opener" let:open on:click={open}>
-    <Container maxWidth>
-      <Icon name="trash" />
-      Delete survey
-    </Container>
-  </Button>
+<Button onclick={() => dialog.open()}>
+  <Container maxWidth>
+    <Icon name="trash" />
+    Delete survey
+  </Container>
+</Button>
 
+<Dialog bind:this={dialog} {onconfirm} {onclose}>
   <span>Delete "{surveyRecord.name}"?</span>
   {#if entryCount}
     <span>{entryCount} {entryCount > 1 ? "entries" : "entry"} will be lost!</span>

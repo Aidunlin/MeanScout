@@ -8,10 +8,17 @@
   import ExportSurveyDialog from "$lib/dialogs/survey/ExportSurveyDialog.svelte";
   import { tbaAuthKeyStore } from "$lib/settings";
 
-  export let idb: IDBDatabase;
-  export let surveyRecord: IDBRecord<Survey>;
+  let {
+    idb,
+    surveyRecord,
+  }: {
+    idb: IDBDatabase;
+    surveyRecord: IDBRecord<Survey>;
+  } = $props();
 
-  $: idb.transaction("surveys", "readwrite").objectStore("surveys").put(surveyRecord);
+  $effect(() => {
+    idb.transaction("surveys", "readwrite").objectStore("surveys").put($state.snapshot(surveyRecord));
+  });
 </script>
 
 <Header backLink="survey/{surveyRecord.id}" title="Options" iconName="gears" />

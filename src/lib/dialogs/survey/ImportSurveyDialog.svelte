@@ -8,10 +8,16 @@
   import { tbaAuthKeyStore } from "$lib/settings";
   import { tbaEventExists } from "$lib/tba";
 
-  export let idb: IDBDatabase;
+  let {
+    idb,
+  }: {
+    idb: IDBDatabase;
+  } = $props();
 
-  let files: FileList | undefined = undefined;
-  let error = "";
+  let dialog: Dialog;
+
+  let files = $state<FileList | undefined>(undefined);
+  let error = $state("");
 
   function parseName(name: any) {
     if (typeof name != "string" || !name.trim()) {
@@ -69,7 +75,7 @@
     return new Date();
   }
 
-  async function onConfirm() {
+  async function onconfirm() {
     if (!files?.length) {
       error = "No input";
       return;
@@ -115,16 +121,20 @@
       location.hash = `/survey/${id}`;
     };
   }
+
+  function onclose() {
+    error = "";
+  }
 </script>
 
-<Dialog {onConfirm} on:close={() => (error = "")}>
-  <Button title="Import survey" slot="opener" let:open on:click={open}>
-    <Container maxWidth>
-      <Icon name="paste" />
-      Import survey
-    </Container>
-  </Button>
+<Button onclick={() => dialog.open()}>
+  <Container maxWidth>
+    <Icon name="paste" />
+    Import survey
+  </Container>
+</Button>
 
+<Dialog bind:this={dialog} {onconfirm} {onclose}>
   <span>Import survey</span>
   <input type="file" accept=".json,.txt" bind:files />
   {#if error}

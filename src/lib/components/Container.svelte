@@ -1,11 +1,25 @@
 <script lang="ts">
-  export let direction: "row" | "column" = "row";
-  export let padding: "none" | "small" | "large" = "none";
-  export let align: "normal" | "center" | "start" | "end" = "normal";
-  export let spaceBetween = false;
-  export let gap: "none" | "small" | "large" = "large";
-  export let maxWidth = false;
-  export let bg = false;
+  import type { Snippet } from "svelte";
+
+  let {
+    direction = "row",
+    padding = "none",
+    align = "normal",
+    spaceBetween = false,
+    gap = "large",
+    maxWidth = false,
+    bg = false,
+    children,
+  }: {
+    direction?: "row" | "column";
+    padding?: "none" | "small" | "large";
+    align?: "normal" | "center" | "start" | "end";
+    spaceBetween?: boolean;
+    gap?: "none" | "small" | "large";
+    maxWidth?: boolean;
+    bg?: boolean;
+    children: Snippet;
+  } = $props();
 </script>
 
 <div
@@ -14,7 +28,7 @@
   class:max-width={maxWidth}
   class:bg
 >
-  <slot />
+  {@render children()}
 </div>
 
 <style>

@@ -6,14 +6,20 @@
   import Icon from "$lib/components/Icon.svelte";
   import QrCodeDisplay from "$lib/components/QRCodeDisplay.svelte";
 
-  export let surveyRecord: IDBRecord<Survey>;
-  export let entry: IDBRecord<Entry>;
+  let {
+    surveyRecord,
+    entry,
+  }: {
+    surveyRecord: IDBRecord<Survey>;
+    entry: IDBRecord<Entry>;
+  } = $props();
 
   const exportFileName = createEntryFileName(surveyRecord, entry);
 
-  let entryData: string;
+  let dialog: Dialog;
+  let entryData = $state("");
 
-  function onOpen() {
+  function onopen() {
     entryData = entryAsCSV(entry);
   }
 
@@ -28,21 +34,20 @@
   function downloadEntry() {
     download(entryData, exportFileName, "text/csv");
   }
+
+  function onclose() {
+    entryData = "";
+  }
 </script>
 
-<Dialog
-  {onOpen}
-  on:close={() => {
-    entryData = "";
-  }}
->
-  <Button slot="opener" let:open on:click={open}>
-    <Container maxWidth>
-      <Icon name="share-from-square" />
-      Export
-    </Container>
-  </Button>
+<Button onclick={() => dialog.open()}>
+  <Container maxWidth>
+    <Icon name="share-from-square" />
+    Export
+  </Container>
+</Button>
 
+<Dialog bind:this={dialog} {onopen} {onclose}>
   <span>Export entry</span>
 
   {#if entryData}
@@ -50,20 +55,20 @@
   {/if}
 
   {#if "canShare" in navigator}
-    <Button on:click={shareEntryAsFile}>
+    <Button onclick={shareEntryAsFile}>
       <Container maxWidth>
         <Icon name="share-from-square" />
         Share as file
       </Container>
     </Button>
-    <Button on:click={shareEntryAsText}>
+    <Button onclick={shareEntryAsText}>
       <Container maxWidth>
         <Icon name="share" />
         Share as text snippet
       </Container>
     </Button>
   {/if}
-  <Button on:click={downloadEntry}>
+  <Button onclick={downloadEntry}>
     <Container maxWidth>
       <Icon name="download" />
       Download as file
