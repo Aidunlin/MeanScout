@@ -27,6 +27,7 @@
   "type": "module",
   "dependencies": {
     "jsqr": "^1.4.0",
-    "qrcode": "^1.5.3"
+    "qrcode": "^1.5.3",
+    "zod": "^3.23.8"
   }
 }

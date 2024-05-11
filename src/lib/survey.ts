@@ -1,23 +1,36 @@
-import type { Match } from "./";
-import type { Expression, PickList } from "./analysis";
-import type { Field } from "./field";
+import { matchSchema } from "$lib";
+import { z } from "zod";
+import { expressionSchema, pickListSchema } from "./analysis";
+import { fieldSchema } from "./field";
 
 export const surveyTypes = ["match", "pit"] as const;
 export type SurveyType = (typeof surveyTypes)[number];
 
-type BaseSurvey<T extends SurveyType> = {
-  name: string;
-  type: T;
-  tbaEventKey?: string | undefined;
-  fields: Field[];
-  teams: string[];
-  expressions: Expression[];
-  pickLists: PickList[];
-  created: Date;
-  modified: Date;
-};
+const baseSurveySchema = z.object({
+  name: z.string(),
+  tbaEventKey: z.optional(z.string()),
+  fields: z.array(fieldSchema),
+  teams: z.array(z.string()),
+  expressions: z.array(expressionSchema),
+  pickLists: z.array(pickListSchema),
+  created: z.date(),
+  modified: z.date(),
+});
 
-export type MatchSurvey = BaseSurvey<"match"> & { matches: Match[] };
-export type PitSurvey = BaseSurvey<"pit">;
+const matchSurveySchema = baseSurveySchema.merge(
+  z.object({
+    type: z.literal("match"),
+    matches: z.array(matchSchema),
+  }),
+);
+export type MatchSurvey = z.infer<typeof matchSurveySchema>;
 
-export type Survey = MatchSurvey | PitSurvey;
+const pitSurveySchema = baseSurveySchema.merge(
+  z.object({
+    type: z.literal("pit"),
+  }),
+);
+export type PitSurvey = z.infer<typeof pitSurveySchema>;
+
+const surveySchema = z.discriminatedUnion("type", [matchSurveySchema, pitSurveySchema]);
+export type Survey = z.infer<typeof surveySchema>;

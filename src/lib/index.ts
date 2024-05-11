@@ -1,28 +1,33 @@
+import { z } from "zod";
 import type { Entry } from "./entry";
 import type { Target } from "./settings";
 import type { Survey } from "./survey";
 
-export type Match = {
-  number: number;
-  red1: string;
-  red2: string;
-  red3: string;
-  blue1: string;
-  blue2: string;
-  blue3: string;
-};
+export const valueSchema = z.string().or(z.number()).or(z.boolean());
+export type Value = z.infer<typeof valueSchema>;
 
-export function createEntryFileName(survey: Survey, entry: Entry | Entry[], target?: Target) {
-  if (Array.isArray(entry)) {
+export const matchSchema = z.object({
+  number: z.number(),
+  red1: z.string(),
+  red2: z.string(),
+  red3: z.string(),
+  blue1: z.string(),
+  blue2: z.string(),
+  blue3: z.string(),
+});
+export type Match = z.infer<typeof matchSchema>;
+
+export function createEntryFileName(survey: Survey, entryOrEntries: Entry | Entry[], target?: Target) {
+  if (Array.isArray(entryOrEntries)) {
     if (target) {
       var fileName = `${survey.name}-entries-${target}.csv`;
     } else {
       var fileName = `${survey.name}-entries.csv`;
     }
-  } else if (entry.type == "match") {
-    var fileName = `${survey.name}-entry-${entry.team}-${entry.match}-${entry.absent}.csv`;
+  } else if (entryOrEntries.type == "match") {
+    var fileName = `${survey.name}-entry-${entryOrEntries.team}-${entryOrEntries.match}-${entryOrEntries.absent}.csv`;
   } else {
-    var fileName = `${survey.name}-entry-${entry.team}.csv`;
+    var fileName = `${survey.name}-entry-${entryOrEntries.team}.csv`;
   }
 
   return fileName.replaceAll(" ", "_");
