@@ -1,4 +1,4 @@
-import { valueSchema } from "$lib";
+import { matchValueSchema, valueSchema, type Value } from "$lib";
 import { z } from "zod";
 
 export const entryStatuses = ["draft", "submitted", "exported"] as const;
@@ -9,14 +9,14 @@ const baseEntrySchema = z.object({
   status: z.enum(entryStatuses),
   team: z.string(),
   values: z.array(valueSchema),
-  created: z.date(),
-  modified: z.date(),
+  created: z.coerce.date(),
+  modified: z.coerce.date(),
 });
 
 const matchEntrySchema = baseEntrySchema.merge(
   z.object({
     type: z.literal("match"),
-    match: z.number(),
+    match: matchValueSchema,
     absent: z.boolean(),
   }),
 );
@@ -32,7 +32,7 @@ export type PitEntry = z.infer<typeof pitEntrySchema>;
 const entrySchema = z.discriminatedUnion("type", [matchEntrySchema, pitEntrySchema]);
 export type Entry = z.infer<typeof entrySchema>;
 
-export function valueAsCSV(value: any) {
+export function valueAsCSV(value: Value) {
   return value.toString().replaceAll(",", "").replaceAll("\n", ". ").trim();
 }
 

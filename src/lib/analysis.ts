@@ -16,7 +16,7 @@ export type ExpressionInput = z.infer<typeof expressionInputSchema>;
 
 const baseExpressionSchema = z.object({
   name: z.string(),
-  inputs: z.array(expressionInputSchema),
+  inputs: z.array(expressionInputSchema).nonempty(),
 });
 
 export const reduceExpressionTypes = ["average", "min", "max", "sum", "count"] as const;
@@ -41,10 +41,12 @@ const convertExpressionSchema = baseExpressionSchema.merge(
 );
 export type ConvertExpression = z.infer<typeof convertExpressionSchema>;
 
+const divisorSchema = z.number().gt(0).or(z.number().lt(0));
+
 const mapExpressionSchema = z.discriminatedUnion("type", [
   convertExpressionSchema,
-  baseExpressionSchema.merge(z.object({ type: z.literal("multiply"), multiplier: z.number() })),
-  baseExpressionSchema.merge(z.object({ type: z.literal("divide"), divisor: z.number() })),
+  baseExpressionSchema.merge(z.object({ type: z.literal("multiply"), multiplier: z.number().finite() })),
+  baseExpressionSchema.merge(z.object({ type: z.literal("divide"), divisor: divisorSchema })),
   baseExpressionSchema.merge(z.object({ type: z.literal("abs") })),
 ]);
 export type MapExpression = z.infer<typeof mapExpressionSchema>;

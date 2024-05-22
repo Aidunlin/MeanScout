@@ -19,7 +19,7 @@ export type NumberField = z.infer<typeof numberFieldSchema>;
 const selectFieldSchema = z.object({
   name: z.string(),
   type: z.literal("select"),
-  values: z.array(z.string()),
+  values: z.array(z.string()).nonempty(),
 });
 export type SelectField = z.infer<typeof selectFieldSchema>;
 

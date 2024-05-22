@@ -6,8 +6,10 @@ import type { Survey } from "./survey";
 export const valueSchema = z.string().or(z.number()).or(z.boolean());
 export type Value = z.infer<typeof valueSchema>;
 
+export const matchValueSchema = z.number().int().gt(0);
+
 export const matchSchema = z.object({
-  number: z.number(),
+  number: matchValueSchema,
   red1: z.string(),
   red2: z.string(),
   red3: z.string(),

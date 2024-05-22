@@ -22,13 +22,13 @@
   let qrCodeReader: QrCodeReader;
 
   let qrCodeData = $state<string | undefined>(undefined);
-  let error = "";
+  let error = $state("");
 
   function onopen() {
     qrCodeReader.start();
   }
 
-  async function onconfirm() {
+  function onconfirm() {
     if (!qrCodeData) {
       error = "No input";
       return;
@@ -115,5 +115,8 @@
   />
   {#if qrCodeData}
     <span>{qrCodeData}</span>
+  {/if}
+  {#if error}
+    <span>{error}</span>
   {/if}
 </Dialog>
