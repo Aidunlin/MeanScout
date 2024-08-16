@@ -1,109 +1,54 @@
-export const fieldTypes = ["team", "match", "toggle", "number", "select", "text", "rating", "timer", "group"] as const;
-export type FieldType = (typeof fieldTypes)[number];
+import { z } from "zod";
+import type { Entry } from "./entry";
+import type { Target } from "./settings";
+import type { Survey } from "./survey";
 
-type BaseField<T extends FieldType> = {
-  name: string;
-  type: T;
-};
+export const valueSchema = z.string().or(z.number()).or(z.boolean());
+export type Value = z.infer<typeof valueSchema>;
 
-type TeamField = BaseField<"team">;
-type MatchField = BaseField<"match">;
-type ToggleField = BaseField<"toggle">;
-type NumberField = BaseField<"number"> & { allowNegative?: boolean };
-type SelectField = BaseField<"select"> & { values: string[] };
-type TextField = BaseField<"text"> & { long?: boolean; tip?: string };
-type RatingField = BaseField<"rating">;
-type TimerField = BaseField<"timer">;
-type GroupField = BaseField<"group"> & { fields: Exclude<Field, GroupField>[] };
+export const matchValueSchema = z.number().int().gt(0);
 
-export type Field =
-  | TeamField
-  | MatchField
-  | ToggleField
-  | NumberField
-  | SelectField
-  | TextField
-  | RatingField
-  | TimerField
-  | GroupField;
+export const matchSchema = z.object({
+  number: matchValueSchema,
+  red1: z.string(),
+  red2: z.string(),
+  red3: z.string(),
+  blue1: z.string(),
+  blue2: z.string(),
+  blue3: z.string(),
+});
+export type Match = z.infer<typeof matchSchema>;
 
-export type Match = {
-  number: number;
-  red1: string;
-  red2: string;
-  red3: string;
-  blue1: string;
-  blue2: string;
-  blue3: string;
-};
-
-export type Survey = {
-  name: string;
-  tbaEventKey?: string | undefined;
-  fields: Field[];
-  matches: Match[];
-  teams: string[];
-  created: Date;
-  modified: Date;
-};
-
-export const entryStatuses = ["draft", "submitted", "exported"] as const;
-export type EntryStatus = (typeof entryStatuses)[number];
-
-export type Entry = {
-  surveyId: number;
-  status: EntryStatus;
-  values: any[];
-  created: Date;
-  modified: Date;
-};
-
-export function getDefaultFieldValue(field: Exclude<Field, GroupField>) {
-  switch (field.type) {
-    case "team":
-      return "";
-    case "match":
-      return 1;
-    case "toggle":
-      return false;
-    case "number":
-      return 0;
-    case "select":
-      return field.values[0];
-    case "text":
-      return "";
-    case "rating":
-      return 0;
-    case "timer":
-      return 0;
-    default:
-      const unhandledType: never = field;
-      throw new Error(`Unhandled type for field ${unhandledType}`);
-  }
-}
-
-export function flattenFields(fields: Field[]) {
-  return fields.flatMap((field) => (field.type == "group" ? field.fields : field));
-}
-
-const API_URL = "https://www.thebluealliance.com/api/v3";
-
-export async function fetchTBA(endpoint: string, tbaKey: string) {
-  const response = await fetch(`${API_URL}${endpoint}`, {
-    headers: [["X-TBA-Auth-Key", tbaKey]],
-  });
-
-  let data = await response.json();
-
-  if (response.status == 200) {
-    return { status: "success" as const, data };
-  } else if (response.status == 401) {
-    return { status: "unauthorized" as const, error: data.Error };
-  } else if (response.status == 404) {
-    return { status: "not found" as const };
+export function createEntryFileName(survey: Survey, entryOrEntries: Entry | Entry[], target?: Target) {
+  if (Array.isArray(entryOrEntries)) {
+    if (target) {
+      var fileName = `${survey.name}-entries-${target}.csv`;
+    } else {
+      var fileName = `${survey.name}-entries.csv`;
+    }
+  } else if (entryOrEntries.type == "match") {
+    var fileName = `${survey.name}-entry-${entryOrEntries.team}-${entryOrEntries.match}-${entryOrEntries.absent}.csv`;
   } else {
-    return { status: "error" as const };
+    var fileName = `${survey.name}-entry-${entryOrEntries.team}.csv`;
   }
+
+  return fileName.replaceAll(" ", "_");
+}
+
+export function parseValueFromString(value: any) {
+  if (typeof value !== "string") return value;
+
+  if (value.toLowerCase() == "true") {
+    return true;
+  } else if (value.toLowerCase() == "false") {
+    return false;
+  } else if (value == "") {
+    return "";
+  } else if (!Number.isNaN(Number(value))) {
+    return Number(value);
+  }
+
+  return value;
 }
 
 export function persistStorage() {
@@ -122,7 +67,7 @@ export function download(data: string, name: string, type: string) {
   const url = URL.createObjectURL(blob);
 
   const anchor = document.createElement("a");
-  anchor.download = name.replaceAll(" ", "_");
+  anchor.download = name;
   anchor.href = url;
   document.body.append(anchor);
   anchor.click();
@@ -131,7 +76,11 @@ export function download(data: string, name: string, type: string) {
   URL.revokeObjectURL(url);
 }
 
-export function share(data: string, name: string, type: string) {
-  const file = new File([data], name.replaceAll(" ", "_"), { type });
+export function shareAsFile(data: string, name: string, type: string) {
+  const file = new File([data], name, { type });
   navigator.share({ files: [file], title: file.name });
+}
+
+export function shareAsText(data: string, name: string) {
+  navigator.share({ text: data, title: name });
 }

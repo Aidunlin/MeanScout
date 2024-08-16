@@ -2,33 +2,41 @@
   import { persistStorage } from "$lib";
   import Container from "$lib/components/Container.svelte";
   import Header from "$lib/components/Header.svelte";
+  import type { Entry } from "$lib/entry";
+  import { fieldTypes, flattenFields, type Field } from "$lib/field";
   import "$lib/global.css";
-  import AboutPage from "$lib/pages/AboutPage.svelte";
-  import EntryPage from "$lib/pages/EntryPage.svelte";
-  import MainPage from "$lib/pages/MainPage.svelte";
-  import SettingsPage from "$lib/pages/SettingsPage.svelte";
-  import SurveyEntriesPage from "$lib/pages/SurveyEntriesPage.svelte";
-  import SurveyFieldsPage from "$lib/pages/SurveyFieldsPage.svelte";
-  import SurveyMatchesPage from "$lib/pages/SurveyMatchesPage.svelte";
-  import SurveyOptionsPage from "$lib/pages/SurveyOptionsPage.svelte";
-  import SurveyPage from "$lib/pages/SurveyPage.svelte";
-  import SurveyTeamsPage from "$lib/pages/SurveyTeamsPage.svelte";
+  import type { MatchSurvey } from "$lib/survey";
   import type { ComponentProps } from "svelte";
+  import AboutPage from "./about/AboutPage.svelte";
+  import EntryPage from "./entry/EntryPage.svelte";
+  import MainPage from "./main/MainPage.svelte";
+  import SettingsPage from "./settings/SettingsPage.svelte";
+  import SurveyPage from "./survey/SurveyPage.svelte";
+  import SurveyAnalysisPage from "./survey/analysis/SurveyAnalysisPage.svelte";
+  import SurveyEntriesPage from "./survey/entries/SurveyEntriesPage.svelte";
+  import SurveyFieldsPage from "./survey/fields/SurveyFieldsPage.svelte";
+  import SurveyMatchesPage from "./survey/matches/SurveyMatchesPage.svelte";
+  import SurveyOptionsPage from "./survey/options/SurveyOptionsPage.svelte";
+  import SurveyTeamsPage from "./survey/teams/SurveyTeamsPage.svelte";
 
-  let idbError: string;
+  let idbError = $state("");
   let idb: IDBDatabase;
 
-  let current:
+  type CurrentPage =
+    | undefined
     | { page: ""; props: ComponentProps<MainPage> }
     | { page: "settings"; props: ComponentProps<SettingsPage> }
     | { page: "about"; props: ComponentProps<AboutPage> }
     | { page: "survey"; subpage: ""; props: ComponentProps<SurveyPage> }
     | { page: "survey"; subpage: "entries"; props: ComponentProps<SurveyEntriesPage> }
+    | { page: "survey"; subpage: "analysis"; props: ComponentProps<SurveyAnalysisPage> }
     | { page: "survey"; subpage: "fields"; props: ComponentProps<SurveyFieldsPage> }
     | { page: "survey"; subpage: "matches"; props: ComponentProps<SurveyMatchesPage> }
     | { page: "survey"; subpage: "teams"; props: ComponentProps<SurveyTeamsPage> }
     | { page: "survey"; subpage: "options"; props: ComponentProps<SurveyOptionsPage> }
     | { page: "entry"; props: ComponentProps<EntryPage> };
+
+  let current = $state<CurrentPage>(undefined);
 
   function setMainPage() {
     if (current?.page == "") {
@@ -63,13 +71,25 @@
     };
   }
 
-  function setSurveyPage(id: number, subpage: "" | "entries" | "fields" | "matches" | "teams" | "options") {
+  function setSurveyPage(
+    id: number,
+    subpage: "" | "entries" | "analysis" | "fields" | "matches" | "teams" | "options",
+  ) {
     if (current?.page == "survey" && current.props.surveyRecord.id == id) {
       current.subpage = subpage;
       return;
     }
 
     if (current?.page == "entry") {
+      if (subpage == "analysis" || subpage == "matches") {
+        current = {
+          page: "survey",
+          subpage,
+          props: { idb, surveyRecord: current.props.surveyRecord as IDBRecord<MatchSurvey> },
+        };
+        return;
+      }
+
       current = {
         page: "survey",
         subpage,
@@ -85,8 +105,21 @@
       const surveyRecord = surveyRequest.result;
       if (!surveyRecord) return setMainPage();
 
-      if (!Array.isArray(surveyRecord.matches)) {
-        surveyRecord.matches = [];
+      if (!surveyRecord.expressions) {
+        surveyRecord.expressions = [];
+      }
+
+      if (!surveyRecord.pickLists) {
+        surveyRecord.pickLists = [];
+      }
+
+      if (subpage == "analysis" || subpage == "matches") {
+        current = {
+          page: "survey",
+          subpage,
+          props: { idb, surveyRecord: surveyRecord as IDBRecord<MatchSurvey> },
+        };
+        return;
       }
 
       current = {
@@ -134,8 +167,12 @@
         const surveyRecord = surveyRequest.result;
         if (!surveyRecord) return setMainPage();
 
-        if (!Array.isArray(surveyRecord.matches)) {
-          surveyRecord.matches = [];
+        if (!surveyRecord.expressions) {
+          surveyRecord.expressions = [];
+        }
+
+        if (!surveyRecord.pickLists) {
+          surveyRecord.pickLists = [];
         }
 
         current = {
@@ -163,6 +200,7 @@
       const subpage =
         hash[2] == "" ||
         hash[2] == "entries" ||
+        hash[2] == "analysis" ||
         hash[2] == "fields" ||
         hash[2] == "matches" ||
         hash[2] == "teams" ||
@@ -179,62 +217,129 @@
     }
   }
 
-  function migrateSurveys(transaction: IDBTransaction) {
-    const surveyStore = transaction.objectStore("surveys");
+  function migrateEntries(entryStore: IDBStore<Entry>, surveyId: number, flattenedFields: any[]) {
+    const entryCursorRequest = entryStore.index("surveyId").openCursor(surveyId);
+    entryCursorRequest.onerror = () => {};
 
-    const surveyCursor = surveyStore.openCursor();
-    surveyCursor.onerror = () => {};
+    entryCursorRequest.onsuccess = () => {
+      const entryCursor = entryCursorRequest.result;
+      if (!entryCursor) return;
 
-    surveyCursor.onsuccess = () => {
-      const cursor = surveyCursor.result;
-      if (!cursor) return;
+      const entry = entryCursor.value as any;
 
-      const survey = cursor.value as any;
+      if (!entry.type) {
+        entry.type = "match";
+      }
 
-      if (Array.isArray(survey.configs)) {
-        survey.fields = survey.configs;
-        for (const field of survey.fields) {
-          if (Array.isArray(field.configs)) {
-            field.fields = field.configs;
-            delete field.configs;
+      flattenedFields.forEach((field, i) => {
+        if (field.type == "team") {
+          entry.team = entry.values[i];
+          entry.values.splice(i, 1);
+        }
+
+        if (entry.type == "match") {
+          if (field.type == "match") {
+            entry.match = entry.values[i];
+            entry.values.splice(i, 1);
+          }
+
+          if (field.type == "toggle" && field.name == "Absent") {
+            entry.absent = entry.values[i];
+            entry.values.splice(i, 1);
           }
         }
-        delete survey.configs;
+      });
+
+      if (!entry.team) {
+        entry.team = "";
       }
 
-      if (Array.isArray(survey.entries)) {
-        const entryStore = transaction.objectStore("entries");
-        for (const entry of survey.entries) {
-          entry.surveyId = cursor.key;
-          entryStore.add(entry);
+      if (entry.type == "match") {
+        if (!entry.match) {
+          entry.match = 1;
         }
-        delete survey.entries;
+
+        if (!entry.absent) {
+          entry.absent = false;
+        }
       }
 
-      cursor.update(survey);
-      cursor.continue();
+      entryCursor.update(entry);
+      entryCursor.continue();
+    };
+  }
+
+  function migrateFields<T extends Field>(fields: T[]) {
+    return fields
+      .map((field) => {
+        if (field.type == "group") {
+          field.fields = migrateFields(field.fields);
+        }
+        return field;
+      })
+      .filter((field) => fieldTypes.includes(field.type) && !(field.type == "toggle" && field.name == "Absent"));
+  }
+
+  function migrateSurveys(transaction: IDBTransaction) {
+    const surveyStore = transaction.objectStore("surveys");
+    const entryStore = transaction.objectStore("entries");
+
+    const surveyCursorRequest = surveyStore.openCursor();
+    surveyCursorRequest.onerror = () => {};
+
+    surveyCursorRequest.onsuccess = () => {
+      const surveyCursor = surveyCursorRequest.result;
+      if (!surveyCursor) return;
+
+      const survey = surveyCursor.value as any;
+
+      if (!survey.type) {
+        survey.type = "match";
+      }
+
+      if (survey.type == "match" && !Array.isArray(survey.matches)) {
+        survey.matches = [];
+      }
+
+      migrateEntries(entryStore, survey.id, flattenFields(survey.fields));
+
+      survey.fields = migrateFields(survey.fields);
+
+      if (!survey.expressions) {
+        survey.expressions = [];
+      }
+
+      if (!survey.pickLists) {
+        survey.pickLists = [];
+      }
+
+      surveyCursor.update(survey);
+      surveyCursor.continue();
     };
   }
 
   function openIDB() {
-    const request = indexedDB.open("MeanScout", 7);
+    const request = indexedDB.open("MeanScout", 8);
     request.onerror = () => (idbError = `${request.error?.message}`);
 
     request.onupgradeneeded = (e) => {
       const storeNames = request.result.objectStoreNames;
 
-      if (storeNames.contains("drafts")) {
-        request.result.deleteObjectStore("drafts");
-      }
-
       if (!storeNames.contains("entries")) {
         const entryStore = request.result.createObjectStore("entries", { keyPath: "id", autoIncrement: true });
         entryStore.createIndex("surveyId", "surveyId", { unique: false });
+      } else if (request.transaction) {
+        const entryStore = request.transaction.objectStore("entries");
+        if (!entryStore.indexNames.contains("surveyId")) {
+          entryStore.createIndex("surveyId", "surveyId", { unique: false });
+        }
       }
 
       if (!storeNames.contains("surveys")) {
         request.result.createObjectStore("surveys", { keyPath: "id", autoIncrement: true });
-      } else if (e.oldVersion < 6 && request.transaction) {
+      }
+
+      if (e.oldVersion < 8 && request.transaction) {
         migrateSurveys(request.transaction);
       }
     };
@@ -276,6 +381,8 @@
     <SurveyPage {...current.props} />
   {:else if current.subpage == "entries"}
     <SurveyEntriesPage {...current.props} />
+  {:else if current.subpage == "analysis"}
+    <SurveyAnalysisPage {...current.props} />
   {:else if current.subpage == "fields"}
     <SurveyFieldsPage {...current.props} />
   {:else if current.subpage == "matches"}

@@ -132,3 +132,22 @@ i,
 option {
   color: var(--theme-color);
 }
+
+.dialog-overflow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--inner-gap);
+  max-height: 500px;
+  overflow: auto;
+  padding: 2px;
+}
+
+.team-rank-table {
+  text-align: right;
+  width: 100%;
+}
+
+.team-rank-table td,
+.team-rank-table th {
+  padding: var(--outer-gap);
+}

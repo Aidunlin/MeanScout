@@ -1,15 +1,25 @@
 <script lang="ts">
+  import type { Snippet } from "svelte";
   import Button from "./Button.svelte";
   import Container from "./Container.svelte";
   import Icon from "./Icon.svelte";
 
+  let {
+    onopen = undefined,
+    onconfirm = undefined,
+    onclose = undefined,
+    children,
+  }: {
+    onopen?: ((element: HTMLDialogElement) => void) | undefined;
+    onconfirm?: (() => void) | undefined;
+    onclose?: (() => void) | undefined;
+    children: Snippet;
+  } = $props();
+
   let element: HTMLDialogElement;
 
-  export let onOpen: ((element: HTMLDialogElement) => void) | undefined = undefined;
-  export let onConfirm: (() => void) | undefined = undefined;
-
   export function open() {
-    onOpen && onOpen(element);
+    onopen && onopen(element);
     element.showModal();
   }
 
@@ -18,18 +28,16 @@
   }
 </script>
 
-<slot name="opener" {open} />
-
-<dialog bind:this={element} on:close>
-  <slot />
+<dialog bind:this={element} {onclose}>
+  {@render children()}
   <Container spaceBetween>
-    {#if onConfirm}
-      <Button on:click={() => onConfirm && onConfirm()}>
+    {#if onconfirm}
+      <Button onclick={() => onconfirm && onconfirm()}>
         <Icon name="check" />
         Confirm
       </Button>
     {/if}
-    <Button on:click={close}>
+    <Button onclick={close}>
       <Icon name="xmark" />
       Close
     </Button>
@@ -44,6 +52,10 @@
     max-height: 100dvh;
     padding: var(--outer-gap);
     width: min(100dvw, 540px);
+  }
+
+  dialog:focus-visible {
+    outline: none;
   }
 
   dialog::backdrop {
