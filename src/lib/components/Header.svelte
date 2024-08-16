@@ -1,17 +1,23 @@
 <script lang="ts">
-  import Anchor from "$lib/components/Anchor.svelte";
-  import Container from "$lib/components/Container.svelte";
-  import Icon from "$lib/components/Icon.svelte";
   import { modeStore, targetStore } from "$lib/settings";
+  import Anchor from "./Anchor.svelte";
+  import Container from "./Container.svelte";
+  import Icon from "./Icon.svelte";
 
-  export let backLink: string | undefined = undefined;
-  export let title: string | undefined = undefined;
-  export let iconName: string | undefined = undefined;
+  let {
+    backLink = undefined,
+    title = undefined,
+    iconName = undefined,
+  }: {
+    backLink?: string | undefined;
+    title?: string | undefined;
+    iconName?: string | undefined;
+  } = $props();
 </script>
 
 <header>
   {#if backLink !== undefined}
-    <Anchor hash={backLink}>
+    <Anchor route={backLink}>
       <Icon name="arrow-left" />
     </Anchor>
   {/if}

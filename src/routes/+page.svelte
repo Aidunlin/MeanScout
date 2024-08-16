@@ -1,26 +1,29 @@
 <script lang="ts">
-  import { persistStorage, type Entry, type MatchSurvey } from "$lib";
+  import { persistStorage } from "$lib";
   import Container from "$lib/components/Container.svelte";
   import Header from "$lib/components/Header.svelte";
+  import type { Entry } from "$lib/entry";
   import { fieldTypes, flattenFields, type Field } from "$lib/field";
   import "$lib/global.css";
-  import AboutPage from "$lib/pages/AboutPage.svelte";
-  import EntryPage from "$lib/pages/EntryPage.svelte";
-  import MainPage from "$lib/pages/MainPage.svelte";
-  import SettingsPage from "$lib/pages/SettingsPage.svelte";
-  import SurveyAnalysisPage from "$lib/pages/survey/SurveyAnalysisPage.svelte";
-  import SurveyEntriesPage from "$lib/pages/survey/SurveyEntriesPage.svelte";
-  import SurveyFieldsPage from "$lib/pages/survey/SurveyFieldsPage.svelte";
-  import SurveyMatchesPage from "$lib/pages/survey/SurveyMatchesPage.svelte";
-  import SurveyOptionsPage from "$lib/pages/survey/SurveyOptionsPage.svelte";
-  import SurveyPage from "$lib/pages/survey/SurveyPage.svelte";
-  import SurveyTeamsPage from "$lib/pages/survey/SurveyTeamsPage.svelte";
+  import type { MatchSurvey } from "$lib/survey";
   import type { ComponentProps } from "svelte";
+  import AboutPage from "./about/AboutPage.svelte";
+  import EntryPage from "./entry/EntryPage.svelte";
+  import MainPage from "./main/MainPage.svelte";
+  import SettingsPage from "./settings/SettingsPage.svelte";
+  import SurveyPage from "./survey/SurveyPage.svelte";
+  import SurveyAnalysisPage from "./survey/analysis/SurveyAnalysisPage.svelte";
+  import SurveyEntriesPage from "./survey/entries/SurveyEntriesPage.svelte";
+  import SurveyFieldsPage from "./survey/fields/SurveyFieldsPage.svelte";
+  import SurveyMatchesPage from "./survey/matches/SurveyMatchesPage.svelte";
+  import SurveyOptionsPage from "./survey/options/SurveyOptionsPage.svelte";
+  import SurveyTeamsPage from "./survey/teams/SurveyTeamsPage.svelte";
 
-  let idbError: string;
+  let idbError = $state("");
   let idb: IDBDatabase;
 
-  let current:
+  type CurrentPage =
+    | undefined
     | { page: ""; props: ComponentProps<MainPage> }
     | { page: "settings"; props: ComponentProps<SettingsPage> }
     | { page: "about"; props: ComponentProps<AboutPage> }
@@ -32,6 +35,8 @@
     | { page: "survey"; subpage: "teams"; props: ComponentProps<SurveyTeamsPage> }
     | { page: "survey"; subpage: "options"; props: ComponentProps<SurveyOptionsPage> }
     | { page: "entry"; props: ComponentProps<EntryPage> };
+
+  let current = $state<CurrentPage>(undefined);
 
   function setMainPage() {
     if (current?.page == "") {

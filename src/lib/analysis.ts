@@ -1,100 +1,67 @@
-import type { Entry } from "$lib";
-import { getDetailedFieldName, type Field } from "$lib/field";
+import { valueSchema } from "$lib";
+import { z } from "zod";
+import type { Entry } from "./entry";
 
-export const expressionInputTypes = ["field", "expression"] as const;
-export type ExpressionInputType = (typeof expressionInputTypes)[number];
+const fieldAsExpressionInputSchema = z.object({ from: z.literal("field"), fieldIndex: z.number() });
+export type FieldAsExpressionInput = z.infer<typeof fieldAsExpressionInputSchema>;
 
-type BaseExpressionInput<T extends ExpressionInputType> = {
-  from: T;
-};
+const expressionAsExpressionInputSchema = z.object({ from: z.literal("expression"), expressionName: z.string() });
+export type ExpressionAsExpressionInput = z.infer<typeof expressionAsExpressionInputSchema>;
 
-export type FieldAsExpressionInput = BaseExpressionInput<"field"> & {
-  fieldIndex: number;
-};
-export type ExpressionAsExpressionInput = BaseExpressionInput<"expression"> & {
-  expressionName: string;
-};
+const expressionInputSchema = z.discriminatedUnion("from", [
+  fieldAsExpressionInputSchema,
+  expressionAsExpressionInputSchema,
+]);
+export type ExpressionInput = z.infer<typeof expressionInputSchema>;
 
-export type ExpressionInput = FieldAsExpressionInput | ExpressionAsExpressionInput;
+const baseExpressionSchema = z.object({
+  name: z.string(),
+  inputs: z.array(expressionInputSchema).nonempty(),
+});
 
 export const reduceExpressionTypes = ["average", "min", "max", "sum", "count"] as const;
-export type ReduceExpressionType = (typeof reduceExpressionTypes)[number];
+
+const reduceExpressionSchema = z.discriminatedUnion("type", [
+  baseExpressionSchema.merge(z.object({ type: z.literal("average") })),
+  baseExpressionSchema.merge(z.object({ type: z.literal("min") })),
+  baseExpressionSchema.merge(z.object({ type: z.literal("max") })),
+  baseExpressionSchema.merge(z.object({ type: z.literal("sum") })),
+  baseExpressionSchema.merge(z.object({ type: z.literal("count"), valueToCount: valueSchema })),
+]);
+export type ReduceExpression = z.infer<typeof reduceExpressionSchema>;
 
 export const mapExpressionTypes = ["convert", "multiply", "divide", "abs"] as const;
-export type MapExpressionType = (typeof mapExpressionTypes)[number];
 
-export const expressionTypes = [...reduceExpressionTypes, ...mapExpressionTypes] as const;
-export type ExpressionType = (typeof expressionTypes)[number];
+const convertExpressionSchema = baseExpressionSchema.merge(
+  z.object({
+    type: z.literal("convert"),
+    converters: z.array(z.object({ from: valueSchema, to: valueSchema })),
+    defaultTo: valueSchema,
+  }),
+);
+export type ConvertExpression = z.infer<typeof convertExpressionSchema>;
 
-type BaseExpression<T extends ExpressionType> = {
-  name: string;
-  type: T;
-  inputs: ExpressionInput[];
-};
+const divisorSchema = z.number().gt(0).or(z.number().lt(0));
 
-type AverageExpression = BaseExpression<"average">;
-type MinExpression = BaseExpression<"min">;
-type MaxExpression = BaseExpression<"max">;
-type SumExpression = BaseExpression<"sum">;
-type CountExpression = BaseExpression<"count"> & {
-  valueToCount: any;
-};
+const mapExpressionSchema = z.discriminatedUnion("type", [
+  convertExpressionSchema,
+  baseExpressionSchema.merge(z.object({ type: z.literal("multiply"), multiplier: z.number().finite() })),
+  baseExpressionSchema.merge(z.object({ type: z.literal("divide"), divisor: divisorSchema })),
+  baseExpressionSchema.merge(z.object({ type: z.literal("abs") })),
+]);
+export type MapExpression = z.infer<typeof mapExpressionSchema>;
 
-export type ConvertExpression = BaseExpression<"convert"> & {
-  converters: {
-    from: any;
-    to: any;
-  }[];
-  defaultTo: any;
-};
-type MultiplyExpression = BaseExpression<"multiply"> & {
-  multiplier: number;
-};
-type DivideExpression = BaseExpression<"divide"> & {
-  divisor: number;
-};
-type AbsExpression = BaseExpression<"abs">;
+export const expressionSchema = z.discriminatedUnion("type", [
+  ...reduceExpressionSchema.options,
+  ...mapExpressionSchema.options,
+]);
+export type Expression = z.infer<typeof expressionSchema>;
 
-export type ReduceExpression = AverageExpression | MinExpression | MaxExpression | SumExpression | CountExpression;
-export type MapExpression = ConvertExpression | MultiplyExpression | DivideExpression | AbsExpression;
-export type Expression = ReduceExpression | MapExpression;
-
-export type PickList = {
-  name: string;
-  weights: {
-    expressionName: string;
-    percentage: number;
-  }[];
-};
-
-export function generateExpressionName(expressions: Expression[], fields: Field[], expression: Expression) {
-  let name = `${expression.type.toUpperCase()} `;
-  if (reduceExpressionTypes.includes(expression.type as ReduceExpressionType)) {
-    name += "OF ";
-  }
-  if (expression.type == "count") {
-    name += expression.valueToCount + " IN ";
-  }
-  name += "(";
-  name += expression.inputs
-    .map((input) => {
-      if (input.from == "field") {
-        return `field: ${getDetailedFieldName(fields, input.fieldIndex)}`;
-      } else {
-        let subExpression = expressions.find((e) => e.name == input.expressionName);
-        return subExpression?.name;
-      }
-    })
-    .filter((thing) => thing)
-    .join(", ");
-  name += ")";
-  if (expression.type == "multiply") {
-    name += ` BY ${expression.multiplier}`;
-  } else if (expression.type == "divide") {
-    name += ` BY ${expression.divisor}`;
-  }
-  return name;
-}
+export const pickListSchema = z.object({
+  name: z.string(),
+  weights: z.array(z.object({ expressionName: z.string(), percentage: z.number() })),
+});
+export type PickList = z.infer<typeof pickListSchema>;
 
 export function calculateTeamData(
   expressionName: string,

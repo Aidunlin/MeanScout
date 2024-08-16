@@ -1,22 +1,64 @@
+import { z } from "zod";
+
 export const fieldTypes = ["toggle", "number", "select", "text", "rating", "timer", "group"] as const;
 export type FieldType = (typeof fieldTypes)[number];
 
-type BaseField<T extends FieldType> = {
-  name: string;
-  type: T;
-};
+const toggleFieldSchema = z.object({
+  name: z.string(),
+  type: z.literal("toggle"),
+});
+export type ToggleField = z.infer<typeof toggleFieldSchema>;
 
-type ToggleField = BaseField<"toggle">;
-type NumberField = BaseField<"number"> & { allowNegative?: boolean };
-type SelectField = BaseField<"select"> & { values: string[] };
-type TextField = BaseField<"text"> & { long?: boolean; tip?: string };
-type RatingField = BaseField<"rating">;
-type TimerField = BaseField<"timer">;
-type GroupField = BaseField<"group"> & { fields: Exclude<Field, GroupField>[] };
+const numberFieldSchema = z.object({
+  name: z.string(),
+  type: z.literal("number"),
+  allowNegative: z.optional(z.boolean()),
+});
+export type NumberField = z.infer<typeof numberFieldSchema>;
 
-export type Field = ToggleField | NumberField | SelectField | TextField | RatingField | TimerField | GroupField;
+const selectFieldSchema = z.object({
+  name: z.string(),
+  type: z.literal("select"),
+  values: z.array(z.string()).nonempty(),
+});
+export type SelectField = z.infer<typeof selectFieldSchema>;
 
-export function getDefaultFieldValue(field: Exclude<Field, GroupField>) {
+const textFieldSchema = z.object({
+  name: z.string(),
+  type: z.literal("text"),
+  long: z.optional(z.boolean()),
+  tip: z.optional(z.string()),
+});
+export type TextField = z.infer<typeof textFieldSchema>;
+
+const ratingFieldSchema = z.object({
+  name: z.string(),
+  type: z.literal("rating"),
+});
+export type RatingField = z.infer<typeof ratingFieldSchema>;
+
+const timerFieldSchema = z.object({
+  name: z.string(),
+  type: z.literal("timer"),
+});
+export type TimerField = z.infer<typeof timerFieldSchema>;
+
+const singleFieldSchema = z.discriminatedUnion("type", [
+  toggleFieldSchema,
+  numberFieldSchema,
+  selectFieldSchema,
+  textFieldSchema,
+  ratingFieldSchema,
+  timerFieldSchema,
+]);
+type SingleField = z.infer<typeof singleFieldSchema>;
+
+const groupFieldSchema = z.object({ name: z.string(), type: z.literal("group"), fields: z.array(singleFieldSchema) });
+
+export const fieldSchema = z.discriminatedUnion("type", [...singleFieldSchema.options, groupFieldSchema]);
+export type Field = z.infer<typeof fieldSchema>;
+
+export function getDefaultFieldValue(field: SingleField) {
   switch (field.type) {
     case "toggle":
       return false;

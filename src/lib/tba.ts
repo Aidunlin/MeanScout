@@ -1,4 +1,4 @@
-import type { Match } from "$lib";
+import type { Match } from "./";
 
 const API_URL = "https://www.thebluealliance.com/api/v3";
 
